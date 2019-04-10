@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+   配置说明：
+   主要分为两部分内容: 缓存引擎：cacheEngine，定义存储缓存内容信息,CacheItem，定义缓存的项目
+   缓存引擎配置说明：
+        1、engineName：必须 缓存引擎名字在，cacheEngines中必须唯一
+        2、implClass： 必须 缓存引擎实现类，要求实现com.sinosoft.ops.kit.cache.OpsCache接口
+        3、engineDesc  可选 缓存引擎描述信息
+        4、params：    可选 缓存引擎初始化时候传递的参数
+   缓存项目配置说明：
+        1、cacheName： 必须 缓存大类，在CacheItems内必须唯一
+        2、engineName：必须 缓存大类使用的主缓存引擎
+        3、params：    可选 缓存项目配置参数，各个缓存引擎初始化时候可以获取该参数，
+            注意：参数名称以cacheEngine开头的参数将作为内部使用，用于定义缓存的多级缓存，可以定义多个多级缓存
+            多级缓存说明：主缓存又称为一级缓存，主要存储到本机；二级缓存主要是非本机缓存用于加快缓存的加装速度。
+                           保存一个项目时候会将缓存信息保存到配置的所有基本的缓存引擎中
+                           读取一个项目时候优先读取主缓存，不能再读取二级缓存中的内容，如果从二级缓存中读取到内容则将缓存信息
+                           保存到本地主缓存以加快下次读取速度
+
+    ehcache引擎缓存可用参数说明：
+        1、cacheTemplateName 使用的Ehcache模板（ehcache.xml)中配置
+        2、maxBytesLocalOffHeap 大类使用的最大非栈内存大小
+        3、maxBytesLocalHeap 大类使用的最大堆内存大小
+-->
+<CacheManagerInfo>
+    <CacheEngines>
+        <CacheEngine>
+            <engineName>ehcache</engineName>
+            <implClass>com.sinosoft.ops.cimp.cache.ehcache.EhCacheEngine</implClass>
+            <engineDesc>Ehcache缓存实现</engineDesc>
+        </CacheEngine>
+        <CacheEngine>
+            <engineName>hashCache</engineName>
+            <implClass>com.sinosoft.ops.cimp.cache.hashcache.SimpleCacheEngine</implClass>
+            <engineDesc>基于内存的HashMap缓存</engineDesc>
+        </CacheEngine>
+        <CacheEngine>
+            <engineName>fileCache</engineName>
+            <implClass>com.sinosoft.ops.cimp.cache.file.FileCacheEngine</implClass>
+            <engineDesc>基于文件的序列化缓存实现</engineDesc>
+        </CacheEngine>
+        <CacheEngine>
+            <engineName>emptyCache</engineName>
+            <implClass>com.sinosoft.ops.cimp.cache.empty.EmptyCacheEngine</implClass>
+            <engineDesc>不缓存配置</engineDesc>
+        </CacheEngine>
+    </CacheEngines>
+    <CacheListeners>
+        <CacheListener>
+            <listenerName>cacheListener</listenerName>
+            <implClass>com.sinosoft.ops.cimp.cache.listener.imp.ExpireCacheListenerImpl</implClass>
+            <listenerDesc>对缓存信息监听处理的实现</listenerDesc>
+            <params>
+                <!--清理任务调度执行的时间，默认1秒，单位 秒 -->
+                <param name="scheduleTimerTime" value="30000"/>
+            </params>
+        </CacheListener>
+    </CacheListeners>
+    <CacheItems>
+        <!--
+            系统配置数据，每个主机一份，使用默认缓存模板
+            缓存策略：当前主机内存及磁盘文件
+            内存置换策略：较少使用（LFU）
+        -->
+        <CacheItem>
+            <cacheName>PASSWORD_RETRY_COUNT_CACHE</cacheName>
+            <engineName>hashCache</engineName>
+            <cacheDesc>密码重试次数缓存</cacheDesc>
+        </CacheItem>
+        <CacheItem>
+            <cacheName>SYS_CONFIG_PROPERTIES_CACHE</cacheName>
+            <engineName>hashCache</engineName>
+            <cacheDesc>缓存properties及xml配置文件</cacheDesc>
+        </CacheItem>
+        <CacheItem>
+            <cacheName>ENTITY_INFO_CACHE</cacheName>
+            <engineName>hashCache</engineName>
+            <cacheDesc>所有实体缓存</cacheDesc>
+        </CacheItem>
+        <CacheItem>
+            <cacheName>ENTITY_INFO_DTO_CACHE</cacheName>
+            <engineName>hashCache</engineName>
+            <cacheDesc>所有实体DTO缓存</cacheDesc>
+        </CacheItem>
+        <CacheItem>
+            <cacheName>ALL_CADRES_CACHE</cacheName>
+            <engineName>ehcache</engineName>
+            <cacheDesc>所有干部列表缓存</cacheDesc>
+        </CacheItem>
+        <CacheItem>
+            <cacheName>DEPARTMENT_CADRE_CACHE</cacheName>
+            <engineName>ehcache</engineName>
+            <cacheDesc>所有单位包含中管干部缓存</cacheDesc>
+        </CacheItem>
+        <CacheItem>
+            <cacheName>DEPARTMENT_TRAIN_QUOTA_CACHE</cacheName>
+            <engineName>ehcache</engineName>
+            <cacheDesc>所有单位本届5年调训完成率缓存</cacheDesc>
+        </CacheItem>
+        <CacheItem>
+            <cacheName>REGISTRATION_DEPARTMENT_TREE_CACHE</cacheName>
+            <engineName>ehcache</engineName>
+            <cacheDesc>报名单位树缓存</cacheDesc>
+        </CacheItem>
+        <CacheItem>
+            <cacheName>TRAIN_DEPARTMENT_TREE_CACHE</cacheName>
+            <engineName>ehcache</engineName>
+            <cacheDesc>培训机构树缓存</cacheDesc>
+        </CacheItem>
+        <CacheItem>
+            <cacheName>TRAINING_COURSE</cacheName>
+            <engineName>ehcache</engineName>
+            <cacheDesc>培训班数据缓存</cacheDesc>
+        </CacheItem>
+        <!--控制层脚本缓存-->
+        <CacheItem>
+            <cacheName>SCRIPT_CONTROL_CACHE</cacheName>
+            <engineName>ehcache</engineName>
+            <cacheDesc>控制层脚本缓存</cacheDesc>
+            <params>
+                <param name="cacheTemplateName" value="scriptCacheTemplate"/>
+            </params>
+        </CacheItem>
+    </CacheItems>
+</CacheManagerInfo>
