@@ -22,15 +22,15 @@ public class SysTableType implements Serializable {
     @Column(name = "ID", length = 36)
     private String id;
     /**
-     * 类别编号
+     * 类别名称
      */
-    @Column(name = "CODE", length = 10)
-    private String code;
+    @Column(name = "NAME_CN", length = 120)
+    private String nameCn;
     /**
      * 类别名称
      */
-    @Column(name = "NAME", length = 120)
-    private String name;
+    @Column(name = "NAME_EN", length = 120)
+    private String nameEn;
     /**
      * 创建人
      */
@@ -62,20 +62,20 @@ public class SysTableType implements Serializable {
         this.id = id;
     }
 
-    public String getCode() {
-        return code;
+    public String getNameCn() {
+        return nameCn;
     }
 
-    public void setCode(String code) {
-        this.code = code;
+    public void setNameCn(String nameCn) {
+        this.nameCn = nameCn;
     }
 
-    public String getName() {
-        return name;
+    public String getNameEn() {
+        return nameEn;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setNameEn(String nameEn) {
+        this.nameEn = nameEn;
     }
 
     public String getCreateId() {

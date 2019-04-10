@@ -1,162 +1,106 @@
-package com.sinosoft.ops.cimp.entity.sys.table;
+package com.sinosoft.ops.cimp.vo.from.table;
 
-import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.*;
-import java.io.Serializable;
-import java.util.Date;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
-/**
- * 系统表字段
- */
-@Entity
-@Table(name = "SYS_TABLE_FIELD")
-public class SysTableField implements Serializable {
-    private static final long serialVersionUID = -131153731245506393L;
-    /**
-     * 主键id
-     */
-    @Id
-    @GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid", strategy = "uuid")
-    @Column(name = "ID", length = 36)
-    private String id;
+@ApiModel(value = "SysTableFieldAddModel",description = "系统表字段添加")
+public class SysTableFieldAddModel {
     /**
      * 系统表ID
      */
-    @Column(name = "SYS_TABLE_ID", length = 36)
+    @ApiModelProperty(value = "系统表ID")
     private String sysTableId;
     /**
      * 中文字段名
      */
-    @Column(name = "NAME_CN", length = 120)
+    @ApiModelProperty(value = "中文字段名")
     private String nameCn;
     /**
      * 英文字段名
      */
-    @Column(name = "NAME_EN", length = 120)
+    @ApiModelProperty(value = "英文字段名")
     private String nameEn;
     /**
      * 字段描述
      */
-    @Column(name = "DESCRIPTION", length = 300)
+    @ApiModelProperty(value = "字段描述")
     private String description;
 
     /**
      * 字段所属表名
      */
-    @Column(name = "DB_TABLE_NAME", length = 30)
+    @ApiModelProperty(value = "字段所属表名")
     private String dbTableName;
 
     /**
      * 数据库中的字段名
      */
-    @Column(name = "DB_FIELD_NAME", length = 30)
+    @ApiModelProperty(value = "数据库中的字段名")
     private String dbFieldName;
 
     /**
      * 是否主键
      */
-    @Column(name = "IS_PK", length = 10)
+    @ApiModelProperty(value = "是否主键")
     private String isPK;
 
     /**
      * 是否外键
      */
-    @Column(name = "IS_FK", length = 10)
+    @ApiModelProperty(value = "是否外键")
     private String isFK;
 
     /**
      * 数据库中的字段类型
      */
-    @Column(name = "DB_FIELD_DATA_TYPE", length = 30)
+    @ApiModelProperty(value = "数据库中的字段类型")
     private String dbFieldDataType;
 
     /**
      * 是否逻辑删除
      */
-    @Column(name = "LOGICAL_DELETE_FLAG", length = 10)
+    @ApiModelProperty(value = "是否逻辑删除")
     private String logicalDeleteFlag;
 
     /**
      * 是否级联删除
      */
-    @Column(name = "DELETE_CASCADE_FLAG", length = 10)
+    @ApiModelProperty(value = "是否级联删除")
     private String deleteCascadeFlag;
 
     /**
      * 属性值修改是否监听
      */
-    @Column(name = "ATTR_VALUE_MONITOR", length = 10)
+    @ApiModelProperty(value = "属性值修改是否监听")
     private String attrValueMonitor;
 
     /**
      * 是否可以搜索结果
      */
-    @Column(name = "CAN_RESULT_FLAG", length = 10)
+    @ApiModelProperty(value = "是否可以搜索结果")
     private String canResultFlag;
     /**
      * 是否可以作为条件字段
      */
-    @Column(name = "CAN_CONDITION_FLAG", length = 10)
+    @ApiModelProperty(value = "是否可以作为条件字段")
     private String canConditionFlag;
     /**
      * 是否可以作为排序字段
      */
-    @Column(name = "CAN_ORDER_FLAG", length = 10)
+    @ApiModelProperty(value = "是否可以作为排序字段")
     private String canOrderFlag;
 
     /**
      * html代码
      */
-    @Column(name = "DEFAULT_HTML", length = 4000)
+    @ApiModelProperty(value = "html代码")
     private String defaultHtml;
     /**
      * 默认脚本
      */
-    @Column(name = "DEFAULT_SCRIPT", length = 4000)
+    @ApiModelProperty(value = "默认脚本")
     private String defaultScript;
-
-    /**
-     * 默认引用代码集
-     */
-    @Column(name = "SYS_CODE_SET_NAME", length = 50)
-    private String sysCodeSetName;
-
-    /**
-     * 创建人
-     */
-    @Column(name = "CREATE_ID", length = 36)
-    private String createId;
-
-    /**
-     * 创建时间
-     */
-    @Column(name = "CREATE_TIME")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date createTime;
-
-    /**
-     * 修改人
-     */
-    @Column(name = "MODIFY_ID", length = 36)
-    private String modifyId;
-
-    /**
-     * 修改时间
-     */
-    @Column(name = "MODIFY_TIME")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date modifyTime;
-
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
 
     public String getSysTableId() {
         return sysTableId;
@@ -292,45 +236,5 @@ public class SysTableField implements Serializable {
 
     public void setDefaultScript(String defaultScript) {
         this.defaultScript = defaultScript;
-    }
-
-    public String getCreateId() {
-        return createId;
-    }
-
-    public void setCreateId(String createId) {
-        this.createId = createId;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public String getModifyId() {
-        return modifyId;
-    }
-
-    public String getSysCodeSetName() {
-        return sysCodeSetName;
-    }
-
-    public void setSysCodeSetName(String sysCodeSetName) {
-        this.sysCodeSetName = sysCodeSetName;
-    }
-
-    public void setModifyId(String modifyId) {
-        this.modifyId = modifyId;
-    }
-
-    public Date getModifyTime() {
-        return modifyTime;
-    }
-
-    public void setModifyTime(Date modifyTime) {
-        this.modifyTime = modifyTime;
     }
 }

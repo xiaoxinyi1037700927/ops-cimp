@@ -1,7 +1,22 @@
 package com.sinosoft.ops.cimp.service.table;
 
-/**
- * Created by Administrator on 2019/4/10.
- */
+
+import com.sinosoft.ops.cimp.dto.PaginationViewModel;
+import com.sinosoft.ops.cimp.vo.from.table.SysTableFieldAddModel;
+import com.sinosoft.ops.cimp.vo.from.table.SysTableFieldModifyModel;
+import com.sinosoft.ops.cimp.vo.from.table.SysTableFieldSearchModel;
+
 public interface SysTableFieldService {
+
+    boolean delSysTableField(String id);
+
+    boolean upSysTableField(SysTableFieldModifyModel sysTableFieldModifyModel);
+
+    boolean addSysTableField(SysTableFieldAddModel sysTableFieldAddModel);
+
+    PaginationViewModel<SysTableFieldModifyModel> findBySysTableFieldByPageOrName(SysTableFieldSearchModel sysTableFieldSearchModel);
+
+    SysTableFieldModifyModel findById(String id);
+
+
 }
