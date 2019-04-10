@@ -26,11 +26,7 @@ public class SysTable implements Serializable {
      */
     @Column(name = "SYS_TABLE_TYPE_ID", length = 36)
     private String sysTableTypeId;
-    /**
-     * 编号
-     */
-    @Column(name = "CODE", length = 10)
-    private String code;
+
     /**
      * 中文表名
      */
@@ -56,11 +52,7 @@ public class SysTable implements Serializable {
      */
     @Column(name = "DB_TABLE_NAME", length = 50)
     private String dbTableName;
-    /**
-     * 父级表名
-     */
-    @Column(name = "PARENT_DB_TABLE_NAME", length = 50)
-    private String parentDbTableName;
+
     /**
      * 排序
      */
@@ -89,6 +81,11 @@ public class SysTable implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date modifyTime;
 
+    /**
+     * 是否主集表
+     */
+    private String isMasterTable;
+
     public String getId() {
         return id;
     }
@@ -103,14 +100,6 @@ public class SysTable implements Serializable {
 
     public void setSysTableTypeId(String sysTableTypeId) {
         this.sysTableTypeId = sysTableTypeId;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
     }
 
     public String getNameCn() {
@@ -153,14 +142,6 @@ public class SysTable implements Serializable {
         this.dbTableName = dbTableName;
     }
 
-    public String getParentDbTableName() {
-        return parentDbTableName;
-    }
-
-    public void setParentDbTableName(String parentDbTableName) {
-        this.parentDbTableName = parentDbTableName;
-    }
-
     public Integer getSort() {
         return sort;
     }
@@ -199,5 +180,13 @@ public class SysTable implements Serializable {
 
     public void setModifyTime(Date modifyTime) {
         this.modifyTime = modifyTime;
+    }
+
+    public String getIsMasterTable() {
+        return isMasterTable;
+    }
+
+    public void setIsMasterTable(String isMasterTable) {
+        this.isMasterTable = isMasterTable;
     }
 }
