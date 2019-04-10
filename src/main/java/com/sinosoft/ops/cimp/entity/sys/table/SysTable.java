@@ -80,10 +80,10 @@ public class SysTable implements Serializable {
     @Column(name = "MODIFY_TIME")
     @Temporal(TemporalType.TIMESTAMP)
     private Date modifyTime;
-
     /**
      * 是否主集表
      */
+    @Column(name = "IS_MASTER_TABLE")
     private String isMasterTable;
 
     public String getId() {
