@@ -143,5 +143,179 @@ public class SysTableField implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date modifyTime;
 
+    public String getId() {
+        return id;
+    }
 
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getSysTableId() {
+        return sysTableId;
+    }
+
+    public void setSysTableId(String sysTableId) {
+        this.sysTableId = sysTableId;
+    }
+
+    public String getNameCn() {
+        return nameCn;
+    }
+
+    public void setNameCn(String nameCn) {
+        this.nameCn = nameCn;
+    }
+
+    public String getNameEn() {
+        return nameEn;
+    }
+
+    public void setNameEn(String nameEn) {
+        this.nameEn = nameEn;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getDbTableName() {
+        return dbTableName;
+    }
+
+    public void setDbTableName(String dbTableName) {
+        this.dbTableName = dbTableName;
+    }
+
+    public String getDbFieldName() {
+        return dbFieldName;
+    }
+
+    public void setDbFieldName(String dbFieldName) {
+        this.dbFieldName = dbFieldName;
+    }
+
+    public String getIsPK() {
+        return isPK;
+    }
+
+    public void setIsPK(String isPK) {
+        this.isPK = isPK;
+    }
+
+    public String getIsFK() {
+        return isFK;
+    }
+
+    public void setIsFK(String isFK) {
+        this.isFK = isFK;
+    }
+
+    public String getDbFieldDataType() {
+        return dbFieldDataType;
+    }
+
+    public void setDbFieldDataType(String dbFieldDataType) {
+        this.dbFieldDataType = dbFieldDataType;
+    }
+
+    public String getLogicalDeleteFlag() {
+        return logicalDeleteFlag;
+    }
+
+    public void setLogicalDeleteFlag(String logicalDeleteFlag) {
+        this.logicalDeleteFlag = logicalDeleteFlag;
+    }
+
+    public String getDeleteCascadeFlag() {
+        return deleteCascadeFlag;
+    }
+
+    public void setDeleteCascadeFlag(String deleteCascadeFlag) {
+        this.deleteCascadeFlag = deleteCascadeFlag;
+    }
+
+    public String getAttrValueMonitor() {
+        return attrValueMonitor;
+    }
+
+    public void setAttrValueMonitor(String attrValueMonitor) {
+        this.attrValueMonitor = attrValueMonitor;
+    }
+
+    public String getCanResultFlag() {
+        return canResultFlag;
+    }
+
+    public void setCanResultFlag(String canResultFlag) {
+        this.canResultFlag = canResultFlag;
+    }
+
+    public String getCanConditionFlag() {
+        return canConditionFlag;
+    }
+
+    public void setCanConditionFlag(String canConditionFlag) {
+        this.canConditionFlag = canConditionFlag;
+    }
+
+    public String getCanOrderFlag() {
+        return canOrderFlag;
+    }
+
+    public void setCanOrderFlag(String canOrderFlag) {
+        this.canOrderFlag = canOrderFlag;
+    }
+
+    public String getDefaultHtml() {
+        return defaultHtml;
+    }
+
+    public void setDefaultHtml(String defaultHtml) {
+        this.defaultHtml = defaultHtml;
+    }
+
+    public String getDefaultScript() {
+        return defaultScript;
+    }
+
+    public void setDefaultScript(String defaultScript) {
+        this.defaultScript = defaultScript;
+    }
+
+    public String getCreateId() {
+        return createId;
+    }
+
+    public void setCreateId(String createId) {
+        this.createId = createId;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    public String getModifyId() {
+        return modifyId;
+    }
+
+    public void setModifyId(String modifyId) {
+        this.modifyId = modifyId;
+    }
+
+    public Date getModifyTime() {
+        return modifyTime;
+    }
+
+    public void setModifyTime(Date modifyTime) {
+        this.modifyTime = modifyTime;
+    }
 }
