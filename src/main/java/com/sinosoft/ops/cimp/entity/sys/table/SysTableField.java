@@ -52,7 +52,7 @@ public class SysTableField implements Serializable {
      * 字段排序
      */
     @Column(name = "SORT", length = 30)
-    private String sort;   //entitySaveTable
+    private Integer sort;   //entitySaveTable
 
     /**
      * 数据库中的字段名
@@ -264,11 +264,11 @@ public class SysTableField implements Serializable {
         return canResultFlag;
     }
 
-    public String getSort() {
+    public Integer getSort() {
         return sort;
     }
 
-    public void setSort(String sort) {
+    public void setSort(Integer sort) {
         this.sort = sort;
     }
 
