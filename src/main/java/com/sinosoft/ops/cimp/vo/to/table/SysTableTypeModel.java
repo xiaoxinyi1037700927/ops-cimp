@@ -9,7 +9,7 @@ import io.swagger.annotations.ApiModelProperty;
 import java.util.List;
 
 
-@ApiModel(value = "SysTableModel", description = "系统表查询模型")
+@ApiModel(value = "SysAppTableModel", description = "系统表查询模型")
 public class SysTableTypeModel extends SysTableTypeModifyModel{
 
     @ApiModelProperty(value = "系统表查询信息")

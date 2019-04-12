@@ -58,4 +58,33 @@ public class PaginationViewModel<T> {
     public void setData(List<T> data) {
         this.data = data;
     }
+
+    public static class Builder<T> {
+        private PaginationViewModel<T> model = new PaginationViewModel<>();
+
+        public Builder<T> pageIndex(int pageIndex) {
+            model.setPageIndex(pageIndex);
+            return this;
+        }
+
+        public Builder<T> pageSize(int pageSize) {
+            model.setPageSize(pageSize);
+            return this;
+        }
+
+        public Builder<T> totalCount(long totalCount) {
+            model.setTotalCount(totalCount);
+            return this;
+        }
+
+        public Builder<T> data(List<T> data) {
+            model.setData(data);
+            return this;
+        }
+
+        public PaginationViewModel<T> build() {
+            return model;
+        }
+    }
+
 }
