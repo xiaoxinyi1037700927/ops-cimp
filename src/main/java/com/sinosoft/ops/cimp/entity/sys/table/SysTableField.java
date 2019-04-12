@@ -51,7 +51,7 @@ public class SysTableField implements Serializable {
     /**
      * 字段排序
      */
-    @Column(name = "SORT", length = 30)
+    @Column(name = "SORT", length = 11)
     private Integer sort;   //entitySaveTable
 
     /**
