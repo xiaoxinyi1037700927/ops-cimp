@@ -78,11 +78,12 @@ public interface OpsErrorMessage {
      * 100205=初始化实体[{0}]属性[{1}]不允许重复
      */
     String ERROR_MESSAGE_100205 = "100205";
-
     /**
      * 100206=实体[{0}]项目编号[{1}],属性[{2}]，在配置中出现问题
      */
     String ERROR_MESSAGE_100206 = "100206";
-
-
+    /**
+     * 100207=实体[{0}]配置错误，必须存在主键字段
+     */
+    String ERROR_MESSAGE_100207 = "100207";
 }

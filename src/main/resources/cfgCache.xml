@@ -45,17 +45,17 @@
             <engineDesc>不缓存配置</engineDesc>
         </CacheEngine>
     </CacheEngines>
-    <CacheListeners>
-        <CacheListener>
-            <listenerName>cacheListener</listenerName>
-            <implClass>com.sinosoft.ops.cimp.cache.listener.imp.ExpireCacheListenerImpl</implClass>
-            <listenerDesc>对缓存信息监听处理的实现</listenerDesc>
-            <params>
-                <!--清理任务调度执行的时间，默认1秒，单位 秒 -->
-                <param name="scheduleTimerTime" value="30000"/>
-            </params>
-        </CacheListener>
-    </CacheListeners>
+    <!--<CacheListeners>-->
+    <!--<CacheListener>-->
+    <!--<listenerName>cacheListener</listenerName>-->
+    <!--<implClass>com.sinosoft.ops.cimp.cache.listener.imp.ExpireCacheListenerImpl</implClass>-->
+    <!--<listenerDesc>对缓存信息监听处理的实现</listenerDesc>-->
+    <!--<params>-->
+    <!--&lt;!&ndash;清理任务调度执行的时间，默认1秒，单位 秒 &ndash;&gt;-->
+    <!--<param name="scheduleTimerTime" value="30000"/>-->
+    <!--</params>-->
+    <!--</CacheListener>-->
+    <!--</CacheListeners>-->
     <CacheItems>
         <!--
             系统配置数据，每个主机一份，使用默认缓存模板
@@ -63,17 +63,12 @@
             内存置换策略：较少使用（LFU）
         -->
         <CacheItem>
-            <cacheName>PASSWORD_RETRY_COUNT_CACHE</cacheName>
-            <engineName>hashCache</engineName>
-            <cacheDesc>密码重试次数缓存</cacheDesc>
-        </CacheItem>
-        <CacheItem>
             <cacheName>SYS_CONFIG_PROPERTIES_CACHE</cacheName>
             <engineName>hashCache</engineName>
             <cacheDesc>缓存properties及xml配置文件</cacheDesc>
         </CacheItem>
         <CacheItem>
-            <cacheName>ENTITY_INFO_CACHE</cacheName>
+            <cacheName>SYS_TABLE_MODEL_INFO_CACHE</cacheName>
             <engineName>hashCache</engineName>
             <cacheDesc>所有实体缓存</cacheDesc>
         </CacheItem>
@@ -92,26 +87,7 @@
             <engineName>ehcache</engineName>
             <cacheDesc>所有单位包含中管干部缓存</cacheDesc>
         </CacheItem>
-        <CacheItem>
-            <cacheName>DEPARTMENT_TRAIN_QUOTA_CACHE</cacheName>
-            <engineName>ehcache</engineName>
-            <cacheDesc>所有单位本届5年调训完成率缓存</cacheDesc>
-        </CacheItem>
-        <CacheItem>
-            <cacheName>REGISTRATION_DEPARTMENT_TREE_CACHE</cacheName>
-            <engineName>ehcache</engineName>
-            <cacheDesc>报名单位树缓存</cacheDesc>
-        </CacheItem>
-        <CacheItem>
-            <cacheName>TRAIN_DEPARTMENT_TREE_CACHE</cacheName>
-            <engineName>ehcache</engineName>
-            <cacheDesc>培训机构树缓存</cacheDesc>
-        </CacheItem>
-        <CacheItem>
-            <cacheName>TRAINING_COURSE</cacheName>
-            <engineName>ehcache</engineName>
-            <cacheDesc>培训班数据缓存</cacheDesc>
-        </CacheItem>
+
         <!--控制层脚本缓存-->
         <CacheItem>
             <cacheName>SCRIPT_CONTROL_CACHE</cacheName>
