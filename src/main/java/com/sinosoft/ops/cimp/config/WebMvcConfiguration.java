@@ -1,9 +1,11 @@
 package com.sinosoft.ops.cimp.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sinosoft.ops.cimp.interceptor.WebContextInterceptor;
 import com.vip.vjtools.vjkit.text.Charsets;
 import com.vip.vjtools.vjkit.time.DateFormatUtil;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -11,6 +13,7 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import javax.persistence.EntityManager;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,5 +46,10 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
         list.add(MediaType.APPLICATION_JSON_UTF8);
         messageConverter.setSupportedMediaTypes(list);
         converters.add(messageConverter);
+    }
+
+    @Bean
+    public JPAQueryFactory jpaQueryFactory(EntityManager entityManager) {
+        return new JPAQueryFactory(entityManager);
     }
 }

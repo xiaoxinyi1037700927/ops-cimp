@@ -44,12 +44,12 @@ public class SysAppTableFieldSet implements Serializable {
     /**
      * 代码模板
      */
-    @Column(name = "HTML", length = 300)
+    @Column(name = "HTML", length = 4000)
     private String html;
     /**
      * 脚本
      */
-    @Column(name = "SCRIPT", length = 300)
+    @Column(name = "SCRIPT", length = 4000)
     private String script;
     /**
      * 创建人
