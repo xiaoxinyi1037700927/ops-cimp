@@ -17,6 +17,21 @@ public class SysAppTableModel {
      */
     @ApiModelProperty(value = "中文表名")
     private String nameCn;
+    /**
+     * 英文表名
+     */
+    @ApiModelProperty(value = "英文表名")
+    private String nameEn;
+    /**
+     * 表描述
+     */
+    @ApiModelProperty(value = "表描述")
+    private String description;
+    /**
+     * 排序
+     */
+    @ApiModelProperty(value = "排序")
+    private Integer sort;
 
     public String getId() {
         return id;
@@ -32,5 +47,29 @@ public class SysAppTableModel {
 
     public void setNameCn(String nameCn) {
         this.nameCn = nameCn;
+    }
+
+    public String getNameEn() {
+        return nameEn;
+    }
+
+    public void setNameEn(String nameEn) {
+        this.nameEn = nameEn;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Integer getSort() {
+        return sort;
+    }
+
+    public void setSort(Integer sort) {
+        this.sort = sort;
     }
 }

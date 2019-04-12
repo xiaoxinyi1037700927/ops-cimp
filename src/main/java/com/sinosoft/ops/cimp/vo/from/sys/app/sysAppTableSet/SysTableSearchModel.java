@@ -12,6 +12,11 @@ public class SysTableSearchModel {
      */
     @ApiModelProperty(value = "表分组ID")
     private String sysAppTableGroupId;
+    /**
+     * 表类别ID
+     */
+    @ApiModelProperty(value = "表类别ID")
+    private String sysTableTypeId;
 
     public String getSysAppTableGroupId() {
         return sysAppTableGroupId;
@@ -19,5 +24,13 @@ public class SysTableSearchModel {
 
     public void setSysAppTableGroupId(String sysAppTableGroupId) {
         this.sysAppTableGroupId = sysAppTableGroupId;
+    }
+
+    public String getSysTableTypeId() {
+        return sysTableTypeId;
+    }
+
+    public void setSysTableTypeId(String sysTableTypeId) {
+        this.sysTableTypeId = sysTableTypeId;
     }
 }

@@ -17,6 +17,11 @@ public class SysAppTableFieldModel {
      */
     @ApiModelProperty(value = "中文字段名")
     private String nameCn;
+    /**
+     * 英文字段名
+     */
+    @ApiModelProperty(value = "英文字段名")
+    private String nameEn;
 
     public String getId() {
         return id;
@@ -32,5 +37,13 @@ public class SysAppTableFieldModel {
 
     public void setNameCn(String nameCn) {
         this.nameCn = nameCn;
+    }
+
+    public String getNameEn() {
+        return nameEn;
+    }
+
+    public void setNameEn(String nameEn) {
+        this.nameEn = nameEn;
     }
 }

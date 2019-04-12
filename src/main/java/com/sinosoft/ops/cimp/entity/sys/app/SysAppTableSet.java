@@ -37,6 +37,11 @@ public class SysAppTableSet implements Serializable {
     @Column(name = "NAME", length = 120)
     private String name;
     /**
+     * 英文表名称
+     */
+    @Column(name = "NAME_EN", length = 120)
+    private String nameEn;
+    /**
      * 排序
      */
     @Column(name = "SORT", length = 10)
@@ -134,5 +139,13 @@ public class SysAppTableSet implements Serializable {
 
     public void setModifyTime(Date modifyTime) {
         this.modifyTime = modifyTime;
+    }
+
+    public String getNameEn() {
+        return nameEn;
+    }
+
+    public void setNameEn(String nameEn) {
+        this.nameEn = nameEn;
     }
 }

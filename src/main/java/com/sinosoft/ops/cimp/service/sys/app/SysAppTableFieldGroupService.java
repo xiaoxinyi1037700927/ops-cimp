@@ -33,4 +33,9 @@ public interface SysAppTableFieldGroupService {
      * 删除系统应用表集合下的所有字段分组
      */
     void deleteByTableSetIds(List<String> tableSetIds);
+
+    /**
+     * 交换排序
+     */
+    boolean swapSort(List<String> ids);
 }

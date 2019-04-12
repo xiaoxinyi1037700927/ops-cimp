@@ -4,6 +4,7 @@ import com.sinosoft.ops.cimp.config.swagger2.SystemApiGroup;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.service.sys.app.SysAppTableFieldSetService;
+import com.sinosoft.ops.cimp.vo.from.sys.app.sysAppTableFieldGroup.SysAppTableFieldGroupSortModel;
 import com.sinosoft.ops.cimp.vo.from.sys.app.sysAppTableFieldSet.*;
 import com.sinosoft.ops.cimp.vo.from.sys.app.sysAppTableSet.SysTableSearchModel;
 import io.swagger.annotations.Api;
@@ -71,5 +72,14 @@ public class SysAppTableFieldSetController extends BaseController {
     @PostMapping("/sysTableField/list")
     public ResponseEntity listSysTableField(@RequestBody SysTableFieldSearchModel searchModel) throws BusinessException {
         return ok(fieldSetService.listSysTableField(searchModel));
+    }
+
+    /**
+     * 交换排序
+     */
+    @ApiOperation(value = "交换排序")
+    @PostMapping("/sort/swap")
+    public ResponseEntity swapSort(@RequestBody SysAppTableFieldSetSortModel sortModel) throws BusinessException {
+        return fieldSetService.swapSort(sortModel.getIds()) ? ok("修改成功！") : fail("修改失败！");
     }
 }

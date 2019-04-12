@@ -4,6 +4,8 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sinosoft.ops.cimp.dto.PaginationViewModel;
 import com.sinosoft.ops.cimp.entity.sys.app.QSysAppTableGroup;
+import com.sinosoft.ops.cimp.entity.sys.app.SysAppTableFieldGroup;
+import com.sinosoft.ops.cimp.entity.sys.app.SysAppTableFieldSet;
 import com.sinosoft.ops.cimp.entity.sys.app.SysAppTableGroup;
 import com.sinosoft.ops.cimp.mapper.sys.app.SysAppMapper;
 import com.sinosoft.ops.cimp.mapper.sys.app.SysAppTableGroupMapper;
@@ -22,6 +24,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -69,6 +72,7 @@ public class SysAppTableGroupServiceImpl implements SysAppTableGroupService {
     /**
      * 添加系统应用表分组
      */
+    @Transactional
     @Override
     public void addTableGroup(SysAppTableGroupAddModel addModel) {
         SysAppTableGroup tableGroup = SysAppTableGroupMapper.INSTANCE.addModelToTableGroup(addModel);
@@ -83,6 +87,7 @@ public class SysAppTableGroupServiceImpl implements SysAppTableGroupService {
     /**
      * 删除系统应用表分组
      */
+    @Transactional
     @Override
     public void deleteTableGroup(List<String> ids) {
         for (String id : ids) {
@@ -96,6 +101,7 @@ public class SysAppTableGroupServiceImpl implements SysAppTableGroupService {
     /**
      * 修改系统应用表分组
      */
+    @Transactional
     @Override
     public boolean modifyTableGroup(SysAppTableGroupModifyModel modifyModel) {
         Optional<SysAppTableGroup> tableGroupOptional = tableGroupRepository.findById(modifyModel.getId());
@@ -114,10 +120,41 @@ public class SysAppTableGroupServiceImpl implements SysAppTableGroupService {
     /**
      * 删除系统应用下的所有分组
      */
+    @Transactional
     @Override
     public void deleteBySysAppIds(List<String> sysAppIds) {
         QSysAppTableGroup qTableGroup = QSysAppTableGroup.sysAppTableGroup;
 
         deleteTableGroup(jpaQueryFactory.select(qTableGroup.id).from(qTableGroup).where(qTableGroup.sysAppId.in(sysAppIds)).fetchResults().getResults());
+    }
+
+    /**
+     * 交换排序
+     */
+    @Transactional
+    @Override
+    public boolean swapSort(List<String> ids) {
+        if (ids == null || ids.size() != 2) {
+            return false;
+        }
+
+        Optional<SysAppTableGroup> optional1 = tableGroupRepository.findById(ids.get(0));
+        Optional<SysAppTableGroup> optional2 = tableGroupRepository.findById(ids.get(1));
+
+        if (!optional1.isPresent() || !optional2.isPresent()) {
+            return false;
+        }
+
+        SysAppTableGroup tableGroup1 = optional1.get();
+        SysAppTableGroup tableGroup2 = optional2.get();
+
+        Integer sort = tableGroup1.getSort();
+        tableGroup1.setSort(tableGroup2.getSort());
+        tableGroup2.setSort(sort);
+
+        tableGroupRepository.save(tableGroup1);
+        tableGroupRepository.save(tableGroup2);
+
+        return true;
     }
 }

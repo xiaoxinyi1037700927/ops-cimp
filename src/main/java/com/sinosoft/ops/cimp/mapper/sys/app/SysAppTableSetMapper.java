@@ -2,10 +2,12 @@ package com.sinosoft.ops.cimp.mapper.sys.app;
 
 import com.sinosoft.ops.cimp.entity.sys.app.SysAppTableSet;
 import com.sinosoft.ops.cimp.entity.sys.table.SysTable;
+import com.sinosoft.ops.cimp.entity.sys.table.SysTableType;
 import com.sinosoft.ops.cimp.util.IdUtil;
 import com.sinosoft.ops.cimp.vo.from.sys.app.sysAppTableSet.SysAppTableSetModifyModel;
 import com.sinosoft.ops.cimp.vo.to.sys.app.sysAppTableSet.SysAppTableModel;
 import com.sinosoft.ops.cimp.vo.to.sys.app.sysAppTableSet.SysAppTableSetModel;
+import com.sinosoft.ops.cimp.vo.to.sys.app.sysAppTableSet.SysAppTableTypeModel;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
@@ -26,6 +28,8 @@ public interface SysAppTableSetMapper {
     void modifyModelToTableSet(SysAppTableSetModifyModel modifyModel, @MappingTarget SysAppTableSet tableSet);
 
     SysAppTableModel sysTableToSysTableModel(SysTable sysTable);
+
+    SysAppTableTypeModel sysTableTypeToSysAppTableTypeModel(SysTableType sysTableType);
 
     @Named("getCurrentId")
     default String getCurrentId(String id) {

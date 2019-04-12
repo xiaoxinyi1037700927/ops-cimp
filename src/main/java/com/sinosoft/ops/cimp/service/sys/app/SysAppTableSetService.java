@@ -7,6 +7,7 @@ import com.sinosoft.ops.cimp.vo.from.sys.app.sysAppTableSet.SysAppTableSetSearch
 import com.sinosoft.ops.cimp.vo.from.sys.app.sysAppTableSet.SysTableSearchModel;
 import com.sinosoft.ops.cimp.vo.to.sys.app.sysAppTableSet.SysAppTableSetModel;
 import com.sinosoft.ops.cimp.vo.to.sys.app.sysAppTableSet.SysAppTableModel;
+import com.sinosoft.ops.cimp.vo.to.sys.app.sysAppTableSet.SysAppTableTypeModel;
 
 import java.util.List;
 
@@ -37,7 +38,17 @@ public interface SysAppTableSetService {
     void deleteByTableGroupIds(List<String> tableGroupIds);
 
     /**
+     * 系统表分类列表
+     */
+    List<SysAppTableTypeModel> listSysTableType();
+
+    /**
      * 系统表列表
      */
     List<SysAppTableModel> listSysTable(SysTableSearchModel searchModel);
+
+    /**
+     * 交换排序
+     */
+    boolean swapSort(List<String> ids);
 }

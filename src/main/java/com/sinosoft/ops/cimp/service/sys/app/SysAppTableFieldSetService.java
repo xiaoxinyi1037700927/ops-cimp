@@ -41,4 +41,9 @@ public interface SysAppTableFieldSetService {
      */
     List<SysAppTableFieldModel> listSysTableField(SysTableFieldSearchModel searchModel);
 
+    /**
+     * 交换排序
+     */
+    boolean swapSort(List<String> ids);
+
 }

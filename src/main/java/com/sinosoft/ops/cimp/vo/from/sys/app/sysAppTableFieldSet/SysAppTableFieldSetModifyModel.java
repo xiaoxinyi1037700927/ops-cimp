@@ -19,11 +19,6 @@ public class SysAppTableFieldSetModifyModel {
     @ApiModelProperty(value = "字段名称")
     private String name;
     /**
-     * 排序
-     */
-    @ApiModelProperty(value = "排序")
-    private Integer sort;
-    /**
      * 代码模板
      */
     @ApiModelProperty(value = "代码模板")
@@ -58,14 +53,6 @@ public class SysAppTableFieldSetModifyModel {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public Integer getSort() {
-        return sort;
-    }
-
-    public void setSort(Integer sort) {
-        this.sort = sort;
     }
 
     public String getHtml() {

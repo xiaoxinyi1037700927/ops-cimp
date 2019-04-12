@@ -30,6 +30,11 @@ public class SysAppTableSetModel {
     @ApiModelProperty(value = "表名称")
     private String name;
     /**
+     * 英文表名
+     */
+    @ApiModelProperty(value = "英文表名")
+    private String nameEn;
+    /**
      * 排序
      */
     @ApiModelProperty(value = "排序")
@@ -73,5 +78,13 @@ public class SysAppTableSetModel {
 
     public void setSort(Integer sort) {
         this.sort = sort;
+    }
+
+    public String getNameEn() {
+        return nameEn;
+    }
+
+    public void setNameEn(String nameEn) {
+        this.nameEn = nameEn;
     }
 }

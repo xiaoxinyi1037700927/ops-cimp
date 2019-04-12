@@ -4,10 +4,7 @@ import com.sinosoft.ops.cimp.config.swagger2.SystemApiGroup;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.service.sys.app.SysAppTableFieldGroupService;
-import com.sinosoft.ops.cimp.vo.from.sys.app.sysAppTableFieldGroup.SysAppTableFieldGroupAddModel;
-import com.sinosoft.ops.cimp.vo.from.sys.app.sysAppTableFieldGroup.SysAppTableFieldGroupDeleteModel;
-import com.sinosoft.ops.cimp.vo.from.sys.app.sysAppTableFieldGroup.SysAppTableFieldGroupModifyModel;
-import com.sinosoft.ops.cimp.vo.from.sys.app.sysAppTableFieldGroup.SysAppTableFieldGroupSearchModel;
+import com.sinosoft.ops.cimp.vo.from.sys.app.sysAppTableFieldGroup.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,4 +62,14 @@ public class SysAppTableFieldGroupController extends BaseController {
     public ResponseEntity modifyFieldGroup(@RequestBody SysAppTableFieldGroupModifyModel modifyModel) throws BusinessException {
         return fieldGroupService.modifyFieldGroup(modifyModel) ? ok("修改成功！") : fail("修改失败！");
     }
+
+    /**
+     * 交换排序
+     */
+    @ApiOperation(value = "交换排序")
+    @PostMapping("/sort/swap")
+    public ResponseEntity swapSort(@RequestBody SysAppTableFieldGroupSortModel sortModel) throws BusinessException {
+        return fieldGroupService.swapSort(sortModel.getIds()) ? ok("修改成功！") : fail("修改失败！");
+    }
+
 }

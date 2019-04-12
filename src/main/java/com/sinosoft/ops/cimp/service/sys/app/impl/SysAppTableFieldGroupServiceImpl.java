@@ -26,6 +26,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -74,6 +75,7 @@ public class SysAppTableFieldGroupServiceImpl implements SysAppTableFieldGroupSe
     /**
      * 添加系统应用字段分组
      */
+    @Transactional
     @Override
     public void addFieldGroup(SysAppTableFieldGroupAddModel addModel) {
         SysAppTableFieldGroup fieldGroup = SysAppTableFieldGroupMapper.INSTANCE.addModelToFieldGroup(addModel);
@@ -88,6 +90,7 @@ public class SysAppTableFieldGroupServiceImpl implements SysAppTableFieldGroupSe
     /**
      * 删除系统应用字段分组
      */
+    @Transactional
     @Override
     public void deleteFieldGroup(List<String> ids) {
         for (String id : ids) {
@@ -101,6 +104,7 @@ public class SysAppTableFieldGroupServiceImpl implements SysAppTableFieldGroupSe
     /**
      * 修改系统应用字段分组
      */
+    @Transactional
     @Override
     public boolean modifyFieldGroup(SysAppTableFieldGroupModifyModel modifyModel) {
         Optional<SysAppTableFieldGroup> fieldGroupOptional = fieldGroupRepository.findById(modifyModel.getId());
@@ -119,10 +123,41 @@ public class SysAppTableFieldGroupServiceImpl implements SysAppTableFieldGroupSe
     /**
      * 删除系统应用表集合下的所有字段分组
      */
+    @Transactional
     @Override
     public void deleteByTableSetIds(List<String> tableSetIds) {
         QSysAppTableFieldGroup qFieldGroup = QSysAppTableFieldGroup.sysAppTableFieldGroup;
 
         deleteFieldGroup(jpaQueryFactory.select(qFieldGroup.id).from(qFieldGroup).where(qFieldGroup.sysAppTableSetId.in(tableSetIds)).fetchResults().getResults());
+    }
+
+    /**
+     * 交换排序
+     */
+    @Transactional
+    @Override
+    public boolean swapSort(List<String> ids) {
+        if (ids == null || ids.size() != 2) {
+            return false;
+        }
+
+        Optional<SysAppTableFieldGroup> optional1 = fieldGroupRepository.findById(ids.get(0));
+        Optional<SysAppTableFieldGroup> optional2 = fieldGroupRepository.findById(ids.get(1));
+
+        if (!optional1.isPresent() || !optional2.isPresent()) {
+            return false;
+        }
+
+        SysAppTableFieldGroup fieldGroup1 = optional1.get();
+        SysAppTableFieldGroup fieldGroup2 = optional2.get();
+
+        Integer sort = fieldGroup1.getSort();
+        fieldGroup1.setSort(fieldGroup2.getSort());
+        fieldGroup2.setSort(sort);
+
+        fieldGroupRepository.save(fieldGroup1);
+        fieldGroupRepository.save(fieldGroup2);
+
+        return true;
     }
 }

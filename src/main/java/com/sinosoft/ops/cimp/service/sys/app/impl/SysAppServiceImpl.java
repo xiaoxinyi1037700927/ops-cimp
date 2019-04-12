@@ -19,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -55,7 +56,6 @@ public class SysAppServiceImpl implements SysAppService {
 
         Page<SysApp> page = sysAppRepository.findAll(builder, pageRequest);
 
-
         return new PaginationViewModel
                 .Builder<SysAppModel>()
                 .pageIndex(pageIndex)
@@ -68,6 +68,7 @@ public class SysAppServiceImpl implements SysAppService {
     /**
      * 添加系统应用
      */
+    @Transactional
     @Override
     public void addSysApp(SysAppAddModel addModel) {
         sysAppRepository.save(SysAppMapper.INSTANCE.addModelToSysApp(addModel));
@@ -76,6 +77,7 @@ public class SysAppServiceImpl implements SysAppService {
     /**
      * 删除系统应用
      */
+    @Transactional
     @Override
     public void deleteSysApp(List<String> ids) {
         for (String id : ids) {
@@ -89,6 +91,7 @@ public class SysAppServiceImpl implements SysAppService {
     /**
      * 修改系统应用
      */
+    @Transactional
     @Override
     public boolean modifySysApp(SysAppModifyModel modifyModel) {
         Optional<SysApp> sysAppOptional = sysAppRepository.findById(modifyModel.getId());

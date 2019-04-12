@@ -29,6 +29,11 @@ public class SysAppTableFieldSetModel {
     @ApiModelProperty(value = "字段名称")
     private String name;
     /**
+     * 英文字段名
+     */
+    @ApiModelProperty(value = "英文字段名")
+    private String nameEn;
+    /**
      * 排序
      */
     @ApiModelProperty(value = "排序")
@@ -98,5 +103,13 @@ public class SysAppTableFieldSetModel {
 
     public void setScript(String script) {
         this.script = script;
+    }
+
+    public String getNameEn() {
+        return nameEn;
+    }
+
+    public void setNameEn(String nameEn) {
+        this.nameEn = nameEn;
     }
 }

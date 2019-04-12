@@ -25,6 +25,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -79,6 +80,7 @@ public class SysAppTableFieldSetServiceImpl implements SysAppTableFieldSetServic
     /**
      * 添加系统应用字段集合
      */
+    @Transactional
     @Override
     public void addFieldSet(SysAppTableFieldSetAddModel addModel) {
         QSysAppTableFieldSet qFieldSet = QSysAppTableFieldSet.sysAppTableFieldSet;
@@ -105,6 +107,7 @@ public class SysAppTableFieldSetServiceImpl implements SysAppTableFieldSetServic
             fieldSet.setSysAppTableFieldGroupId(addModel.getSysAppTableFieldGroupId());
             fieldSet.setSysTableFieldId(fieldId);
             fieldSet.setName(tableField.getNameCn());
+            fieldSet.setNameEn(tableField.getNameEn());
             fieldSet.setScript(tableField.getDefaultScript());
             fieldSet.setHtml(tableField.getDefaultHtml());
 
@@ -119,6 +122,7 @@ public class SysAppTableFieldSetServiceImpl implements SysAppTableFieldSetServic
     /**
      * 删除系统应用字段集合
      */
+    @Transactional
     @Override
     public void deleteFieldSet(List<String> ids) {
         for (String id : ids) {
@@ -129,6 +133,7 @@ public class SysAppTableFieldSetServiceImpl implements SysAppTableFieldSetServic
     /**
      * 修改系统应用字段集合
      */
+    @Transactional
     @Override
     public boolean modifyFieldSet(SysAppTableFieldSetModifyModel modifyModel) {
         Optional<SysAppTableFieldSet> fieldSetOptional = fieldSetRepository.findById(modifyModel.getId());
@@ -147,6 +152,7 @@ public class SysAppTableFieldSetServiceImpl implements SysAppTableFieldSetServic
     /**
      * 删除系统应用字段分组下的所有字段
      */
+    @Transactional
     @Override
     public void deleteByFieldGroupIds(List<String> fieldGroupIds) {
         QSysAppTableFieldSet qFieldSet = QSysAppTableFieldSet.sysAppTableFieldSet;
@@ -157,6 +163,7 @@ public class SysAppTableFieldSetServiceImpl implements SysAppTableFieldSetServic
     /**
      * 系统字段列表
      */
+    @Transactional
     @Override
     public List<SysAppTableFieldModel> listSysTableField(SysTableFieldSearchModel searchModel) {
         QSysTableField qSysTableField = QSysTableField.sysTableField;
@@ -185,6 +192,36 @@ public class SysAppTableFieldSetServiceImpl implements SysAppTableFieldSetServic
         Iterable<SysTableField> iterable = sysTableFieldRepository.findAll(builder);
 
         return StreamSupport.stream(iterable.spliterator(), false).map(SysAppTableFieldSetMapper.INSTANCE::sysTableFieldToSysTableFieldModel).collect(Collectors.toList());
+    }
+
+    /**
+     * 交换排序
+     */
+    @Transactional
+    @Override
+    public boolean swapSort(List<String> ids) {
+        if (ids == null || ids.size() != 2) {
+            return false;
+        }
+
+        Optional<SysAppTableFieldSet> optional1 = fieldSetRepository.findById(ids.get(0));
+        Optional<SysAppTableFieldSet> optional2 = fieldSetRepository.findById(ids.get(1));
+
+        if (!optional1.isPresent() || !optional2.isPresent()) {
+            return false;
+        }
+
+        SysAppTableFieldSet fieldSet1 = optional1.get();
+        SysAppTableFieldSet fieldSet2 = optional2.get();
+
+        Integer sort = fieldSet1.getSort();
+        fieldSet1.setSort(fieldSet2.getSort());
+        fieldSet2.setSort(sort);
+
+        fieldSetRepository.save(fieldSet1);
+        fieldSetRepository.save(fieldSet2);
+
+        return true;
     }
 }
 

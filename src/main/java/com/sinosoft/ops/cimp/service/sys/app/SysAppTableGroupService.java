@@ -33,4 +33,9 @@ public interface SysAppTableGroupService {
      * 删除系统应用下的所有分组
      */
     void deleteBySysAppIds(List<String> sysAppIds);
+
+    /**
+     * 交换排序
+     */
+    boolean swapSort(List<String> ids);
 }

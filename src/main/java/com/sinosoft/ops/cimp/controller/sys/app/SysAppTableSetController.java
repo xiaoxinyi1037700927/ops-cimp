@@ -4,7 +4,9 @@ import com.sinosoft.ops.cimp.config.swagger2.SystemApiGroup;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.service.sys.app.SysAppTableSetService;
+import com.sinosoft.ops.cimp.vo.from.sys.app.sysAppTableGroup.SysAppTableGroupSortModel;
 import com.sinosoft.ops.cimp.vo.from.sys.app.sysAppTableSet.*;
+import com.sinosoft.ops.cimp.vo.from.table.SysTableTypeSearchModel;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,11 +66,29 @@ public class SysAppTableSetController extends BaseController {
     }
 
     /**
+     * 系统表分类选择列表
+     */
+    @ApiOperation(value = "系统表分类选择列表")
+    @PostMapping("/sysTableType/list")
+    public ResponseEntity listSysTableType() throws BusinessException {
+        return ok(tableSetService.listSysTableType());
+    }
+
+    /**
      * 系统表选择列表
      */
     @ApiOperation(value = "系统表选择列表")
     @PostMapping("/sysTable/list")
     public ResponseEntity listSysTable(@RequestBody SysTableSearchModel searchModel) throws BusinessException {
         return ok(tableSetService.listSysTable(searchModel));
+    }
+
+    /**
+     * 交换排序
+     */
+    @ApiOperation(value = "交换排序")
+    @PostMapping("/sort/swap")
+    public ResponseEntity swapSort(@RequestBody SysAppTableSetSortModel sortModel) throws BusinessException {
+        return tableSetService.swapSort(sortModel.getIds()) ? ok("修改成功！") : fail("修改失败！");
     }
 }

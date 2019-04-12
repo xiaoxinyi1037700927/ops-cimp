@@ -19,11 +19,6 @@ public class SysAppTableSetModifyModel {
     @ApiModelProperty(value = "表名称")
     private String name;
     /**
-     * 排序
-     */
-    @ApiModelProperty(value = "排序")
-    private Integer sort;
-    /**
      * 修改人
      */
     @ApiModelProperty(value = "修改人")
@@ -48,14 +43,6 @@ public class SysAppTableSetModifyModel {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public Integer getSort() {
-        return sort;
-    }
-
-    public void setSort(Integer sort) {
-        this.sort = sort;
     }
 
     public String getModifyId() {
