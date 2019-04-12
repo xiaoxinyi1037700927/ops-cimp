@@ -26,6 +26,13 @@ public class SysTableType implements Serializable {
      */
     @Column(name = "NAME_CN", length = 120)
     private String nameCn;
+
+    /**
+     * 排序
+     */
+    @Column(name = "SORT", length = 120)
+    private String sort;
+
     /**
      * 类别名称
      */
@@ -76,6 +83,14 @@ public class SysTableType implements Serializable {
 
     public void setNameEn(String nameEn) {
         this.nameEn = nameEn;
+    }
+
+    public String getSort() {
+        return sort;
+    }
+
+    public void setSort(String sort) {
+        this.sort = sort;
     }
 
     public String getCreateId() {

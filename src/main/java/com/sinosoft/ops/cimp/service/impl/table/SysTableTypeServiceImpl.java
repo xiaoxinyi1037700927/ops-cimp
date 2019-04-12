@@ -1,26 +1,25 @@
 package com.sinosoft.ops.cimp.service.impl.table;
 
 import com.google.common.collect.Lists;
-import com.querydsl.core.BooleanBuilder;
-import com.sinosoft.ops.cimp.dto.PaginationViewModel;
-import com.sinosoft.ops.cimp.entity.sys.table.QSysTableType;
+import com.sinosoft.ops.cimp.entity.sys.table.SysTable;
 import com.sinosoft.ops.cimp.entity.sys.table.SysTableType;
+import com.sinosoft.ops.cimp.mapper.table.SysTableModelMapper;
 import com.sinosoft.ops.cimp.mapper.table.SysTableTypeModelMapper;
+import com.sinosoft.ops.cimp.repository.table.SysTableRepository;
 import com.sinosoft.ops.cimp.repository.table.SysTableTypeRepository;
 import com.sinosoft.ops.cimp.service.table.SysTableService;
 import com.sinosoft.ops.cimp.service.table.SysTableTypeService;
+import com.sinosoft.ops.cimp.vo.from.table.SysTableAddModel;
+import com.sinosoft.ops.cimp.vo.from.table.SysTableModifyModel;
 import com.sinosoft.ops.cimp.vo.from.table.SysTableTypeAddModel;
 import com.sinosoft.ops.cimp.vo.from.table.SysTableTypeModifyModel;
-import com.sinosoft.ops.cimp.vo.from.table.SysTableTypeSearchModel;
 import com.sinosoft.ops.cimp.vo.to.table.SysTableTypeModel;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,10 +27,10 @@ import java.util.stream.Collectors;
 public class SysTableTypeServiceImpl implements SysTableTypeService {
 
     @Autowired
-    private SysTableTypeRepository sysTableTypeDao;
+    private SysTableRepository sysTableDao;
 
     @Autowired
-    private SysTableService sysTableService;
+    private SysTableTypeRepository sysTableTypeDao;
 
     @Override
     @Transactional
@@ -40,6 +39,7 @@ public class SysTableTypeServiceImpl implements SysTableTypeService {
             return false;
         }
         SysTableType sysTableType = SysTableTypeModelMapper.INSTANCE.addModelfyToSysTableType(sysTableTypeAddModel);
+        sysTableType.setCreateTime(new Date());
         sysTableTypeDao.save(sysTableType);
         return true;
     }
@@ -51,6 +51,7 @@ public class SysTableTypeServiceImpl implements SysTableTypeService {
             return false;
         }
         SysTableType sysTableType = SysTableTypeModelMapper.INSTANCE.modifyModelToSysTableType(sysTableTypeModifyModel);
+        sysTableType.setModifyTime(new Date());
         sysTableTypeDao.save(sysTableType);
         return true;
     }
@@ -63,54 +64,30 @@ public class SysTableTypeServiceImpl implements SysTableTypeService {
     }
 
     @Override
-    public List<SysTableTypeModifyModel> findSysTableTypeByCode(String code) {
-        List<SysTableType> sysTableTypes = null;//sysTableTypeDao.findByCode(code);
-        List<SysTableTypeModifyModel> sysTableTypeModifyModels = Lists.newArrayList();
-        sysTableTypes.forEach(e -> {
-            SysTableTypeModifyModel sysTableTypeModifyModel = SysTableTypeModelMapper.INSTANCE.sysTableTypeToModel(e);
-            sysTableTypeModifyModels.add(sysTableTypeModifyModel);
-        });
-        return sysTableTypeModifyModels;
-    }
-
-    @Override
-    public PaginationViewModel<SysTableTypeModifyModel> findSysTableTypeByPageOrName(SysTableTypeSearchModel searchModel) {
-        int pageIndex = searchModel.getPageIndex();
-        int pageSize = searchModel.getPageSize();
-        if (pageIndex <= 0) pageIndex = 1;
-        if (pageSize <= 0) pageSize = 10;
-
-        QSysTableType qSysTableType = QSysTableType.sysTableType;
-        PageRequest pageRequest = PageRequest.of(pageIndex - 1, pageSize, new Sort(Sort.Direction.ASC, qSysTableType.nameCn.getMetadata().getName()));
-        BooleanBuilder builder = new BooleanBuilder();
-        if (StringUtils.isNotEmpty(searchModel.getCode())) {
-            builder = builder.and(qSysTableType.id.eq(searchModel.getCode()));
-        }
-
-        if (StringUtils.isNotEmpty(searchModel.getNameCn())) {
-            builder = builder.and(qSysTableType.nameCn.contains(searchModel.getNameCn()));
-        }
-        Page<SysTableType> all = sysTableTypeDao.findAll(builder, pageRequest);
-        List<SysTableTypeModifyModel> collect = all.getContent().stream().map(x -> SysTableTypeModelMapper.INSTANCE.sysTableTypeToModel(x)).collect(Collectors.toList());
-
-        PaginationViewModel<SysTableTypeModifyModel> page = new PaginationViewModel<SysTableTypeModifyModel>();
-        page.setPageIndex(searchModel.getPageIndex());
-        page.setPageSize(searchModel.getPageSize());
-        page.setTotalCount(all.getTotalElements());
-        page.setData(collect);
-
-        return page;
-    }
-
-    @Override
     public List<SysTableTypeModel> getAllSysTableType() {
         List<SysTableType> sysTableTypes = sysTableTypeDao.findAll();
+        List<SysTable> sysTables = sysTableDao.findAll();
+        List<SysTableModifyModel> sysTableModifyModels = sysTables.stream()
+                .map(SysTableModelMapper.INSTANCE::toModifyModel)
+                .collect(Collectors.toList());
         List<SysTableTypeModel> sysTableTypeModels = Lists.newArrayList();
-        sysTableTypes.forEach(e ->{
+
+
+        sysTableTypes.forEach(e -> {
             SysTableTypeModel sysTableTypeModel = SysTableTypeModelMapper.INSTANCE.toSysTableTypeModel(e);
-            sysTableTypeModel.setSysTableModifyModels(sysTableService.findBySysTableTypeId(e.getId()));
+            List<SysTableModifyModel> adSysTableModifyModels = sysTableModifyModels
+                    .stream()
+                    .filter(s ->s.getSysTableTypeId().equals(e.getId()))
+                    .collect(Collectors.toList());
+
+            adSysTableModifyModels.sort(Comparator.comparing(SysTableAddModel::getSort));
+
+            sysTableTypeModel.setSysTableModifyModels(adSysTableModifyModels);
+
+            sysTableTypeModels.add(sysTableTypeModel);
         });
 
+        sysTableTypeModels.sort(Comparator.comparing(SysTableTypeModel::getSort));
         return sysTableTypeModels;
     }
 
