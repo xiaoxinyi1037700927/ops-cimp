@@ -112,7 +112,7 @@ public class SysTableInfoDaoImpl implements SysTableInfoDao {
 
         //TODO 根据项目编号确定出表模型
 
-        Optional<SysApp> sysAppOpt = sysAppRepository.findOne(QSysApp.sysApp.code.eq(prjCode));
+        Optional<SysApp> sysAppOpt = sysAppRepository.findOne(QSysApp.sysApp.code.eq(Integer.parseInt(prjCode)));
         if (!sysAppOpt.isPresent()) {
             throw new BusinessException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE, "项目编号对应的项目不存在");
         }

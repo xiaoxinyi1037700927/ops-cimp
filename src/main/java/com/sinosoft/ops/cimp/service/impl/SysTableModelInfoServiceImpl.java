@@ -11,6 +11,7 @@ import com.sinosoft.ops.cimp.dto.QueryDataParamBuilder;
 import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.service.SysTableModelInfoService;
 import com.sinosoft.ops.cimp.util.IdUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +39,9 @@ public class SysTableModelInfoServiceImpl implements SysTableModelInfoService {
         String tableNameEn = queryDataParam.getTableNameEn();
         String prjCode = queryDataParam.getPrjCode();
         String primaryKey = queryDataParam.getTableNameEnPK();
+        String tableNameEnFK = queryDataParam.getTableNameEnFK();
+        Object tableNameEnFKValue = queryDataParam.getTableNameEnFKValue();
+
         Map<String, Object> saveOrUpdateFormData = queryDataParam.getSaveOrUpdateFormData();
 
         //获取系统表结构信息
@@ -60,9 +64,17 @@ public class SysTableModelInfoServiceImpl implements SysTableModelInfoService {
             Object value = entry.getValue();
             execParamList.add(new ExecParam(key, value));
         }
-
+        //主键字段和系统配置主键一致则认为是主集信息保存
+        String sysPrimaryKey = tableInfo.getPrimaryKey();
+        ExecParam fKeyExecParam = null;
+        if (!StringUtils.equals(sysPrimaryKey, primaryKey) && StringUtils.equals(tableNameEnFK, sysPrimaryKey)) {
+            fKeyExecParam = new ExecParam(tableNameEnFK, tableNameEnFKValue);
+        }
         ExecParam primaryKeyExecParam = new ExecParam(primaryKey, IdUtil.uuidWithoutMinus());
         execParamList.add(primaryKeyExecParam);
+        if (fKeyExecParam != null) {
+            execParamList.add(fKeyExecParam);
+        }
         DaoParam daoParam = new DaoParam();
         daoParam.addEntityName(tableTypeNameEn)
                 .addTableNameEn(tableNameEn)

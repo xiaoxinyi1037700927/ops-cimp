@@ -54,8 +54,15 @@ public class SysTableModelInfoController extends BaseController {
             return fail("查询表结构必须传递表类型名称");
         }
         SysTableModelInfoDTO tableInfo = sysTableInfoDao.getTableInfo(tableTypeName, prjCode);
-        Map<String, String> result = Maps.newHashMap();
-        tableInfo.getTables().forEach(table -> result.put(table.getTableNameEn(), table.getTableNameCn()));
+        List<Map<String, String>> result = Lists.newArrayList();
+
+        tableInfo.getTables().forEach(table -> {
+            Map<String, String> map = Maps.newHashMap();
+            map.put("tableNameEn", table.getTableNameEn());
+            map.put("tableNameCn", table.getTableNameCn());
+            map.put("appGroupName", table.getAppTableGroupName());
+            result.add(map);
+        });
         return ok(result);
     }
 
@@ -88,6 +95,7 @@ public class SysTableModelInfoController extends BaseController {
             @RequestParam("tableName") String tableName,
             @RequestParam("tableNamePK") String tableNamePK,
             @RequestParam("tableNameFK") String tableNameFK,
+            @RequestParam("tableNameFKValue") String tableNameFKValue,
             @RequestParam("form") String form) throws BusinessException {
 
         if (StringUtils.isEmpty(tableTypeName)) {
@@ -119,6 +127,8 @@ public class SysTableModelInfoController extends BaseController {
                 .setTableTypeNameEn(tableTypeName)
                 .setTableNameEn(tableName)
                 .setTableNameEnPK(tableNamePK)
+                .setTableNameEnFK(tableNameFK)
+                .setTableNameEnFKValue(tableNameFKValue)
                 .setSaveOrUpdateFormData(formMap);
 
         sysTableModelInfoService.saveData(queryDataParam);

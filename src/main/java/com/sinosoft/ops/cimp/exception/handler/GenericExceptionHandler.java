@@ -18,7 +18,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@RestControllerAdvice(basePackages = "com.sinosoft.cimp.controller")
+@RestControllerAdvice(basePackages = "com.sinosoft.ops.cimp.controller")
 @SuppressWarnings("unchecked")
 public class GenericExceptionHandler extends ResponseEntityExceptionHandler {
 

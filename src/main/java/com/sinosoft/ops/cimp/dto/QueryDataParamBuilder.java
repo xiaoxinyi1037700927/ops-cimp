@@ -28,6 +28,10 @@ public class QueryDataParamBuilder implements Serializable {
     //待查询实体主键属性值
     @ApiModelProperty(value = "待查询信息集主键字段值")
     private Object tableNameEnPKValue;
+    @ApiModelProperty(value = "信息集外键字段")
+    private String tableNameEnFK;
+    @ApiModelProperty(value = "信息集外键字段的值")
+    private Object tableNameEnFKValue;
 
     //是否需要分页
     @ApiModelProperty(value = "是否需要分页")
@@ -102,6 +106,24 @@ public class QueryDataParamBuilder implements Serializable {
 
     public QueryDataParamBuilder setTableNameEnPKValue(Object tableNameEnPKValue) {
         this.tableNameEnPKValue = tableNameEnPKValue;
+        return this;
+    }
+
+    public String getTableNameEnFK() {
+        return tableNameEnFK;
+    }
+
+    public QueryDataParamBuilder setTableNameEnFK(String tableNameEnFK) {
+        this.tableNameEnFK = tableNameEnFK;
+        return this;
+    }
+
+    public Object getTableNameEnFKValue() {
+        return tableNameEnFKValue;
+    }
+
+    public QueryDataParamBuilder setTableNameEnFKValue(Object tableNameEnFKValue) {
+        this.tableNameEnFKValue = tableNameEnFKValue;
         return this;
     }
 
