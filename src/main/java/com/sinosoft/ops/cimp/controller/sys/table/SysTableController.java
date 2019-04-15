@@ -1,5 +1,6 @@
 package com.sinosoft.ops.cimp.controller.sys.table;
 
+import com.sinosoft.ops.cimp.cache.CacheManager;
 import com.sinosoft.ops.cimp.config.swagger2.SystemApiGroup;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.dto.PaginationViewModel;
@@ -33,6 +34,7 @@ public class SysTableController extends BaseController {
     @RequestMapping(value = "/addSysTable", method = RequestMethod.POST)
     public ResponseEntity saveSysEntityDef(
             @Valid @RequestBody SysTableAddModel sysTableAddModel) throws BusinessException {
+        CacheManager.getInstance().remove("SYS_TABLE_MODEL_INFO_CACHE");
         boolean isok = sysTableService.addSysTable(sysTableAddModel);
         if (isok) return ok("操作成功");
         return fail("操作失败");
@@ -42,6 +44,7 @@ public class SysTableController extends BaseController {
     @RequestMapping(value = "/delSysTableById", method = RequestMethod.POST)
     public ResponseEntity deleteSysEntityDef(
             @RequestParam("id") String id) throws BusinessException {
+        CacheManager.getInstance().remove("SYS_TABLE_MODEL_INFO_CACHE");
         boolean isok = sysTableService.delSysTable(id);
         if (isok) {
             return ok("删除成功");
@@ -53,6 +56,7 @@ public class SysTableController extends BaseController {
     @RequestMapping(value = "/updateSysTable", method = RequestMethod.POST)
     public ResponseEntity updateSysEntityDef(
             @RequestBody SysTableModifyModel sysTableModifyModel) throws BusinessException {
+        CacheManager.getInstance().remove("SYS_TABLE_MODEL_INFO_CACHE");
         boolean isok = sysTableService.upSysTable(sysTableModifyModel);
         if (isok) {
             return ok("操作成功");
@@ -72,6 +76,7 @@ public class SysTableController extends BaseController {
     @RequestMapping(value = "/operatingDbTable", method = RequestMethod.POST)
     public ResponseEntity operatingDbTable(
             @RequestParam("sysTableId") String sysTableId ) throws BusinessException {
+        CacheManager.getInstance().remove("SYS_TABLE_MODEL_INFO_CACHE");
         boolean isok = sysTableService.operatingDbTable(sysTableId);
         if (isok) {
             return ok("提交成功");

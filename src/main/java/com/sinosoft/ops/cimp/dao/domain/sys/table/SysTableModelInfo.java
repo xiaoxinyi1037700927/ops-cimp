@@ -117,6 +117,7 @@ public class SysTableModelInfo implements Serializable {
                         sysTableFieldInfo.setNameEn(field.getNameEn());
                         sysTableFieldInfo.setPK(StringUtils.equalsIgnoreCase(field.getIsPK(), YES));
                         sysTableFieldInfo.setSort(field.getSort() == null ? 0 : field.getSort());
+                        sysTableFieldInfo.setCodeSetName(field.getSysCodeSetName());
                         return sysTableFieldInfo;
                     }
             ).collect(Collectors.toList());

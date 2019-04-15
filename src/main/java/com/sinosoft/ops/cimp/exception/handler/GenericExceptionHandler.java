@@ -33,11 +33,11 @@ public class GenericExceptionHandler extends ResponseEntityExceptionHandler {
         logger.error(ExceptionUtil.stackTraceText(e));
         if (e instanceof BusinessException) {
             BusinessException exception = (BusinessException) e;
-            errorMsg = exception.getErrorMsg();
+            errorMsg = exception.getErrorDtlMsg();
         }
         if (e instanceof SystemException) {
             SystemException exception = (SystemException) e;
-            errorMsg = exception.getErrorMsg();
+            errorMsg = exception.getErrorDtlMsg();
         }
         if (StringUtils.isEmpty(errorMsg)) {
             errorMsg = "系统异常";

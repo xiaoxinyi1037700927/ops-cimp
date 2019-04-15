@@ -224,9 +224,11 @@ public class SysTableInfoDaoImpl implements SysTableInfoDao {
                     String defaultHtml = sysTableFieldInfo.getDefaultHtml();
                     String defaultScript = sysTableFieldInfo.getDefaultScript();
                     Integer sysSort = sysTableFieldInfo.getSort();
+                    String codeSetName = sysTableFieldInfo.getCodeSetName();
 
                     sysTableFieldInfoDTO.setId(sysFieldId);
                     sysTableFieldInfoDTO.setAppTableFieldGroupName(appFieldGroupName);
+                    sysTableFieldInfoDTO.setCodeSetName(codeSetName);
                     if (StringUtils.isNotEmpty(appFieldNameCn)) {
                         sysTableFieldInfoDTO.setFieldNameCn(appFieldNameCn);
                     } else {
@@ -239,9 +241,9 @@ public class SysTableInfoDaoImpl implements SysTableInfoDao {
                         sysTableFieldInfoDTO.setDefaultHtml(defaultHtml);
                     }
                     if (StringUtils.isNotEmpty(appScript)) {
-                        sysTableFieldInfoDTO.setDefaultHtml(appScript);
+                        sysTableFieldInfoDTO.setDefaultScript(appScript);
                     } else {
-                        sysTableFieldInfoDTO.setDefaultHtml(defaultScript);
+                        sysTableFieldInfoDTO.setDefaultScript(defaultScript);
                     }
                     if (appSort != null) {
                         sysTableFieldInfoDTO.setSort(appSort);
