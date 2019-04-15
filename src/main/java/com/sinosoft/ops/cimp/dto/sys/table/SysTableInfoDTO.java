@@ -23,6 +23,8 @@ public class SysTableInfoDTO implements Serializable {
     private String tableNameFK;
     @ApiModelProperty(value = "信息集排序")
     private Integer sort;
+    @ApiModelProperty(value = "信息集分组名称")
+    private String appTableGroupName;
     @ApiModelProperty(value = "信息集下所有属性")
     private List<SysTableFieldInfoDTO> fields = Lists.newArrayList();
 
@@ -80,6 +82,14 @@ public class SysTableInfoDTO implements Serializable {
 
     public void setSort(Integer sort) {
         this.sort = sort;
+    }
+
+    public String getAppTableGroupName() {
+        return appTableGroupName;
+    }
+
+    public void setAppTableGroupName(String appTableGroupName) {
+        this.appTableGroupName = appTableGroupName;
     }
 
     public List<SysTableFieldInfoDTO> getFields() {

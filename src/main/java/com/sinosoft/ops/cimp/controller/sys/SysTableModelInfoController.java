@@ -1,6 +1,7 @@
 package com.sinosoft.ops.cimp.controller.sys;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.sinosoft.ops.cimp.config.swagger2.SystemApiGroup;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.dao.SysTableInfoDao;
@@ -41,7 +42,24 @@ public class SysTableModelInfoController extends BaseController {
         this.sysTableInfoDao = sysTableInfoDao;
     }
 
-    @RequestMapping(value = "/getSysEntityStructure", method = RequestMethod.GET)
+    @RequestMapping(value = "/getSysTableNames", method = RequestMethod.GET)
+    public ResponseEntity getSysTableNames(
+            @RequestParam("appCode") String prjCode,
+            @RequestParam("tableTypeName") String tableTypeName) throws BusinessException {
+
+        if (StringUtils.isEmpty(prjCode)) {
+            return fail("查询表结构必须传递项目编号");
+        }
+        if (StringUtils.isEmpty(tableTypeName)) {
+            return fail("查询表结构必须传递表类型名称");
+        }
+        SysTableModelInfoDTO tableInfo = sysTableInfoDao.getTableInfo(tableTypeName, prjCode);
+        Map<String, String> result = Maps.newHashMap();
+        tableInfo.getTables().forEach(table -> result.put(table.getTableNameEn(), table.getTableNameCn()));
+        return ok(result);
+    }
+
+    @RequestMapping(value = "/getSysTableStructure", method = RequestMethod.GET)
     public ResponseEntity<SysTableModelInfoDTO> getSysEntityInfo(
             @RequestParam("prjCode") String prjCode,
             @RequestParam("tableTypeName") String tableTypeName,
@@ -65,7 +83,7 @@ public class SysTableModelInfoController extends BaseController {
 
     @RequestMapping(value = "saveSysEntityData", method = RequestMethod.POST)
     public ResponseEntity saveSysEntityData(
-            @RequestParam("prjCode") String prjCode,
+            @RequestParam("appCode") String appCode,
             @RequestParam("tableTypeName") String tableTypeName,
             @RequestParam("tableName") String tableName,
             @RequestParam("tableNamePK") String tableNamePK,
@@ -97,7 +115,7 @@ public class SysTableModelInfoController extends BaseController {
         Map formMap = JsonUtil.parseStringToObject(form, HashMap.class);
         QueryDataParamBuilder queryDataParam = new QueryDataParamBuilder();
 
-        queryDataParam.setPrjCode(prjCode)
+        queryDataParam.setPrjCode(appCode)
                 .setTableTypeNameEn(tableTypeName)
                 .setTableNameEn(tableName)
                 .setTableNameEnPK(tableNamePK)
@@ -106,4 +124,45 @@ public class SysTableModelInfoController extends BaseController {
         sysTableModelInfoService.saveData(queryDataParam);
         return ok("保存成功");
     }
+
+//    @RequestMapping(value = "updateSysTableData", method = RequestMethod.POST)
+//    public ResponseEntity getSysEntityData(
+//            @RequestParam("prjCode") String prjCode,
+//            @RequestParam("tableTypeName") String tableTypeName,
+//            @RequestParam("tableName") String tableName,
+//            @RequestParam("tableNamePK") String tableNamePK,
+//            @RequestParam("tableNamePKValue") String tableNamePK,
+//            @RequestParam("tableNameFK") String tableNameFK,
+//            @RequestParam("tableNameFK") String tableNameFK,
+//            @RequestParam("form") String form) throws BusinessException {
+//
+//        if (StringUtils.isEmpty(entityAttrGroupName)) {
+//            return fail("修改信息集必须指定表名");
+//        }
+//        if (StringUtils.isEmpty(saveTablePrimaryField)) {
+//            return fail("修改信息集必须指定信息集主键字段");
+//        }
+//        if (StringUtils.isEmpty(saveTablePrimaryFieldValue)) {
+//            return fail("修改信息集必须指定信息集主键字段的值");
+//        }
+//
+//        Map<String, List<SysEntityGroup>> groupNameEnMap = entityInfo.getGroupList().stream().collect(Collectors.groupingBy(SysEntityGroup::getGroupNameEn));
+//        List<SysEntityGroup> sysEntityGroups = groupNameEnMap.get(entityAttrGroupName);
+//        if (sysEntityGroups == null) {
+//            return fail("查询的属性组不存在");
+//        }
+//
+//        Map formMap = JsonUtil.parseStringToObject(form, HashMap.class);
+//        QueryDataParamBuilder queryDataParam = new QueryDataParamBuilder();
+//
+//        queryDataParam.setPrjCode(prjCode)
+//                .setEntityName(entityName)
+//                .setEntityAttrGroupName(entityAttrGroupName)
+//                .setSaveTablePrimaryField(saveTablePrimaryField)
+//                .setSaveTablePrimaryFieldValue(saveTablePrimaryFieldValue)
+//                .setSaveOrUpdateFormData(formMap);
+//
+//        sysEntityService.updateData(queryDataParam);
+//        return ok("修改成功");
+//    }
 }

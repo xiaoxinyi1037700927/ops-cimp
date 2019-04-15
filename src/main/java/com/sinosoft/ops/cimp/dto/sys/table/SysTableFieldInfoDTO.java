@@ -19,6 +19,8 @@ public class SysTableFieldInfoDTO implements Serializable {
     private String defaultScript;
     @ApiModelProperty(value = "排序")
     private Integer sort;
+    @ApiModelProperty(value = "表字段分组名称")
+    private String appTableFieldGroupName;
 
     public String getId() {
         return id;
@@ -66,5 +68,13 @@ public class SysTableFieldInfoDTO implements Serializable {
 
     public void setSort(Integer sort) {
         this.sort = sort;
+    }
+
+    public String getAppTableFieldGroupName() {
+        return appTableFieldGroupName;
+    }
+
+    public void setAppTableFieldGroupName(String appTableFieldGroupName) {
+        this.appTableFieldGroupName = appTableFieldGroupName;
     }
 }
