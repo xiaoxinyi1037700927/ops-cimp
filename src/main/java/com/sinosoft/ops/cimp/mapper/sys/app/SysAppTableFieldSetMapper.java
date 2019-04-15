@@ -29,7 +29,7 @@ public interface SysAppTableFieldSetMapper {
 
     @Named("getCurrentId")
     default String getCurrentId(String id) {
-        return "test";
+        return "0";
     }
 
     @Named("getTime")

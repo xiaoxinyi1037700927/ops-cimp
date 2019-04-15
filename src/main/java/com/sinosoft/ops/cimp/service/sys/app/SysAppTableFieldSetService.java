@@ -4,7 +4,7 @@ import com.sinosoft.ops.cimp.dto.PaginationViewModel;
 import com.sinosoft.ops.cimp.vo.from.sys.app.sysAppTableFieldSet.SysAppTableFieldSetAddModel;
 import com.sinosoft.ops.cimp.vo.from.sys.app.sysAppTableFieldSet.SysAppTableFieldSetModifyModel;
 import com.sinosoft.ops.cimp.vo.from.sys.app.sysAppTableFieldSet.SysAppTableFieldSetSearchModel;
-import com.sinosoft.ops.cimp.vo.from.sys.app.sysAppTableFieldSet.SysTableFieldSearchModel;
+import com.sinosoft.ops.cimp.vo.from.sys.app.sysAppTableFieldSet.SysAppTableFieldSearchModel;
 import com.sinosoft.ops.cimp.vo.to.sys.app.sysAppTableFieldSet.SysAppTableFieldModel;
 import com.sinosoft.ops.cimp.vo.to.sys.app.sysAppTableFieldSet.SysAppTableFieldSetModel;
 
@@ -39,7 +39,7 @@ public interface SysAppTableFieldSetService {
     /**
      * 系统字段列表
      */
-    List<SysAppTableFieldModel> listSysTableField(SysTableFieldSearchModel searchModel);
+    List<SysAppTableFieldModel> listSysTableField(SysAppTableFieldSearchModel searchModel);
 
     /**
      * 交换排序

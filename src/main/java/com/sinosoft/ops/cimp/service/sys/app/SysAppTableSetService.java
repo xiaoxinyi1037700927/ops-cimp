@@ -4,7 +4,7 @@ import com.sinosoft.ops.cimp.dto.PaginationViewModel;
 import com.sinosoft.ops.cimp.vo.from.sys.app.sysAppTableSet.SysAppTableSetAddModel;
 import com.sinosoft.ops.cimp.vo.from.sys.app.sysAppTableSet.SysAppTableSetModifyModel;
 import com.sinosoft.ops.cimp.vo.from.sys.app.sysAppTableSet.SysAppTableSetSearchModel;
-import com.sinosoft.ops.cimp.vo.from.sys.app.sysAppTableSet.SysTableSearchModel;
+import com.sinosoft.ops.cimp.vo.from.sys.app.sysAppTableSet.SysAppTableSearchModel;
 import com.sinosoft.ops.cimp.vo.to.sys.app.sysAppTableSet.SysAppTableSetModel;
 import com.sinosoft.ops.cimp.vo.to.sys.app.sysAppTableSet.SysAppTableModel;
 import com.sinosoft.ops.cimp.vo.to.sys.app.sysAppTableSet.SysAppTableTypeModel;
@@ -45,7 +45,7 @@ public interface SysAppTableSetService {
     /**
      * 系统表列表
      */
-    List<SysAppTableModel> listSysTable(SysTableSearchModel searchModel);
+    List<SysAppTableModel> listSysTable(SysAppTableSearchModel searchModel);
 
     /**
      * 交换排序
