@@ -1,0 +1,58 @@
+package com.sinosoft.ops.cimp.common.word.data;
+
+import java.util.List;
+import java.util.Map;
+
+import com.sinosoft.ops.cimp.service.word.ExportService;
+import com.sinosoft.ops.cimp.util.StringUtil;
+import org.apache.commons.lang3.StringUtils;
+
+/**
+ * @version 1.0.0
+ * @classname: SartySecretaryAttrValue
+ * @description: 党组织书记姓名
+ * @author: zhangxp
+ * @date: 2017年12月4日 下午1:01:36
+ */
+public class SartySecretaryAttrValue implements AttrValue {
+    private final String key = "partySecretary";
+    private final int order = 7;
+
+    @Override
+    public Object getAttrValue(Map<String, Object> attrValueContext, String partyId, ExportService exportWordService) {
+//    	String partyId = OrganizationFullNameAttrValue.getPartyId();
+        Map d001Map = (Map) attrValueContext.get("D001");
+        final String partySecretaryInfoSql = "SELECT D001024 FROM Party_D001 WHERE PARTY_ID = '%s'";
+        if (d001Map != null) {
+            String partySecretary = StringUtil.obj2Str(d001Map.get("D001024"));
+            if (StringUtils.isEmpty(partySecretary)) {
+                partySecretary = this.getPartySecretary(partySecretaryInfoSql, partyId, exportWordService);
+            }
+            return partySecretary;
+        } else {
+            String partySecretary = this.getPartySecretary(partySecretaryInfoSql, partyId, exportWordService);
+            return partySecretary;
+        }
+    }
+
+    private String getPartySecretary(String sql, String depId, ExportService exportWordService) {
+        String attrInfoSql = String.format(sql, depId);
+        List attrInfoList = exportWordService.findBySQL(attrInfoSql);
+        if (attrInfoList != null && attrInfoList.size() > 0) {
+            Map map = (Map) attrInfoList.get(0);
+            if (map != null) {
+                return StringUtil.obj2Str(map.get("D001024"));
+            }
+        }
+        return "";
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    @Override
+    public int getOrder() {
+        return order;
+    }
+}

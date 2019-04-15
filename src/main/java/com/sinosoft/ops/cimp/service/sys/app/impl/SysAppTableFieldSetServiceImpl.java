@@ -56,6 +56,7 @@ public class SysAppTableFieldSetServiceImpl implements SysAppTableFieldSetServic
     @Override
     public PaginationViewModel<SysAppTableFieldSetModel> listFieldSet(SysAppTableFieldSetSearchModel searchModel) {
         QSysAppTableFieldSet qFieldSet = QSysAppTableFieldSet.sysAppTableFieldSet;
+        QSysTableField qSysTableField = QSysTableField.sysTableField;
 
         int pageSize = searchModel.getPageSize() > 0 ? searchModel.getPageSize() : 1;
         int pageIndex = searchModel.getPageIndex() > 0 ? searchModel.getPageIndex() : 10;
@@ -73,7 +74,14 @@ public class SysAppTableFieldSetServiceImpl implements SysAppTableFieldSetServic
                 .pageIndex(pageIndex)
                 .pageSize(pageSize)
                 .totalCount(page.getTotalElements())
-                .data(page.getContent().stream().map(SysAppTableFieldSetMapper.INSTANCE::fieldSetToFieldSetModel).collect(Collectors.toList()))
+                .data(page.getContent().stream().map(fieldSet -> {
+                    SysAppTableFieldSetModel model = SysAppTableFieldSetMapper.INSTANCE.fieldSetToFieldSetModel(fieldSet);
+                    //如果英文名为空，去系统表字段表中查询
+                    if (StringUtils.isNotEmpty(model.getNameEn())) {
+                        model.setNameEn(jpaQueryFactory.select(qSysTableField.nameEn).from(qSysTableField).where(qSysTableField.id.eq(model.getSysTableFieldId())).fetchOne());
+                    }
+                    return model;
+                }).collect(Collectors.toList()))
                 .build();
     }
 
