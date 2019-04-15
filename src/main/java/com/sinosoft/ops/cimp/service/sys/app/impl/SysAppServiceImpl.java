@@ -47,8 +47,8 @@ public class SysAppServiceImpl implements SysAppService {
 
         QSysApp qSysApp = QSysApp.sysApp;
         BooleanBuilder builder = new BooleanBuilder();
-        if (StringUtils.isNotEmpty(searchModel.getCode())) {
-            builder = builder.and(qSysApp.code.contains(searchModel.getCode()));
+        if (null != searchModel.getCode()) {
+            builder = builder.and(qSysApp.code.eq(searchModel.getCode()));
         }
         if (StringUtils.isNotEmpty(searchModel.getName())) {
             builder = builder.and(qSysApp.name.contains(searchModel.getName()));

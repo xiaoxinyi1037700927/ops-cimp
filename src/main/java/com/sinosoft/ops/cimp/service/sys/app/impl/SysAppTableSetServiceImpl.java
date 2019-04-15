@@ -4,7 +4,6 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sinosoft.ops.cimp.dto.PaginationViewModel;
 import com.sinosoft.ops.cimp.entity.sys.app.QSysAppTableSet;
-import com.sinosoft.ops.cimp.entity.sys.app.SysAppTableFieldSet;
 import com.sinosoft.ops.cimp.entity.sys.app.SysAppTableSet;
 import com.sinosoft.ops.cimp.entity.sys.table.QSysTable;
 import com.sinosoft.ops.cimp.entity.sys.table.SysTable;
@@ -14,10 +13,10 @@ import com.sinosoft.ops.cimp.repository.table.SysTableRepository;
 import com.sinosoft.ops.cimp.repository.table.SysTableTypeRepository;
 import com.sinosoft.ops.cimp.service.sys.app.SysAppTableFieldGroupService;
 import com.sinosoft.ops.cimp.service.sys.app.SysAppTableSetService;
+import com.sinosoft.ops.cimp.vo.from.sys.app.sysAppTableSet.SysAppTableSearchModel;
 import com.sinosoft.ops.cimp.vo.from.sys.app.sysAppTableSet.SysAppTableSetAddModel;
 import com.sinosoft.ops.cimp.vo.from.sys.app.sysAppTableSet.SysAppTableSetModifyModel;
 import com.sinosoft.ops.cimp.vo.from.sys.app.sysAppTableSet.SysAppTableSetSearchModel;
-import com.sinosoft.ops.cimp.vo.from.sys.app.sysAppTableSet.SysTableSearchModel;
 import com.sinosoft.ops.cimp.vo.to.sys.app.sysAppTableSet.SysAppTableModel;
 import com.sinosoft.ops.cimp.vo.to.sys.app.sysAppTableSet.SysAppTableSetModel;
 import com.sinosoft.ops.cimp.vo.to.sys.app.sysAppTableSet.SysAppTableTypeModel;
@@ -177,7 +176,7 @@ public class SysAppTableSetServiceImpl implements SysAppTableSetService {
      * 系统表列表
      */
     @Override
-    public List<SysAppTableModel> listSysTable(SysTableSearchModel searchModel) {
+    public List<SysAppTableModel> listSysTable(SysAppTableSearchModel searchModel) {
         QSysTable qSysTable = QSysTable.sysTable;
         QSysAppTableSet qTableSet = QSysAppTableSet.sysAppTableSet;
 
@@ -188,6 +187,9 @@ public class SysAppTableSetServiceImpl implements SysAppTableSetService {
         builder = builder.and(qSysTable.sysTableTypeId.eq(searchModel.getSysTableTypeId()));
         if (sysTableIds.size() > 0) {
             builder = builder.and(qSysTable.id.notIn(sysTableIds));
+        }
+        if (StringUtils.isNotEmpty(searchModel.getNameCn())) {
+            builder = builder.and(qSysTable.nameCn.contains(searchModel.getNameCn()));
         }
 
         Iterable<SysTable> iterable = sysTableRepository.findAll(builder, new Sort(Sort.Direction.ASC, qSysTable.sort.getMetadata().getName()));

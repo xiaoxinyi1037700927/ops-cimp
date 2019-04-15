@@ -15,7 +15,7 @@ import com.sinosoft.ops.cimp.service.sys.app.SysAppTableFieldSetService;
 import com.sinosoft.ops.cimp.vo.from.sys.app.sysAppTableFieldSet.SysAppTableFieldSetAddModel;
 import com.sinosoft.ops.cimp.vo.from.sys.app.sysAppTableFieldSet.SysAppTableFieldSetModifyModel;
 import com.sinosoft.ops.cimp.vo.from.sys.app.sysAppTableFieldSet.SysAppTableFieldSetSearchModel;
-import com.sinosoft.ops.cimp.vo.from.sys.app.sysAppTableFieldSet.SysTableFieldSearchModel;
+import com.sinosoft.ops.cimp.vo.from.sys.app.sysAppTableFieldSet.SysAppTableFieldSearchModel;
 import com.sinosoft.ops.cimp.vo.to.sys.app.sysAppTableFieldSet.SysAppTableFieldSetModel;
 import com.sinosoft.ops.cimp.vo.to.sys.app.sysAppTableFieldSet.SysAppTableFieldModel;
 import org.apache.commons.lang3.StringUtils;
@@ -165,7 +165,7 @@ public class SysAppTableFieldSetServiceImpl implements SysAppTableFieldSetServic
      */
     @Transactional
     @Override
-    public List<SysAppTableFieldModel> listSysTableField(SysTableFieldSearchModel searchModel) {
+    public List<SysAppTableFieldModel> listSysTableField(SysAppTableFieldSearchModel searchModel) {
         QSysTableField qSysTableField = QSysTableField.sysTableField;
         QSysAppTableFieldSet qFieldSet = QSysAppTableFieldSet.sysAppTableFieldSet;
         QSysAppTableSet qTableSet = QSysAppTableSet.sysAppTableSet;
@@ -189,6 +189,10 @@ public class SysAppTableFieldSetServiceImpl implements SysAppTableFieldSetServic
         if (sysTableFieldIds.size() > 0) {
             builder = builder.and(qSysTableField.id.notIn(sysTableFieldIds));
         }
+        if (StringUtils.isNotEmpty(searchModel.getNameCn())) {
+            builder = builder.and(qSysTableField.nameCn.contains(searchModel.getNameCn()));
+        }
+
         Iterable<SysTableField> iterable = sysTableFieldRepository.findAll(builder);
 
         return StreamSupport.stream(iterable.spliterator(), false).map(SysAppTableFieldSetMapper.INSTANCE::sysTableFieldToSysTableFieldModel).collect(Collectors.toList());

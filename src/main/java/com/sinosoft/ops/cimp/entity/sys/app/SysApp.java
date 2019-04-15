@@ -24,8 +24,8 @@ public class SysApp implements Serializable {
     /**
      * 应用编号
      */
-    @Column(name = "CODE", length = 30)
-    private String code;
+    @Column(name = "CODE", length = 10)
+    private Integer code;
     /**
      * 应用名称
      */
@@ -62,11 +62,11 @@ public class SysApp implements Serializable {
         this.id = id;
     }
 
-    public String getCode() {
+    public Integer getCode() {
         return code;
     }
 
-    public void setCode(String code) {
+    public void setCode(Integer code) {
         this.code = code;
     }
 

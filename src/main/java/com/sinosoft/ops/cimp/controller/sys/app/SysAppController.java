@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
+@Validated
 @SystemApiGroup
 @Api(description = "系统应用操作")
 @RestController
@@ -43,7 +44,7 @@ public class SysAppController extends BaseController {
      */
     @ApiOperation(value = "新增系统应用")
     @PostMapping("/add")
-    public ResponseEntity addSysApp(@RequestBody SysAppAddModel addModel) throws BusinessException {
+    public ResponseEntity addSysApp(@Valid @RequestBody SysAppAddModel addModel) throws BusinessException {
         sysAppService.addSysApp(addModel);
         return ok("新增成功！");
     }

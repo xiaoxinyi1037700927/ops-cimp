@@ -3,6 +3,7 @@ package com.sinosoft.ops.cimp.vo.from.sys.app.sysApp;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 
@@ -11,8 +12,9 @@ public class SysAppAddModel {
     /**
      * 应用编码
      */
-    @ApiModelProperty(value = "应用编码")
-    private String code;
+    @ApiModelProperty(value = "应用编码", required = true)
+    @NotNull(message = "应用编码不能为空")
+    private Integer code;
     /**
      * 应用名称
      */
@@ -29,11 +31,11 @@ public class SysAppAddModel {
     @ApiModelProperty(value = "创建时间")
     private Date createTime;
 
-    public String getCode() {
+    public Integer getCode() {
         return code;
     }
 
-    public void setCode(String code) {
+    public void setCode(Integer code) {
         this.code = code;
     }
 

@@ -16,7 +16,7 @@ public class SysAppModifyModel {
      * 应用编码
      */
     @ApiModelProperty(value = "应用编码")
-    private String code;
+    private Integer code;
     /**
      * 应用名称
      */
@@ -41,11 +41,11 @@ public class SysAppModifyModel {
         this.id = id;
     }
 
-    public String getCode() {
+    public Integer getCode() {
         return code;
     }
 
-    public void setCode(String code) {
+    public void setCode(Integer code) {
         this.code = code;
     }
 
