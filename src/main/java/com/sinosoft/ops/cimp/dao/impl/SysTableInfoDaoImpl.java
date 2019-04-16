@@ -239,9 +239,9 @@ public class SysTableInfoDaoImpl implements SysTableInfoDao {
                         sysTableFieldInfoDTO.setDefaultHtml(defaultHtml);
                     }
                     if (StringUtils.isNotEmpty(appScript)) {
-                        sysTableFieldInfoDTO.setDefaultHtml(appScript);
+                        sysTableFieldInfoDTO.setDefaultScript(appScript);
                     } else {
-                        sysTableFieldInfoDTO.setDefaultHtml(defaultScript);
+                        sysTableFieldInfoDTO.setDefaultScript(defaultScript);
                     }
                     if (appSort != null) {
                         sysTableFieldInfoDTO.setSort(appSort);
