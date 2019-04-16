@@ -14,17 +14,17 @@ import java.util.List;
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *     &lt;restriction common="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
  *         &lt;element name="CacheEngines">
  *           &lt;complexType>
  *             &lt;complexContent>
- *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *               &lt;restriction common="{http://www.w3.org/2001/XMLSchema}anyType">
  *                 &lt;sequence>
  *                   &lt;element name="CacheEngine" maxOccurs="unbounded">
  *                     &lt;complexType>
  *                       &lt;complexContent>
- *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                         &lt;restriction common="{http://www.w3.org/2001/XMLSchema}anyType">
  *                           &lt;sequence>
  *                             &lt;element name="engineName" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *                             &lt;element name="implClass" type="{http://www.w3.org/2001/XMLSchema}string"/>
@@ -32,7 +32,7 @@ import java.util.List;
  *                             &lt;element name="params" minOccurs="0">
  *                               &lt;complexType>
  *                                 &lt;complexContent>
- *                                   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                                   &lt;restriction common="{http://www.w3.org/2001/XMLSchema}anyType">
  *                                     &lt;sequence>
  *                                       &lt;element name="param" type="{}Param" maxOccurs="unbounded" minOccurs="0"/>
  *                                     &lt;/sequence>
@@ -53,12 +53,12 @@ import java.util.List;
  *         &lt;element name="CacheListeners">
  *           &lt;complexType>
  *             &lt;complexContent>
- *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *               &lt;restriction common="{http://www.w3.org/2001/XMLSchema}anyType">
  *                 &lt;sequence>
  *                   &lt;element name="CacheListener" maxOccurs="unbounded" minOccurs="0">
  *                     &lt;complexType>
  *                       &lt;complexContent>
- *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                         &lt;restriction common="{http://www.w3.org/2001/XMLSchema}anyType">
  *                           &lt;sequence>
  *                             &lt;element name="listenerName" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *                             &lt;element name="implClass" type="{http://www.w3.org/2001/XMLSchema}string"/>
@@ -66,7 +66,7 @@ import java.util.List;
  *                             &lt;element name="params" minOccurs="0">
  *                               &lt;complexType>
  *                                 &lt;complexContent>
- *                                   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                                   &lt;restriction common="{http://www.w3.org/2001/XMLSchema}anyType">
  *                                     &lt;sequence>
  *                                       &lt;element name="param" type="{}Param" maxOccurs="unbounded" minOccurs="0"/>
  *                                     &lt;/sequence>
@@ -87,12 +87,12 @@ import java.util.List;
  *         &lt;element name="CacheItems">
  *           &lt;complexType>
  *             &lt;complexContent>
- *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *               &lt;restriction common="{http://www.w3.org/2001/XMLSchema}anyType">
  *                 &lt;sequence>
  *                   &lt;element name="CacheItem" maxOccurs="unbounded" minOccurs="0">
  *                     &lt;complexType>
  *                       &lt;complexContent>
- *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                         &lt;restriction common="{http://www.w3.org/2001/XMLSchema}anyType">
  *                           &lt;sequence>
  *                             &lt;element name="cacheName" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *                             &lt;element name="engineName" type="{http://www.w3.org/2001/XMLSchema}string"/>
@@ -101,7 +101,7 @@ import java.util.List;
  *                             &lt;element name="params" minOccurs="0">
  *                               &lt;complexType>
  *                                 &lt;complexContent>
- *                                   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                                   &lt;restriction common="{http://www.w3.org/2001/XMLSchema}anyType">
  *                                     &lt;sequence>
  *                                       &lt;element name="param" type="{}Param" maxOccurs="unbounded" minOccurs="0"/>
  *                                     &lt;/sequence>
@@ -210,12 +210,12 @@ public class CacheManagerInfo {
      * <pre>
      * &lt;complexType>
      *   &lt;complexContent>
-     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *     &lt;restriction common="{http://www.w3.org/2001/XMLSchema}anyType">
      *       &lt;sequence>
      *         &lt;element name="CacheEngine" maxOccurs="unbounded">
      *           &lt;complexType>
      *             &lt;complexContent>
-     *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *               &lt;restriction common="{http://www.w3.org/2001/XMLSchema}anyType">
      *                 &lt;sequence>
      *                   &lt;element name="engineName" type="{http://www.w3.org/2001/XMLSchema}string"/>
      *                   &lt;element name="implClass" type="{http://www.w3.org/2001/XMLSchema}string"/>
@@ -223,7 +223,7 @@ public class CacheManagerInfo {
      *                   &lt;element name="params" minOccurs="0">
      *                     &lt;complexType>
      *                       &lt;complexContent>
-     *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *                         &lt;restriction common="{http://www.w3.org/2001/XMLSchema}anyType">
      *                           &lt;sequence>
      *                             &lt;element name="param" type="{}Param" maxOccurs="unbounded" minOccurs="0"/>
      *                           &lt;/sequence>
@@ -287,7 +287,7 @@ public class CacheManagerInfo {
          * <pre>
          * &lt;complexType>
          *   &lt;complexContent>
-         *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+         *     &lt;restriction common="{http://www.w3.org/2001/XMLSchema}anyType">
          *       &lt;sequence>
          *         &lt;element name="engineName" type="{http://www.w3.org/2001/XMLSchema}string"/>
          *         &lt;element name="implClass" type="{http://www.w3.org/2001/XMLSchema}string"/>
@@ -295,7 +295,7 @@ public class CacheManagerInfo {
          *         &lt;element name="params" minOccurs="0">
          *           &lt;complexType>
          *             &lt;complexContent>
-         *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+         *               &lt;restriction common="{http://www.w3.org/2001/XMLSchema}anyType">
          *                 &lt;sequence>
          *                   &lt;element name="param" type="{}Param" maxOccurs="unbounded" minOccurs="0"/>
          *                 &lt;/sequence>
@@ -415,7 +415,7 @@ public class CacheManagerInfo {
              * <pre>
              * &lt;complexType>
              *   &lt;complexContent>
-             *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+             *     &lt;restriction common="{http://www.w3.org/2001/XMLSchema}anyType">
              *       &lt;sequence>
              *         &lt;element name="param" type="{}Param" maxOccurs="unbounded" minOccurs="0"/>
              *       &lt;/sequence>
@@ -474,12 +474,12 @@ public class CacheManagerInfo {
      * <pre>
      * &lt;complexType>
      *   &lt;complexContent>
-     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *     &lt;restriction common="{http://www.w3.org/2001/XMLSchema}anyType">
      *       &lt;sequence>
      *         &lt;element name="CacheItem" maxOccurs="unbounded" minOccurs="0">
      *           &lt;complexType>
      *             &lt;complexContent>
-     *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *               &lt;restriction common="{http://www.w3.org/2001/XMLSchema}anyType">
      *                 &lt;sequence>
      *                   &lt;element name="cacheName" type="{http://www.w3.org/2001/XMLSchema}string"/>
      *                   &lt;element name="engineName" type="{http://www.w3.org/2001/XMLSchema}string"/>
@@ -488,7 +488,7 @@ public class CacheManagerInfo {
      *                   &lt;element name="params" minOccurs="0">
      *                     &lt;complexType>
      *                       &lt;complexContent>
-     *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *                         &lt;restriction common="{http://www.w3.org/2001/XMLSchema}anyType">
      *                           &lt;sequence>
      *                             &lt;element name="param" type="{}Param" maxOccurs="unbounded" minOccurs="0"/>
      *                           &lt;/sequence>
@@ -552,7 +552,7 @@ public class CacheManagerInfo {
          * <pre>
          * &lt;complexType>
          *   &lt;complexContent>
-         *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+         *     &lt;restriction common="{http://www.w3.org/2001/XMLSchema}anyType">
          *       &lt;sequence>
          *         &lt;element name="cacheName" type="{http://www.w3.org/2001/XMLSchema}string"/>
          *         &lt;element name="engineName" type="{http://www.w3.org/2001/XMLSchema}string"/>
@@ -561,7 +561,7 @@ public class CacheManagerInfo {
          *         &lt;element name="params" minOccurs="0">
          *           &lt;complexType>
          *             &lt;complexContent>
-         *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+         *               &lt;restriction common="{http://www.w3.org/2001/XMLSchema}anyType">
          *                 &lt;sequence>
          *                   &lt;element name="param" type="{}Param" maxOccurs="unbounded" minOccurs="0"/>
          *                 &lt;/sequence>
@@ -703,7 +703,7 @@ public class CacheManagerInfo {
              * <pre>
              * &lt;complexType>
              *   &lt;complexContent>
-             *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+             *     &lt;restriction common="{http://www.w3.org/2001/XMLSchema}anyType">
              *       &lt;sequence>
              *         &lt;element name="param" type="{}Param" maxOccurs="unbounded" minOccurs="0"/>
              *       &lt;/sequence>
@@ -762,12 +762,12 @@ public class CacheManagerInfo {
      * <pre>
      * &lt;complexType>
      *   &lt;complexContent>
-     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *     &lt;restriction common="{http://www.w3.org/2001/XMLSchema}anyType">
      *       &lt;sequence>
      *         &lt;element name="CacheListener" maxOccurs="unbounded" minOccurs="0">
      *           &lt;complexType>
      *             &lt;complexContent>
-     *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *               &lt;restriction common="{http://www.w3.org/2001/XMLSchema}anyType">
      *                 &lt;sequence>
      *                   &lt;element name="listenerName" type="{http://www.w3.org/2001/XMLSchema}string"/>
      *                   &lt;element name="implClass" type="{http://www.w3.org/2001/XMLSchema}string"/>
@@ -775,7 +775,7 @@ public class CacheManagerInfo {
      *                   &lt;element name="params" minOccurs="0">
      *                     &lt;complexType>
      *                       &lt;complexContent>
-     *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *                         &lt;restriction common="{http://www.w3.org/2001/XMLSchema}anyType">
      *                           &lt;sequence>
      *                             &lt;element name="param" type="{}Param" maxOccurs="unbounded" minOccurs="0"/>
      *                           &lt;/sequence>
@@ -839,7 +839,7 @@ public class CacheManagerInfo {
          * <pre>
          * &lt;complexType>
          *   &lt;complexContent>
-         *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+         *     &lt;restriction common="{http://www.w3.org/2001/XMLSchema}anyType">
          *       &lt;sequence>
          *         &lt;element name="listenerName" type="{http://www.w3.org/2001/XMLSchema}string"/>
          *         &lt;element name="implClass" type="{http://www.w3.org/2001/XMLSchema}string"/>
@@ -847,7 +847,7 @@ public class CacheManagerInfo {
          *         &lt;element name="params" minOccurs="0">
          *           &lt;complexType>
          *             &lt;complexContent>
-         *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+         *               &lt;restriction common="{http://www.w3.org/2001/XMLSchema}anyType">
          *                 &lt;sequence>
          *                   &lt;element name="param" type="{}Param" maxOccurs="unbounded" minOccurs="0"/>
          *                 &lt;/sequence>
@@ -967,7 +967,7 @@ public class CacheManagerInfo {
              * <pre>
              * &lt;complexType>
              *   &lt;complexContent>
-             *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+             *     &lt;restriction common="{http://www.w3.org/2001/XMLSchema}anyType">
              *       &lt;sequence>
              *         &lt;element name="param" type="{}Param" maxOccurs="unbounded" minOccurs="0"/>
              *       &lt;/sequence>

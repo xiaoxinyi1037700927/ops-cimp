@@ -1,5 +1,7 @@
 package com.sinosoft.ops.cimp.controller;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.sinosoft.ops.cimp.common.BaseResult;
 import com.sinosoft.ops.cimp.common.BaseResultHttpStatus;
 import com.sinosoft.ops.cimp.exception.BusinessException;
@@ -9,6 +11,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
+import javax.servlet.http.HttpServletResponse;
+import java.io.PrintWriter;
 
 @SuppressWarnings("unchecked")
 public abstract class BaseController {
@@ -57,5 +62,25 @@ public abstract class BaseController {
             }
         }
         return new ResponseEntity(BaseResult.fail(message), HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * 写入JSON格式数据（返回给客户端）
+     *
+     * @param response HTTPResponse对象
+     * @param data     数据
+     */
+    protected void writeJson(HttpServletResponse response, Object data) {
+        try (PrintWriter writer = response.getWriter()) {
+            String json = JSON.toJSONString(data, SerializerFeature.WriteDateUseDateFormat);
+            // 设置信息类型、编码格式和禁用缓存
+            response.setContentType("application/json;charset=utf-8");
+            response.setHeader("cache-Control", "no-cache");
+            response.setCharacterEncoding("utf-8");
+            writer.print(json);
+            writer.flush();
+        } catch (Exception e) {
+            LOGGER.error("写入JSON数据失败！" + data, e);
+        }
     }
 }

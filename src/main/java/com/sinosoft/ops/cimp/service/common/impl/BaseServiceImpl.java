@@ -35,6 +35,7 @@ public class BaseServiceImpl implements BaseService {
 
     /**
      * 将可树型化的对象集构建成树型结构
+     *
      * @param collection 可树型化的对象集
      * @return 根节点集合
      */
@@ -85,6 +86,7 @@ public class BaseServiceImpl implements BaseService {
 
     /**
      * 克隆对象
+     *
      * @param obj 要克隆的对象
      * @return 克隆对象
      * @throws IllegalAccessException
@@ -102,7 +104,8 @@ public class BaseServiceImpl implements BaseService {
 
     /**
      * 根据页号和每页数据行数计算起始记录
-     * @param pageNo 页号
+     *
+     * @param pageNo   页号
      * @param pageSize 每页数据行数
      * @return 起始记录
      */
@@ -112,6 +115,7 @@ public class BaseServiceImpl implements BaseService {
 
     /**
      * 将java对象（必须实现序列化接口）写入到文件
+     *
      * @param obj
      * @param filename
      */
@@ -143,6 +147,7 @@ public class BaseServiceImpl implements BaseService {
 
     /**
      * 从文件读取对象
+     *
      * @param filename
      * @return
      */
