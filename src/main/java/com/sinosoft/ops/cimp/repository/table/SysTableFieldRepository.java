@@ -9,12 +9,6 @@ import java.util.List;
 
 public interface SysTableFieldRepository extends JpaRepository<SysTableField, String>, QuerydslPredicateExecutor<SysTableField> {
 
-//    List<SysTableField> findByEntityGroupIdIsIn(List<Integer> entityGroupIds);
-//
-//    List<SysTableField> findBySysTableIdIs(Integer groupId);
-//
-//    List<SysTableField> findByNameCn(String entityAttrNameEn);
-//
-//    List<SysTableField> findByDbTableName(String entitySaveTable);
+    List<SysTableField> findBySysTableId(String sysCodeId);
 
 }

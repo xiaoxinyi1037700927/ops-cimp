@@ -37,6 +37,11 @@ public class SysAppTableFieldSet implements Serializable {
     @Column(name = "NAME", length = 120)
     private String name;
     /**
+     * 英文字段名称
+     */
+    @Column(name = "NAME_EN", length = 120)
+    private String nameEn;
+    /**
      * 排序
      */
     @Column(name = "SORT", length = 10)
@@ -44,12 +49,12 @@ public class SysAppTableFieldSet implements Serializable {
     /**
      * 代码模板
      */
-    @Column(name = "HTML", length = 300)
+    @Column(name = "HTML", length = 4000)
     private String html;
     /**
      * 脚本
      */
-    @Column(name = "SCRIPT", length = 300)
+    @Column(name = "SCRIPT", length = 4000)
     private String script;
     /**
      * 创建人
@@ -160,5 +165,13 @@ public class SysAppTableFieldSet implements Serializable {
 
     public void setModifyTime(Date modifyTime) {
         this.modifyTime = modifyTime;
+    }
+
+    public String getNameEn() {
+        return nameEn;
+    }
+
+    public void setNameEn(String nameEn) {
+        this.nameEn = nameEn;
     }
 }

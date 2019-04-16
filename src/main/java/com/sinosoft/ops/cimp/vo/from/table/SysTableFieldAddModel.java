@@ -28,6 +28,12 @@ public class SysTableFieldAddModel {
     private String description;
 
     /**
+     * 字段排序
+     */
+    @ApiModelProperty(value = "字段排序")
+    private String sort;
+
+    /**
      * 字段所属表名
      */
     @ApiModelProperty(value = "字段所属表名")
@@ -102,6 +108,9 @@ public class SysTableFieldAddModel {
     @ApiModelProperty(value = "默认脚本")
     private String defaultScript;
 
+    @ApiModelProperty(value = " 默认引用代码集")
+    private String sysCodeSetName;
+
     public String getSysTableId() {
         return sysTableId;
     }
@@ -160,6 +169,14 @@ public class SysTableFieldAddModel {
 
     public String getIsFK() {
         return isFK;
+    }
+
+    public String getSort() {
+        return sort;
+    }
+
+    public void setSort(String sort) {
+        this.sort = sort;
     }
 
     public void setIsFK(String isFK) {
@@ -236,5 +253,13 @@ public class SysTableFieldAddModel {
 
     public void setDefaultScript(String defaultScript) {
         this.defaultScript = defaultScript;
+    }
+
+    public String getSysCodeSetName() {
+        return sysCodeSetName;
+    }
+
+    public void setSysCodeSetName(String sysCodeSetName) {
+        this.sysCodeSetName = sysCodeSetName;
     }
 }

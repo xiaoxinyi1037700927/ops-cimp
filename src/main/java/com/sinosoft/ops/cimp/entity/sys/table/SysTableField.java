@@ -25,34 +25,40 @@ public class SysTableField implements Serializable {
      * 系统表ID
      */
     @Column(name = "SYS_TABLE_ID", length = 36)
-    private String sysTableId;
+    private String sysTableId;   //entityGroupId
     /**
      * 中文字段名
      */
     @Column(name = "NAME_CN", length = 120)
-    private String nameCn;
+    private String nameCn;      //entityAttrNameCn
     /**
      * 英文字段名
      */
     @Column(name = "NAME_EN", length = 120)
-    private String nameEn;
+    private String nameEn;      //entityAttrNameEn
     /**
      * 字段描述
      */
     @Column(name = "DESCRIPTION", length = 300)
-    private String description;
+    private String description;   //entityAttrDesc
 
     /**
      * 字段所属表名
      */
     @Column(name = "DB_TABLE_NAME", length = 30)
-    private String dbTableName;
+    private String dbTableName;   //entitySaveTable
+
+    /**
+     * 字段排序
+     */
+    @Column(name = "SORT", length = 11)
+    private Integer sort;   //entitySaveTable
 
     /**
      * 数据库中的字段名
      */
     @Column(name = "DB_FIELD_NAME", length = 30)
-    private String dbFieldName;
+    private String dbFieldName;   //entitySaveField
 
     /**
      * 是否主键
@@ -70,52 +76,52 @@ public class SysTableField implements Serializable {
      * 数据库中的字段类型
      */
     @Column(name = "DB_FIELD_DATA_TYPE", length = 30)
-    private String dbFieldDataType;
+    private String dbFieldDataType;    //entitySaveType
 
     /**
      * 是否逻辑删除
      */
     @Column(name = "LOGICAL_DELETE_FLAG", length = 10)
-    private String logicalDeleteFlag;
+    private String logicalDeleteFlag;   //logicalDeleteFlag
 
     /**
      * 是否级联删除
      */
     @Column(name = "DELETE_CASCADE_FLAG", length = 10)
-    private String deleteCascadeFlag;
+    private String deleteCascadeFlag;   //deleteCascadeFlag
 
     /**
      * 属性值修改是否监听
      */
     @Column(name = "ATTR_VALUE_MONITOR", length = 10)
-    private String attrValueMonitor;
+    private String attrValueMonitor;       //attrValueMonitor
 
     /**
      * 是否可以搜索结果
      */
     @Column(name = "CAN_RESULT_FLAG", length = 10)
-    private String canResultFlag;
+    private String canResultFlag;   //canResultFlag
     /**
      * 是否可以作为条件字段
      */
     @Column(name = "CAN_CONDITION_FLAG", length = 10)
-    private String canConditionFlag;
+    private String canConditionFlag;    //canConditionFlag
     /**
      * 是否可以作为排序字段
      */
     @Column(name = "CAN_ORDER_FLAG", length = 10)
-    private String canOrderFlag;
+    private String canOrderFlag;        //canOrderFlag
 
     /**
      * html代码
      */
     @Column(name = "DEFAULT_HTML", length = 4000)
-    private String defaultHtml;
+    private String defaultHtml;     //defaultHtml
     /**
      * 默认脚本
      */
     @Column(name = "DEFAULT_SCRIPT", length = 4000)
-    private String defaultScript;
+    private String defaultScript;   //defaultScript
 
     /**
      * 默认引用代码集
@@ -256,6 +262,14 @@ public class SysTableField implements Serializable {
 
     public String getCanResultFlag() {
         return canResultFlag;
+    }
+
+    public Integer getSort() {
+        return sort;
+    }
+
+    public void setSort(Integer sort) {
+        this.sort = sort;
     }
 
     public void setCanResultFlag(String canResultFlag) {

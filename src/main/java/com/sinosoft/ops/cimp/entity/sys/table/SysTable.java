@@ -21,12 +21,15 @@ public class SysTable implements Serializable {
     @GenericGenerator(name = "uuid", strategy = "uuid")
     @Column(name = "ID", length = 36)
     private String id;
+
+    //原来的标示
+    private String sourceId;
+
     /**
      * 类别ID
      */
     @Column(name = "SYS_TABLE_TYPE_ID", length = 36)
     private String sysTableTypeId;
-
     /**
      * 中文表名
      */
@@ -47,12 +50,12 @@ public class SysTable implements Serializable {
      */
     @Column(name = "STATUS", length = 10)
     private String status;
+
     /**
      * 数据库中的表名
      */
     @Column(name = "DB_TABLE_NAME", length = 50)
     private String dbTableName;
-
     /**
      * 排序
      */
@@ -80,6 +83,7 @@ public class SysTable implements Serializable {
     @Column(name = "MODIFY_TIME")
     @Temporal(TemporalType.TIMESTAMP)
     private Date modifyTime;
+
     /**
      * 是否主集表
      */

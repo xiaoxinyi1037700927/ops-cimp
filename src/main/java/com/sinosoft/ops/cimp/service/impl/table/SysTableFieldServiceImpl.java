@@ -18,6 +18,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -42,6 +43,7 @@ public class SysTableFieldServiceImpl implements SysTableFieldService {
             return false;
         }
         SysTableField sysTableField = SysTableFieldModelMapper.INSTANCE.modifyModelToSysTableField(sysTableFieldModifyModel);
+        sysTableField.setModifyTime(new Date());
         sysTableFieldDao.save(sysTableField);
         return true;
     }
@@ -53,6 +55,7 @@ public class SysTableFieldServiceImpl implements SysTableFieldService {
             return false;
         }
         SysTableField sysTableField = SysTableFieldModelMapper.INSTANCE.addModelToSysTableField(sysTableFieldAddModel);
+        sysTableField.setCreateTime(new Date());
         sysTableFieldDao.save(sysTableField);
         return true;
     }
@@ -65,10 +68,10 @@ public class SysTableFieldServiceImpl implements SysTableFieldService {
         if (pageSize <= 0) pageSize = 10;
 
         QSysTableField qSysTableField = QSysTableField.sysTableField;
-        PageRequest pageRequest = PageRequest.of(pageIndex - 1, pageSize, new Sort(Sort.Direction.ASC, qSysTableField.nameCn.getMetadata().getName()));
+        PageRequest pageRequest = PageRequest.of(pageIndex - 1, pageSize, new Sort(Sort.Direction.ASC, qSysTableField.sort.getMetadata().getName()));
         BooleanBuilder builder = new BooleanBuilder();
         if (StringUtils.isNotEmpty(searchModel.getSysTableId())) {
-            builder = builder.and(qSysTableField.id.eq(searchModel.getSysTableId()));
+            builder = builder.and(qSysTableField.sysTableId.eq(searchModel.getSysTableId()));
         }
 
         if (StringUtils.isNotEmpty(searchModel.getNameCn())) {
@@ -95,6 +98,12 @@ public class SysTableFieldServiceImpl implements SysTableFieldService {
         SysTableField sysTableField1 = sysTableField.get();
         SysTableFieldModifyModel sysTableFieldModifyModel = SysTableFieldModelMapper.INSTANCE.sysTableFieldToModel(sysTableField1);
         return sysTableFieldModifyModel;
+    }
+
+    @Override
+    public List<SysTableField> getSysTableFieldBySysTableId(String sysTableId) {
+        List<SysTableField> sysTableFields = sysTableFieldDao.findBySysTableId(sysTableId);
+        return sysTableFields;
     }
 
 

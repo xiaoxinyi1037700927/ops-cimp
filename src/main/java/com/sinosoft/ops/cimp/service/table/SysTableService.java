@@ -4,6 +4,7 @@ package com.sinosoft.ops.cimp.service.table;
 import com.sinosoft.ops.cimp.dto.PaginationViewModel;
 import com.sinosoft.ops.cimp.entity.sys.table.SysTable;
 import com.sinosoft.ops.cimp.vo.from.table.SysTableAddModel;
+import com.sinosoft.ops.cimp.vo.from.table.SysTableSearchModel;
 import com.sinosoft.ops.cimp.vo.to.table.SysTableModel;
 import com.sinosoft.ops.cimp.vo.from.table.SysTableModifyModel;
 
@@ -17,10 +18,16 @@ public interface SysTableService {
 
     boolean upSysTable(SysTableModifyModel sysTableModifyModel);
 
-    List<SysTableModel> findSysTableModels();
+    boolean operatingDbTable(String sysTableId);
+
+//    List<SysTableModel> findSysTableModels();
+
+    List<SysTableModifyModel> findAllSysTable();
 
     List<SysTableModifyModel> findBySysTableTypeId(String SysTableTypeId);
 
-    PaginationViewModel<SysTable> getSysTableByPage(String sysTableTypeId,String nameCn);
+    PaginationViewModel<SysTableModifyModel> getSysTableByPage(SysTableSearchModel sysTableSearchModel);
+
+
 
 }
