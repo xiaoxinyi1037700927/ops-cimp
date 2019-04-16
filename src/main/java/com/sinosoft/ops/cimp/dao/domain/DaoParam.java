@@ -32,6 +32,10 @@ public class DaoParam implements Serializable {
      */
     private String tableNameEn;
     /**
+     * 项目编号
+     */
+    private String prjCode;
+    /**
      * 分页对象
      */
     private Page page;
@@ -65,6 +69,11 @@ public class DaoParam implements Serializable {
 
     public DaoParam addTableNameEn(String tableNameEn) {
         this.tableNameEn = tableNameEn;
+        return this;
+    }
+
+    public DaoParam addPrjCode(String prjCode) {
+        this.prjCode = prjCode;
         return this;
     }
 
@@ -252,6 +261,10 @@ public class DaoParam implements Serializable {
 
     public String getTableNameEn() {
         return tableNameEn;
+    }
+
+    public String getPrjCode() {
+        return prjCode;
     }
 
     public Page getPage() {

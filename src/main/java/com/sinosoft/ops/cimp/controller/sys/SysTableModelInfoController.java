@@ -67,7 +67,7 @@ public class SysTableModelInfoController extends BaseController {
     }
 
     @RequestMapping(value = "/getSysTableStructure", method = RequestMethod.GET)
-    public ResponseEntity<SysTableModelInfoDTO> getSysEntityInfo(
+    public ResponseEntity<SysTableModelInfoDTO> getSysTableStructure(
             @RequestParam("prjCode") String prjCode,
             @RequestParam("tableTypeName") String tableTypeName,
             @RequestParam(value = "tableName", required = false) String tableName) throws BusinessException {
@@ -88,8 +88,8 @@ public class SysTableModelInfoController extends BaseController {
         return ok(tableInfo);
     }
 
-    @RequestMapping(value = "saveSysEntityData", method = RequestMethod.POST)
-    public ResponseEntity saveSysEntityData(
+    @RequestMapping(value = "saveSysTableData", method = RequestMethod.POST)
+    public ResponseEntity saveSysTableData(
             @RequestParam("appCode") String appCode,
             @RequestParam("tableTypeName") String tableTypeName,
             @RequestParam("tableName") String tableName,
@@ -174,8 +174,8 @@ public class SysTableModelInfoController extends BaseController {
         return ok("修改成功");
     }
 
-    @RequestMapping(value = "getSysEntityData")
-    public ResponseEntity getSysTableData(
+    @RequestMapping(value = "getSysTableData")
+    public ResponseEntity<QueryDataParamBuilder> getSysTableData(
             @RequestParam("appCode") String appCode,
             @RequestParam("tableTypeName") String tableTypeName,
             @RequestParam("tableName") String tableName,
@@ -196,9 +196,6 @@ public class SysTableModelInfoController extends BaseController {
         if (StringUtils.isEmpty(tableNamePK)) {
             return fail("查询信息集必须指定表名主键");
         }
-        if (StringUtils.isEmpty(tableNamePKValue)) {
-            return fail("查询信息集必须指定表名主键的值");
-        }
 
         QueryDataParamBuilder dataParamBuilder = new QueryDataParamBuilder();
 
@@ -211,7 +208,6 @@ public class SysTableModelInfoController extends BaseController {
                 .setTableNameEnFKValue(tableNameFKValue);
 
         QueryDataParamBuilder resultDataParam = sysTableModelInfoService.queryData(dataParamBuilder);
-
-        return null;
+        return ok(resultDataParam);
     }
 }
