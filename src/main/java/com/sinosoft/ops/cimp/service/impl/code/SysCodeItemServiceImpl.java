@@ -1,11 +1,15 @@
 package com.sinosoft.ops.cimp.service.impl.code;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sinosoft.ops.cimp.dto.PaginationViewModel;
 import com.sinosoft.ops.cimp.entity.sys.code.QSysCodeItem;
+import com.sinosoft.ops.cimp.entity.sys.code.QSysCodeSet;
 import com.sinosoft.ops.cimp.entity.sys.code.SysCodeItem;
+import com.sinosoft.ops.cimp.entity.sys.code.SysCodeSet;
 import com.sinosoft.ops.cimp.mapper.code.SysCodeItemModelMapper;
 import com.sinosoft.ops.cimp.repository.code.SysCodeItemRepository;
+import com.sinosoft.ops.cimp.repository.code.SysCodeSetRepository;
 import com.sinosoft.ops.cimp.service.code.SysCodeItemService;
 import com.sinosoft.ops.cimp.vo.from.code.SysCodeItemAddModel;
 import com.sinosoft.ops.cimp.vo.from.code.SysCodeItemModifyModel;
@@ -17,6 +21,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.List;
@@ -27,11 +34,39 @@ import java.util.stream.Collectors;
 public class SysCodeItemServiceImpl implements SysCodeItemService {
 
     @Autowired
+    private SysCodeSetRepository sysCodeSetDao;
+
+    @Autowired
     private SysCodeItemRepository sysCodeItemDao;
+
+    @PersistenceContext
+    private final EntityManager entityManager;
+    private JPAQueryFactory queryFactory;
+
+    @Autowired
+    public SysCodeItemServiceImpl(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
+
+    @PostConstruct
+    public void init() {
+        queryFactory = new JPAQueryFactory(entityManager);
+    }
+
 
     @Override
     @Transactional
     public boolean delSysCodeItemById(Integer id) {
+        Optional<SysCodeItem> sysCodeItem = sysCodeItemDao.findById(id);
+        QSysCodeSet qSysCodeSet = QSysCodeSet.sysCodeSet;
+        Integer codeSetId = sysCodeItem.get().getCodeSetId();
+        Optional<SysCodeSet> sysCodeSet = sysCodeSetDao.findById(codeSetId);
+        Integer version = sysCodeSet.get().getVersion();
+        queryFactory.update(qSysCodeSet)
+                .set(qSysCodeSet.version, version+1)
+                .where(qSysCodeSet.id.eq(codeSetId))
+                .execute();
+
         sysCodeItemDao.deleteById(id);
         return true;
     }
@@ -42,6 +77,16 @@ public class SysCodeItemServiceImpl implements SysCodeItemService {
         if (sysCodeItemAddModel == null) {
             return false;
         }
+
+        Integer codeSetId = sysCodeItemAddModel.getCodeSetId();
+        Optional<SysCodeSet> sysCodeSet = sysCodeSetDao.findById(codeSetId);
+        Integer version = sysCodeSet.get().getVersion();
+        QSysCodeSet qSysCodeSet = QSysCodeSet.sysCodeSet;
+        queryFactory.update(qSysCodeSet)
+                .set(qSysCodeSet.version, version+1)
+                .where(qSysCodeSet.id.eq(codeSetId))
+                .execute();
+
         SysCodeItem sysCodeItem = SysCodeItemModelMapper.INSTANCE.addModelToSysCodeItem(sysCodeItemAddModel);
         sysCodeItem.setCreatedTime(new Date());
         sysCodeItem.setLastModifiedTime(new Date());
@@ -55,6 +100,16 @@ public class SysCodeItemServiceImpl implements SysCodeItemService {
         if (sysCodeItemModifyModel.getId() == null) {
             return false;
         }
+
+        Integer codeSetId = sysCodeItemModifyModel.getCodeSetId();
+        Optional<SysCodeSet> sysCodeSet = sysCodeSetDao.findById(codeSetId);
+        Integer version = sysCodeSet.get().getVersion();
+        QSysCodeSet qSysCodeSet = QSysCodeSet.sysCodeSet;
+        queryFactory.update(qSysCodeSet)
+                .set(qSysCodeSet.version, version+1)
+                .where(qSysCodeSet.id.eq(codeSetId))
+                .execute();
+
         SysCodeItem sysCodeItem = SysCodeItemModelMapper.INSTANCE.modifyModelToSysCodeItem(sysCodeItemModifyModel);
         sysCodeItem.setLastModifiedTime(new Date());
         sysCodeItemDao.save(sysCodeItem);
