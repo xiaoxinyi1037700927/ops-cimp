@@ -2,11 +2,15 @@ package com.sinosoft.ops.cimp.controller.sys.code;
 
 import com.sinosoft.ops.cimp.config.swagger2.SystemApiGroup;
 import com.sinosoft.ops.cimp.controller.BaseController;
+import com.sinosoft.ops.cimp.dto.PaginationViewModel;
 import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.service.code.SysCodeSetService;
 import com.sinosoft.ops.cimp.vo.from.code.SysCodeItemModifyModel;
 import com.sinosoft.ops.cimp.vo.from.code.SysCodeSetAddModel;
 import com.sinosoft.ops.cimp.vo.from.code.SysCodeSetModifyModel;
+import com.sinosoft.ops.cimp.vo.from.code.SysCodeSetSearchModel;
+import com.sinosoft.ops.cimp.vo.to.sys.code.SysCodeSetDisplayModel;
+import com.sinosoft.ops.cimp.vo.to.sys.code.SysCodeSetModel;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +39,14 @@ public class SysCodeSetController extends BaseController {
     public ResponseEntity getAllSysCodeSet() throws BusinessException {
         List<SysCodeSetModifyModel> sysCodeSetModifyModels = sysCodeSetService.findAllSysCodeSets();
         return ok(sysCodeSetModifyModels);
+    }
+
+    @ApiOperation(value = "分页获取全部代码集")
+    @RequestMapping(value = "/getPageSysCodeSet", method = RequestMethod.POST)
+    public ResponseEntity getPageSysCodeSet(
+            @Valid @RequestBody SysCodeSetSearchModel sysCodeSetSearchModel) throws BusinessException {
+        PaginationViewModel<SysCodeSetDisplayModel> sysCodeSetDisplayModels = sysCodeSetService.getPageSysCodeSet(sysCodeSetSearchModel);
+        return ok(sysCodeSetDisplayModels);
     }
 
 
@@ -70,12 +82,18 @@ public class SysCodeSetController extends BaseController {
         return fail("添加失败");
     }
 
-    @ApiOperation(value = "根据代码项编号获取对应代码项")
+    @ApiOperation(value = "根据代码集编号获取对应代码项")
     @RequestMapping(value = "/getSysCodeSetById", method = RequestMethod.POST)
     public ResponseEntity getSysCodeSetById(@RequestParam("id") Integer id) throws BusinessException {
         SysCodeSetModifyModel sysCodeSetModifyModel = sysCodeSetService.getSysCodeById(id);
         return ok(sysCodeSetModifyModel);
     }
 
+    @ApiOperation(value = "用于系统表字段选择所属代码集")
+    @RequestMapping(value = "/getSysCodeSet", method = RequestMethod.POST)
+    public ResponseEntity getSysCodeSet() throws BusinessException {
+        List<SysCodeSetModel> sysCodeSets = sysCodeSetService.getSysCodeSet();
+        return ok(sysCodeSets);
+    }
 
 }

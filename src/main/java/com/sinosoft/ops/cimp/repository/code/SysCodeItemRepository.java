@@ -11,4 +11,5 @@ public interface SysCodeItemRepository extends JpaRepository<SysCodeItem, Intege
 
     List<SysCodeItem> findByCodeSetId(Integer codeSetId);
 
+    void deleteByCodeSetId(Integer codeSetId);
 }

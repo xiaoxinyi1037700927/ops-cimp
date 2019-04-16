@@ -1,20 +1,18 @@
-package com.sinosoft.ops.cimp.vo.from.code;
-
+package com.sinosoft.ops.cimp.vo.to.sys.code;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import java.util.Date;
 
-@ApiModel(value = "SysCodeSetAddModel",description = "代码集添加")
-public class SysCodeSetAddModel {
+@ApiModel(value = "SysCodeSetDisplayModel", description = "代码集分页查询")
+public class SysCodeSetDisplayModel {
+
+    @ApiModelProperty(value = "代码集编号")
+    private Integer id;
 
     @ApiModelProperty(value = "名称")
     private String name;
 
-    @NotBlank(message = "中文名称不能为空")
     @ApiModelProperty(value = "中文名称")
     private String nameCn;
 
@@ -36,7 +34,6 @@ public class SysCodeSetAddModel {
     @ApiModelProperty(value = "应用标识")
     private String appId;
 
-    @NotNull(message = "状态不能为空")
     @ApiModelProperty(value = "状态")
     private Integer status;
 
@@ -48,6 +45,14 @@ public class SysCodeSetAddModel {
 
     @ApiModelProperty(value = "父级编号")
     private Integer parentId;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;

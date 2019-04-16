@@ -1,9 +1,6 @@
 package com.sinosoft.ops.cimp.entity.sys.code;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -17,7 +14,7 @@ public class SysCodeItem implements Serializable {
 
     //'标识'
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "SYS_CODE_ITEM_ID_SEQ")
     private Integer id;
 
     //'代码集标识'

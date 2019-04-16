@@ -4,15 +4,12 @@ import com.querydsl.core.BooleanBuilder;
 import com.sinosoft.ops.cimp.dto.PaginationViewModel;
 import com.sinosoft.ops.cimp.entity.sys.code.QSysCodeItem;
 import com.sinosoft.ops.cimp.entity.sys.code.SysCodeItem;
-import com.sinosoft.ops.cimp.entity.sys.table.SysTableField;
 import com.sinosoft.ops.cimp.mapper.code.SysCodeItemModelMapper;
-import com.sinosoft.ops.cimp.mapper.table.SysTableFieldModelMapper;
 import com.sinosoft.ops.cimp.repository.code.SysCodeItemRepository;
 import com.sinosoft.ops.cimp.service.code.SysCodeItemService;
 import com.sinosoft.ops.cimp.vo.from.code.SysCodeItemAddModel;
 import com.sinosoft.ops.cimp.vo.from.code.SysCodeItemModifyModel;
 import com.sinosoft.ops.cimp.vo.from.code.SysCodeItemPageModel;
-import com.sinosoft.ops.cimp.vo.from.table.SysTableFieldModifyModel;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -21,7 +18,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -74,7 +70,7 @@ public class SysCodeItemServiceImpl implements SysCodeItemService {
 
         QSysCodeItem qSysCodeItem = QSysCodeItem.sysCodeItem;
 
-        PageRequest pageRequest = PageRequest.of(pageIndex - 1, pageSize, new Sort(Sort.Direction.ASC, qSysCodeItem.id.getMetadata().getName()));
+        PageRequest pageRequest = PageRequest.of(pageIndex - 1, pageSize, new Sort(Sort.Direction.ASC, qSysCodeItem.ordinal.getMetadata().getName()));
         BooleanBuilder builder = new BooleanBuilder();
 
         builder = builder.and(qSysCodeItem.codeSetId.eq(searchModel.getId()));

@@ -10,7 +10,7 @@ import java.util.Date;
 public class SysCodeSetModifyModel extends SysCodeSetAddModel {
 
     @NotNull(message = "代码集编号不能为空")
-    @ApiModelProperty(name = "代码集编号")
+    @ApiModelProperty(value = "代码集编号")
     private Integer id;
 
     //'创建时间'

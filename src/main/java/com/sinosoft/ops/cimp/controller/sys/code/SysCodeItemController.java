@@ -32,7 +32,7 @@ public class SysCodeItemController extends BaseController {
 
 
     @ApiOperation(value = "删除代码项")
-    @RequestMapping(value = "/delSysCodeSet", method = RequestMethod.POST)
+    @RequestMapping(value = "/delSysCodeItem", method = RequestMethod.POST)
     public ResponseEntity delSysCodeSet(@RequestParam("id") Integer id) throws BusinessException {
         boolean isok = sysCodeItemService.delSysCodeItemById(id);
         if (isok) {
@@ -42,7 +42,7 @@ public class SysCodeItemController extends BaseController {
     }
 
     @ApiOperation("代码项修改")
-    @RequestMapping(value = "/upSysCodeSet", method = RequestMethod.POST)
+    @RequestMapping(value = "/upSysCodeItem", method = RequestMethod.POST)
     public ResponseEntity upSysCodeSet(
             @Valid @RequestBody SysCodeItemModifyModel sysCodeItemModifyModel) throws BusinessException {
         boolean isok = sysCodeItemService.upSysCodeItem(sysCodeItemModifyModel);
@@ -53,7 +53,7 @@ public class SysCodeItemController extends BaseController {
     }
 
     @ApiOperation("添加代码项")
-    @RequestMapping(value = "/saveSysCodeSet", method = RequestMethod.POST)
+    @RequestMapping(value = "/saveSysCodeItem", method = RequestMethod.POST)
     public ResponseEntity saveSysCodeSet(
             @Valid @RequestBody SysCodeItemAddModel sysCodeItemAddModel) throws BusinessException {
         boolean isok = sysCodeItemService.saveSysCodeItem(sysCodeItemAddModel);
