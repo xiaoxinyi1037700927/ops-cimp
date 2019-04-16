@@ -2,6 +2,7 @@ package com.sinosoft.ops.cimp.dao.impl;
 
 import com.google.common.collect.Lists;
 import com.sinosoft.ops.cimp.cache.CacheManager;
+import com.sinosoft.ops.cimp.constant.Constants;
 import com.sinosoft.ops.cimp.constant.OpsErrorMessage;
 import com.sinosoft.ops.cimp.dao.SysTableInfoDao;
 import com.sinosoft.ops.cimp.dao.domain.sys.table.SysTableFieldInfo;
@@ -61,11 +62,13 @@ public class SysTableInfoDaoImpl implements SysTableInfoDao {
     public SysTableModelInfo getTableInfo(String tableTypeName) throws BusinessException {
         tableTypeName = tableTypeName.trim();
 
-        Object o = CacheManager.getInstance().get(SYS_TABLE_MODEL_INFO, tableTypeName);
+        Object o = CacheManager.getInstance().get(Constants.SYS_TABLE_MODEL_INFO, tableTypeName);
         if (o != null) {
             return (SysTableModelInfo) o;
         }
-        return this.getTableInfoNoCached(tableTypeName);
+        SysTableModelInfo sysTableModelInfo = this.getTableInfoNoCached(tableTypeName);
+        CacheManager.getInstance().put(Constants.SYS_TABLE_MODEL_INFO, tableTypeName, sysTableModelInfo);
+        return sysTableModelInfo;
     }
 
     private SysTableModelInfo getTableInfoNoCached(String tableTypeName) throws BusinessException {
@@ -83,9 +86,7 @@ public class SysTableInfoDaoImpl implements SysTableInfoDao {
                 //根据系统表id获取系统表字段
                 Iterable<SysTableField> tableFields = sysTableFieldRepository.findAll(QSysTableField.sysTableField.sysTableId.in(sysTableIds), QSysTableField.sysTableField.sort.asc());
                 List<SysTableField> sysTableFields = Lists.newArrayList(tableFields);
-                SysTableModelInfo sysTableModelInfo = new SysTableModelInfo(tableType, sysTableList, sysTableFields);
-                CacheManager.getInstance().put(SYS_TABLE_MODEL_INFO, tableTypeName, sysTableModelInfo);
-                return sysTableModelInfo;
+                return new SysTableModelInfo(tableType, sysTableList, sysTableFields);
             }
         } catch (Exception e) {
             if (e instanceof SystemException) {
@@ -102,7 +103,7 @@ public class SysTableInfoDaoImpl implements SysTableInfoDao {
         prjCode = prjCode.trim();
         //缓存key
         String cacheKey = tableTypeName + "_" + prjCode;
-        Object o = CacheManager.getInstance().get(SYS_TABLE_MODEL_INFO, cacheKey);
+        Object o = CacheManager.getInstance().get(Constants.SYS_TABLE_MODEL_INFO_DTO, cacheKey);
 
         if (o != null) {
             return (SysTableModelInfoDTO) o;
@@ -236,9 +237,12 @@ public class SysTableInfoDaoImpl implements SysTableInfoDao {
                         String defaultHtml = sysTableFieldInfo.getDefaultHtml();
                         String defaultScript = sysTableFieldInfo.getDefaultScript();
                         Integer sysSort = sysTableFieldInfo.getSort();
+                        String codeSetName = sysTableFieldInfo.getCodeSetName();
 
                         sysTableFieldInfoDTO.setId(sysFieldId);
                         sysTableFieldInfoDTO.setAppTableFieldGroupName(appFieldGroupName);
+                        sysTableFieldInfoDTO.setCodeSetName(codeSetName);
+
                         if (StringUtils.isNotEmpty(appFieldNameCn)) {
                             sysTableFieldInfoDTO.setFieldNameCn(appFieldNameCn);
                         } else {
@@ -270,7 +274,7 @@ public class SysTableInfoDaoImpl implements SysTableInfoDao {
 
         sysTableModelInfoDTO.setTables(sysTableInfoDTOList);
 
-        CacheManager.getInstance().put(SYS_TABLE_MODEL_INFO, cacheKey, sysTableModelInfoDTO);
+        CacheManager.getInstance().put(Constants.SYS_TABLE_MODEL_INFO, cacheKey, sysTableModelInfoDTO);
         return sysTableModelInfoDTO;
         //1.将查询出app信息进行模型转换
         /*

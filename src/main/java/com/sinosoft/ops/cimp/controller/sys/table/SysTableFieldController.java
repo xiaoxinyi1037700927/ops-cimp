@@ -2,6 +2,7 @@ package com.sinosoft.ops.cimp.controller.sys.table;
 
 import com.sinosoft.ops.cimp.cache.CacheManager;
 import com.sinosoft.ops.cimp.config.swagger2.SystemApiGroup;
+import com.sinosoft.ops.cimp.constant.Constants;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.dto.PaginationViewModel;
 import com.sinosoft.ops.cimp.exception.BusinessException;
@@ -34,7 +35,7 @@ public class SysTableFieldController extends BaseController {
     @RequestMapping(value = "/addSysTableField", method = RequestMethod.POST)
     public ResponseEntity saveSysEntityAttrDef(
             @RequestBody SysTableFieldAddModel sysTableFieldAddModel) throws BusinessException {
-        CacheManager.getInstance().remove("SYS_TABLE_MODEL_INFO_CACHE");
+        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
         boolean isok = sysTableFieldService.addSysTableField(sysTableFieldAddModel);
         if (isok) {
             return ok("操作成功");
@@ -46,7 +47,7 @@ public class SysTableFieldController extends BaseController {
     @RequestMapping(value = "/delSysTableFieldById", method = RequestMethod.POST)
     public ResponseEntity delById(
             @RequestParam(value = "id") String id) throws BusinessException {
-        CacheManager.getInstance().remove("SYS_TABLE_MODEL_INFO_CACHE");
+        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
         boolean isok = sysTableFieldService.delSysTableField(id);
         if (isok) {
             return ok("删除成功");
@@ -58,7 +59,7 @@ public class SysTableFieldController extends BaseController {
     @RequestMapping(value = "/updateSysTableField", method = RequestMethod.POST)
     public ResponseEntity updateSysEntityAttrDef(
             @RequestBody SysTableFieldModifyModel sysTableFieldModifyModel) throws BusinessException {
-        CacheManager.getInstance().remove("SYS_TABLE_MODEL_INFO_CACHE");
+        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
         boolean isok = sysTableFieldService.upSysTableField(sysTableFieldModifyModel);
         return ok(isok);
     }

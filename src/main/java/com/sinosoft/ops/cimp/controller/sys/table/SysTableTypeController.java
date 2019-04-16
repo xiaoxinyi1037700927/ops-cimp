@@ -3,6 +3,7 @@ package com.sinosoft.ops.cimp.controller.sys.table;
 
 import com.sinosoft.ops.cimp.cache.CacheManager;
 import com.sinosoft.ops.cimp.config.swagger2.SystemApiGroup;
+import com.sinosoft.ops.cimp.constant.Constants;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.service.table.SysTableTypeService;
@@ -16,8 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
-import static org.springframework.http.ResponseEntity.ok;
 
 
 @SystemApiGroup
@@ -37,39 +36,36 @@ public class SysTableTypeController extends BaseController {
     @RequestMapping(value = "/addSysTableType", method = RequestMethod.POST)
     public ResponseEntity saveSysEntityGroupDef(
             @RequestBody SysTableTypeAddModel sysTableTypeAddModel) throws BusinessException {
-        CacheManager.getInstance().remove("SYS_TABLE_MODEL_INFO_CACHE");
+        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
         boolean isok = sysTableTypeService.addSysTableType(sysTableTypeAddModel);
         if (isok) {
             return ok("操作成功");
         }
-       // return fail("操作失败");
-        return null;
+        return fail("操作失败");
     }
 
     @ApiOperation(value = "根据表类别编号删除表")
     @RequestMapping(value = "/delSysTableType", method = RequestMethod.POST)
     public ResponseEntity deleteSysEntityGroupDef(
             @RequestParam String id) throws BusinessException {
-        CacheManager.getInstance().remove("SYS_TABLE_MODEL_INFO_CACHE");
+        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
         boolean isok = sysTableTypeService.delSysTableType(id);
         if (isok) {
             return ok("删除成功");
         }
-       // return fail("删除异常");
-        return null;
+        return fail("删除异常");
     }
 
     @ApiOperation(value = "修改表类别信息")
     @RequestMapping(value = "/updateSysTableType", method = RequestMethod.POST)
     public ResponseEntity updateSysEntityAttrDef(
             @RequestBody SysTableTypeModifyModel sysTableTypeModifyModel) throws BusinessException {
-        CacheManager.getInstance().remove("SYS_TABLE_MODEL_INFO_CACHE");
+        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
         boolean isok = sysTableTypeService.upSysTableType(sysTableTypeModifyModel);
         if (isok) {
             return ok("操作成功");
         }
-       // return fail("操作失败");
-        return null;
+        return fail("操作失败");
     }
 
     @ApiOperation("显示所有表类别数据")

@@ -1,47 +1,14 @@
 package com.sinosoft.ops.cimp.constant;
 
 public interface Constants {
-    /**
-     * 操作名称
-     */
-    String OP_NAME = "op";
 
     /**
-     * 消息key
+     * 所有实体缓存key
      */
-    String MESSAGE = "message";
-
+    String SYS_TABLE_MODEL_INFO = "SYS_TABLE_MODEL_INFO_CACHE";
     /**
-     * 错误key
+     * 所有实体DTO缓存key
      */
-    String ERROR = "error";
-
-    /**
-     * 上个页面地址
-     */
-    String BACK_URL = "BackURL";
-
-
-    String IGNORE_BACK_URL = "ignoreBackURL";
-
-    /**
-     * 当前请求的地址 带参数
-     */
-    String CURRENT_URL = "currentURL";
-
-    /**
-     * 当前请求的地址 不带参数
-     */
-    String NO_QUERYSTRING_CURRENT_URL = "noQueryStringCurrentURL";
-
-    String CONTEXT_PATH = "ctx";
-
-    /**
-     * 当前登录的用户
-     */
-    String CURRENT_USER = "user";
-    String CURRENT_USERNAME = "username";
-
-    String ENCODING = "UTF-8";
+    String SYS_TABLE_MODEL_INFO_DTO = "SYS_TABLE_MODEL_INFO_DTO_CACHE";
 
 }

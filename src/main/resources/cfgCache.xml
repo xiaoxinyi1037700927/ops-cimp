@@ -73,6 +73,11 @@
             <cacheDesc>所有实体缓存</cacheDesc>
         </CacheItem>
         <CacheItem>
+            <cacheName>SYS_TABLE_MODEL_INFO_DTO_CACHE</cacheName>
+            <engineName>hashCache</engineName>
+            <cacheDesc>所有前端实体缓存</cacheDesc>
+        </CacheItem>
+        <CacheItem>
             <cacheName>ENTITY_INFO_DTO_CACHE</cacheName>
             <engineName>hashCache</engineName>
             <cacheDesc>所有实体DTO缓存</cacheDesc>

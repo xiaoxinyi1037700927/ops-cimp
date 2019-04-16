@@ -2,6 +2,7 @@ package com.sinosoft.ops.cimp.controller.sys.app;
 
 import com.sinosoft.ops.cimp.cache.CacheManager;
 import com.sinosoft.ops.cimp.config.swagger2.SystemApiGroup;
+import com.sinosoft.ops.cimp.constant.Constants;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.service.sys.app.SysAppTableFieldSetService;
@@ -38,7 +39,7 @@ public class SysAppTableFieldSetController extends BaseController {
     @ApiOperation(value = "新增系统应用表字段集合")
     @PostMapping("/add")
     public ResponseEntity addFieldSet(@RequestBody SysAppTableFieldSetAddModel addModel) throws BusinessException {
-        CacheManager.getInstance().remove("SYS_TABLE_MODEL_INFO_CACHE");
+        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
         fieldSetService.addFieldSet(addModel);
         return ok("新增成功！");
     }
@@ -49,7 +50,7 @@ public class SysAppTableFieldSetController extends BaseController {
     @ApiOperation(value = "删除系统应用表字段集合")
     @PostMapping("/delete")
     public ResponseEntity deleteFieldSet(@RequestBody SysAppTableFieldSetDeleteModel deleteModel) throws BusinessException {
-        CacheManager.getInstance().remove("SYS_TABLE_MODEL_INFO_CACHE");
+        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
         fieldSetService.deleteFieldSet(deleteModel.getIds());
         return ok("删除成功！");
     }
@@ -60,7 +61,7 @@ public class SysAppTableFieldSetController extends BaseController {
     @ApiOperation(value = "修改系统应用表字段集合")
     @PostMapping("/modify")
     public ResponseEntity modifyFieldSet(@RequestBody SysAppTableFieldSetModifyModel modifyModel) throws BusinessException {
-        CacheManager.getInstance().remove("SYS_TABLE_MODEL_INFO_CACHE");
+        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
         return fieldSetService.modifyFieldSet(modifyModel) ? ok("修改成功！") : fail("修改失败！");
     }
 
@@ -79,7 +80,7 @@ public class SysAppTableFieldSetController extends BaseController {
     @ApiOperation(value = "交换排序")
     @PostMapping("/sort/swap")
     public ResponseEntity swapSort(@RequestBody SysAppTableFieldSetSortModel sortModel) throws BusinessException {
-        CacheManager.getInstance().remove("SYS_TABLE_MODEL_INFO_CACHE");
+        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
         return fieldSetService.swapSort(sortModel.getIds()) ? ok("修改成功！") : fail("修改失败！");
     }
 }
