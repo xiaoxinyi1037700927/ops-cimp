@@ -5,12 +5,10 @@ import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.dto.PaginationViewModel;
 import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.service.code.SysCodeSetService;
-import com.sinosoft.ops.cimp.vo.from.code.SysCodeItemModifyModel;
-import com.sinosoft.ops.cimp.vo.from.code.SysCodeSetAddModel;
-import com.sinosoft.ops.cimp.vo.from.code.SysCodeSetModifyModel;
-import com.sinosoft.ops.cimp.vo.from.code.SysCodeSetSearchModel;
+import com.sinosoft.ops.cimp.vo.from.code.*;
 import com.sinosoft.ops.cimp.vo.to.sys.code.SysCodeSetDisplayModel;
 import com.sinosoft.ops.cimp.vo.to.sys.code.SysCodeSetModel;
+import com.sinosoft.ops.cimp.vo.to.sys.code.SysCodeSetObtainModel;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,6 +79,15 @@ public class SysCodeSetController extends BaseController {
         }
         return fail("添加失败");
     }
+
+    @ApiOperation(value = "获取代码集以及对应代码项")
+    @RequestMapping(value = "/getSysCodeSetAndSysCodeIem", method = RequestMethod.POST)
+    public ResponseEntity getSysCodeSetAndSysCodeIem(
+            @Valid @RequestBody SysCodeSetSearchListModel sysCodeSetSearchListModel) throws BusinessException {
+        List<SysCodeSetObtainModel> sysCodeSetObtainModels = sysCodeSetService.getSysCodeSetAndSysCodeItem(sysCodeSetSearchListModel);
+        return ok(sysCodeSetObtainModels);
+    }
+
 
     @ApiOperation(value = "根据代码集编号获取对应代码项")
     @RequestMapping(value = "/getSysCodeSetById", method = RequestMethod.POST)

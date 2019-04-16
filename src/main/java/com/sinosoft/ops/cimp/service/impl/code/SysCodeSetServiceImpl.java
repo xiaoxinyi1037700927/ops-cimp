@@ -1,10 +1,13 @@
 package com.sinosoft.ops.cimp.service.impl.code;
 
+import com.google.common.collect.Lists;
 import com.querydsl.core.BooleanBuilder;
 import com.sinosoft.ops.cimp.dto.PaginationViewModel;
 import com.sinosoft.ops.cimp.entity.sys.code.QSysCodeSet;
+import com.sinosoft.ops.cimp.entity.sys.code.SysCodeItem;
 import com.sinosoft.ops.cimp.entity.sys.code.SysCodeSet;
 import com.sinosoft.ops.cimp.entity.sys.table.SysTableField;
+import com.sinosoft.ops.cimp.mapper.code.SysCodeItemModelMapper;
 import com.sinosoft.ops.cimp.mapper.code.SysCodeSetModelMapper;
 import com.sinosoft.ops.cimp.mapper.table.SysTableFieldModelMapper;
 import com.sinosoft.ops.cimp.repository.code.SysCodeItemRepository;
@@ -12,10 +15,13 @@ import com.sinosoft.ops.cimp.repository.code.SysCodeSetRepository;
 import com.sinosoft.ops.cimp.service.code.SysCodeSetService;
 import com.sinosoft.ops.cimp.vo.from.code.SysCodeSetAddModel;
 import com.sinosoft.ops.cimp.vo.from.code.SysCodeSetModifyModel;
+import com.sinosoft.ops.cimp.vo.from.code.SysCodeSetSearchListModel;
 import com.sinosoft.ops.cimp.vo.from.code.SysCodeSetSearchModel;
 import com.sinosoft.ops.cimp.vo.from.table.SysTableFieldModifyModel;
+import com.sinosoft.ops.cimp.vo.to.sys.code.SysCodeItemModel;
 import com.sinosoft.ops.cimp.vo.to.sys.code.SysCodeSetDisplayModel;
 import com.sinosoft.ops.cimp.vo.to.sys.code.SysCodeSetModel;
+import com.sinosoft.ops.cimp.vo.to.sys.code.SysCodeSetObtainModel;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -124,6 +130,29 @@ public class SysCodeSetServiceImpl implements SysCodeSetService {
         }
         SysCodeSet sysCodeSet1 = sysCodeSet.get();
         return SysCodeSetModelMapper.INSTANCE.sysCodeSetToModifyModel(sysCodeSet1);
+    }
+
+    @Override
+    public List<SysCodeSetObtainModel> getSysCodeSetAndSysCodeItem(SysCodeSetSearchListModel searchListModel) {
+        List<SysCodeSet> sysCodeSets = Lists.newArrayList();
+        if (searchListModel.getIds().size() == 0) {
+            sysCodeSets = sysCodeSetDao.findAll();
+        }
+        for (Integer id : searchListModel.getIds()) {
+            Optional<SysCodeSet> sysCodeSet = sysCodeSetDao.findById(id);
+            if (sysCodeSet.isPresent()) {
+                sysCodeSets.add(sysCodeSet.get());
+            }
+        }
+
+        List<SysCodeSetObtainModel> sysCodeSetObtainModels = sysCodeSets.stream().map(SysCodeSetModelMapper.INSTANCE::codeSetToObtail).collect(Collectors.toList());
+        for (SysCodeSetObtainModel setObtainModel : sysCodeSetObtainModels) {
+            List<SysCodeItem> sysCodeItems = sysCodeItemDao.findByCodeSetId(setObtainModel.getId());
+            List<SysCodeItemModel> sysCodeItemModels = sysCodeItems.stream().map(SysCodeItemModelMapper.INSTANCE::codeItemToModel).collect(Collectors.toList());
+            setObtainModel.setSysCodeItemModels(sysCodeItemModels);
+        }
+
+        return sysCodeSetObtainModels;
     }
 
     @Override

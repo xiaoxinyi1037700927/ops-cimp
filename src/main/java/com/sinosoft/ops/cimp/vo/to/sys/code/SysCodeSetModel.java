@@ -17,6 +17,9 @@ public class SysCodeSetModel {
     @ApiModelProperty(value = "中文名称")
     private String nameCn;
 
+    @ApiModelProperty(value = "版本号")
+    private Integer version;
+
     @ApiModelProperty(value = "次序")
     private Integer ordinal;
 
@@ -42,6 +45,14 @@ public class SysCodeSetModel {
 
     public void setNameCn(String nameCn) {
         this.nameCn = nameCn;
+    }
+
+    public Integer getVersion() {
+        return version;
+    }
+
+    public void setVersion(Integer version) {
+        this.version = version;
     }
 
     public Integer getOrdinal() {

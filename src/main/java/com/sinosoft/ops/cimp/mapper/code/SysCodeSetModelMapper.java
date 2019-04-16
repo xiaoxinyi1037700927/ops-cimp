@@ -5,6 +5,7 @@ import com.sinosoft.ops.cimp.vo.from.code.SysCodeSetAddModel;
 import com.sinosoft.ops.cimp.vo.from.code.SysCodeSetModifyModel;
 import com.sinosoft.ops.cimp.vo.to.sys.code.SysCodeSetDisplayModel;
 import com.sinosoft.ops.cimp.vo.to.sys.code.SysCodeSetModel;
+import com.sinosoft.ops.cimp.vo.to.sys.code.SysCodeSetObtainModel;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -22,4 +23,6 @@ public interface SysCodeSetModelMapper {
     SysCodeSetModel codeSetToModel(SysCodeSet sysCodeSet);
 
     SysCodeSetDisplayModel codeSetToDisplay(SysCodeSet sysCodeSet);
-}
+
+    SysCodeSetObtainModel codeSetToObtail(SysCodeSet sysCodeSet);
+ }

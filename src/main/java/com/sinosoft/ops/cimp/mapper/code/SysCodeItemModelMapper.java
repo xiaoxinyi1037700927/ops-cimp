@@ -3,6 +3,7 @@ package com.sinosoft.ops.cimp.mapper.code;
 import com.sinosoft.ops.cimp.entity.sys.code.SysCodeItem;
 import com.sinosoft.ops.cimp.vo.from.code.SysCodeItemAddModel;
 import com.sinosoft.ops.cimp.vo.from.code.SysCodeItemModifyModel;
+import com.sinosoft.ops.cimp.vo.to.sys.code.SysCodeItemModel;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -16,4 +17,6 @@ public interface SysCodeItemModelMapper {
     SysCodeItem modifyModelToSysCodeItem(SysCodeItemModifyModel sysCodeItemModifyModel);
 
     SysCodeItemModifyModel sysCodeItemToModifyModel(SysCodeItem sysCodeItem);
+
+    SysCodeItemModel codeItemToModel(SysCodeItem sysCodeItem);
 }
