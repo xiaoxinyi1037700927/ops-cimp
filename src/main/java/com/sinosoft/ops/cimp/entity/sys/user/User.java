@@ -90,11 +90,6 @@ public class User {
     private Integer status;
 
     /**
-     * 系统类型
-     * */
-    private String systemType;
-
-    /**
      * 数据权限单位
      */
     private String dataOrganizationId;
@@ -326,15 +321,6 @@ public class User {
         this.modifyTime = modifyTime;
     }
 
-    @Column(length = 5)
-    public String getSystemType() {
-        return systemType;
-    }
-
-    public void setSystemType(String systemType) {
-        this.systemType = systemType;
-    }
-
     @Column(length = 50)
     public String getDataOrganizationId() {
         return dataOrganizationId;
@@ -365,7 +351,6 @@ public class User {
                 ", LastInvalidLoginTime=" + LastInvalidLoginTime +
                 ", description='" + description + '\'' +
                 ", status=" + status +
-                ", systemType='" + systemType + '\'' +
                 ", dataOrganizationId='" + dataOrganizationId + '\'' +
                 ", createId='" + createId + '\'' +
                 ", createTime=" + createTime +

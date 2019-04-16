@@ -30,10 +30,6 @@ public class MenuGroup {
      * */
     private String type;
 
-    /**
-     * 系统类型
-     * */
-    private String systemType;
 
     /**
      * 排序
@@ -77,15 +73,6 @@ public class MenuGroup {
 
     public void setType(String type) {
         this.type = type;
-    }
-
-    @Column(length = 50)
-    public String getSystemType() {
-        return systemType;
-    }
-
-    public void setSystemType(String systemType) {
-        this.systemType = systemType;
     }
 
     @Column(length = 10)

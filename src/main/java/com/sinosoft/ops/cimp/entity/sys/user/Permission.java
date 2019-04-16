@@ -34,10 +34,6 @@ public class Permission {
      * */
     private String type;
 
-    /**
-     * 系统类型
-     * */
-    private String systemType;
 
     /**
      * 颜色
@@ -177,15 +173,6 @@ public class Permission {
 
     public void setType(String type) {
         this.type = type;
-    }
-
-    @Column(length = 50)
-    public String getSystemType() {
-        return systemType;
-    }
-
-    public void setSystemType(String systemType) {
-        this.systemType = systemType;
     }
 
     @Column(length = 50)

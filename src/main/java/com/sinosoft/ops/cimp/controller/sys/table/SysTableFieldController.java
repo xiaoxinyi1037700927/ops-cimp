@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
+import static org.springframework.http.ResponseEntity.ok;
+
 @SystemApiGroup
 @Api(description = "系统表下字段操纵-->对应-->对应干部信息，单位类")
 @RestController
@@ -37,7 +39,7 @@ public class SysTableFieldController extends BaseController {
         if (isok) {
             return ok("操作成功");
         }
-        return fail("操作失败");
+        return null ;//fail("操作失败");
     }
 
     @ApiOperation(value = "根据属性编号删除")
@@ -48,7 +50,7 @@ public class SysTableFieldController extends BaseController {
         if (isok) {
             return ok("删除成功");
         }
-        return fail("删除异常");
+          return null;///fail("删除异常");
     }
 
     @ApiOperation(value = "修改属性信息")
@@ -69,10 +71,10 @@ public class SysTableFieldController extends BaseController {
 
     @ApiOperation("查询单个属性信息")
     @RequestMapping(value = "/findAttrDefById", method = RequestMethod.POST)
-    public ResponseEntity findAttrDefById(@RequestParam("id") String id) throws BusinessException {
+    public ResponseEntity<SysTableFieldModifyModel> findAttrDefById(@RequestParam("id") String id) throws BusinessException {
         SysTableFieldModifyModel sysEntityAttrDefModel = sysTableFieldService.findById(id);
         if (sysEntityAttrDefModel == null) {
-            return fail("查询失败");
+          //  return fail("查询失败");
         }
         return ok(sysEntityAttrDefModel);
     }

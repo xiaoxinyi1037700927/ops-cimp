@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 
+import static org.springframework.http.ResponseEntity.ok;
+
 @SystemApiGroup
 @Api(description = "系统表操纵-->对应-->对应干部信息，单位类")
 @RestController
@@ -35,7 +37,8 @@ public class SysTableController extends BaseController {
             @Valid @RequestBody SysTableAddModel sysTableAddModel) throws BusinessException {
         boolean isok = sysTableService.addSysTable(sysTableAddModel);
         if (isok) return ok("操作成功");
-        return fail("操作失败");
+       // return fail("操作失败");
+        return null;
     }
 
     @ApiOperation("根据Id删除实体")
@@ -46,7 +49,8 @@ public class SysTableController extends BaseController {
         if (isok) {
             return ok("删除成功");
         }
-        return fail("删除异常");
+        //return fail("删除异常");
+        return null;
     }
 
     @ApiOperation("修改实体")
@@ -57,7 +61,7 @@ public class SysTableController extends BaseController {
         if (isok) {
             return ok("操作成功");
         }
-        return fail("操作失败");
+        return null;
     }
 
     @ApiOperation("显示所有数据")

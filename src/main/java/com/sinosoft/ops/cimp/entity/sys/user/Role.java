@@ -30,10 +30,6 @@ public class Role {
      */
     private String description;
 
-    /**
-     * 系统类型
-     */
-    private String systemType;
 
     /**
      * 首页类型：1.默认首页，2.无待办首页，3.带统计首页
@@ -60,6 +56,10 @@ public class Role {
      * 修改时间
      */
     private Date modifyTime;
+    /**
+     * 父角色id
+     */
+    private String parentId;
 
     @Id
     @GeneratedValue(generator = "uuid")
@@ -137,16 +137,7 @@ public class Role {
         this.modifyTime = modifyTime;
     }
 
-    @Column(length = 5)
-    public String getSystemType() {
-        return systemType;
-    }
-
-    public void setSystemType(String systemType) {
-        this.systemType = systemType;
-    }
-
-    @Column(length = 2)
+    @Column(length = 6)
     public String getPageType() {
         return pageType;
     }
@@ -176,5 +167,13 @@ public class Role {
                 ", modifyId='" + modifyId + '\'' +
                 ", modifyTime=" + modifyTime +
                 '}';
+    }
+    @Column(length = 200)
+    public String getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(String parentId) {
+        this.parentId = parentId;
     }
 }

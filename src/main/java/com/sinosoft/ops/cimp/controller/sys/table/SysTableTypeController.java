@@ -3,13 +3,10 @@ package com.sinosoft.ops.cimp.controller.sys.table;
 
 import com.sinosoft.ops.cimp.config.swagger2.SystemApiGroup;
 import com.sinosoft.ops.cimp.controller.BaseController;
-import com.sinosoft.ops.cimp.dto.PaginationViewModel;
 import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.service.table.SysTableTypeService;
 import com.sinosoft.ops.cimp.vo.from.table.SysTableTypeAddModel;
 import com.sinosoft.ops.cimp.vo.from.table.SysTableTypeModifyModel;
-import com.sinosoft.ops.cimp.vo.from.table.SysTableTypeSearchModel;
-import com.sinosoft.ops.cimp.vo.to.table.SysTableModel;
 import com.sinosoft.ops.cimp.vo.to.table.SysTableTypeModel;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -17,15 +14,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.List;
+
+import static org.springframework.http.ResponseEntity.ok;
 
 
 @SystemApiGroup
 @Api(description = "系统表类别操纵-->对应-->对应干部信息，单位类")
 @RestController
 @RequestMapping(value = "/sys/table/type")
-public class SysTableTypeController extends BaseController{
+public class SysTableTypeController extends BaseController {
 
     private final SysTableTypeService sysTableTypeService;
 
@@ -42,7 +40,8 @@ public class SysTableTypeController extends BaseController{
         if (isok) {
             return ok("操作成功");
         }
-        return fail("操作失败");
+       // return fail("操作失败");
+        return null;
     }
 
     @ApiOperation(value = "根据组编号删除表")
@@ -53,7 +52,8 @@ public class SysTableTypeController extends BaseController{
         if (isok) {
             return ok("删除成功");
         }
-        return fail("删除异常");
+       // return fail("删除异常");
+        return null;
     }
 
     @ApiOperation(value = "修改组信息")
@@ -64,7 +64,8 @@ public class SysTableTypeController extends BaseController{
         if (isok) {
             return ok("操作成功");
         }
-        return fail("操作失败");
+       // return fail("操作失败");
+        return null;
     }
 
     @ApiOperation("显示所有数据")
