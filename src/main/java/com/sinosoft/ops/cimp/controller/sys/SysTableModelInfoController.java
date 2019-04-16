@@ -173,4 +173,45 @@ public class SysTableModelInfoController extends BaseController {
         sysTableModelInfoService.updateData(queryDataParam);
         return ok("修改成功");
     }
+
+    @RequestMapping(value = "getSysEntityData")
+    public ResponseEntity getSysTableData(
+            @RequestParam("appCode") String appCode,
+            @RequestParam("tableTypeName") String tableTypeName,
+            @RequestParam("tableName") String tableName,
+            @RequestParam("tableNamePK") String tableNamePK,
+            @RequestParam("tableNamePKValue") String tableNamePKValue,
+            @RequestParam("tableNameFK") String tableNameFK,
+            @RequestParam("tableNameFKValue") String tableNameFKValue) throws BusinessException {
+
+        if (StringUtils.isEmpty(appCode)) {
+            return fail("查询信息集必须指定项目编号");
+        }
+        if (StringUtils.isEmpty(tableTypeName)) {
+            return fail("查询信息集必须指定表类型名称");
+        }
+        if (StringUtils.isEmpty(tableName)) {
+            return fail("查询信息集必须指定表名");
+        }
+        if (StringUtils.isEmpty(tableNamePK)) {
+            return fail("查询信息集必须指定表名主键");
+        }
+        if (StringUtils.isEmpty(tableNamePKValue)) {
+            return fail("查询信息集必须指定表名主键的值");
+        }
+
+        QueryDataParamBuilder dataParamBuilder = new QueryDataParamBuilder();
+
+        dataParamBuilder.setPrjCode(appCode)
+                .setTableTypeNameEn(tableTypeName)
+                .setTableNameEn(tableName)
+                .setTableNameEnPK(tableNamePK)
+                .setTableNameEnPKValue(tableNamePKValue)
+                .setTableNameEnFK(tableNameFK)
+                .setTableNameEnFKValue(tableNameFKValue);
+
+        QueryDataParamBuilder resultDataParam = sysTableModelInfoService.queryData(dataParamBuilder);
+
+        return null;
+    }
 }

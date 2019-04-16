@@ -140,6 +140,11 @@
             <version>16.3.0</version>
             <classifier>jdk16</classifier>
         </dependency>
+        <dependency>
+            <groupId>org.codehaus.jettison</groupId>
+            <artifactId>jettison</artifactId>
+            <version>1.0</version>
+        </dependency>
     </dependencies>
 
     <build>
