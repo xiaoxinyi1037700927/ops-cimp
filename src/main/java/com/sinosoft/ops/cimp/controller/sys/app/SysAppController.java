@@ -1,5 +1,6 @@
 package com.sinosoft.ops.cimp.controller.sys.app;
 
+import com.sinosoft.ops.cimp.cache.CacheManager;
 import com.sinosoft.ops.cimp.config.swagger2.SystemApiGroup;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.exception.BusinessException;
@@ -45,6 +46,7 @@ public class SysAppController extends BaseController {
     @ApiOperation(value = "新增系统应用")
     @PostMapping("/add")
     public ResponseEntity addSysApp(@Valid @RequestBody SysAppAddModel addModel) throws BusinessException {
+        CacheManager.getInstance().remove("SYS_TABLE_MODEL_INFO_CACHE");
         sysAppService.addSysApp(addModel);
         return ok("新增成功！");
     }
@@ -55,6 +57,7 @@ public class SysAppController extends BaseController {
     @ApiOperation(value = "删除系统应用")
     @PostMapping("/delete")
     public ResponseEntity deleteSysApp(@RequestBody SysAppDeleteModel deleteModel) throws BusinessException {
+        CacheManager.getInstance().remove("SYS_TABLE_MODEL_INFO_CACHE");
         sysAppService.deleteSysApp(deleteModel.getIds());
         return ok("删除成功！");
     }
@@ -65,6 +68,7 @@ public class SysAppController extends BaseController {
     @ApiOperation(value = "修改系统应用")
     @PostMapping("/modify")
     public ResponseEntity modifySysApp(@RequestBody SysAppModifyModel modifyModel) throws BusinessException {
+        CacheManager.getInstance().remove("SYS_TABLE_MODEL_INFO_CACHE");
         return sysAppService.modifySysApp(modifyModel) ? ok("修改成功！") : fail("修改失败！");
     }
 

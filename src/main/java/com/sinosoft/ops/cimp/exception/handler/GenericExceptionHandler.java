@@ -18,7 +18,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@RestControllerAdvice(basePackages = "com.sinosoft.cimp.controller")
+@RestControllerAdvice(basePackages = "com.sinosoft.ops.cimp.controller")
 @SuppressWarnings("unchecked")
 public class GenericExceptionHandler extends ResponseEntityExceptionHandler {
 
@@ -33,11 +33,11 @@ public class GenericExceptionHandler extends ResponseEntityExceptionHandler {
         logger.error(ExceptionUtil.stackTraceText(e));
         if (e instanceof BusinessException) {
             BusinessException exception = (BusinessException) e;
-            errorMsg = exception.getErrorMsg();
+            errorMsg = exception.getErrorDtlMsg();
         }
         if (e instanceof SystemException) {
             SystemException exception = (SystemException) e;
-            errorMsg = exception.getErrorMsg();
+            errorMsg = exception.getErrorDtlMsg();
         }
         if (StringUtils.isEmpty(errorMsg)) {
             errorMsg = "系统异常";

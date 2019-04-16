@@ -58,7 +58,7 @@ public class DaoParam implements Serializable {
         this.otherParam = otherParam;
     }
 
-    public DaoParam addEntityName(String entityName) {
+    public DaoParam addTableTypeNameEn(String entityName) {
         this.tableTypeNameEn = entityName;
         return this;
     }

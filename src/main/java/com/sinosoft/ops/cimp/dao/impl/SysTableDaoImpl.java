@@ -51,7 +51,15 @@ public class SysTableDaoImpl implements SysTableDao {
 
     @Override
     public void updateData(DaoParam daoParam) throws BusinessException {
+        ResultSql executeSql = updateSqlBuilder.getExecuteSql(daoParam);
+        String sql = executeSql.getSql();
+        Object[] data = executeSql.getData();
 
+        if (StringUtils.isNotEmpty(sql)) {
+            jdbcTemplate.update(sql, data);
+            LOGGER.debug("执行sql为：" + sql);
+            LOGGER.debug("执行sql的参数为：" + ObjectUtil.toPrettyString(data));
+        }
     }
 
     @Override

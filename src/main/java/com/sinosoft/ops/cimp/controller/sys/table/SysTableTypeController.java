@@ -1,6 +1,7 @@
 package com.sinosoft.ops.cimp.controller.sys.table;
 
 
+import com.sinosoft.ops.cimp.cache.CacheManager;
 import com.sinosoft.ops.cimp.config.swagger2.SystemApiGroup;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.exception.BusinessException;
@@ -34,6 +35,7 @@ public class SysTableTypeController extends BaseController {
     @RequestMapping(value = "/addSysTableType", method = RequestMethod.POST)
     public ResponseEntity saveSysEntityGroupDef(
             @RequestBody SysTableTypeAddModel sysTableTypeAddModel) throws BusinessException {
+        CacheManager.getInstance().remove("SYS_TABLE_MODEL_INFO_CACHE");
         boolean isok = sysTableTypeService.addSysTableType(sysTableTypeAddModel);
         if (isok) {
             return ok("操作成功");
@@ -45,6 +47,7 @@ public class SysTableTypeController extends BaseController {
     @RequestMapping(value = "/delSysTableType", method = RequestMethod.POST)
     public ResponseEntity deleteSysEntityGroupDef(
             @RequestParam String id) throws BusinessException {
+        CacheManager.getInstance().remove("SYS_TABLE_MODEL_INFO_CACHE");
         boolean isok = sysTableTypeService.delSysTableType(id);
         if (isok) {
             return ok("删除成功");
@@ -56,6 +59,7 @@ public class SysTableTypeController extends BaseController {
     @RequestMapping(value = "/updateSysTableType", method = RequestMethod.POST)
     public ResponseEntity updateSysEntityAttrDef(
             @RequestBody SysTableTypeModifyModel sysTableTypeModifyModel) throws BusinessException {
+        CacheManager.getInstance().remove("SYS_TABLE_MODEL_INFO_CACHE");
         boolean isok = sysTableTypeService.upSysTableType(sysTableTypeModifyModel);
         if (isok) {
             return ok("操作成功");

@@ -57,6 +57,7 @@ public class SysAppTableSetServiceImpl implements SysAppTableSetService {
     @Override
     public PaginationViewModel<SysAppTableSetModel> listTableSet(SysAppTableSetSearchModel searchModel) {
         QSysAppTableSet qTableSet = QSysAppTableSet.sysAppTableSet;
+        QSysTable qSysTable = QSysTable.sysTable;
 
         int pageSize = searchModel.getPageSize() > 0 ? searchModel.getPageSize() : 1;
         int pageIndex = searchModel.getPageIndex() > 0 ? searchModel.getPageIndex() : 10;
@@ -74,7 +75,14 @@ public class SysAppTableSetServiceImpl implements SysAppTableSetService {
                 .pageIndex(pageIndex)
                 .pageSize(pageSize)
                 .totalCount(page.getTotalElements())
-                .data(page.getContent().stream().map(SysAppTableSetMapper.INSTANCE::tableSetToTableSetModel).collect(Collectors.toList()))
+                .data(page.getContent().stream().map(tableSet -> {
+                    SysAppTableSetModel model = SysAppTableSetMapper.INSTANCE.tableSetToTableSetModel(tableSet);
+                    //如果英文名为空，去系统表中查询
+                    if (StringUtils.isEmpty(model.getNameEn())) {
+                        model.setNameEn(jpaQueryFactory.select(qSysTable.nameEn).from(qSysTable).where(qSysTable.id.eq(model.getSysTableId())).fetchOne());
+                    }
+                    return model;
+                }).collect(Collectors.toList()))
                 .build();
     }
 
@@ -83,6 +91,7 @@ public class SysAppTableSetServiceImpl implements SysAppTableSetService {
      */
     @Transactional
     @Override
+
     public void addTableSet(SysAppTableSetAddModel addModel) {
         QSysAppTableSet qTableSet = QSysAppTableSet.sysAppTableSet;
         SysAppTableSetMapper mapper = SysAppTableSetMapper.INSTANCE;
