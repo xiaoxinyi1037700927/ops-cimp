@@ -65,6 +65,11 @@ public class SysTableInfoDaoImpl implements SysTableInfoDao {
         if (o != null) {
             return (SysTableModelInfo) o;
         }
+        return this.getTableInfoNoCached(tableTypeName);
+    }
+
+    private SysTableModelInfo getTableInfoNoCached(String tableTypeName) throws BusinessException {
+        tableTypeName = tableTypeName.trim();
         try {
             Optional<SysTableType> sysTableType = sysTableTypeRepository.findOne(QSysTableType.sysTableType.nameEn.equalsIgnoreCase(tableTypeName));
 
@@ -96,13 +101,16 @@ public class SysTableInfoDaoImpl implements SysTableInfoDao {
         tableTypeName = tableTypeName.trim();
         prjCode = prjCode.trim();
         //缓存key
-        String cacheKey = tableTypeName + prjCode;
+        String cacheKey = tableTypeName + "_" + prjCode;
         Object o = CacheManager.getInstance().get(SYS_TABLE_MODEL_INFO, cacheKey);
 
         if (o != null) {
             return (SysTableModelInfoDTO) o;
         }
-        SysTableModelInfo tableInfo = this.getTableInfo(tableTypeName);
+        SysTableModelInfo tableInfo = this.getTableInfoNoCached(tableTypeName);
+        if (tableInfo == null) {
+            throw new BusinessException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE, "无对应的表类型" + tableTypeName);
+        }
         //系统属性信息列表
         Map<String, List<SysTableFieldInfo>> tableFieldIdMap = tableInfo.getTableFields().stream().collect(Collectors.groupingBy(SysTableFieldInfo::getId));
         //系统表（信息项）列表
@@ -150,110 +158,116 @@ public class SysTableInfoDaoImpl implements SysTableInfoDao {
         sysTableModelInfoDTO.setPrimaryField(primaryKey);
 
         List<SysTableInfoDTO> sysTableInfoDTOList = Lists.newArrayList();
-        for (SysAppTableSet sysAppTableSet : sysAppTableSets) {
-            SysTableInfoDTO sysTableInfoDTO = new SysTableInfoDTO();
+        Map<String, List<SysAppTableSet>> sysAppTableSetMap = sysAppTableSets.stream().collect(Collectors.groupingBy(SysAppTableSet::getSysAppTableGroupId));
+        for (SysAppTableGroup sysAppTableGroup1 : sysAppTableGroups) {
+            String sysAppTableGroupId = sysAppTableGroup1.getId();
+            List<SysAppTableSet> sysAppTableSetList = sysAppTableSetMap.getOrDefault(sysAppTableGroupId, Lists.newArrayList());
+            for (SysAppTableSet sysAppTableSet : sysAppTableSetList) {
+                SysTableInfoDTO sysTableInfoDTO = new SysTableInfoDTO();
 
-            String appTableSetId = sysAppTableSet.getId();
-            String appTableGroupId = sysAppTableSet.getSysAppTableGroupId();
-            String sysTableId = sysAppTableSet.getSysTableId();
-            String appTableNameCn = sysAppTableSet.getName();
+                String appTableSetId = sysAppTableSet.getId();
+                String appTableGroupId = sysAppTableSet.getSysAppTableGroupId();
+                String sysTableId = sysAppTableSet.getSysTableId();
+                String appTableNameCn = sysAppTableSet.getName();
 
-            //app表信息
-            SysAppTableGroup sysAppTableGroup = sysAppTableGroupIdMap.get(appTableGroupId).get(0);
-            Integer sort = sysAppTableGroup.getSort();
-            String appGroupNameCn = sysAppTableGroup.getName();
-            //sys表信息
-            List<SysTableInfo> sysTableInfos = tableInfoIdMap.get(sysTableId);
-            if (sysTableInfos == null) {
-                continue;
-            }
-            SysTableInfo sysTableInfo = sysTableInfos.get(0);
-            String sysTableNameCn = sysTableInfo.getNameCn();
-            boolean masterTable = sysTableInfo.isMasterTable();
-            String sysTableNameEn = sysTableInfo.getNameEn();
-
-            sysTableInfoDTO.setAppTableGroupName(appGroupNameCn);
-            sysTableInfoDTO.setTableNameEn(sysTableNameEn);
-            if (StringUtils.isNotEmpty(appTableNameCn)) {
-                sysTableInfoDTO.setTableNameCn(appTableNameCn);
-            } else {
-                sysTableInfoDTO.setTableNameCn(sysTableNameCn);
-            }
-            if (sort == null) {
-                sort = sysTableInfo.getSort();
-            }
-            sysTableInfoDTO.setSort(sort);
-            sysTableInfoDTO.setMasterTable(masterTable);
-            if (masterTable) {
-                sysTableInfoDTO.setTableNamePK(tableInfo.getPrimaryKey());
-            } else {
-                sysTableInfoDTO.setTableNamePK(subPrimaryKeyMap.get(sysTableNameEn));
-                sysTableInfoDTO.setTableNameFK(tableInfo.getPrimaryKey());
-            }
-
-            List<SysAppTableFieldGroup> sysAppTableFieldGroupsList = sysAppTableFieldGroupSetIdMap.get(appTableSetId);
-            //该组下没有对应的属性，跳过
-            if (sysAppTableFieldGroupsList == null) {
-                continue;
-            }
-            List<SysTableFieldInfoDTO> sysTableFieldInfoDTOS = Lists.newArrayList();
-            for (SysAppTableFieldGroup sysAppTableFieldGroup1 : sysAppTableFieldGroupsList) {
-                String appTableFieldGroupId = sysAppTableFieldGroup1.getId();
-                List<SysAppTableFieldSet> sysAppTableFieldSetList = sysAppFiledGroupIdMap.getOrDefault(appTableFieldGroupId, Lists.newArrayList());
-                for (SysAppTableFieldSet sysAppTableFieldSet : sysAppTableFieldSetList) {
-                    SysTableFieldInfoDTO sysTableFieldInfoDTO = new SysTableFieldInfoDTO();
-
-                    String sysTableFieldId = sysAppTableFieldSet.getSysTableFieldId();
-                    String sysAppTableFieldGroupId = sysAppTableFieldSet.getSysAppTableFieldGroupId();
-                    SysAppTableFieldGroup sysAppTableFieldGroup = sysAppTableFieldGroupIdMap.get(sysAppTableFieldGroupId).get(0);
-
-                    String appFieldGroupName = sysAppTableFieldGroup.getName();
-
-                    //app配置字段
-                    SysAppTableFieldSet sysAppTableField = sysAppFieldIdMap.get(sysTableFieldId).get(0);
-                    String appFieldNameCn = sysAppTableField.getName();
-                    String appHtml = sysAppTableField.getHtml();
-                    String appScript = sysAppTableField.getScript();
-                    Integer appSort = sysAppTableField.getSort();
-
-                    //sys系统字段
-                    SysTableFieldInfo sysTableFieldInfo = tableFieldIdMap.get(sysTableFieldId).get(0);
-                    String sysFieldId = sysTableFieldInfo.getId();
-                    String sysFieldNameEn = sysTableFieldInfo.getNameEn();
-                    String sysFieldNameCn = sysTableFieldInfo.getNameCn();
-                    String defaultHtml = sysTableFieldInfo.getDefaultHtml();
-                    String defaultScript = sysTableFieldInfo.getDefaultScript();
-                    Integer sysSort = sysTableFieldInfo.getSort();
-
-                    sysTableFieldInfoDTO.setId(sysFieldId);
-                    sysTableFieldInfoDTO.setAppTableFieldGroupName(appFieldGroupName);
-                    if (StringUtils.isNotEmpty(appFieldNameCn)) {
-                        sysTableFieldInfoDTO.setFieldNameCn(appFieldNameCn);
-                    } else {
-                        sysTableFieldInfoDTO.setFieldNameCn(sysFieldNameCn);
-                    }
-                    sysTableFieldInfoDTO.setFieldNameEn(sysFieldNameEn);
-                    if (StringUtils.isNotEmpty(appHtml)) {
-                        sysTableFieldInfoDTO.setDefaultHtml(appHtml);
-                    } else {
-                        sysTableFieldInfoDTO.setDefaultHtml(defaultHtml);
-                    }
-                    if (StringUtils.isNotEmpty(appScript)) {
-                        sysTableFieldInfoDTO.setDefaultScript(appScript);
-                    } else {
-                        sysTableFieldInfoDTO.setDefaultScript(defaultScript);
-                    }
-                    if (appSort != null) {
-                        sysTableFieldInfoDTO.setSort(appSort);
-                    } else {
-                        sysTableFieldInfoDTO.setSort(sysSort);
-                    }
-                    sysTableFieldInfoDTOS.add(sysTableFieldInfoDTO);
+                //app表信息
+                SysAppTableGroup sysAppTableGroup = sysAppTableGroupIdMap.get(appTableGroupId).get(0);
+                Integer sort = sysAppTableGroup.getSort();
+                String appGroupNameCn = sysAppTableGroup.getName();
+                //sys表信息
+                List<SysTableInfo> sysTableInfos = tableInfoIdMap.get(sysTableId);
+                if (sysTableInfos == null) {
+                    continue;
                 }
+                SysTableInfo sysTableInfo = sysTableInfos.get(0);
+                String sysTableNameCn = sysTableInfo.getNameCn();
+                boolean masterTable = sysTableInfo.isMasterTable();
+                String sysTableNameEn = sysTableInfo.getNameEn();
+
+                sysTableInfoDTO.setAppTableGroupName(appGroupNameCn);
+                sysTableInfoDTO.setTableNameEn(sysTableNameEn);
+                if (StringUtils.isNotEmpty(appTableNameCn)) {
+                    sysTableInfoDTO.setTableNameCn(appTableNameCn);
+                } else {
+                    sysTableInfoDTO.setTableNameCn(sysTableNameCn);
+                }
+                if (sort == null) {
+                    sort = sysTableInfo.getSort();
+                }
+                sysTableInfoDTO.setSort(sort);
+                sysTableInfoDTO.setMasterTable(masterTable);
+                if (masterTable) {
+                    sysTableInfoDTO.setTableNamePK(tableInfo.getPrimaryKey());
+                } else {
+                    sysTableInfoDTO.setTableNamePK(subPrimaryKeyMap.get(sysTableNameEn));
+                    sysTableInfoDTO.setTableNameFK(tableInfo.getPrimaryKey());
+                }
+
+                List<SysAppTableFieldGroup> sysAppTableFieldGroupsList = sysAppTableFieldGroupSetIdMap.get(appTableSetId);
+                //该组下没有对应的属性，跳过
+                if (sysAppTableFieldGroupsList == null) {
+                    continue;
+                }
+                List<SysTableFieldInfoDTO> sysTableFieldInfoDTOS = Lists.newArrayList();
+                for (SysAppTableFieldGroup sysAppTableFieldGroup1 : sysAppTableFieldGroupsList) {
+                    String appTableFieldGroupId = sysAppTableFieldGroup1.getId();
+                    List<SysAppTableFieldSet> sysAppTableFieldSetList = sysAppFiledGroupIdMap.getOrDefault(appTableFieldGroupId, Lists.newArrayList());
+                    for (SysAppTableFieldSet sysAppTableFieldSet : sysAppTableFieldSetList) {
+                        SysTableFieldInfoDTO sysTableFieldInfoDTO = new SysTableFieldInfoDTO();
+
+                        String sysTableFieldId = sysAppTableFieldSet.getSysTableFieldId();
+                        String sysAppTableFieldGroupId = sysAppTableFieldSet.getSysAppTableFieldGroupId();
+                        SysAppTableFieldGroup sysAppTableFieldGroup = sysAppTableFieldGroupIdMap.get(sysAppTableFieldGroupId).get(0);
+
+                        String appFieldGroupName = sysAppTableFieldGroup.getName();
+
+                        //app配置字段
+                        SysAppTableFieldSet sysAppTableField = sysAppFieldIdMap.get(sysTableFieldId).get(0);
+                        String appFieldNameCn = sysAppTableField.getName();
+                        String appHtml = sysAppTableField.getHtml();
+                        String appScript = sysAppTableField.getScript();
+                        Integer appSort = sysAppTableField.getSort();
+
+                        //sys系统字段
+                        SysTableFieldInfo sysTableFieldInfo = tableFieldIdMap.get(sysTableFieldId).get(0);
+                        String sysFieldId = sysTableFieldInfo.getId();
+                        String sysFieldNameEn = sysTableFieldInfo.getNameEn();
+                        String sysFieldNameCn = sysTableFieldInfo.getNameCn();
+                        String defaultHtml = sysTableFieldInfo.getDefaultHtml();
+                        String defaultScript = sysTableFieldInfo.getDefaultScript();
+                        Integer sysSort = sysTableFieldInfo.getSort();
+
+                        sysTableFieldInfoDTO.setId(sysFieldId);
+                        sysTableFieldInfoDTO.setAppTableFieldGroupName(appFieldGroupName);
+                        if (StringUtils.isNotEmpty(appFieldNameCn)) {
+                            sysTableFieldInfoDTO.setFieldNameCn(appFieldNameCn);
+                        } else {
+                            sysTableFieldInfoDTO.setFieldNameCn(sysFieldNameCn);
+                        }
+                        sysTableFieldInfoDTO.setFieldNameEn(sysFieldNameEn);
+                        if (StringUtils.isNotEmpty(appHtml)) {
+                            sysTableFieldInfoDTO.setDefaultHtml(appHtml);
+                        } else {
+                            sysTableFieldInfoDTO.setDefaultHtml(defaultHtml);
+                        }
+                        if (StringUtils.isNotEmpty(appScript)) {
+                            sysTableFieldInfoDTO.setDefaultScript(appScript);
+                        } else {
+                            sysTableFieldInfoDTO.setDefaultScript(defaultScript);
+                        }
+                        if (appSort != null) {
+                            sysTableFieldInfoDTO.setSort(appSort);
+                        } else {
+                            sysTableFieldInfoDTO.setSort(sysSort);
+                        }
+                        sysTableFieldInfoDTOS.add(sysTableFieldInfoDTO);
+                    }
+                }
+                sysTableInfoDTO.setFields(sysTableFieldInfoDTOS);
+                sysTableInfoDTOList.add(sysTableInfoDTO);
             }
-            sysTableInfoDTO.setFields(sysTableFieldInfoDTOS);
-            sysTableInfoDTOList.add(sysTableInfoDTO);
         }
+
         sysTableModelInfoDTO.setTables(sysTableInfoDTOList);
 
         CacheManager.getInstance().put(SYS_TABLE_MODEL_INFO, cacheKey, sysTableModelInfoDTO);
