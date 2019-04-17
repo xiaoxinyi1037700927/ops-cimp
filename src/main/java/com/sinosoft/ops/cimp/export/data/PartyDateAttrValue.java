@@ -18,8 +18,8 @@ import java.util.Map;
  */
 public class PartyDateAttrValue implements AttrValue {
 
-    private final String key = "partyDate";
-    private final int order = 6;
+    public static final String KEY = "partyDate";
+    public static final int ORDER = 6;
 
     @Override
     public Object getAttrValue(Map<String, Object> attrValueContext, String empId) throws Exception {
@@ -90,12 +90,9 @@ public class PartyDateAttrValue implements AttrValue {
         }
     }
 
-    public String getKey() {
-        return key;
-    }
-
     @Override
     public int getOrder() {
-        return order;
+        return ORDER;
     }
+
 }

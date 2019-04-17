@@ -17,8 +17,8 @@ import java.util.Map;
  */
 public class JobDateAttrValue implements AttrValue {
 
-    private final String key = "jobDate";
-    private final int order = 7;
+    public static final String KEY = "jobDate";
+    public static final int ORDER = 7;
 
     @Override
     public Object getAttrValue(Map<String, Object> attrValueContext, String empId) throws Exception {
@@ -57,12 +57,9 @@ public class JobDateAttrValue implements AttrValue {
         return "";
     }
 
-    public String getKey() {
-        return key;
-    }
-
     @Override
     public int getOrder() {
-        return order;
+        return ORDER;
     }
+
 }

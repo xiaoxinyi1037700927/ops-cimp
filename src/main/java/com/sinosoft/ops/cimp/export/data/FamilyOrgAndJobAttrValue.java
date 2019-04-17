@@ -18,8 +18,8 @@ import java.util.Map;
  */
 public class FamilyOrgAndJobAttrValue implements AttrValue {
 
-    private final String key = "fmOrgAndJob";
-    private final int order = 28;
+    public static final String KEY = "fmOrgAndJob";
+    public static final int ORDER = 28;
 
     @Override
     public Object getAttrValue(Map<String, Object> attrValueContext, String empId) throws Exception {
@@ -43,22 +43,9 @@ public class FamilyOrgAndJobAttrValue implements AttrValue {
         return familyMap;
     }
 
-//    private String getFmStatusStr(String fmStatusCode) {
-//        if (StringUtils.isNotEmpty(fmStatusCode)) {
-//            return CodeTranslateUtil.codeToName("DM125",fmStatusCode, ExportConstant.exportWordService);
-//        } else {
-//            return "";
-//        }
-//
-//
-//    }
-
     @Override
     public int getOrder() {
-        return order;
+        return ORDER;
     }
 
-    public String getKey() {
-        return key;
-    }
 }

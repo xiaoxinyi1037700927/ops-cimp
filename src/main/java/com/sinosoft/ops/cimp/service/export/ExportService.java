@@ -17,7 +17,5 @@ public interface ExportService extends BaseService {
 
     List<Map<String, Object>> findBySQL(String sql);
 
-    List<Map<String, Object>> findBySQL1(String sql, String empId);
-    //shixianggui-20180131, 入参 String sort 修改为  Map<String, Object> params
 
 }

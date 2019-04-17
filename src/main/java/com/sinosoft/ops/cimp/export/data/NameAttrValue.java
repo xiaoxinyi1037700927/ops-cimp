@@ -22,28 +22,21 @@ import java.util.Map;
 @Component
 public class NameAttrValue implements AttrValue {
 
-    /*	@Autowired(required=true)
-        @Qualifier("exportWordService")
-        private ExportService exportWordService;*/
-    @Autowired
-    private ExportService exportWordService;
     //属性与属性之间的排序，越小越靠前
-    private final int order = 0;
+    public static final int ORDER = 0;
 
-    private final String key = "name";
+    public static final String KEY = "name";
 
-    public static String name = "";
-    public static String id = "";
-    public static String cardNo = "";
+    private String name = "";
+    private String cardNo = "";
+
 
     @Override
     public Object getAttrValue(Map<String, Object> attrValueContext, String empId) throws Exception {
         try {
             String a01TableSql = "SELECT * FROM EMP_A001 A01 WHERE EMP_ID = '%s'  and status=0";
             a01TableSql = String.format(a01TableSql, empId);
-            //ExportService exportWordService=new ExportServiceImpl();
             List a01TableList = ExportConstant.exportWordService.findBySQL(a01TableSql);
-            //List a01TableList = exportWordService.findBySQL(a01TableSql);
 
             if (a01TableList != null && a01TableList.size() > 0) {
                 Map map = (Map) a01TableList.get(0);
@@ -53,7 +46,7 @@ public class NameAttrValue implements AttrValue {
                 String name = StringUtil.obj2Str(map.get("A01001"));
                 String cardNo = StringUtil.obj2Str(map.get("A001003"));//身份证号
                 this.name = name;
-                this.id = id;
+//                this.id = id;
                 this.cardNo = cardNo;
                 if (name.length() == 2) {
                     String firstName = name.substring(0, 1);
@@ -70,32 +63,17 @@ public class NameAttrValue implements AttrValue {
         }
     }
 
-    public static String getCardNo() {
+    public String getCardNo() {
         return cardNo;
     }
 
-    public int getOrder() {
-        return order;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public static String getName() {
+    public String getName() {
         return name;
     }
 
-    public static String getId() {
-        return id;
-    }
-
-    public ExportService getExportWordService() {
-        return exportWordService;
-    }
-
-    public void setExportWordService(ExportService exportWordService) {
-        this.exportWordService = exportWordService;
+    @Override
+    public int getOrder() {
+        return ORDER;
     }
 
 }

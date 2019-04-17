@@ -5,12 +5,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.sinosoft.ops.cimp.export.common.ExportConstant;
 import com.sinosoft.ops.cimp.export.common.bean.AttributeBean;
 import com.sinosoft.ops.cimp.export.common.bean.CategoryBean;
 import com.sinosoft.ops.cimp.export.common.StreamGobbler;
 import com.sinosoft.ops.cimp.export.common.bean.CategoryData;
 import com.sinosoft.ops.cimp.service.common.impl.BaseServiceImpl;
-import com.sinosoft.ops.cimp.service.export.PdfTohtmlService;
+import com.sinosoft.ops.cimp.service.export.Pdf2htmlService;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -21,32 +22,26 @@ import org.springframework.stereotype.Service;
 
 
 @Service
-public class PdfTohtmlServiceImpl extends BaseServiceImpl implements PdfTohtmlService {
+public class Pdf2htmlServiceImpl extends BaseServiceImpl implements Pdf2htmlService {
 
-    private final Logger logger = LoggerFactory.getLogger(PdfTohtmlServiceImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(Pdf2htmlServiceImpl.class);
 
     @Override
-    public boolean pdfToHtml(String exeFilePathName,
-                             String pdfFilePath, String pdfFileName,
-                             String htmlFilePath, String htmlFileName) throws Exception {
+    public boolean pdf2Html(String pdfFilePath, String pdfFileName,
+                            String htmlFilePath, String htmlFileName) throws Exception {
 
-//		logger.debug("exeFilePathName=" + exeFilePathName);
-//		logger.debug("pdfFilePath=" + pdfFilePath);
-//		logger.debug("pdfFileName=" + pdfFileName);
-//		logger.debug("htmlFilePath=" + htmlFilePath);
-//		logger.debug("htmlFileName=" + htmlFileName);
 
         StringBuilder command = new StringBuilder();
-        command.append(exeFilePathName).append(" ");
+        command.append(ExportConstant.PDF2HTML_PATH).append(" ");
 
         // pdf
-        command.append(pdfFilePath).append("\\").append(pdfFileName).append(" ");
+//        command.append(pdfFilePath).append("\\").append(pdfFileName).append(" ");
 
         // html
-        command.append(htmlFileName).append(" ");
+//        command.append(htmlFileName).append(" ");
 
         // 生成文件存放位置
-        command.append("--dest-dir ").append(htmlFilePath).append(" ");
+//        command.append("--dest-dir ").append(htmlFilePath).append(" ");
 
         // 尽量减少用于文本的HTML元素的数目 (default: 0)
         command.append("--optimize-text 1 ");
@@ -58,14 +53,14 @@ public class PdfTohtmlServiceImpl extends BaseServiceImpl implements PdfTohtmlSe
         // 嵌入html中的字体后缀(ttf,otf,woff,svg) (default: "woff")
         command.append("--font-format woff ");
 
-        command.append(pdfFileName).append(" ");
+        command.append(pdfFilePath).append(pdfFileName).append(" ");
         command.append(htmlFileName).append(" ");
 
 //		logger.debug("+++++++++ Command: " + command.toString());
 
         try {
             Runtime rt = Runtime.getRuntime();
-            Process p = rt.exec(command.toString());
+            Process p = rt.exec(command.toString(), null, new File(pdfFilePath));
 
             StreamGobbler errorGobbler = new StreamGobbler(p.getErrorStream(), "ERROR");
             errorGobbler.start(); // 开启屏幕标准错误流

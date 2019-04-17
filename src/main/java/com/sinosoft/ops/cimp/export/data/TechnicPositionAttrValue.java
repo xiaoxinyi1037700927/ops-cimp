@@ -19,8 +19,8 @@ import java.util.Map;
  */
 public class TechnicPositionAttrValue implements AttrValue {
 
-    private final String key = "technicPosition";
-    private final int order = 9;
+    public static final String KEY = "technicPosition";
+    public static final int ORDER = 9;
 
     @Override
     public Object getAttrValue(Map<String, Object> attrValueContext, String empId) throws Exception {
@@ -73,12 +73,9 @@ public class TechnicPositionAttrValue implements AttrValue {
         }
     }
 
-    public String getKey() {
-        return key;
-    }
-
     @Override
     public int getOrder() {
-        return order;
+        return ORDER;
     }
+
 }

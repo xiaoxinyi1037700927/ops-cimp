@@ -19,9 +19,9 @@ import java.util.Map;
  */
 public class BirthdayAttrValue implements AttrValue {
 
-    private final int order = 2;
+    public static final int ORDER = 2;
 
-    private final String key = "birthday";
+    public static final String KEY = "birthday";
 
     @Override
     public Object getAttrValue(Map<String, Object> attrValueContext, String empId) throws Exception {
@@ -76,13 +76,8 @@ public class BirthdayAttrValue implements AttrValue {
         return dateStr + (char) 11 + "(" + yearsOld + "岁)";
     }
 
-
     @Override
     public int getOrder() {
-        return order;
-    }
-
-    public String getKey() {
-        return key;
+        return ORDER;
     }
 }
