@@ -3,25 +3,35 @@ package com.sinosoft.ops.cimp.service.impl;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.sinosoft.ops.cimp.constant.OpsErrorMessage;
+import com.sinosoft.ops.cimp.constant.TableFieldLogicalDeleteFlagEnum;
 import com.sinosoft.ops.cimp.dao.SysTableDao;
 import com.sinosoft.ops.cimp.dao.SysTableInfoDao;
+import com.sinosoft.ops.cimp.dao.domain.Conditions;
 import com.sinosoft.ops.cimp.dao.domain.DaoParam;
 import com.sinosoft.ops.cimp.dao.domain.ExecParam;
 import com.sinosoft.ops.cimp.dao.domain.ResultParam;
+import com.sinosoft.ops.cimp.dao.domain.sys.table.SysTableFieldInfo;
 import com.sinosoft.ops.cimp.dto.QueryDataParamBuilder;
 import com.sinosoft.ops.cimp.dto.sys.table.SysTableFieldInfoDTO;
 import com.sinosoft.ops.cimp.dto.sys.table.SysTableInfoDTO;
 import com.sinosoft.ops.cimp.dto.sys.table.SysTableModelInfoDTO;
+import com.sinosoft.ops.cimp.entity.sys.table.SysTableField;
 import com.sinosoft.ops.cimp.exception.BusinessException;
+import com.sinosoft.ops.cimp.exception.SystemException;
 import com.sinosoft.ops.cimp.service.SysTableModelInfoService;
+import com.sinosoft.ops.cimp.service.table.SysTableFieldService;
 import com.sinosoft.ops.cimp.util.IdUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,11 +39,13 @@ public class SysTableModelInfoServiceImpl implements SysTableModelInfoService {
 
     private final SysTableInfoDao sysTableInfoDao;
     private final SysTableDao sysTableDao;
+    private final SysTableFieldService sysTableFieldService;
 
     @Autowired
-    public SysTableModelInfoServiceImpl(SysTableInfoDao sysTableInfoDao, SysTableDao sysTableDao) {
+    public SysTableModelInfoServiceImpl(SysTableInfoDao sysTableInfoDao, SysTableDao sysTableDao, SysTableFieldService sysTableFieldService) {
         this.sysTableInfoDao = sysTableInfoDao;
         this.sysTableDao = sysTableDao;
+        this.sysTableFieldService = sysTableFieldService;
     }
 
     @Override
@@ -226,7 +238,58 @@ public class SysTableModelInfoServiceImpl implements SysTableModelInfoService {
     }
 
     @Override
-    public void deleteData(QueryDataParamBuilder queryDataParam) throws BusinessException {
+    public QueryDataParamBuilder deleteData(QueryDataParamBuilder queryDataParam) throws BusinessException {
+        String prjCode = queryDataParam.getPrjCode();
+        String tableTypeNameEn = queryDataParam.getTableTypeNameEn();
+        String tableNameEn = queryDataParam.getTableNameEn();
+        String tableNameEnPK = queryDataParam.getTableNameEnPK();
+        String tableNameEnPKValue = String.valueOf(queryDataParam.getTableNameEnPKValue());
+        Map<String, Object> saveOrUpdateFormData = queryDataParam.getSaveOrUpdateFormData();
 
+        SysTableModelInfoDTO tableInfo = sysTableInfoDao.getTableInfo(tableTypeNameEn, prjCode);
+        if (tableInfo == null) {
+            throw new BusinessException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE_100202, tableTypeNameEn);
+        }
+        //TODO 获取app定义信息对属性进行过滤
+        Map<String, List<SysTableInfoDTO>> sysTableInfoMap = tableInfo.getTables().stream().collect(Collectors.groupingBy(SysTableInfoDTO::getTableNameEn));
+        List<SysTableInfoDTO> sysTableInfoDTOList = sysTableInfoMap.get(tableNameEn);
+        if (sysTableInfoDTOList == null) {
+            throw new BusinessException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE, "保存信息集必须在项目中存在");
+        }
+
+        SysTableInfoDTO sysTableInfoDTO = sysTableInfoDTOList.get(0);
+        List<SysTableField> sysTableFields = sysTableFieldService.getSysTableFieldBySysTableId(sysTableInfoDTO.getId());
+
+        String deleteFlagFieldEnName="";
+
+        //获取删除列
+        Optional<SysTableField> logicalDeleteFlagField = sysTableFields.stream().filter(x -> x.getLogicalDeleteFlag().equals(TableFieldLogicalDeleteFlagEnum.删除.getCode())).findFirst();
+
+        //删除字段必须存在
+        if (logicalDeleteFlagField.isPresent()) {
+            SysTableField sysTableField = logicalDeleteFlagField.get();
+            deleteFlagFieldEnName = sysTableField.getNameEn();
+        } else {
+            throw new SystemException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE_100207, tableTypeNameEn);
+        }
+
+        List<ExecParam> execParamList = Lists.newArrayList();
+
+        String key = deleteFlagFieldEnName;
+        String value=TableFieldLogicalDeleteFlagEnum.删除.getCode();
+        execParamList.add(new ExecParam(key, value));
+
+        DaoParam daoParam = new DaoParam();
+
+        List<String> idList = (List<String>) saveOrUpdateFormData.get(tableNameEnPK);
+        String idJoinString = idList.stream().collect(Collectors.joining("','", "'", "'"));
+
+        daoParam.addTableTypeNameEn(tableTypeNameEn)
+                .addTableNameEn(tableNameEn)
+                .addExecParamList(execParamList)
+                .addCondition(tableNameEnPK, Conditions.ConditionsEnum.IN, idJoinString);
+
+        sysTableDao.updateData(daoParam);
+        return queryDataParam;
     }
 }

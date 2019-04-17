@@ -11,7 +11,9 @@ import com.sinosoft.ops.cimp.dto.sys.table.SysTableInfoDTO;
 import com.sinosoft.ops.cimp.dto.sys.table.SysTableModelInfoDTO;
 import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.service.SysTableModelInfoService;
+import com.sinosoft.ops.cimp.service.table.SysTableTypeService;
 import com.sinosoft.ops.cimp.util.JsonUtil;
+import com.sinosoft.ops.cimp.vo.to.table.SysTableTypeModel;
 import io.swagger.annotations.Api;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,11 +37,24 @@ public class SysTableModelInfoController extends BaseController {
 
     private final SysTableModelInfoService sysTableModelInfoService;
     private final SysTableInfoDao sysTableInfoDao;
+    private final SysTableTypeService sysTableTypeService;
 
     @Autowired
-    public SysTableModelInfoController(SysTableModelInfoService sysTableModelInfoService, SysTableInfoDao sysTableInfoDao) {
+    public SysTableModelInfoController(SysTableModelInfoService sysTableModelInfoService, SysTableInfoDao sysTableInfoDao, SysTableTypeService sysTableTypeService) {
         this.sysTableModelInfoService = sysTableModelInfoService;
         this.sysTableInfoDao = sysTableInfoDao;
+        this.sysTableTypeService = sysTableTypeService;
+    }
+
+    @RequestMapping(value = "/getSysTableTypes", method = RequestMethod.GET)
+    public ResponseEntity getSysTableTypes(
+            @RequestParam("appCode") String prjCode) throws BusinessException {
+
+        if (StringUtils.isEmpty(prjCode)) {
+            return fail("查询表结构必须传递项目编号");
+        }
+        List<SysTableTypeModel> allSysTableType = sysTableTypeService.getAllSysTableType();
+        return ok(allSysTableType);
     }
 
     @RequestMapping(value = "/getSysTableNames", method = RequestMethod.GET)
@@ -212,5 +227,44 @@ public class SysTableModelInfoController extends BaseController {
 
         QueryDataParamBuilder resultDataParam = sysTableModelInfoService.queryData(dataParamBuilder);
         return ok(resultDataParam);
+    }
+
+    @RequestMapping(value = "deleteSysTableData", method = RequestMethod.POST)
+    public ResponseEntity deleteSysTableData(
+            @RequestParam("appCode") String appCode,
+            @RequestParam("tableTypeName") String tableTypeName,
+            @RequestParam("tableName") String tableName,
+            @RequestParam("tableNamePK") String tableNamePK,
+            @RequestParam("tableNamePKValue") String tableNamePKValue,
+            @RequestParam("form") String form) throws BusinessException {
+
+        if (StringUtils.isEmpty(tableTypeName)) {
+            return fail("修改信息集必须指定表类型");
+        }
+        if (StringUtils.isEmpty(appCode)) {
+            return fail("修改信息集必须指定项目编号");
+        }
+        if (StringUtils.isEmpty(tableName)) {
+            return fail("修改信息集必须指定表名");
+        }
+        if (StringUtils.isEmpty(tableNamePK)) {
+            return fail("修改信息集必须指定信息集主键字段");
+        }
+        if (StringUtils.isEmpty(tableNamePKValue)) {
+            return fail("修改信息集必须指定信息集主键字段的值");
+        }
+
+        Map formMap = JsonUtil.parseStringToObject(form, HashMap.class);
+        QueryDataParamBuilder queryDataParam = new QueryDataParamBuilder();
+
+        queryDataParam.setPrjCode(appCode)
+                .setTableTypeNameEn(tableTypeName)
+                .setTableNameEn(tableName)
+                .setTableNameEnPK(tableNamePK)
+                .setTableNameEnPKValue(tableNamePKValue)
+                .setSaveOrUpdateFormData(formMap);
+
+        sysTableModelInfoService.updateData(queryDataParam);
+        return ok("删除成功");
     }
 }

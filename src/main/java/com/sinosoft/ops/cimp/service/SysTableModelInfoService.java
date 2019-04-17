@@ -23,6 +23,6 @@ public interface SysTableModelInfoService {
     /**
      * 删除信息集数据
      */
-    void deleteData(QueryDataParamBuilder queryDataParam) throws BusinessException;
+    QueryDataParamBuilder deleteData(QueryDataParamBuilder queryDataParam) throws BusinessException;
 
 }
