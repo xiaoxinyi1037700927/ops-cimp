@@ -54,13 +54,16 @@ public class SysTableModelInfoController extends BaseController {
             return fail("查询表结构必须传递表类型名称");
         }
         SysTableModelInfoDTO tableInfo = sysTableInfoDao.getTableInfo(tableTypeName, prjCode);
-        List<Map<String, String>> result = Lists.newArrayList();
+        List<Map<String, Object>> result = Lists.newArrayList();
 
         tableInfo.getTables().forEach(table -> {
-            Map<String, String> map = Maps.newHashMap();
+            Map<String, Object> map = Maps.newHashMap();
             map.put("tableNameEn", table.getTableNameEn());
             map.put("tableNameCn", table.getTableNameCn());
             map.put("appGroupName", table.getAppTableGroupName());
+            map.put("isMasterTable", table.isMasterTable());
+            map.put("tableNamePK", table.getTableNamePK());
+            map.put("tableNameFK", table.getTableNameFK());
             result.add(map);
         });
         return ok(result);
