@@ -237,24 +237,16 @@ public class SysTableModelInfoController extends BaseController {
             @RequestParam("appCode") String appCode,
             @RequestParam("tableTypeName") String tableTypeName,
             @RequestParam("tableName") String tableName,
-            @RequestParam("tableNamePK") String tableNamePK,
-            @RequestParam("tableNamePKValue") String tableNamePKValue,
             @RequestParam("form") String form) throws BusinessException {
 
         if (StringUtils.isEmpty(tableTypeName)) {
-            return fail("修改信息集必须指定表类型");
+            return fail("删除信息集必须指定表类型");
         }
         if (StringUtils.isEmpty(appCode)) {
-            return fail("修改信息集必须指定项目编号");
+            return fail("删除信息集必须指定项目编号");
         }
         if (StringUtils.isEmpty(tableName)) {
-            return fail("修改信息集必须指定表名");
-        }
-        if (StringUtils.isEmpty(tableNamePK)) {
-            return fail("修改信息集必须指定信息集主键字段");
-        }
-        if (StringUtils.isEmpty(tableNamePKValue)) {
-            return fail("修改信息集必须指定信息集主键字段的值");
+            return fail("删除信息集必须指定表名");
         }
 
         Map formMap = JsonUtil.parseStringToObject(form, HashMap.class);
@@ -263,11 +255,67 @@ public class SysTableModelInfoController extends BaseController {
         queryDataParam.setPrjCode(appCode)
                 .setTableTypeNameEn(tableTypeName)
                 .setTableNameEn(tableName)
-                .setTableNameEnPK(tableNamePK)
-                .setTableNameEnPKValue(tableNamePKValue)
                 .setSaveOrUpdateFormData(formMap);
 
-        sysTableModelInfoService.updateData(queryDataParam);
+        sysTableModelInfoService.deleteData(queryDataParam);
         return ok("删除成功");
+    }
+
+    @RequestMapping(value = "deleteSysTableDataRecover", method = RequestMethod.POST)
+    public ResponseEntity deleteSysTableDataRecover(
+            @RequestParam("appCode") String appCode,
+            @RequestParam("tableTypeName") String tableTypeName,
+            @RequestParam("tableName") String tableName,
+            @RequestParam("form") String form) throws BusinessException {
+
+        if (StringUtils.isEmpty(tableTypeName)) {
+            return fail("恢复信息集必须指定表类型");
+        }
+        if (StringUtils.isEmpty(appCode)) {
+            return fail("恢复信息集必须指定项目编号");
+        }
+        if (StringUtils.isEmpty(tableName)) {
+            return fail("恢复信息集必须指定表名");
+        }
+
+        Map formMap = JsonUtil.parseStringToObject(form, HashMap.class);
+        QueryDataParamBuilder queryDataParam = new QueryDataParamBuilder();
+
+        queryDataParam.setPrjCode(appCode)
+                .setTableTypeNameEn(tableTypeName)
+                .setTableNameEn(tableName)
+                .setSaveOrUpdateFormData(formMap);
+
+        sysTableModelInfoService.deleteDataRecover(queryDataParam);
+        return ok("恢复成功");
+    }
+
+    @RequestMapping(value = "deleteSysTableDataFinal", method = RequestMethod.POST)
+    public ResponseEntity deleteSysTableDataFinal(
+            @RequestParam("appCode") String appCode,
+            @RequestParam("tableTypeName") String tableTypeName,
+            @RequestParam("tableName") String tableName,
+            @RequestParam("form") String form) throws BusinessException {
+
+        if (StringUtils.isEmpty(tableTypeName)) {
+            return fail("清空信息集必须指定表类型");
+        }
+        if (StringUtils.isEmpty(appCode)) {
+            return fail("清空信息集必须指定项目编号");
+        }
+        if (StringUtils.isEmpty(tableName)) {
+            return fail("清空信息集必须指定表名");
+        }
+
+        Map formMap = JsonUtil.parseStringToObject(form, HashMap.class);
+        QueryDataParamBuilder queryDataParam = new QueryDataParamBuilder();
+
+        queryDataParam.setPrjCode(appCode)
+                .setTableTypeNameEn(tableTypeName)
+                .setTableNameEn(tableName)
+                .setSaveOrUpdateFormData(formMap);
+
+        sysTableModelInfoService.deleteDataFinal(queryDataParam);
+        return ok("回收站删除成功");
     }
 }
