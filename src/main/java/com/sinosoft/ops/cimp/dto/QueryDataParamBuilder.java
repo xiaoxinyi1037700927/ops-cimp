@@ -32,7 +32,8 @@ public class QueryDataParamBuilder implements Serializable {
     private String tableNameEnFK;
     @ApiModelProperty(value = "信息集外键字段的值")
     private Object tableNameEnFKValue;
-
+    @ApiModelProperty(value = "待翻译的字段和值")
+    private List<TranslateField> translateFields = Lists.newArrayList();
     //是否需要分页
     @ApiModelProperty(value = "是否需要分页")
     private boolean needPager;
@@ -124,6 +125,24 @@ public class QueryDataParamBuilder implements Serializable {
 
     public QueryDataParamBuilder setTableNameEnFKValue(Object tableNameEnFKValue) {
         this.tableNameEnFKValue = tableNameEnFKValue;
+        return this;
+    }
+
+    public List<TranslateField> getTranslateFields() {
+        return translateFields;
+    }
+
+    public QueryDataParamBuilder setTranslateFields(List<TranslateField> translateFields) {
+        if (translateFields != null) {
+            this.translateFields.addAll(translateFields);
+        }
+        return this;
+    }
+
+    public QueryDataParamBuilder setTranslateFields(TranslateField translateField) {
+        if (translateField != null) {
+            this.translateFields.add(translateField);
+        }
         return this;
     }
 

@@ -43,6 +43,8 @@ public class SysTableFieldInfo implements Serializable {
     private Integer sort;
     //代码集名称
     private String codeSetName;
+    //代码集类型
+    private String codeSetType;
 
     public String getId() {
         return id;
@@ -196,6 +198,14 @@ public class SysTableFieldInfo implements Serializable {
         this.codeSetName = codeSetName;
     }
 
+    public String getCodeSetType() {
+        return codeSetType;
+    }
+
+    public void setCodeSetType(String codeSetType) {
+        this.codeSetType = codeSetType;
+    }
+
     @Override
     public String toString() {
         return "SysTableFieldInfo{" +
@@ -218,6 +228,7 @@ public class SysTableFieldInfo implements Serializable {
                 ", defaultScript='" + defaultScript + '\'' +
                 ", sort=" + sort +
                 ", codeSetName='" + codeSetName + '\'' +
+                ", codeSetType='" + codeSetType + '\'' +
                 '}';
     }
 }

@@ -179,6 +179,9 @@ public class SysTableModelInfoController extends BaseController {
         }
 
         Map formMap = JsonUtil.parseStringToObject(form, HashMap.class);
+        if (formMap == null || formMap.size() == 0) {
+            return ok("修改成功");
+        }
         QueryDataParamBuilder queryDataParam = new QueryDataParamBuilder();
 
         queryDataParam.setPrjCode(appCode)
