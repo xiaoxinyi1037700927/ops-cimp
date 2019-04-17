@@ -111,6 +111,9 @@ public class SysTableFieldAddModel {
     @ApiModelProperty(value = " 默认引用代码集")
     private String sysCodeSetName;
 
+    @ApiModelProperty(value = " 默认引用代码集类型")
+    private String sysCodeSetType;
+
     public String getSysTableId() {
         return sysTableId;
     }
@@ -261,5 +264,13 @@ public class SysTableFieldAddModel {
 
     public void setSysCodeSetName(String sysCodeSetName) {
         this.sysCodeSetName = sysCodeSetName;
+    }
+
+    public String getSysCodeSetType() {
+        return sysCodeSetType;
+    }
+
+    public void setSysCodeSetType(String sysCodeSetType) {
+        this.sysCodeSetType = sysCodeSetType;
     }
 }
