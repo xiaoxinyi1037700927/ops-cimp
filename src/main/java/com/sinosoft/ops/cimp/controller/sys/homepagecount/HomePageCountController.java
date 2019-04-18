@@ -1,12 +1,12 @@
 package com.sinosoft.ops.cimp.controller.sys.homepagecount;
 
 
-import com.sinosoft.ops.cimp.config.annotation.SystemLimitsApiGroup;
+import com.sinosoft.ops.cimp.annotation.SystemLimitsApiGroup;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.service.sys.homepagecount.HomePageCountService;
 import com.sinosoft.ops.cimp.service.sys.homepagecount.RoleHomePageCountService;
-import com.sinosoft.ops.cimp.config.annotation.RequiresAuthentication;
+import com.sinosoft.ops.cimp.annotation.RequiresAuthentication;
 import com.sinosoft.ops.cimp.vo.from.sys.homepagecount.RoleHomePageCountModel;
 import com.sinosoft.ops.cimp.vo.to.sys.homepagecount.HomePageCountQueryVO;
 import com.sinosoft.ops.cimp.vo.to.sys.homepagecount.RoleHomePageCountVO;

@@ -1,8 +1,8 @@
 package com.sinosoft.ops.cimp.controller.sys.permission;
 
 import com.google.common.collect.Lists;
-import com.sinosoft.ops.cimp.config.annotation.RequiresAuthentication;
-import com.sinosoft.ops.cimp.config.annotation.SystemLimitsApiGroup;
+import com.sinosoft.ops.cimp.annotation.RequiresAuthentication;
+import com.sinosoft.ops.cimp.annotation.SystemLimitsApiGroup;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.entity.sys.permission.PermissionPage;
 import com.sinosoft.ops.cimp.entity.sys.permission.PermissionPageOperation;

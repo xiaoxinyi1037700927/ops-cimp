@@ -276,21 +276,6 @@ public class UserServiceImpl implements UserService {
         return null;
     }
 
-//    @Override
-//    @Transactional
-//    public boolean setOrganTask(UserTaskAddViewModel userTaskAddViewModel) {
-//        List<String> taskIdList = userTaskAddViewModel.getTaskIdList();
-//        List<UserTask> userTaskList = new ArrayList<>();
-//        taskIdList.forEach(taskId -> {
-//            UserTask userTask = UserViewModelMapper.INSTANCE.viewModelToUserTask(userTaskAddViewModel);
-//            userTask.setTaskId(taskId);
-//            userTaskList.add(userTask);
-//        });
-//        userTaskRepository.deleteByUserId(userTaskAddViewModel.getUserId());
-//        userTaskRepository.saveAll(userTaskList);
-    //   return true;
-    //  }
-
     @Override
     @Transactional
     public boolean deleteById(String userId) {

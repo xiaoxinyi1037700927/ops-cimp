@@ -1,7 +1,7 @@
 package com.sinosoft.ops.cimp.controller.organization;
 
-import com.sinosoft.ops.cimp.config.annotation.OrganizationApiGroup;
-import com.sinosoft.ops.cimp.config.annotation.RequiresAuthentication;
+import com.sinosoft.ops.cimp.annotation.OrganizationApiGroup;
+import com.sinosoft.ops.cimp.annotation.RequiresAuthentication;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.entity.oraganization.Organization;
 import com.sinosoft.ops.cimp.exception.BusinessException;

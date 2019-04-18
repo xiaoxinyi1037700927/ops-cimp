@@ -1,8 +1,8 @@
 package com.sinosoft.ops.cimp.controller.user;
 
 
-import com.sinosoft.ops.cimp.config.annotation.RequiresAuthentication;
-import com.sinosoft.ops.cimp.config.annotation.SystemUserApiGroup;
+import com.sinosoft.ops.cimp.annotation.RequiresAuthentication;
+import com.sinosoft.ops.cimp.annotation.SystemUserApiGroup;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.dto.PaginationViewModel;
 import com.sinosoft.ops.cimp.entity.user.Role;

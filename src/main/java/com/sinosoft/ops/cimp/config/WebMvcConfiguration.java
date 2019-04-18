@@ -2,7 +2,6 @@ package com.sinosoft.ops.cimp.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.sinosoft.ops.cimp.interceptor.WebContextInterceptor;
 import com.vip.vjtools.vjkit.text.Charsets;
 import com.vip.vjtools.vjkit.time.DateFormatUtil;
 import org.springframework.context.annotation.Bean;
@@ -10,7 +9,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.persistence.EntityManager;
@@ -21,13 +19,7 @@ import java.util.List;
 @Configuration
 public class WebMvcConfiguration implements WebMvcConfigurer {
 
-    /**
-     * 增加Spring MVC的拦截器
-     */
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new WebContextInterceptor());
-    }
+
 
     @Override
     public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {

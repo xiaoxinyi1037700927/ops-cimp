@@ -16,9 +16,6 @@ public class LoginViewModel {
     @NotEmpty(message = "密码不能为空")
     private String passWord;
 
-    @ApiModelProperty(value = "类型 1任免 2监督")
-    private String systemType;
-
     public String getUserName() {
         return userName;
     }
@@ -35,11 +32,4 @@ public class LoginViewModel {
         this.passWord = passWord;
     }
 
-    public String getSystemType() {
-        return systemType;
-    }
-
-    public void setSystemType(String systemType) {
-        this.systemType = systemType;
-    }
 }

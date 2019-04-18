@@ -114,6 +114,9 @@ public class DataPermissionServiceImpl implements DataPermissionService {
     public String findSearchCondition() {
         HttpServletRequest request = ((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getRequest();
         String requestURI = request.getRequestURI();
+        if (SecurityUtils.getSubject().getCurrentUser() == null) {
+            return "";
+        }
         String userId = SecurityUtils.getSubject().getCurrentUser().getId();
         Organization dataOrganization = organizationRepository.findById(SecurityUtils.getSubject().getCurrentUser().getDataOrganizationId()).get();
         ArrayList<UserRole> userRoles = Lists.newArrayList(userRoleRepository.findAll(QUserRole.userRole.userId.eq(userId)));

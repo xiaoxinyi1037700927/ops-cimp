@@ -1,6 +1,6 @@
 package com.sinosoft.ops.cimp.controller.sys.syscode;
 
-import com.sinosoft.ops.cimp.config.annotation.SystemApiGroup;
+import com.sinosoft.ops.cimp.annotation.SystemApiGroup;
 import com.sinosoft.ops.cimp.constant.SysCodeSetTypeEnum;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.dto.PaginationViewModel;

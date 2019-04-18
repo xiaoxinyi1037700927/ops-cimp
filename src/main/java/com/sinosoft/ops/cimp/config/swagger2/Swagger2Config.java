@@ -1,6 +1,6 @@
 package com.sinosoft.ops.cimp.config.swagger2;
 
-import com.sinosoft.ops.cimp.config.annotation.*;
+import com.sinosoft.ops.cimp.annotation.*;
 import org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

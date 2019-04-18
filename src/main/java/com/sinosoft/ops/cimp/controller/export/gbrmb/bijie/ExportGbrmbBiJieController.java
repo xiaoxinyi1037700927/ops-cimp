@@ -1,6 +1,6 @@
 package com.sinosoft.ops.cimp.controller.export.gbrmb.bijie;
 
-import com.sinosoft.ops.cimp.config.annotation.BusinessApiGroup;
+import com.sinosoft.ops.cimp.annotation.BusinessApiGroup;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.export.common.ExportConstant;

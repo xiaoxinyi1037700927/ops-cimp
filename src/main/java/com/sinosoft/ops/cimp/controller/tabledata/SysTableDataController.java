@@ -2,7 +2,7 @@ package com.sinosoft.ops.cimp.controller.tabledata;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.sinosoft.ops.cimp.config.annotation.SystemApiGroup;
+import com.sinosoft.ops.cimp.annotation.SystemApiGroup;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.dao.SysTableInfoDao;
 import com.sinosoft.ops.cimp.dao.domain.sys.table.SysTableModelInfo;
