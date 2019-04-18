@@ -5,6 +5,7 @@ import com.sinosoft.ops.cimp.entity.user.QRole;
 import com.sinosoft.ops.cimp.entity.user.Role;
 import com.sinosoft.ops.cimp.repository.user.RoleRepository;
 import com.sinosoft.ops.cimp.service.user.RoleService;
+import com.sinosoft.ops.cimp.util.SecurityUtils;
 import com.sinosoft.ops.cimp.vo.from.sys.role.RoleModel;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +54,7 @@ public class RoleServiceImpl implements RoleService {
     public Role save(RoleModel roleModel) {
         Role role = new Role();
         BeanUtils.copyProperties(roleModel, role);
-        role.setCreateId("111");  //获得当前登录用户ID
+        role.setCreateId(SecurityUtils.getSubject().getCurrentUser().getId());  //获得当前登录用户ID
         role.setCreateTime(Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant()));
         return roleRepository.save(role);
     }
@@ -66,7 +67,7 @@ public class RoleServiceImpl implements RoleService {
         if (options.isPresent()) {
             Role role = options.get();
             BeanUtils.copyProperties(roleModel, role);
-            role.setModifyId("111"); //获取当前登录用户ID
+            role.setModifyId(SecurityUtils.getSubject().getCurrentUser().getId()); //获取当前登录用户ID
             role.setModifyTime(Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant()));
             return role;
         }

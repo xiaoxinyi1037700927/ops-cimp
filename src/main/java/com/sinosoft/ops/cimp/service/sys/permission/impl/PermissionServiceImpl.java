@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.sinosoft.ops.cimp.constant.RoleEnum;
 import com.sinosoft.ops.cimp.entity.sys.permission.*;
 import com.sinosoft.ops.cimp.entity.user.*;
 import com.sinosoft.ops.cimp.mapper.sys.permission.MenuMapper;
@@ -15,7 +16,7 @@ import com.sinosoft.ops.cimp.repository.user.RolePermissionRepository;
 import com.sinosoft.ops.cimp.repository.user.RoleRepository;
 import com.sinosoft.ops.cimp.repository.user.UserRoleRepository;
 import com.sinosoft.ops.cimp.service.sys.permission.PermissionService;
-import com.sinosoft.ops.cimp.constant.RoleEnum;
+import com.sinosoft.ops.cimp.util.SecurityUtils;
 import com.sinosoft.ops.cimp.vo.from.sys.permission.PermissionModel;
 import com.sinosoft.ops.cimp.vo.to.sys.permission.AddMenuToGroupViewModel;
 import com.sinosoft.ops.cimp.vo.to.sys.permission.SaveMenuGroupSortViewModel;
@@ -95,7 +96,7 @@ public class PermissionServiceImpl implements PermissionService {
     public Permission save(PermissionModel permissionModel) {
         Permission permission = new Permission();
         BeanUtils.copyProperties(permissionModel, permission);
-        permission.setCreateId("111"); //获得当前登录ID
+        permission.setCreateId(SecurityUtils.getSubject().getCurrentUser().getId()); //获得当前登录ID
         permission.setCreateTime(Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant()));
         return permissionRepository.save(permission);
     }
@@ -108,7 +109,7 @@ public class PermissionServiceImpl implements PermissionService {
         if (options.isPresent()) {
             Permission permission = options.get();
             BeanUtils.copyProperties(permissionModel, permission);
-            permission.setModifyId("111"); //获得当前登录ID
+            permission.setModifyId(SecurityUtils.getSubject().getCurrentUser().getId()); //获得当前登录ID
             permission.setModifyTime(Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant()));
             return permission;
         }
