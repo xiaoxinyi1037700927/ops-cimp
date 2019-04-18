@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 @ApiPermissionPageInfo
 @Api(description = "功能权限细化到操作")
 @RestController
-@RequestMapping("/permissionPage")
+@RequestMapping("/sys/user/permissionPage")
 public class PermissionPageController extends BaseController {
     @Autowired
     private PermissionPageService permissionPageService;

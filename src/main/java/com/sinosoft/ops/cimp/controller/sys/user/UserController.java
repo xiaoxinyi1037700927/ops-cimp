@@ -37,18 +37,12 @@ import java.util.stream.Collectors;
 
 @Api(description = "用户部分接口")
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/sys/user/user")
 public class UserController extends BaseController {
     @Autowired
     private UserService userService;
     @Autowired
     private UserRoleService userRoleService;
-//    @Autowired
-//    private InvestigateService investigateService;
-//    @Autowired
-//    private ProjectService projectService;
-//    @Autowired
-//    private PanelMessageService panelMessageService;
 
 
     @SuppressWarnings("all")
@@ -204,26 +198,6 @@ public class UserController extends BaseController {
         return ok(userModifyContactVO);
     }
 
-
-//    @ApiOperation(value = "查询待考察的任务列表")
-//    @PostMapping(value = "/findInvestigateTask")
-//    @RequiresAuthentication
-//    public Result<List<InvestigateTaskListViewModel>> findUnApprovedInvestigateTask() {
-//        List<InvestigateTaskListViewModel> investigateTaskList = investigateService.findUnApprovedInvestigateTask();
-//        return JsonSuccess(investigateTaskList);
-//    }
-
-//    /**
-//     * 给考察组设置考察单位
-//     */
-//    @ApiOperation(value = "给考察组设置考察单位")
-//    @PostMapping(value = "/setOrganTask")
-//    @RequiresAuthentication
-//    public Result<String> setOrganTask(@RequestBody UserTaskAddViewModel userTaskAddViewModel) {
-//        boolean flag = userService.setOrganTask(userTaskAddViewModel);
-//        if (flag) return JsonSuccess("操作成功！");
-//        return JsonError("设置考察单位异常！");
-//    }
 
     /**
      * 删除用户
