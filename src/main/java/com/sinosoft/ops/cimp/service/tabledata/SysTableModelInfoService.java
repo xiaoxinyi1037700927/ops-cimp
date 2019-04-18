@@ -23,7 +23,7 @@ public interface SysTableModelInfoService {
     /**
      * 删除信息集数据（更新删除标识字段）
      */
-    QueryDataParamBuilder deleteDataByFlag(QueryDataParamBuilder queryDataParam,String deleteFlagCode) throws BusinessException;
+    QueryDataParamBuilder deleteDataByFlag(QueryDataParamBuilder queryDataParam,String deleteType,String deleteFlagCode) throws BusinessException;
 
     /**
      * 删除信息集数据

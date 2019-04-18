@@ -1,72 +1,82 @@
 package com.sinosoft.ops.cimp.dao.impl;
 
+import com.sinosoft.ops.cimp.constant.OpsErrorMessage;
 import com.sinosoft.ops.cimp.dao.SqlBuilder;
+import com.sinosoft.ops.cimp.dao.SysTableInfoDao;
+import com.sinosoft.ops.cimp.dao.domain.Conditions;
 import com.sinosoft.ops.cimp.dao.domain.DaoParam;
 import com.sinosoft.ops.cimp.dao.domain.ResultSql;
+import com.sinosoft.ops.cimp.dao.domain.sys.table.SysTableModelInfo;
 import com.sinosoft.ops.cimp.exception.BusinessException;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class DeleteSqlBuilder implements SqlBuilder {
+
+    private final SysTableInfoDao sysTableInfoDao;
+
+    @Autowired
+    public DeleteSqlBuilder(SysTableInfoDao sysTableInfoDao) {
+        this.sysTableInfoDao = sysTableInfoDao;
+    }
+
     @Override
     public ResultSql getExecuteSql(DaoParam daoParam) throws BusinessException {
-//        ResultSql resultSql = new ResultSql();
-//
-//        String entityName = daoParam.getTableTypeNameEn();
-//        String entityGroup = daoParam.getTableNameEn();
-//        List<Conditions> conditionsList = daoParam.getConditionsList();
-//
-//        SysEntityInfo entityInfo = EntityManager.getInstance().getEntity(entityName, prjCode);
-//        if (entityInfo == null) {
-//            throw new BusinessException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE, "请确认删除的实体和项目编号存在");
-//        }
-//        SysEntityGroupDef sysEntityGroupDef = entityInfo.getGroupMap().get(entityGroup);
-//        if (sysEntityGroupDef == null) {
-//            throw new BusinessException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE, "删除信息必须指定分组");
-//        }
-//
-//        StringBuilder deleteSqlBuilder = new StringBuilder();
-//        StringBuilder logicDeleteSqlBuilder = new StringBuilder();
-//
-//        //如果父组名为空则认为是主集，否则为子集，主集使用逻辑删除，子集使用物理删除
-//        if (StringUtils.isEmpty(sysEntityGroupDef.getEntityGroupParentName())) {
-//            String tableName = sysEntityGroupDef.getEntityGroupTableName();
-//            if (conditionsList == null || conditionsList.size() == 0) {
-//                throw new BusinessException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE, "删除信息必须传递主键条件");
-//            }
-//
-//            String logicalDeleteAttrSaveField = entityInfo.getLogicalDeleteAttrSaveField();
-//
-//
-//            logicDeleteSqlBuilder.append("UPDATE ").append(tableName)
-//                    .append(" SET ")
-//                    .append(logicalDeleteAttrSaveField)
-//                    .append(" = ")
-//                    .append("'1'");
-//            resultSql.setSql(logicDeleteSqlBuilder.toString());
-//        } else {
-//            String tableName = sysEntityGroupDef.getEntityGroupTableName();
-//            if (conditionsList == null || conditionsList.size() == 0) {
-//                throw new BusinessException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE, "删除信息必须传递主键条件");
-//            }
-//            Conditions conditions = conditionsList.get(0);
-//            String conditionName = conditions.getConditionName();
-//            Object conditionValue = conditions.getConditionValue();
-//            String condition = conditions.getCondition();
-//
-//            deleteSqlBuilder.append("DELETE FROM ")
-//                    .append(tableName)
-//                    .append(" WHERE ")
-//                    .append(conditionName)
-//                    .append(" ")
-//                    .append(condition)
-//                    .append(" ")
-//                    .append("'")
-//                    .append(conditionValue)
-//                    .append("'");
-//            resultSql.setSql(deleteSqlBuilder.toString());
-//        }
-//        return resultSql;
-        return null;
+        ResultSql resultSql = new ResultSql();
+
+        String tableTypeNameEn = daoParam.getTableTypeNameEn();
+        String tableNameEn = daoParam.getTableNameEn();
+        List<Conditions> conditionsList = daoParam.getConditionsList();
+        SysTableModelInfo tableInfo = sysTableInfoDao.getTableInfo(tableTypeNameEn);
+
+        StringBuilder deleteSqlBuilder = new StringBuilder("DELETE FROM ");
+        String saveTableName = tableInfo.getTableNameEnAndSaveTableMap().get(tableNameEn);
+        if (StringUtils.isEmpty(saveTableName)) {
+            throw new BusinessException(OpsErrorMessage.MODULE_NAME, "删除属性信息必须传递表名");
+        }
+
+        deleteSqlBuilder.append(saveTableName);
+
+        StringBuilder conditionSqlBuilder = new StringBuilder();
+        if (conditionsList != null && conditionsList.size() > 0) {
+            StringBuilder conditionColumn = new StringBuilder(" WHERE 1=1 ");
+            for (Conditions conditions : conditionsList) {
+                String conditionName = conditions.getConditionName();
+                String condition = conditions.getCondition();
+                Object conditionValue = conditions.getConditionValue();
+
+                if (condition.equals(Conditions.ConditionsEnum.IN)) {
+                    conditionSqlBuilder.append(" AND ")
+                            .append(conditionName)
+                            .append(" ")
+                            .append(condition)
+                            .append(" ")
+                            .append("(")
+                            .append(conditionValue)
+                            .append(")");
+                } else {
+                    conditionSqlBuilder.append(" AND ")
+                            .append(conditionName)
+                            .append(" ")
+                            .append(condition)
+                            .append(" ")
+                            .append("'")
+                            .append(conditionValue)
+                            .append("'");
+                }
+
+            }
+
+        } else {
+            conditionSqlBuilder.append(" WHERE 1=2 ");
+        }
+        deleteSqlBuilder.append(conditionSqlBuilder);
+
+        resultSql.setSql(deleteSqlBuilder.toString());
+        return  resultSql;
     }
 }
