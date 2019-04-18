@@ -12,7 +12,6 @@ import com.sinosoft.ops.cimp.repository.user.*;
 import com.sinosoft.ops.cimp.service.user.permissionPage.UserRoleService;
 import com.sinosoft.ops.cimp.util.SecurityUtils;
 import com.sinosoft.ops.cimp.vo.to.user.MenuByRoleIdAndMenuId;
-import com.sinosoft.ops.cimp.vo.user.PermissionEnum;
 import com.sinosoft.ops.cimp.vo.user.RoleGroupViewModel;
 import com.sinosoft.ops.cimp.vo.user.RoleViewModel;
 import com.sinosoft.ops.cimp.vo.user.role.MenuChildViewModel;
@@ -44,10 +43,7 @@ public class UserRoleServiceImpl implements UserRoleService {
     private UserRoleService userRoleService;
     @Autowired
     private MenuGroupRepository menuGroupRepository;
-//    @Autowired
-//    private ProjectService projectService;
-//    @Autowired
-//    private PanelMessageService panelMessageService;
+
     @Autowired
     private RoleGroupRepository roleGroupRepository;
     @Autowired

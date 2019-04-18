@@ -13,7 +13,6 @@ import com.sinosoft.ops.cimp.repository.user.permissionPage.PermissionPageOperat
 import com.sinosoft.ops.cimp.repository.user.permissionPage.PermissionPageRepository;
 import com.sinosoft.ops.cimp.repository.user.permissionPage.RolePermissionPageRepository;
 import com.sinosoft.ops.cimp.service.user.permissionPage.PermissionPageService;
-import com.sinosoft.ops.cimp.util.SecurityUtils;
 import com.sinosoft.ops.cimp.vo.from.user.permissionPage.PermissionPageSearchVO;
 import com.sinosoft.ops.cimp.vo.user.PermissionPageOperationVO;
 import com.sinosoft.ops.cimp.vo.user.PermissionPageVO;
@@ -131,22 +130,16 @@ public class PermissionPageServiceImpl implements PermissionPageService {
 
 
     @Override
-    public List<PermissionPageOperationVO> findPermissionPageOperation(String permissionPageId, String roleId) {
-        if (StringUtils.isEmpty(roleId)) {
-            String id = SecurityUtils.getSubject().getCurrentUser().getId();
-            List<UserRole> byUserId = userRoleRepository.findByUserId(id);
-            roleId = byUserId.get(0).getRoleId();
-        }
+    public List<PermissionPageOperationVO> findPermissionPageOperation(String permissionPageId) {
         JPAQuery<PermissionPageOperationVO> where = queryFactory.select(
                 Projections.bean(PermissionPageOperationVO.class,
                         QPermissionPageOperation.permissionPageOperation.id,
                         QPermissionPageOperation.permissionPageOperation.name,
                         QPermissionPageOperation.permissionPageOperation.operationId,
                         QPermissionPageOperation.permissionPageOperation.permissionPageId,
-                        QPermissionPageOperation.permissionPageOperation.description,
-                        QRolePermissionPage.rolePermissionPage.status))
+                        QPermissionPageOperation.permissionPageOperation.description
+                        ))
                 .from(QPermissionPageOperation.permissionPageOperation)
-                .leftJoin(QRolePermissionPage.rolePermissionPage).on(QPermissionPageOperation.permissionPageOperation.id.eq(QRolePermissionPage.rolePermissionPage.permissionPageOperationId).and(QRolePermissionPage.rolePermissionPage.roleId.eq(roleId)))
                 .where(QPermissionPageOperation.permissionPageOperation.permissionPageId.eq(permissionPageId));
         List<PermissionPageOperationVO> permissionPageOperationVOS = where.fetch();
         return permissionPageOperationVOS;
