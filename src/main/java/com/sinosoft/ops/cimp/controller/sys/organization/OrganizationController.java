@@ -1,5 +1,6 @@
 package com.sinosoft.ops.cimp.controller.sys.organization;
 
+import com.sinosoft.ops.cimp.config.annotation.OrganizationApiGroup;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.dto.PaginationViewModel;
 import com.sinosoft.ops.cimp.entity.sys.oraganization.Organization;
@@ -34,6 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@OrganizationApiGroup
 @Api(description = "单位接口")
 @RestController
 @RequestMapping(value = "/sys/organization")

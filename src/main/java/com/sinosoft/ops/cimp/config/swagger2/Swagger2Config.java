@@ -1,6 +1,7 @@
 package com.sinosoft.ops.cimp.config.swagger2;
 
 import com.sinosoft.ops.cimp.config.annotation.BusinessApiGroup;
+import com.sinosoft.ops.cimp.config.annotation.OrganizationApiGroup;
 import com.sinosoft.ops.cimp.config.annotation.SystemApiGroup;
 import com.sinosoft.ops.cimp.config.annotation.SystemLimitsApiGroup;
 import org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController;
@@ -30,7 +31,8 @@ public class Swagger2Config {
                     return declaringClass != BasicErrorController.class
                             && !declaringClass.isAnnotationPresent(BusinessApiGroup.class)
                             && !declaringClass.isAnnotationPresent(SystemApiGroup.class)
-                            && !declaringClass.isAnnotationPresent(SystemLimitsApiGroup.class);
+                            && !declaringClass.isAnnotationPresent(SystemLimitsApiGroup.class)
+                            && !declaringClass.isAnnotationPresent(OrganizationApiGroup.class);
                 })
                 .paths(PathSelectors.any())
                 .build();
@@ -52,7 +54,7 @@ public class Swagger2Config {
     }
 
     @Bean
-    public Docket createSystemLimitsGroupRestApi() {
+    public Docket createSystemLimitsApiGroupRestApi() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .groupName("12.系统权限配置接口分组")
                 .apiInfo(apiInfo())
@@ -61,6 +63,21 @@ public class Swagger2Config {
                     assert input != null;
                     Class<?> declaringClass = input.declaringClass();
                     return declaringClass.isAnnotationPresent(SystemLimitsApiGroup.class);
+                })
+                .paths(PathSelectors.any())
+                .build();
+    }
+
+    @Bean
+    public Docket createOrganizationApiGroupRestApi() {
+        return new Docket(DocumentationType.SWAGGER_2)
+                .groupName("12.机构部分接口分组")
+                .apiInfo(apiInfo())
+                .select()
+                .apis(input -> {
+                    assert input != null;
+                    Class<?> declaringClass = input.declaringClass();
+                    return declaringClass.isAnnotationPresent(OrganizationApiGroup.class);
                 })
                 .paths(PathSelectors.any())
                 .build();
