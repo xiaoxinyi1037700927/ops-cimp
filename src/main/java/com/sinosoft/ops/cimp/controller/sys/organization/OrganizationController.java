@@ -8,16 +8,20 @@ import com.sinosoft.ops.cimp.entity.sys.user.organization.OrganizationPosition;
 import com.sinosoft.ops.cimp.entity.sys.user.organization.OrganizationPositionService;
 import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.mapper.user.OrganizationPositionViewMapper;
-import com.sinosoft.ops.cimp.service.user.*;
+import com.sinosoft.ops.cimp.service.user.BusinessUnitOrgService;
+import com.sinosoft.ops.cimp.service.user.BusinessUnitService;
+import com.sinosoft.ops.cimp.service.user.OrganizationService;
+import com.sinosoft.ops.cimp.service.user.ProjectPositionService;
 import com.sinosoft.ops.cimp.swaggwegroup.RequiresAuthentication;
 import com.sinosoft.ops.cimp.util.CachePackage.OrganizationCacheManager;
 import com.sinosoft.ops.cimp.vo.from.user.DeleteAttachmentViewModel;
-import com.sinosoft.ops.cimp.vo.from.user.organization.*;
+import com.sinosoft.ops.cimp.vo.from.user.organization.BusinessUnitAddViewModel;
+import com.sinosoft.ops.cimp.vo.from.user.organization.BusinessUnitDeleteViewModel;
+import com.sinosoft.ops.cimp.vo.from.user.organization.BusinessUnitOrgChangeViewModel;
 import com.sinosoft.ops.cimp.vo.to.user.BusinessUnitListViewModel;
 import com.sinosoft.ops.cimp.vo.to.user.OrganizationPositionViewModel;
 import com.sinosoft.ops.cimp.vo.user.organization.OrganizationSearchViewModel;
 import com.sinosoft.ops.cimp.vo.user.organization.OrganizationViewModel;
-import com.sinosoft.ops.cimp.vo.user.organization.SecretaryMemberViewModel;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -46,8 +50,6 @@ public class OrganizationController extends BaseController {
     private BusinessUnitService businessUnitService;
     @Autowired
     private BusinessUnitOrgService businessUnitOrgService;
-    @Autowired
-    private SecretaryMemberService secretaryMemberService;
 
     @ApiOperation(value = "查询机构树")
     @PostMapping("/lstTreeNode")
@@ -174,52 +176,7 @@ public class OrganizationController extends BaseController {
         return ok(viewModel);
     }
 
-    /**
-     * 查询书记会成员干部列表
-     */
-    @ApiOperation(value = "查询书记会成员干部列表")
-    @PostMapping("/findSecretaryMemberList")
-    @RequiresAuthentication
-    public ResponseEntity<PaginationViewModel<SecretaryMemberViewModel>> findSecretaryMemberList(@RequestBody SecretaryMemberSearchViewModel searchViewModel) throws BusinessException {
-        PaginationViewModel<SecretaryMemberViewModel> page = secretaryMemberService.findByPageData(searchViewModel);
-        return ok(page);
-    }
 
-    /**
-     * 新增书记会成员
-     */
-    @ApiOperation(value = "新增书记会成员")
-    @PostMapping("/addSecretaryMember")
-    @RequiresAuthentication
-    public ResponseEntity<String> addSecretaryMember(@RequestBody SecretaryMemberAddViewModel addViewModel) throws BusinessException {
-        boolean flag = secretaryMemberService.addSecretaryMember(addViewModel);
-        if (flag) return ok("操作成功！");
-        return fail("操作异常！");
-    }
-
-    /**
-     * 修改书记会成员
-     */
-    @ApiOperation(value = "修改书记会成员")
-    @PostMapping("/modifySecretaryMember")
-    @RequiresAuthentication
-    public ResponseEntity<String> modifySecretaryMember(@RequestBody SecretaryMemberModifyViewModel modifyViewModel) throws BusinessException {
-        boolean flag = secretaryMemberService.modifySecretaryMember(modifyViewModel);
-        if (flag) return ok("操作成功！");
-        return fail("操作异常！");
-    }
-
-    /**
-     * 根据ID删除书记会成员
-     */
-    @ApiOperation(value = "根据ID删除书记会成员")
-    @PostMapping("/deleteBySecretaryMemberId")
-    @RequiresAuthentication
-    public ResponseEntity<String> deleteBySecretaryMemberId(String secretaryMemberId) throws BusinessException {
-        boolean flag = secretaryMemberService.deleteById(secretaryMemberId);
-        if (flag) return ok("操作成功！");
-        return fail("操作异常！");
-    }
 
     /**
      * 删除文件

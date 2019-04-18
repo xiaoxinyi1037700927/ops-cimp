@@ -87,8 +87,6 @@ public interface UserService {
      */
     boolean isHaveChildrenOrg(String orgId);
 
-    UserLoginViewModel genLoginName(String organizationId);
-
 
     boolean resetPassword(String userId, String password);
 }

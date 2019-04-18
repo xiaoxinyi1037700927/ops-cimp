@@ -9,8 +9,6 @@ import com.sinosoft.ops.cimp.dto.PaginationViewModel;
 import com.sinosoft.ops.cimp.entity.sys.oraganization.Organization;
 import com.sinosoft.ops.cimp.entity.sys.oraganization.QOrganization;
 import com.sinosoft.ops.cimp.entity.sys.user.*;
-import com.sinosoft.ops.cimp.entity.sys.user.cadre.CadreInfo;
-import com.sinosoft.ops.cimp.repository.user.CadreInfoRepository;
 import com.sinosoft.ops.cimp.repository.user.RoleRepository;
 import com.sinosoft.ops.cimp.repository.user.UserRepository;
 import com.sinosoft.ops.cimp.repository.user.UserRoleRepository;
@@ -20,7 +18,6 @@ import com.sinosoft.ops.cimp.util.PasswordEncoderHelper;
 import com.sinosoft.ops.cimp.util.SecurityUtils;
 import com.sinosoft.ops.cimp.vo.from.user.UserModifyContactVO;
 import com.sinosoft.ops.cimp.vo.from.user.UserModifyPasswordVO;
-import com.sinosoft.ops.cimp.vo.user.UserLoginViewModel;
 import com.sinosoft.ops.cimp.vo.user.UserSearchViewModel;
 import com.sinosoft.ops.cimp.vo.user.UserViewModel;
 import org.apache.commons.lang3.StringUtils;
@@ -60,8 +57,6 @@ public class UserServiceImpl implements UserService {
     private UserRoleRepository userRoleRepository;
     @Autowired
     private RoleRepository roleRepository;
-    @Autowired
-    private CadreInfoRepository cadreInfoRepository;
 
     @Override
     public PaginationViewModel<UserViewModel> findByPageData(UserSearchViewModel userSearchViewModel) {
@@ -89,7 +84,6 @@ public class UserServiceImpl implements UserService {
         QueryResults<UserViewModel> queryResults = queryFactory.select(Projections.bean(
                 UserViewModel.class,
                 qUser.id,
-                qUser.cadreInfoId,
                 qUser.name,
                 qUser.loginName,
                 qUser.organizationId,
@@ -326,21 +320,6 @@ public class UserServiceImpl implements UserService {
         return false;
     }
 
-    @Override
-    public UserLoginViewModel genLoginName(String organizationId, String cadreInfoId) {
-        UserLoginViewModel userLoginViewModel = new UserLoginViewModel();
-        Organization organization = OrganizationCacheManager.getSubject().getOrganizationById(organizationId);
-        String loginName = null;
-        Optional<CadreInfo> options = cadreInfoRepository.findById(cadreInfoId);
-        if (options.isPresent()) {
-            CadreInfo cadreInfo = options.get();
-
-
-            userLoginViewModel.setLoginName(loginName);
-            userLoginViewModel.setPassword("123456");
-        }
-        return userLoginViewModel;
-    }
 
 
     @Override
