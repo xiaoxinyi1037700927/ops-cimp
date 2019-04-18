@@ -1,13 +1,14 @@
 package com.sinosoft.ops.cimp.controller.sys.user;
 
+import com.sinosoft.ops.cimp.config.annotation.RequiresAuthentication;
+import com.sinosoft.ops.cimp.config.annotation.RequiresRoles;
+import com.sinosoft.ops.cimp.config.annotation.SystemLimitsApiGroup;
 import com.sinosoft.ops.cimp.constant.UserRoleConstants;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.entity.sys.user.Role;
 import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.mapper.user.RoleViewModelMapper;
 import com.sinosoft.ops.cimp.service.user.RoleService;
-import com.sinosoft.ops.cimp.swaggwegroup.RequiresAuthentication;
-import com.sinosoft.ops.cimp.swaggwegroup.RequiresRoles;
 import com.sinosoft.ops.cimp.vo.user.RoleModel;
 import com.sinosoft.ops.cimp.vo.user.RoleViewModel;
 import io.swagger.annotations.*;
@@ -20,7 +21,7 @@ import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
-//角色控制层
+@SystemLimitsApiGroup
 @Api(description = "角色管理接口")
 @RestController
 @RequestMapping("/sys/user/role")

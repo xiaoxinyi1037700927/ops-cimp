@@ -1,12 +1,12 @@
 package com.sinosoft.ops.cimp.controller.sys.user.homePageCount;
 
 
-import com.sinosoft.ops.cimp.config.annotation.swaggergroup.ApiPermissionInfo;
+import com.sinosoft.ops.cimp.config.annotation.SystemLimitsApiGroup;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.service.user.homePageCount.HomePageCountService;
 import com.sinosoft.ops.cimp.service.user.homePageCount.RoleHomePageCountService;
-import com.sinosoft.ops.cimp.swaggwegroup.RequiresAuthentication;
+import com.sinosoft.ops.cimp.config.annotation.RequiresAuthentication;
 import com.sinosoft.ops.cimp.vo.from.user.homePageCount.RoleHomePageCountModel;
 import com.sinosoft.ops.cimp.vo.to.homePageCount.HomePageCountQueryVO;
 import com.sinosoft.ops.cimp.vo.to.homePageCount.RoleHomePageCountVO;
@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * 首页统计配置管理
  */
-@ApiPermissionInfo
+@SystemLimitsApiGroup
 @Api(description = "首页统计配置管理")
 @RestController
 @RequestMapping("/sys/user/homePageCount")

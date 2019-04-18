@@ -1,7 +1,7 @@
 package com.sinosoft.ops.cimp.controller.sys.user.permissionPage;
 
 import com.google.common.collect.Lists;
-import com.sinosoft.ops.cimp.config.annotation.swaggergroup.ApiPermissionInfo;
+import com.sinosoft.ops.cimp.config.annotation.SystemLimitsApiGroup;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.entity.sys.user.MenuGroup;
 import com.sinosoft.ops.cimp.exception.BusinessException;
@@ -10,7 +10,7 @@ import com.sinosoft.ops.cimp.repository.user.MenuGroupRepository;
 import com.sinosoft.ops.cimp.service.user.PermissionService;
 import com.sinosoft.ops.cimp.service.user.RoleService;
 import com.sinosoft.ops.cimp.service.user.permissionPage.UserRoleService;
-import com.sinosoft.ops.cimp.swaggwegroup.RequiresAuthentication;
+import com.sinosoft.ops.cimp.config.annotation.RequiresAuthentication;
 import com.sinosoft.ops.cimp.vo.to.user.AddMenuToGroupViewModel;
 import com.sinosoft.ops.cimp.vo.to.user.MenuByRoleIdAndMenuId;
 import com.sinosoft.ops.cimp.vo.to.user.SaveMenuGroupSortViewModel;
@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@ApiPermissionInfo
+@SystemLimitsApiGroup
 @Api(description = "权限管理接口")
 @RestController
 @RequestMapping("/sys/user/permission")

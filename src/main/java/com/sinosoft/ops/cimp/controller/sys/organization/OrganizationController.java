@@ -12,7 +12,7 @@ import com.sinosoft.ops.cimp.service.user.BusinessUnitOrgService;
 import com.sinosoft.ops.cimp.service.user.BusinessUnitService;
 import com.sinosoft.ops.cimp.service.user.OrganizationService;
 import com.sinosoft.ops.cimp.service.user.ProjectPositionService;
-import com.sinosoft.ops.cimp.swaggwegroup.RequiresAuthentication;
+import com.sinosoft.ops.cimp.config.annotation.RequiresAuthentication;
 import com.sinosoft.ops.cimp.util.CachePackage.OrganizationCacheManager;
 import com.sinosoft.ops.cimp.vo.from.user.DeleteAttachmentViewModel;
 import com.sinosoft.ops.cimp.vo.from.user.organization.BusinessUnitAddViewModel;
@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 
 @Api(description = "单位接口")
 @RestController
-@RequestMapping(value = "/organization")
+@RequestMapping(value = "/sys/organization")
 @SuppressWarnings("unchecked")
 public class OrganizationController extends BaseController {
 

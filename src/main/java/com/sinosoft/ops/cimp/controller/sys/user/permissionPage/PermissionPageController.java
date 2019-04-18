@@ -1,6 +1,8 @@
 package com.sinosoft.ops.cimp.controller.sys.user.permissionPage;
 
 import com.google.common.collect.Lists;
+import com.sinosoft.ops.cimp.config.annotation.RequiresAuthentication;
+import com.sinosoft.ops.cimp.config.annotation.SystemLimitsApiGroup;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.entity.sys.user.*;
 import com.sinosoft.ops.cimp.exception.BusinessException;
@@ -8,8 +10,6 @@ import com.sinosoft.ops.cimp.repository.user.permissionPage.PermissionPageOperat
 import com.sinosoft.ops.cimp.repository.user.permissionPage.PermissionPageRepository;
 import com.sinosoft.ops.cimp.repository.user.permissionPage.RolePermissionPageRepository;
 import com.sinosoft.ops.cimp.service.user.permissionPage.PermissionPageService;
-import com.sinosoft.ops.cimp.swaggwegroup.ApiPermissionPageInfo;
-import com.sinosoft.ops.cimp.swaggwegroup.RequiresAuthentication;
 import com.sinosoft.ops.cimp.vo.from.user.permissionPage.PermissionPageSearchVO;
 import com.sinosoft.ops.cimp.vo.to.user.permissionPage.PermissionBatchVO;
 import com.sinosoft.ops.cimp.vo.user.PermissionPageOperationVO;
@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@ApiPermissionPageInfo
+@SystemLimitsApiGroup
 @Api(description = "功能权限细化到操作")
 @RestController
 @RequestMapping("/sys/user/permissionPage")
