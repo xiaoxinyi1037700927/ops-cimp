@@ -4,7 +4,7 @@ import com.querydsl.core.BooleanBuilder;
 import com.sinosoft.ops.cimp.dto.PaginationViewModel;
 import com.sinosoft.ops.cimp.entity.sys.sysapp.QSysApp;
 import com.sinosoft.ops.cimp.entity.sys.sysapp.SysApp;
-import com.sinosoft.ops.cimp.mapper.sys.app.SysAppMapper;
+import com.sinosoft.ops.cimp.mapper.sys.sysapp.SysAppMapper;
 import com.sinosoft.ops.cimp.repository.sys.sysapp.SysAppRepository;
 import com.sinosoft.ops.cimp.service.sys.sysapp.SysAppService;
 import com.sinosoft.ops.cimp.service.sys.sysapp.SysAppTableGroupService;

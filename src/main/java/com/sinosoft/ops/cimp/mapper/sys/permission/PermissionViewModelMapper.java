@@ -1,4 +1,4 @@
-package com.sinosoft.ops.cimp.mapper.user;
+package com.sinosoft.ops.cimp.mapper.sys.permission;
 
 import com.sinosoft.ops.cimp.entity.sys.permission.Permission;
 import com.sinosoft.ops.cimp.entity.sys.permission.PermissionPage;

@@ -1,4 +1,4 @@
-package com.sinosoft.ops.cimp.mapper.code;
+package com.sinosoft.ops.cimp.mapper.sys.syscode;
 
 import com.sinosoft.ops.cimp.entity.sys.syscode.SysCodeItem;
 import com.sinosoft.ops.cimp.vo.from.sys.syscode.SysCodeItemAddModel;

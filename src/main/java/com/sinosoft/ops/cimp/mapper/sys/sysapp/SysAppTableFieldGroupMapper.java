@@ -1,10 +1,10 @@
-package com.sinosoft.ops.cimp.mapper.sys.app;
+package com.sinosoft.ops.cimp.mapper.sys.sysapp;
 
-import com.sinosoft.ops.cimp.entity.sys.sysapp.SysAppTableGroup;
+import com.sinosoft.ops.cimp.entity.sys.sysapp.SysAppTableFieldGroup;
 import com.sinosoft.ops.cimp.util.IdUtil;
-import com.sinosoft.ops.cimp.vo.from.sys.sysapp.sysAppTableGroup.SysAppTableGroupAddModel;
-import com.sinosoft.ops.cimp.vo.from.sys.sysapp.sysAppTableGroup.SysAppTableGroupModifyModel;
-import com.sinosoft.ops.cimp.vo.to.sys.sysapp.sysAppTableGroup.SysAppTableGroupModel;
+import com.sinosoft.ops.cimp.vo.from.sys.sysapp.sysAppTableFieldGroup.SysAppTableFieldGroupAddModel;
+import com.sinosoft.ops.cimp.vo.from.sys.sysapp.sysAppTableFieldGroup.SysAppTableFieldGroupModifyModel;
+import com.sinosoft.ops.cimp.vo.to.sys.sysapp.sysAppTableFieldGroup.SysAppTableFieldGroupModel;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
@@ -13,23 +13,23 @@ import java.time.ZoneId;
 import java.util.Date;
 
 @Mapper
-public interface SysAppTableGroupMapper {
-    SysAppTableGroupMapper INSTANCE = Mappers.getMapper(SysAppTableGroupMapper.class);
+public interface SysAppTableFieldGroupMapper {
+    SysAppTableFieldGroupMapper INSTANCE = Mappers.getMapper(SysAppTableFieldGroupMapper.class);
 
-    SysAppTableGroupModel tableGroupToTableGroupModel(SysAppTableGroup tableGroup);
+    SysAppTableFieldGroupModel fieldGroupToFieldGroupModel(SysAppTableFieldGroup fieldGroup);
 
     @Mappings({
             @Mapping(source = "createId", target = "createId", qualifiedByName = "getCurrentId"),
             @Mapping(source = "createTime", target = "createTime", qualifiedByName = "getTime"),
             @Mapping(target = "id", qualifiedByName = "getNewId")
     })
-    SysAppTableGroup addModelToTableGroup(SysAppTableGroupAddModel addModel);
+    SysAppTableFieldGroup addModelToFieldGroup(SysAppTableFieldGroupAddModel addModel);
 
     @Mappings({
             @Mapping(source = "modifyId", target = "modifyId", qualifiedByName = "getCurrentId"),
             @Mapping(source = "modifyTime", target = "modifyTime", qualifiedByName = "getTime")
     })
-    void modifyModelToTableGroup(SysAppTableGroupModifyModel modifyModel, @MappingTarget SysAppTableGroup tableGroup);
+    void modifyModelToFieldGroup(SysAppTableFieldGroupModifyModel modifyModel, @MappingTarget SysAppTableFieldGroup fieldGroup);
 
 
     @Named("getCurrentId")

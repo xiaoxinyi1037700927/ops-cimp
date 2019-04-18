@@ -1,4 +1,4 @@
-package com.sinosoft.ops.cimp.mapper.table;
+package com.sinosoft.ops.cimp.mapper.sys.systable;
 
 import com.sinosoft.ops.cimp.entity.sys.systable.SysTable;
 import com.sinosoft.ops.cimp.vo.from.sys.systable.SysTableAddModel;

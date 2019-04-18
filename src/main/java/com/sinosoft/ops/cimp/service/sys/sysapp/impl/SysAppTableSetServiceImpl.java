@@ -7,7 +7,7 @@ import com.sinosoft.ops.cimp.entity.sys.sysapp.QSysAppTableSet;
 import com.sinosoft.ops.cimp.entity.sys.sysapp.SysAppTableSet;
 import com.sinosoft.ops.cimp.entity.sys.systable.QSysTable;
 import com.sinosoft.ops.cimp.entity.sys.systable.SysTable;
-import com.sinosoft.ops.cimp.mapper.sys.app.SysAppTableSetMapper;
+import com.sinosoft.ops.cimp.mapper.sys.sysapp.SysAppTableSetMapper;
 import com.sinosoft.ops.cimp.repository.sys.sysapp.SysAppTableSetRepository;
 import com.sinosoft.ops.cimp.repository.sys.systable.SysTableRepository;
 import com.sinosoft.ops.cimp.repository.sys.systable.SysTableTypeRepository;

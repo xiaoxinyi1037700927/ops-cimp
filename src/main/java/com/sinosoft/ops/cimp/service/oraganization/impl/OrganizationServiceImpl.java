@@ -2,7 +2,7 @@ package com.sinosoft.ops.cimp.service.oraganization.impl;
 
 import com.sinosoft.ops.cimp.entity.oraganization.Organization;
 import com.sinosoft.ops.cimp.entity.user.User;
-import com.sinosoft.ops.cimp.mapper.user.OrganizationViewMapper;
+import com.sinosoft.ops.cimp.mapper.oraganization.OrganizationViewMapper;
 import com.sinosoft.ops.cimp.repository.oraganization.OrganizationRepository;
 import com.sinosoft.ops.cimp.service.oraganization.OrganizationService;
 import com.sinosoft.ops.cimp.util.CachePackage.OrganizationCacheManager;

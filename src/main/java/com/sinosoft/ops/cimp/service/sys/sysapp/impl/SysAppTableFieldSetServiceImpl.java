@@ -6,7 +6,7 @@ import com.sinosoft.ops.cimp.dto.PaginationViewModel;
 import com.sinosoft.ops.cimp.entity.sys.sysapp.*;
 import com.sinosoft.ops.cimp.entity.sys.systable.QSysTableField;
 import com.sinosoft.ops.cimp.entity.sys.systable.SysTableField;
-import com.sinosoft.ops.cimp.mapper.sys.app.SysAppTableFieldSetMapper;
+import com.sinosoft.ops.cimp.mapper.sys.sysapp.SysAppTableFieldSetMapper;
 import com.sinosoft.ops.cimp.repository.sys.sysapp.SysAppTableFieldGroupRepository;
 import com.sinosoft.ops.cimp.repository.sys.sysapp.SysAppTableFieldSetRepository;
 import com.sinosoft.ops.cimp.repository.sys.sysapp.SysAppTableSetRepository;

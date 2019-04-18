@@ -6,7 +6,7 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sinosoft.ops.cimp.entity.sys.permission.*;
 import com.sinosoft.ops.cimp.entity.user.*;
-import com.sinosoft.ops.cimp.mapper.user.MenuMapper;
+import com.sinosoft.ops.cimp.mapper.sys.permission.MenuMapper;
 import com.sinosoft.ops.cimp.repository.sys.permission.MenuGroupPerRelRepository;
 import com.sinosoft.ops.cimp.repository.sys.permission.MenuGroupRepository;
 import com.sinosoft.ops.cimp.repository.sys.permission.PermissionRepository;

@@ -5,7 +5,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sinosoft.ops.cimp.dto.PaginationViewModel;
 import com.sinosoft.ops.cimp.entity.sys.sysapp.QSysAppTableGroup;
 import com.sinosoft.ops.cimp.entity.sys.sysapp.SysAppTableGroup;
-import com.sinosoft.ops.cimp.mapper.sys.app.SysAppTableGroupMapper;
+import com.sinosoft.ops.cimp.mapper.sys.sysapp.SysAppTableGroupMapper;
 import com.sinosoft.ops.cimp.repository.sys.sysapp.SysAppTableGroupRepository;
 import com.sinosoft.ops.cimp.service.sys.sysapp.SysAppTableGroupService;
 import com.sinosoft.ops.cimp.service.sys.sysapp.SysAppTableSetService;

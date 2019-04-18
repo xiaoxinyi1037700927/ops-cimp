@@ -6,7 +6,7 @@ import com.sinosoft.ops.cimp.entity.sys.homepagecount.HomePageCount;
 import com.sinosoft.ops.cimp.entity.user.QRoleHomePageCount;
 import com.sinosoft.ops.cimp.entity.user.RoleHomePageCount;
 import com.sinosoft.ops.cimp.entity.user.User;
-import com.sinosoft.ops.cimp.mapper.user.homePageCount.HomePageCountMapper;
+import com.sinosoft.ops.cimp.mapper.sys.homepagecount.HomePageCountMapper;
 import com.sinosoft.ops.cimp.repository.sys.homepagecount.HomePageCountRepository;
 import com.sinosoft.ops.cimp.repository.user.RoleHomePageCountRepository;
 import com.sinosoft.ops.cimp.service.sys.homepagecount.HomePageCountService;

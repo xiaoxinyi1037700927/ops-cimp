@@ -1,4 +1,4 @@
-package com.sinosoft.ops.cimp.mapper.user;
+package com.sinosoft.ops.cimp.mapper.sys.permission;
 
 import com.google.common.collect.Lists;
 

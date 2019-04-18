@@ -5,7 +5,7 @@ import com.sinosoft.ops.cimp.dto.PaginationViewModel;
 import com.sinosoft.ops.cimp.entity.sys.systable.QSysTable;
 import com.sinosoft.ops.cimp.entity.sys.systable.SysTable;
 import com.sinosoft.ops.cimp.entity.sys.systable.SysTableField;
-import com.sinosoft.ops.cimp.mapper.table.SysTableModelMapper;
+import com.sinosoft.ops.cimp.mapper.sys.systable.SysTableModelMapper;
 import com.sinosoft.ops.cimp.repository.sys.systable.SysTableRepository;
 import com.sinosoft.ops.cimp.service.sys.systable.SysTableFieldService;
 import com.sinosoft.ops.cimp.service.sys.systable.SysTableService;

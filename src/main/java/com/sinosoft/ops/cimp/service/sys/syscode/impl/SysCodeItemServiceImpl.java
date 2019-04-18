@@ -7,7 +7,7 @@ import com.sinosoft.ops.cimp.entity.sys.syscode.QSysCodeItem;
 import com.sinosoft.ops.cimp.entity.sys.syscode.QSysCodeSet;
 import com.sinosoft.ops.cimp.entity.sys.syscode.SysCodeItem;
 import com.sinosoft.ops.cimp.entity.sys.syscode.SysCodeSet;
-import com.sinosoft.ops.cimp.mapper.code.SysCodeItemModelMapper;
+import com.sinosoft.ops.cimp.mapper.sys.syscode.SysCodeItemModelMapper;
 import com.sinosoft.ops.cimp.repository.sys.syscode.SysCodeItemRepository;
 import com.sinosoft.ops.cimp.repository.sys.syscode.SysCodeSetRepository;
 import com.sinosoft.ops.cimp.service.sys.syscode.SysCodeItemService;

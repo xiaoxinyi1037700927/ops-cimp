@@ -8,7 +8,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sinosoft.ops.cimp.entity.sys.permission.*;
 import com.sinosoft.ops.cimp.entity.user.QRolePermissionPage;
 import com.sinosoft.ops.cimp.entity.user.RolePermissionPage;
-import com.sinosoft.ops.cimp.mapper.user.PermissionViewModelMapper;
+import com.sinosoft.ops.cimp.mapper.sys.permission.PermissionViewModelMapper;
 import com.sinosoft.ops.cimp.repository.sys.permission.PermissionPageOperationRepository;
 import com.sinosoft.ops.cimp.repository.sys.permission.PermissionPageRepository;
 import com.sinosoft.ops.cimp.repository.sys.permission.PermissionRepository;

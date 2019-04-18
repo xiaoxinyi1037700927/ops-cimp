@@ -7,7 +7,7 @@ import com.sinosoft.ops.cimp.constant.UserRoleConstants;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.entity.sys.permission.Permission;
 import com.sinosoft.ops.cimp.exception.BusinessException;
-import com.sinosoft.ops.cimp.mapper.user.PermissionViewModelMapper;
+import com.sinosoft.ops.cimp.mapper.sys.permission.PermissionViewModelMapper;
 import com.sinosoft.ops.cimp.service.sys.permission.PermissionService;
 import com.sinosoft.ops.cimp.vo.from.sys.permission.PermissionModel;
 import com.sinosoft.ops.cimp.vo.to.sys.permission.PermissionViewModel;

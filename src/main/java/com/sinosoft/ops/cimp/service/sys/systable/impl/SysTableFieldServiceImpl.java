@@ -4,7 +4,7 @@ import com.querydsl.core.BooleanBuilder;
 import com.sinosoft.ops.cimp.dto.PaginationViewModel;
 import com.sinosoft.ops.cimp.entity.sys.systable.QSysTableField;
 import com.sinosoft.ops.cimp.entity.sys.systable.SysTableField;
-import com.sinosoft.ops.cimp.mapper.table.SysTableFieldModelMapper;
+import com.sinosoft.ops.cimp.mapper.sys.systable.SysTableFieldModelMapper;
 import com.sinosoft.ops.cimp.repository.sys.systable.SysTableFieldRepository;
 import com.sinosoft.ops.cimp.service.sys.systable.SysTableFieldService;
 import com.sinosoft.ops.cimp.vo.from.sys.systable.SysTableFieldAddModel;

@@ -1,4 +1,4 @@
-package com.sinosoft.ops.cimp.mapper.sys.app;
+package com.sinosoft.ops.cimp.mapper.sys.sysapp;
 
 import com.sinosoft.ops.cimp.entity.sys.sysapp.SysAppTableFieldSet;
 import com.sinosoft.ops.cimp.entity.sys.systable.SysTableField;

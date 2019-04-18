@@ -6,7 +6,7 @@ import com.sinosoft.ops.cimp.config.annotation.SystemLimitsApiGroup;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.entity.sys.permission.MenuGroup;
 import com.sinosoft.ops.cimp.exception.BusinessException;
-import com.sinosoft.ops.cimp.mapper.user.MenuMapper;
+import com.sinosoft.ops.cimp.mapper.sys.permission.MenuMapper;
 import com.sinosoft.ops.cimp.repository.sys.permission.MenuGroupRepository;
 import com.sinosoft.ops.cimp.service.sys.permission.PermissionService;
 import com.sinosoft.ops.cimp.service.user.RoleService;

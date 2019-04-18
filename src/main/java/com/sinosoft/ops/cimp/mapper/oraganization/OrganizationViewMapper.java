@@ -1,4 +1,4 @@
-package com.sinosoft.ops.cimp.mapper.user;
+package com.sinosoft.ops.cimp.mapper.oraganization;
 
 import com.sinosoft.ops.cimp.entity.oraganization.Organization;
 import com.sinosoft.ops.cimp.vo.to.organization.OrganizationViewModel;
