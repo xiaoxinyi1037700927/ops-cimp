@@ -1,5 +1,6 @@
 package com.sinosoft.ops.cimp.dao.impl;
 
+import com.google.common.collect.Maps;
 import com.sinosoft.ops.cimp.constant.OpsErrorMessage;
 import com.sinosoft.ops.cimp.dao.SqlBuilder;
 import com.sinosoft.ops.cimp.dao.SysTableInfoDao;
@@ -44,6 +45,10 @@ public class InsertSqlBuilder implements SqlBuilder {
 
         //注意【List<List<String>>内List 0，1，2 分别为 属性英文名，数据库存储字段名称，数据库存储类型】
         List<List<String>> tableFieldList = tableInfo.getTableNameEnAndFieldMap().get(tableNameEn);
+        Map<String, String> fieldTypeMap = Maps.newHashMap();
+        for (List<String> fields : tableFieldList) {
+            fieldTypeMap.put(fields.get(0), fields.get(2));
+        }
 
         Map<String, String> selectField = this.selectField(execTableField, tableFieldList);
 
@@ -67,7 +72,10 @@ public class InsertSqlBuilder implements SqlBuilder {
                     .append(",");
             List<ExecParam> params = execParams.get(key);
             if (params.size() > 0) {
-                paramData[i] = params.get(0).getFieldValue();
+                String fieldType = fieldTypeMap.get(key);
+                Object fieldValue = params.get(0).getFieldValue();
+
+                paramData[i] = this.parseParam(fieldType, fieldValue);
             } else {
                 paramData[i] = null;
             }
