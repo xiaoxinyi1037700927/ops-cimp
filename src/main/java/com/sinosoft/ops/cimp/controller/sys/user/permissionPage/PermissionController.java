@@ -1,24 +1,19 @@
 package com.sinosoft.ops.cimp.controller.sys.user.permissionPage;
 
 import com.google.common.collect.Lists;
-import com.sinosoft.ops.cimp.config.annotation.swaggergroup.ApiPermissionInfo;
+import com.sinosoft.ops.cimp.config.annotation.SystemLimitsApiGroup;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.entity.sys.user.MenuGroup;
-import com.sinosoft.ops.cimp.entity.sys.user.Permission;
-import com.sinosoft.ops.cimp.entity.sys.user.QMenuGroup;
 import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.mapper.user.MenuMapper;
-import com.sinosoft.ops.cimp.mapper.user.PermissionViewModelMapper;
 import com.sinosoft.ops.cimp.repository.user.MenuGroupRepository;
 import com.sinosoft.ops.cimp.service.user.PermissionService;
 import com.sinosoft.ops.cimp.service.user.RoleService;
 import com.sinosoft.ops.cimp.service.user.permissionPage.UserRoleService;
-import com.sinosoft.ops.cimp.swaggwegroup.RequiresAuthentication;
+import com.sinosoft.ops.cimp.config.annotation.RequiresAuthentication;
 import com.sinosoft.ops.cimp.vo.to.user.AddMenuToGroupViewModel;
 import com.sinosoft.ops.cimp.vo.to.user.MenuByRoleIdAndMenuId;
 import com.sinosoft.ops.cimp.vo.to.user.SaveMenuGroupSortViewModel;
-import com.sinosoft.ops.cimp.vo.user.PermissionModel;
-import com.sinosoft.ops.cimp.vo.user.PermissionViewModel;
 import com.sinosoft.ops.cimp.vo.user.RoleGroupViewModel;
 import com.sinosoft.ops.cimp.vo.user.RoleViewModel;
 import com.sinosoft.ops.cimp.vo.user.role.MenuChildViewModel;
@@ -35,10 +30,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@ApiPermissionInfo
+@SystemLimitsApiGroup
 @Api(description = "权限管理接口")
 @RestController
-@RequestMapping("/permission")
+@RequestMapping("/sys/user/permission")
 public class PermissionController extends BaseController {
     @Autowired
     private MenuGroupRepository menuGroupRepository;
@@ -49,17 +44,6 @@ public class PermissionController extends BaseController {
     @Autowired
     private RoleService roleService;
 
-    /*@ApiOperation(value = "根据左侧菜单主键查询权限列表")
-    @PostMapping("/findData")
-    @RequiresAuthentication
-    public ResponseEntity<List<PermissionViewModel>> findDataById(id) throws BusinessException {
-        Iterable<Permission> rightLst = permissionService.findDataById(id);
-        List<PermissionViewModel> rightViewModelLst = new ArrayList<>();
-        rightLst.iterator().forEachRemaining(right -> {
-            rightViewModelLst.add(PermissionViewModelMapper.INSTANCE.permissionToPermissionViewModel(right));
-        });
-        return ok(rightViewModelLst);
-    }*/
 
 
     @ApiOperation(value = "查询菜单分组")

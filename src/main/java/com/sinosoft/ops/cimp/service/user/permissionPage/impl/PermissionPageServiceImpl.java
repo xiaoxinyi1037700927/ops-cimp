@@ -13,7 +13,6 @@ import com.sinosoft.ops.cimp.repository.user.permissionPage.PermissionPageOperat
 import com.sinosoft.ops.cimp.repository.user.permissionPage.PermissionPageRepository;
 import com.sinosoft.ops.cimp.repository.user.permissionPage.RolePermissionPageRepository;
 import com.sinosoft.ops.cimp.service.user.permissionPage.PermissionPageService;
-import com.sinosoft.ops.cimp.util.SecurityUtils;
 import com.sinosoft.ops.cimp.vo.from.user.permissionPage.PermissionPageSearchVO;
 import com.sinosoft.ops.cimp.vo.user.PermissionPageOperationVO;
 import com.sinosoft.ops.cimp.vo.user.PermissionPageVO;
@@ -65,12 +64,12 @@ public class PermissionPageServiceImpl implements PermissionPageService {
         String roleId = searchVO.getRoleId();
         String permissionId = searchVO.getPermissionId();
         String url = searchVO.getUrl();
-        BooleanBuilder booleanBuilder=new BooleanBuilder();
+        BooleanBuilder booleanBuilder = new BooleanBuilder();
         booleanBuilder.and(QRolePermissionPage.rolePermissionPage.roleId.eq(roleId));
-        if(!StringUtils.isEmpty(permissionId)){
+        if (!StringUtils.isEmpty(permissionId)) {
             booleanBuilder.and(QPermissionPage.permissionPage.permissionId.eq(permissionId));
         }
-        if(!StringUtils.isEmpty(url)){
+        if (!StringUtils.isEmpty(url)) {
             booleanBuilder.and(QPermissionPage.permissionPage.url.eq(url));
         }
         JPAQuery<PermissionPageOperationVO> permissionPageId = queryFactory.select(Projections.bean(
@@ -102,7 +101,7 @@ public class PermissionPageServiceImpl implements PermissionPageService {
     public void pageCount(String permissionId) {
         long count = permissionPageRepository.count(QPermissionPage.permissionPage.permissionId.eq(permissionId));
         Permission permission = permissionRepository.findById(permissionId).get();
-        permission.setPageCount((int)count);
+        permission.setPageCount((int) count);
         permissionRepository.save(permission);
     }
 
@@ -110,11 +109,11 @@ public class PermissionPageServiceImpl implements PermissionPageService {
     public List<PermissionPageVO> findPermissionPage(PermissionPageSearchVO searchVO) {
         String permissionId = searchVO.getPermissionId();
         String url = searchVO.getUrl();
-        BooleanBuilder booleanBuilder=new BooleanBuilder();
-        if(!StringUtils.isEmpty(permissionId)){
+        BooleanBuilder booleanBuilder = new BooleanBuilder();
+        if (!StringUtils.isEmpty(permissionId)) {
             booleanBuilder.and(QPermissionPage.permissionPage.permissionId.eq(permissionId));
         }
-        if(!StringUtils.isEmpty(url)){
+        if (!StringUtils.isEmpty(url)) {
             booleanBuilder.and(QPermissionPage.permissionPage.url.eq(url));
         }
         ArrayList<PermissionPage> permissionPages = Lists.newArrayList(permissionPageRepository.findAll(booleanBuilder));
@@ -123,29 +122,24 @@ public class PermissionPageServiceImpl implements PermissionPageService {
     }
 
     @Override
-    public Boolean addPermissionPageOperation(List<PermissionPageOperationVO> voList) {
-        List<PermissionPageOperation> collect = voList.stream().map(x -> PermissionViewModelMapper.INSTANCE.permissionPageOperationToEntity(x)).collect(Collectors.toList());
-        permissionPageOperationRepository.saveAll(collect);
+    public Boolean addPermissionPageOperation(PermissionPageOperationVO permissionPageOperationVO) {
+        PermissionPageOperation permissionPageOperation = PermissionViewModelMapper.INSTANCE.permissionPageOperationToEntity(permissionPageOperationVO);
+        permissionPageOperationRepository.save(permissionPageOperation);
         return true;
     }
 
+
     @Override
-    public List<PermissionPageOperationVO> findPermissionPageOperation(String permissionPageId,String roleId) {
-        if(StringUtils.isEmpty(roleId)){
-            String id = SecurityUtils.getSubject().getCurrentUser().getId();
-            List<UserRole> byUserId = userRoleRepository.findByUserId(id);
-            roleId = byUserId.get(0).getRoleId();
-        }
+    public List<PermissionPageOperationVO> findPermissionPageOperation(String permissionPageId) {
         JPAQuery<PermissionPageOperationVO> where = queryFactory.select(
                 Projections.bean(PermissionPageOperationVO.class,
                         QPermissionPageOperation.permissionPageOperation.id,
                         QPermissionPageOperation.permissionPageOperation.name,
                         QPermissionPageOperation.permissionPageOperation.operationId,
                         QPermissionPageOperation.permissionPageOperation.permissionPageId,
-                        QPermissionPageOperation.permissionPageOperation.description,
-                        QRolePermissionPage.rolePermissionPage.status))
+                        QPermissionPageOperation.permissionPageOperation.description
+                        ))
                 .from(QPermissionPageOperation.permissionPageOperation)
-                .leftJoin(QRolePermissionPage.rolePermissionPage).on(QPermissionPageOperation.permissionPageOperation.id.eq(QRolePermissionPage.rolePermissionPage.permissionPageOperationId).and(QRolePermissionPage.rolePermissionPage.roleId.eq(roleId)))
                 .where(QPermissionPageOperation.permissionPageOperation.permissionPageId.eq(permissionPageId));
         List<PermissionPageOperationVO> permissionPageOperationVOS = where.fetch();
         return permissionPageOperationVOS;
@@ -157,14 +151,14 @@ public class PermissionPageServiceImpl implements PermissionPageService {
     public Boolean switchPermissionPageOperation(String permissionPageOperationId, String roleId) {
         PermissionPageOperation permissionPageOperation = permissionPageOperationRepository.findById(permissionPageOperationId).get();
         ArrayList<RolePermissionPage> rolePermissionPages = Lists.newArrayList(rolePermissionPageRepository.findAll(QRolePermissionPage.rolePermissionPage.permissionPageOperationId.eq(permissionPageOperationId).and(QRolePermissionPage.rolePermissionPage.roleId.eq(roleId))));
-        if(rolePermissionPages.size() == 0){
-            RolePermissionPage rolePermissionPage=new RolePermissionPage();
+        if (rolePermissionPages.size() == 0) {
+            RolePermissionPage rolePermissionPage = new RolePermissionPage();
             rolePermissionPage.setRoleId(roleId);
             rolePermissionPage.setPermissionPageId(permissionPageOperation.getPermissionPageId());
             rolePermissionPage.setPermissionPageOperationId(permissionPageOperationId);
             rolePermissionPage.setStatus("0");
             rolePermissionPageRepository.save(rolePermissionPage);
-        }else{
+        } else {
             rolePermissionPageRepository.deleteAll(rolePermissionPages);
         }
         return true;
@@ -173,23 +167,23 @@ public class PermissionPageServiceImpl implements PermissionPageService {
     @SuppressWarnings("all")
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public Boolean switchPermissionPageOperation(List<String> permissionPageOperationIds, String roleId,String type) {
-        for (String permissionPageOperationId:permissionPageOperationIds){
+    public Boolean switchPermissionPageOperation(List<String> permissionPageOperationIds, String roleId, String type) {
+        for (String permissionPageOperationId : permissionPageOperationIds) {
             PermissionPageOperation permissionPageOperation = permissionPageOperationRepository.findById(permissionPageOperationId).get();
             ArrayList<RolePermissionPage> rolePermissionPages = Lists.newArrayList(rolePermissionPageRepository.findAll(QRolePermissionPage.rolePermissionPage.permissionPageOperationId.eq(permissionPageOperationId).and(QRolePermissionPage.rolePermissionPage.roleId.eq(roleId))));
-            if("0".equals(type)){
+            if ("0".equals(type)) {
                 //禁用
-                if(rolePermissionPages.size() == 0){
-                    RolePermissionPage rolePermissionPage=new RolePermissionPage();
+                if (rolePermissionPages.size() == 0) {
+                    RolePermissionPage rolePermissionPage = new RolePermissionPage();
                     rolePermissionPage.setRoleId(roleId);
                     rolePermissionPage.setPermissionPageId(permissionPageOperation.getPermissionPageId());
                     rolePermissionPage.setPermissionPageOperationId(permissionPageOperationId);
                     rolePermissionPage.setStatus("0");
                     rolePermissionPageRepository.save(rolePermissionPage);
                 }
-            }else{
+            } else {
                 //启用
-                if(rolePermissionPages.size() > 0){
+                if (rolePermissionPages.size() > 0) {
                     rolePermissionPageRepository.deleteAll(rolePermissionPages);
                 }
             }

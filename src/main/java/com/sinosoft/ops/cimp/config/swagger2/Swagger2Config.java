@@ -1,11 +1,14 @@
 package com.sinosoft.ops.cimp.config.swagger2;
 
+import com.sinosoft.ops.cimp.config.annotation.BusinessApiGroup;
+import com.sinosoft.ops.cimp.config.annotation.OrganizationApiGroup;
+import com.sinosoft.ops.cimp.config.annotation.SystemApiGroup;
+import com.sinosoft.ops.cimp.config.annotation.SystemLimitsApiGroup;
 import org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
-import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
@@ -14,21 +17,11 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @Configuration
 @EnableSwagger2
 public class Swagger2Config {
-    @Bean
-    public Docket createRestApi() {
-        return new Docket(DocumentationType.SWAGGER_2)
-                .groupName("4.其他分组")
-                .apiInfo(apiInfo())
-                .select()
-                .apis(RequestHandlerSelectors.basePackage("com.sinosoft.cimp.controller"))
-                .paths(PathSelectors.any())
-                .build();
-    }
 
     @Bean
     public Docket createDefaultGroupRestApi() {
         return new Docket(DocumentationType.SWAGGER_2)
-                .groupName("3.默认分组")
+                .groupName("31.其他分组")
                 .apiInfo(apiInfo())
                 .select()
                 .apis(input -> {
@@ -37,7 +30,9 @@ public class Swagger2Config {
                     // 排除
                     return declaringClass != BasicErrorController.class
                             && !declaringClass.isAnnotationPresent(BusinessApiGroup.class)
-                            && !declaringClass.isAnnotationPresent(SystemApiGroup.class);
+                            && !declaringClass.isAnnotationPresent(SystemApiGroup.class)
+                            && !declaringClass.isAnnotationPresent(SystemLimitsApiGroup.class)
+                            && !declaringClass.isAnnotationPresent(OrganizationApiGroup.class);
                 })
                 .paths(PathSelectors.any())
                 .build();
@@ -46,13 +41,43 @@ public class Swagger2Config {
     @Bean
     public Docket createSystemGroupRestApi() {
         return new Docket(DocumentationType.SWAGGER_2)
-                .groupName("2.系统接口分组")
+                .groupName("11.系统配置接口分组")
                 .apiInfo(apiInfo())
                 .select()
                 .apis(input -> {
                     assert input != null;
                     Class<?> declaringClass = input.declaringClass();
                     return declaringClass.isAnnotationPresent(SystemApiGroup.class);
+                })
+                .paths(PathSelectors.any())
+                .build();
+    }
+
+    @Bean
+    public Docket createSystemLimitsApiGroupRestApi() {
+        return new Docket(DocumentationType.SWAGGER_2)
+                .groupName("12.系统权限配置接口分组")
+                .apiInfo(apiInfo())
+                .select()
+                .apis(input -> {
+                    assert input != null;
+                    Class<?> declaringClass = input.declaringClass();
+                    return declaringClass.isAnnotationPresent(SystemLimitsApiGroup.class);
+                })
+                .paths(PathSelectors.any())
+                .build();
+    }
+
+    @Bean
+    public Docket createOrganizationApiGroupRestApi() {
+        return new Docket(DocumentationType.SWAGGER_2)
+                .groupName("12.机构部分接口分组")
+                .apiInfo(apiInfo())
+                .select()
+                .apis(input -> {
+                    assert input != null;
+                    Class<?> declaringClass = input.declaringClass();
+                    return declaringClass.isAnnotationPresent(OrganizationApiGroup.class);
                 })
                 .paths(PathSelectors.any())
                 .build();

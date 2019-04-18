@@ -2,7 +2,7 @@ package com.sinosoft.ops.cimp.controller.sys.table;
 
 
 import com.sinosoft.ops.cimp.cache.CacheManager;
-import com.sinosoft.ops.cimp.config.swagger2.SystemApiGroup;
+import com.sinosoft.ops.cimp.config.annotation.SystemApiGroup;
 import com.sinosoft.ops.cimp.constant.Constants;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.exception.BusinessException;

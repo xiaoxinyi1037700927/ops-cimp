@@ -35,12 +35,12 @@ public interface PermissionPageService {
     /**
      * 新增操作
      * */
-    Boolean addPermissionPageOperation(List<PermissionPageOperationVO> voList);
+    Boolean addPermissionPageOperation(PermissionPageOperationVO permissionPageOperationVO);
 
     /**
      * 查询页面操作
      * */
-    List<PermissionPageOperationVO> findPermissionPageOperation(String permissionPageId, String roleId);
+    List<PermissionPageOperationVO> findPermissionPageOperation(String permissionPageId);
 
     /**
      * 启用/禁用操作

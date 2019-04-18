@@ -1,6 +1,8 @@
 package com.sinosoft.ops.cimp.controller.sys.user;
 
 
+import com.sinosoft.ops.cimp.config.annotation.RequiresAuthentication;
+import com.sinosoft.ops.cimp.config.annotation.SystemLimitsApiGroup;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.dto.PaginationViewModel;
 import com.sinosoft.ops.cimp.entity.sys.user.Role;
@@ -10,14 +12,12 @@ import com.sinosoft.ops.cimp.mapper.user.RoleViewModelMapper;
 import com.sinosoft.ops.cimp.mapper.user.UserViewModelMapper;
 import com.sinosoft.ops.cimp.service.user.UserService;
 import com.sinosoft.ops.cimp.service.user.permissionPage.UserRoleService;
-import com.sinosoft.ops.cimp.swaggwegroup.RequiresAuthentication;
 import com.sinosoft.ops.cimp.util.CachePackage.UserCacheManager;
 import com.sinosoft.ops.cimp.util.HttpUtils;
 import com.sinosoft.ops.cimp.util.PasswordEncoderHelper;
 import com.sinosoft.ops.cimp.util.SecurityUtils;
 import com.sinosoft.ops.cimp.vo.from.user.*;
 import com.sinosoft.ops.cimp.vo.user.RoleViewModel;
-import com.sinosoft.ops.cimp.vo.user.UserLoginViewModel;
 import com.sinosoft.ops.cimp.vo.user.UserSearchViewModel;
 import com.sinosoft.ops.cimp.vo.user.UserViewModel;
 import io.swagger.annotations.Api;
@@ -36,20 +36,15 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@SystemLimitsApiGroup
 @Api(description = "用户部分接口")
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/sys/user/user")
 public class UserController extends BaseController {
     @Autowired
     private UserService userService;
     @Autowired
     private UserRoleService userRoleService;
-//    @Autowired
-//    private InvestigateService investigateService;
-//    @Autowired
-//    private ProjectService projectService;
-//    @Autowired
-//    private PanelMessageService panelMessageService;
 
 
     @SuppressWarnings("all")
@@ -147,13 +142,6 @@ public class UserController extends BaseController {
         return fail("操作异常!");
     }
 
-    @ApiOperation(value = "生成LoginName")
-    @PostMapping("/genLoginName")
-    @RequiresAuthentication
-    public ResponseEntity<UserLoginViewModel> genLoginName(String organizationId, String cadreInfoId) throws BusinessException {
-        UserLoginViewModel userLoginViewModel = userService.genLoginName(organizationId, cadreInfoId);
-        return ok(userLoginViewModel);
-    }
 
     @ApiOperation(value = "修改用户")
     @PostMapping("/modifyUser")
@@ -212,26 +200,6 @@ public class UserController extends BaseController {
         return ok(userModifyContactVO);
     }
 
-
-//    @ApiOperation(value = "查询待考察的任务列表")
-//    @PostMapping(value = "/findInvestigateTask")
-//    @RequiresAuthentication
-//    public Result<List<InvestigateTaskListViewModel>> findUnApprovedInvestigateTask() {
-//        List<InvestigateTaskListViewModel> investigateTaskList = investigateService.findUnApprovedInvestigateTask();
-//        return JsonSuccess(investigateTaskList);
-//    }
-
-//    /**
-//     * 给考察组设置考察单位
-//     */
-//    @ApiOperation(value = "给考察组设置考察单位")
-//    @PostMapping(value = "/setOrganTask")
-//    @RequiresAuthentication
-//    public Result<String> setOrganTask(@RequestBody UserTaskAddViewModel userTaskAddViewModel) {
-//        boolean flag = userService.setOrganTask(userTaskAddViewModel);
-//        if (flag) return JsonSuccess("操作成功！");
-//        return JsonError("设置考察单位异常！");
-//    }
 
     /**
      * 删除用户

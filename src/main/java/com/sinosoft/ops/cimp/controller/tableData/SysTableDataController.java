@@ -1,8 +1,8 @@
-package com.sinosoft.ops.cimp.controller.sys;
+package com.sinosoft.ops.cimp.controller.tableData;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.sinosoft.ops.cimp.config.swagger2.SystemApiGroup;
+import com.sinosoft.ops.cimp.config.annotation.SystemApiGroup;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.dao.SysTableInfoDao;
 import com.sinosoft.ops.cimp.dao.domain.sys.table.SysTableModelInfo;
@@ -33,14 +33,13 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping(value = "/sys/")
 @SuppressWarnings("unchecked")
-public class SysTableModelInfoController extends BaseController {
-
+public class SysTableDataController extends BaseController {
     private final SysTableModelInfoService sysTableModelInfoService;
     private final SysTableInfoDao sysTableInfoDao;
     private final SysTableTypeService sysTableTypeService;
 
     @Autowired
-    public SysTableModelInfoController(SysTableModelInfoService sysTableModelInfoService, SysTableInfoDao sysTableInfoDao, SysTableTypeService sysTableTypeService) {
+    public SysTableDataController(SysTableModelInfoService sysTableModelInfoService, SysTableInfoDao sysTableInfoDao, SysTableTypeService sysTableTypeService) {
         this.sysTableModelInfoService = sysTableModelInfoService;
         this.sysTableInfoDao = sysTableInfoDao;
         this.sysTableTypeService = sysTableTypeService;

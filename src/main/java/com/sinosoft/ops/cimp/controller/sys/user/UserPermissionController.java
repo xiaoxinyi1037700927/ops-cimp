@@ -1,15 +1,16 @@
 package com.sinosoft.ops.cimp.controller.sys.user;
 
-import com.sinosoft.ops.cimp.controller.BaseController;
-import com.sinosoft.ops.cimp.exception.BusinessException;
-import com.sinosoft.ops.cimp.swaggwegroup.RequiresAuthentication;
-import com.sinosoft.ops.cimp.swaggwegroup.RequiresRoles;
+import com.sinosoft.ops.cimp.config.annotation.RequiresAuthentication;
+import com.sinosoft.ops.cimp.config.annotation.RequiresRoles;
+import com.sinosoft.ops.cimp.config.annotation.SystemLimitsApiGroup;
 import com.sinosoft.ops.cimp.constant.UserRoleConstants;
-import com.sinosoft.ops.cimp.entity.sys.user.Permission ;
+import com.sinosoft.ops.cimp.controller.BaseController;
+import com.sinosoft.ops.cimp.entity.sys.user.Permission;
+import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.mapper.user.PermissionViewModelMapper;
 import com.sinosoft.ops.cimp.service.user.PermissionService;
-import com.sinosoft.ops.cimp.vo.user.PermissionModel ;
-import com.sinosoft.ops.cimp.vo.user.PermissionViewModel ;
+import com.sinosoft.ops.cimp.vo.user.PermissionModel;
+import com.sinosoft.ops.cimp.vo.user.PermissionViewModel;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -23,15 +24,11 @@ import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.springframework.http.ResponseEntity.ok;
 
-
-/*
-权限控制层
- */
-//@Api(description = "权限管理接口")
-//@RestController
-//@RequestMapping("/sys/user/permission")
+@SystemLimitsApiGroup
+@Api(description = "权限管理接口")
+@RestController
+@RequestMapping("/sys/user/userpermission")
 public class UserPermissionController extends BaseController {
 
     @Autowired

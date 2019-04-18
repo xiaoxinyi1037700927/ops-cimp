@@ -13,11 +13,6 @@ public class SecretaryMemberSearchViewModel extends RePagination {
      */
     @ApiModelProperty(value = "单位名称")
     private String organizationName;
-    /**
-     * 干部姓名
-     */
-    @ApiModelProperty(value = "干部姓名")
-    private String cadreInfoName;
 
     /**
      * 机构ID
@@ -39,14 +34,6 @@ public class SecretaryMemberSearchViewModel extends RePagination {
 
     public void setOrganizationName(String organizationName) {
         this.organizationName = organizationName;
-    }
-
-    public String getCadreInfoName() {
-        return cadreInfoName;
-    }
-
-    public void setCadreInfoName(String cadreInfoName) {
-        this.cadreInfoName = cadreInfoName;
     }
 
     public String getOrganizationId() {

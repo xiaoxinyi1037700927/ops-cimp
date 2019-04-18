@@ -97,4 +97,28 @@ public interface SqlBuilder {
         }
         return "";
     }
+
+    default Object parseParam(String fieldType, Object paramValue) {
+        if (StringUtils.equalsIgnoreCase("DATE", fieldType)) {
+            if (paramValue != null) {
+                int length = String.valueOf(paramValue).length();
+                if (length <= 10) {//yyyy-MM-dd格式
+                    try {
+                        return DateFormatUtil.parseDate(DateFormatUtil.PATTERN_ISO_ON_DATE, String.valueOf(paramValue));
+                    } catch (ParseException e) {
+                        return null;
+                    }
+                } else if (length <= 19) { //yyyy-MM-dd HH:mm:ss
+                    try {
+                        return DateFormatUtil.parseDate(DateFormatUtil.PATTERN_DEFAULT_ON_SECOND, String.valueOf(paramValue));
+                    } catch (ParseException e) {
+                        return null;
+                    }
+                }
+            }
+        } else {
+            return String.valueOf(paramValue);
+        }
+        return null;
+    }
 }

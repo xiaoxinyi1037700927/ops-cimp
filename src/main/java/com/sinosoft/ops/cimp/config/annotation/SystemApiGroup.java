@@ -1,4 +1,4 @@
-package com.sinosoft.ops.cimp.config.swagger2;
+package com.sinosoft.ops.cimp.config.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -7,5 +7,5 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface BusinessApiGroup {
+public @interface SystemApiGroup {
 }

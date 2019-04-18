@@ -1,6 +1,8 @@
 package com.sinosoft.ops.cimp.controller.sys.user.permissionPage;
 
 import com.google.common.collect.Lists;
+import com.sinosoft.ops.cimp.config.annotation.RequiresAuthentication;
+import com.sinosoft.ops.cimp.config.annotation.SystemLimitsApiGroup;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.entity.sys.user.*;
 import com.sinosoft.ops.cimp.exception.BusinessException;
@@ -8,8 +10,6 @@ import com.sinosoft.ops.cimp.repository.user.permissionPage.PermissionPageOperat
 import com.sinosoft.ops.cimp.repository.user.permissionPage.PermissionPageRepository;
 import com.sinosoft.ops.cimp.repository.user.permissionPage.RolePermissionPageRepository;
 import com.sinosoft.ops.cimp.service.user.permissionPage.PermissionPageService;
-import com.sinosoft.ops.cimp.swaggwegroup.ApiPermissionPageInfo;
-import com.sinosoft.ops.cimp.swaggwegroup.RequiresAuthentication;
 import com.sinosoft.ops.cimp.vo.from.user.permissionPage.PermissionPageSearchVO;
 import com.sinosoft.ops.cimp.vo.to.user.permissionPage.PermissionBatchVO;
 import com.sinosoft.ops.cimp.vo.user.PermissionPageOperationVO;
@@ -24,10 +24,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@ApiPermissionPageInfo
+@SystemLimitsApiGroup
 @Api(description = "功能权限细化到操作")
 @RestController
-@RequestMapping("/permissionPage")
+@RequestMapping("/sys/user/permissionPage")
 public class PermissionPageController extends BaseController {
     @Autowired
     private PermissionPageService permissionPageService;
@@ -93,7 +93,7 @@ public class PermissionPageController extends BaseController {
     @ApiOperation(value = "增加操作")
     @PostMapping("/addPermissionPageOperation")
     @RequiresAuthentication
-    public ResponseEntity<Boolean> addPermissionPageOperation(@RequestBody List<PermissionPageOperationVO> voList) throws BusinessException {
+    public ResponseEntity<Boolean> addPermissionPageOperation(@RequestBody PermissionPageOperationVO voList) throws BusinessException {
         Boolean aBoolean = permissionPageService.addPermissionPageOperation(voList);
         return ok(aBoolean);
     }
@@ -101,9 +101,8 @@ public class PermissionPageController extends BaseController {
     @ApiOperation(value = "查询页面操作")
     @PostMapping("/findPermissionPageOperation")
     @RequiresAuthentication
-    public ResponseEntity<List<PermissionPageOperationVO>> findPermissionPageOperation(@RequestParam String permissionPageId,
-                                                                               @RequestParam(required = false) String roleId) throws BusinessException {
-        List<PermissionPageOperationVO> permissionPageOperation = permissionPageService.findPermissionPageOperation(permissionPageId,roleId);
+    public ResponseEntity<List<PermissionPageOperationVO>> findPermissionPageOperation(@RequestParam String permissionPageId) throws BusinessException {
+        List<PermissionPageOperationVO> permissionPageOperation = permissionPageService.findPermissionPageOperation(permissionPageId);
         return ok(permissionPageOperation);
     }
 
