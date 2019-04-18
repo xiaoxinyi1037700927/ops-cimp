@@ -9,6 +9,8 @@ import com.sinosoft.ops.cimp.dto.PaginationViewModel;
 import com.sinosoft.ops.cimp.entity.sys.oraganization.Organization;
 import com.sinosoft.ops.cimp.entity.sys.oraganization.QOrganization;
 import com.sinosoft.ops.cimp.entity.sys.user.*;
+import com.sinosoft.ops.cimp.entity.sys.user.cadre.CadreInfo;
+import com.sinosoft.ops.cimp.repository.user.CadreInfoRepository;
 import com.sinosoft.ops.cimp.repository.user.RoleRepository;
 import com.sinosoft.ops.cimp.repository.user.UserRepository;
 import com.sinosoft.ops.cimp.repository.user.UserRoleRepository;
@@ -58,7 +60,8 @@ public class UserServiceImpl implements UserService {
     private UserRoleRepository userRoleRepository;
     @Autowired
     private RoleRepository roleRepository;
-
+    @Autowired
+    private CadreInfoRepository cadreInfoRepository;
 
     @Override
     public PaginationViewModel<UserViewModel> findByPageData(UserSearchViewModel userSearchViewModel) {
@@ -70,7 +73,6 @@ public class UserServiceImpl implements UserService {
         QUserRole qUserRole = QUserRole.userRole;
         QRole qRole = QRole.role;
         QOrganization qOrganization = QOrganization.organization;
-
 
         BooleanBuilder builder = new BooleanBuilder();
 
@@ -87,6 +89,7 @@ public class UserServiceImpl implements UserService {
         QueryResults<UserViewModel> queryResults = queryFactory.select(Projections.bean(
                 UserViewModel.class,
                 qUser.id,
+                qUser.cadreInfoId,
                 qUser.name,
                 qUser.loginName,
                 qUser.organizationId,
@@ -279,6 +282,20 @@ public class UserServiceImpl implements UserService {
         return null;
     }
 
+//    @Override
+//    @Transactional
+//    public boolean setOrganTask(UserTaskAddViewModel userTaskAddViewModel) {
+//        List<String> taskIdList = userTaskAddViewModel.getTaskIdList();
+//        List<UserTask> userTaskList = new ArrayList<>();
+//        taskIdList.forEach(taskId -> {
+//            UserTask userTask = UserViewModelMapper.INSTANCE.viewModelToUserTask(userTaskAddViewModel);
+//            userTask.setTaskId(taskId);
+//            userTaskList.add(userTask);
+//        });
+//        userTaskRepository.deleteByUserId(userTaskAddViewModel.getUserId());
+//        userTaskRepository.saveAll(userTaskList);
+    //   return true;
+    //  }
 
     @Override
     @Transactional
@@ -310,11 +327,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserLoginViewModel genLoginName(String organizationId) {
+    public UserLoginViewModel genLoginName(String organizationId, String cadreInfoId) {
         UserLoginViewModel userLoginViewModel = new UserLoginViewModel();
         Organization organization = OrganizationCacheManager.getSubject().getOrganizationById(organizationId);
         String loginName = null;
+        Optional<CadreInfo> options = cadreInfoRepository.findById(cadreInfoId);
+        if (options.isPresent()) {
+            CadreInfo cadreInfo = options.get();
 
+
+            userLoginViewModel.setLoginName(loginName);
+            userLoginViewModel.setPassword("123456");
+        }
         return userLoginViewModel;
     }
 

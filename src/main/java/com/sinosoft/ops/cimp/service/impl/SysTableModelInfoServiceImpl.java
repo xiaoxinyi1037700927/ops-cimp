@@ -3,17 +3,25 @@ package com.sinosoft.ops.cimp.service.impl;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.sinosoft.ops.cimp.constant.OpsErrorMessage;
+import com.sinosoft.ops.cimp.constant.TableFieldLogicalDeleteFlagEnum;
 import com.sinosoft.ops.cimp.dao.SysTableDao;
 import com.sinosoft.ops.cimp.dao.SysTableInfoDao;
+import com.sinosoft.ops.cimp.dao.domain.Conditions;
 import com.sinosoft.ops.cimp.dao.domain.DaoParam;
 import com.sinosoft.ops.cimp.dao.domain.ExecParam;
 import com.sinosoft.ops.cimp.dao.domain.ResultParam;
 import com.sinosoft.ops.cimp.dto.QueryDataParamBuilder;
+import com.sinosoft.ops.cimp.dto.TranslateField;
 import com.sinosoft.ops.cimp.dto.sys.table.SysTableFieldInfoDTO;
 import com.sinosoft.ops.cimp.dto.sys.table.SysTableInfoDTO;
 import com.sinosoft.ops.cimp.dto.sys.table.SysTableModelInfoDTO;
+import com.sinosoft.ops.cimp.entity.sys.oraganization.Organization;
+import com.sinosoft.ops.cimp.entity.sys.table.SysTableField;
 import com.sinosoft.ops.cimp.exception.BusinessException;
+import com.sinosoft.ops.cimp.exception.SystemException;
 import com.sinosoft.ops.cimp.service.SysTableModelInfoService;
+import com.sinosoft.ops.cimp.service.table.SysTableFieldService;
+import com.sinosoft.ops.cimp.util.CachePackage.OrganizationCacheManager;
 import com.sinosoft.ops.cimp.util.IdUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,11 +38,13 @@ public class SysTableModelInfoServiceImpl implements SysTableModelInfoService {
 
     private final SysTableInfoDao sysTableInfoDao;
     private final SysTableDao sysTableDao;
+    private final SysTableFieldService sysTableFieldService;
 
     @Autowired
-    public SysTableModelInfoServiceImpl(SysTableInfoDao sysTableInfoDao, SysTableDao sysTableDao) {
+    public SysTableModelInfoServiceImpl(SysTableInfoDao sysTableInfoDao, SysTableDao sysTableDao, SysTableFieldService sysTableFieldService) {
         this.sysTableInfoDao = sysTableInfoDao;
         this.sysTableDao = sysTableDao;
+        this.sysTableFieldService = sysTableFieldService;
     }
 
     @Override
@@ -122,7 +133,10 @@ public class SysTableModelInfoServiceImpl implements SysTableModelInfoService {
 
         SysTableInfoDTO sysTableInfoDTO = sysTableInfoDTOList.get(0);
 
-        List<ExecParam> execParamList = sysTableInfoDTO.getFields().stream().map(field -> {
+        List<SysTableFieldInfoDTO> fields = sysTableInfoDTO.getFields();
+        Map<String, List<SysTableFieldInfoDTO>> fieldNameEnMap = fields.stream().collect(Collectors.groupingBy(SysTableFieldInfoDTO::getFieldNameEn));
+
+        List<ExecParam> execParamList = fields.stream().map(field -> {
             ExecParam execParam = new ExecParam();
             execParam.setFieldName(field.getFieldNameEn());
             return execParam;
@@ -155,6 +169,10 @@ public class SysTableModelInfoServiceImpl implements SysTableModelInfoService {
             for (int i = 0; i < resultFields.size(); i++) {
                 String s = resultFields.get(i);
                 Object value = values[i];
+                TranslateField translateField = this.getTranslateField(fieldNameEnMap, s, value);
+                if (translateField != null) {
+                    queryDataParam.setTranslateFields(translateField);
+                }
                 maps.put(s, value);
             }
             queryDataParam.setResultDataType("1");
@@ -165,15 +183,21 @@ public class SysTableModelInfoServiceImpl implements SysTableModelInfoService {
             List<String> resultFields = queryDataParam.getResultFields();
             Object[][] valueLists = resultParam.getValueLists();
             if (valueLists != null) {
+                List<TranslateField> translateFields = Lists.newArrayList();
                 for (Object[] valueList : valueLists) {
                     Map<String, Object> values = Maps.newLinkedHashMap();
                     for (int i1 = 0; i1 < resultFields.size(); i1++) {
                         String s = resultFields.get(i1);
                         Object o = valueList[i1];
+                        TranslateField translateField = this.getTranslateField(fieldNameEnMap, s, o);
+                        if (translateField != null) {
+                            translateFields.add(translateField);
+                        }
                         values.put(s, o);
                     }
                     resultList.add(values);
                 }
+                queryDataParam.setTranslateFields(translateFields);
             }
             queryDataParam.setResultDataType("2");
             queryDataParam.setResultMultiData(resultList);
@@ -226,7 +250,108 @@ public class SysTableModelInfoServiceImpl implements SysTableModelInfoService {
     }
 
     @Override
-    public void deleteData(QueryDataParamBuilder queryDataParam) throws BusinessException {
+    public QueryDataParamBuilder deleteDataByFlag(QueryDataParamBuilder queryDataParam, String deleteFlagCode) throws BusinessException {
+        String prjCode = queryDataParam.getPrjCode();
+        String tableTypeNameEn = queryDataParam.getTableTypeNameEn();
+        String tableNameEn = queryDataParam.getTableNameEn();
+        Map<String, Object> saveOrUpdateFormData = queryDataParam.getSaveOrUpdateFormData();
 
+        SysTableModelInfoDTO tableInfo = sysTableInfoDao.getTableInfo(tableTypeNameEn, prjCode);
+        if (tableInfo == null) {
+            throw new BusinessException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE_100202, tableTypeNameEn);
+        }
+        //TODO 获取app定义信息对属性进行过滤
+        Map<String, List<SysTableInfoDTO>> sysTableInfoMap = tableInfo.getTables().stream().collect(Collectors.groupingBy(SysTableInfoDTO::getTableNameEn));
+        List<SysTableInfoDTO> sysTableInfoDTOList = sysTableInfoMap.get(tableNameEn);
+        if (sysTableInfoDTOList == null) {
+            throw new BusinessException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE, "删除信息集必须在项目中存在");
+        }
+
+        SysTableInfoDTO sysTableInfoDTO = sysTableInfoDTOList.get(0);
+        List<SysTableField> sysTableFields = sysTableFieldService.getSysTableFieldBySysTableId(sysTableInfoDTO.getId());
+
+        String deleteFlagFieldEnName = new String("");
+        String tableNameEnPK = new String("");
+
+        //获取主键
+        Optional<SysTableField> primaryKeyField = sysTableFields.stream().filter(x -> x.getIsFK().equals("1")).findFirst();
+
+        //主键字段必须存在
+        if (primaryKeyField.isPresent()) {
+            SysTableField sysTableField = primaryKeyField.get();
+            tableNameEnPK = sysTableField.getNameEn();
+        } else {
+            throw new SystemException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE_100207, tableTypeNameEn);
+        }
+
+        //获取删除列
+        Optional<SysTableField> logicalDeleteFlagField = sysTableFields.stream().filter(x -> x.getLogicalDeleteFlag().equals(TableFieldLogicalDeleteFlagEnum.删除.getCode())).findFirst();
+
+        //删除字段必须存在
+        if (logicalDeleteFlagField.isPresent()) {
+            SysTableField sysTableField = logicalDeleteFlagField.get();
+            deleteFlagFieldEnName = sysTableField.getNameEn();
+        } else {
+            throw new SystemException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE_100207, tableTypeNameEn);
+        }
+
+        List<ExecParam> execParamList = Lists.newArrayList();
+
+        String key = deleteFlagFieldEnName;
+        String value = deleteFlagCode;
+        execParamList.add(new ExecParam(key, value));
+
+        DaoParam daoParam = new DaoParam();
+
+        List<String> idList = (List<String>) saveOrUpdateFormData.get(tableNameEnPK);
+        String idJoinString = idList.stream().collect(Collectors.joining("','", "'", "'"));
+
+        daoParam.addTableTypeNameEn(tableTypeNameEn)
+                .addTableNameEn(tableNameEn)
+                .addExecParamList(execParamList)
+                .addCondition(tableNameEnPK, Conditions.ConditionsEnum.IN, idJoinString);
+
+        sysTableDao.updateData(daoParam);
+        return queryDataParam;
+    }
+
+    @Override
+    public QueryDataParamBuilder deleteData(QueryDataParamBuilder queryDataParam) throws BusinessException {
+        return deleteDataByFlag(queryDataParam, TableFieldLogicalDeleteFlagEnum.删除.getCode());
+    }
+
+    @Override
+    public QueryDataParamBuilder deleteDataRecover(QueryDataParamBuilder queryDataParam) throws BusinessException {
+        return deleteDataByFlag(queryDataParam, TableFieldLogicalDeleteFlagEnum.有效.getCode());
+    }
+
+    @Override
+    public QueryDataParamBuilder deleteDataFinal(QueryDataParamBuilder queryDataParam) throws BusinessException {
+        return null;
+    }
+
+    private TranslateField getTranslateField(Map<String, List<SysTableFieldInfoDTO>> fieldNameEnMap, String fieldName, Object fieldValue) {
+        //字段中有需要进行“单位树”翻译的字段
+        TranslateField translateField = null;
+
+        List<SysTableFieldInfoDTO> sysTableFieldInfoDTOS = fieldNameEnMap.get(fieldName);
+        if (sysTableFieldInfoDTOS != null && sysTableFieldInfoDTOS.size() > 0) {
+            SysTableFieldInfoDTO sysTableFieldInfoDTO = sysTableFieldInfoDTOS.get(0);
+            String codeSetName = sysTableFieldInfoDTO.getCodeSetName();
+            String codeSetType = sysTableFieldInfoDTO.getCodeSetType();
+            if (StringUtils.equals(codeSetType, "1")) {
+                if (StringUtils.isNotEmpty(codeSetName)) {
+                    translateField = new TranslateField();
+                    translateField.setFieldName(fieldName);
+                    translateField.setFieldValue(fieldValue);
+                    Organization organization = OrganizationCacheManager.getSubject().getOrganizationById(String.valueOf(fieldValue));
+                    if (organization != null) {
+                        translateField.setFieldTranslateValue(organization.getName());
+                        return translateField;
+                    }
+                }
+            }
+        }
+        return translateField;
     }
 }

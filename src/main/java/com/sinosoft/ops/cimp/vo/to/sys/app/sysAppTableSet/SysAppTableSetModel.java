@@ -30,6 +30,11 @@ public class SysAppTableSetModel {
     @ApiModelProperty(value = "表名称")
     private String name;
     /**
+     * 表名称是否修改过
+     */
+    @ApiModelProperty(value = "表名称是否修改过")
+    private boolean nameChanged;
+    /**
      * 英文表名
      */
     @ApiModelProperty(value = "英文表名")
@@ -87,4 +92,13 @@ public class SysAppTableSetModel {
     public void setNameEn(String nameEn) {
         this.nameEn = nameEn;
     }
+
+    public boolean isNameChanged() {
+        return nameChanged;
+    }
+
+    public void setNameChanged(boolean nameChanged) {
+        this.nameChanged = nameChanged;
+    }
+
 }

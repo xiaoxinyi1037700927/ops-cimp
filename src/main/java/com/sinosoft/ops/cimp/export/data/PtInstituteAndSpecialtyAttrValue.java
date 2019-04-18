@@ -18,8 +18,8 @@ import java.util.Map;
  */
 public class PtInstituteAndSpecialtyAttrValue implements AttrValue {
 
-    private final String key = "ptInstituteAndSpecialty";
-    private final int order = 14;
+    public static final String KEY = "ptInstituteAndSpecialty";
+    public static final int ORDER = 14;
 
     @Override
     @SuppressWarnings("unchecked")
@@ -151,12 +151,9 @@ public class PtInstituteAndSpecialtyAttrValue implements AttrValue {
 //        return ptInstituteAndSpecialty.toString();
     }
 
-    public String getKey() {
-        return key;
-    }
-
     @Override
     public int getOrder() {
-        return order;
+        return ORDER;
     }
+
 }

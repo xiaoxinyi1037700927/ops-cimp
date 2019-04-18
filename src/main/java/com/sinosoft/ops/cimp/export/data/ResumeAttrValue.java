@@ -31,8 +31,8 @@ import java.util.*;
  */
 public class ResumeAttrValue extends ResumeAttrVauleHandle implements AttrValue {
 
-    private final String key = "resume";
-    private final int order = 20;
+    public static final String KEY = "resume";
+    public static final int ORDER = 20;
 
     @Override
     @SuppressWarnings("unchecked")
@@ -909,19 +909,15 @@ public class ResumeAttrValue extends ResumeAttrVauleHandle implements AttrValue 
      */
     public void checkStartAndEndDate(String start, String end, StringBuffer buffer) {
         if (StringUtils.isEmpty(start)) {
-            throw new RuntimeException("任免表生成失败:[" + NameAttrValue.getName() + "]干部的简历的开始日期有误【" + buffer.toString() + "】 其中开始日期为【" + start + "】 请修改后重试！");
+            throw new RuntimeException("任免表生成失败:干部的简历的开始日期有误【" + buffer.toString() + "】 其中开始日期为【" + start + "】 请修改后重试！");
         }
         if (StringUtils.isNotEmpty(end) && new DateTime(start).getMillis() > new DateTime(end).getMillis()) {
-            throw new RuntimeException("任免表生成失败:开始日期[" + start + "]--结束日期[" + end + "]  " + "[" + NameAttrValue.getName() + "]的" + buffer.toString() + "的开始日期大于结束日期，请修改后重试！");
+            throw new RuntimeException("任免表生成失败:开始日期[" + start + "]--结束日期[" + end + "]  " + "的" + buffer.toString() + "的开始日期大于结束日期，请修改后重试！");
         }
-    }
-
-    public String getKey() {
-        return key;
     }
 
     @Override
     public int getOrder() {
-        return order;
+        return ORDER;
     }
 }

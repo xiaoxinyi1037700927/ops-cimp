@@ -21,8 +21,24 @@ public interface SysTableModelInfoService {
     QueryDataParamBuilder updateData(QueryDataParamBuilder queryDataParam) throws BusinessException;
 
     /**
+     * 删除信息集数据（更新删除标识字段）
+     */
+    QueryDataParamBuilder deleteDataByFlag(QueryDataParamBuilder queryDataParam,String deleteFlagCode) throws BusinessException;
+
+    /**
      * 删除信息集数据
      */
-    void deleteData(QueryDataParamBuilder queryDataParam) throws BusinessException;
+    QueryDataParamBuilder deleteData(QueryDataParamBuilder queryDataParam) throws BusinessException;
+
+    /**
+     * 删除信息集数据（恢复已删除）
+     */
+    QueryDataParamBuilder deleteDataRecover(QueryDataParamBuilder queryDataParam) throws BusinessException;
+
+
+    /**
+     * 删除回收站信息集数据
+     */
+    QueryDataParamBuilder deleteDataFinal(QueryDataParamBuilder queryDataParam) throws BusinessException;
 
 }

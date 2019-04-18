@@ -19,9 +19,9 @@ import java.util.Map;
  */
 public class NativeAttrValue implements AttrValue {
 
-    private final int order = 4;
+    public static final int ORDER = 4;
 
-    private final String key = "native";
+    public static final String KEY = "native";
 
     @Override
     public Object getAttrValue(Map<String, Object> attrValueContext, String empId) throws Exception {
@@ -65,10 +65,7 @@ public class NativeAttrValue implements AttrValue {
 
     @Override
     public int getOrder() {
-        return order;
+        return ORDER;
     }
 
-    public String getKey() {
-        return key;
-    }
 }

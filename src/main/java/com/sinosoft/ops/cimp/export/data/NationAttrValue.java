@@ -19,9 +19,9 @@ import java.util.Map;
  */
 public class NationAttrValue implements AttrValue {
 
-    private final int order = 3;
+    public static final int ORDER = 3;
 
-    private final String key = "nation";
+    public static final String KEY = "nation";
 
     @Override
     public Object getAttrValue(Map<String, Object> attrValueContext, String empId) throws Exception {
@@ -66,10 +66,6 @@ public class NationAttrValue implements AttrValue {
 
     @Override
     public int getOrder() {
-        return order;
-    }
-
-    public String getKey() {
-        return key;
+        return ORDER;
     }
 }

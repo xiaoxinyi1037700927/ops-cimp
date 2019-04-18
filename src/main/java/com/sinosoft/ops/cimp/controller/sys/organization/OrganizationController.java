@@ -1,4 +1,4 @@
-package com.sinosoft.ops.cimp.controller.sys.user;
+package com.sinosoft.ops.cimp.controller.sys.organization;
 
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.dto.PaginationViewModel;
@@ -11,15 +11,17 @@ import com.sinosoft.ops.cimp.mapper.user.OrganizationPositionViewMapper;
 import com.sinosoft.ops.cimp.service.user.*;
 import com.sinosoft.ops.cimp.swaggwegroup.RequiresAuthentication;
 import com.sinosoft.ops.cimp.util.CachePackage.OrganizationCacheManager;
+import com.sinosoft.ops.cimp.vo.from.user.DeleteAttachmentViewModel;
 import com.sinosoft.ops.cimp.vo.from.user.organization.*;
 import com.sinosoft.ops.cimp.vo.to.user.BusinessUnitListViewModel;
 import com.sinosoft.ops.cimp.vo.to.user.OrganizationPositionViewModel;
 import com.sinosoft.ops.cimp.vo.user.organization.OrganizationSearchViewModel;
 import com.sinosoft.ops.cimp.vo.user.organization.OrganizationViewModel;
+import com.sinosoft.ops.cimp.vo.user.organization.SecretaryMemberViewModel;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
-
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,6 +33,7 @@ import java.util.stream.Collectors;
 @Api(description = "单位接口")
 @RestController
 @RequestMapping(value = "/organization")
+@SuppressWarnings("unchecked")
 public class OrganizationController extends BaseController {
 
     @Autowired
@@ -43,7 +46,8 @@ public class OrganizationController extends BaseController {
     private BusinessUnitService businessUnitService;
     @Autowired
     private BusinessUnitOrgService businessUnitOrgService;
-
+    @Autowired
+    private SecretaryMemberService secretaryMemberService;
 
     @ApiOperation(value = "查询机构树")
     @PostMapping("/lstTreeNode")
@@ -85,8 +89,6 @@ public class OrganizationController extends BaseController {
 
     /**
      * 根据职务id查询对应的职级信息
-     *
-     * @return
      */
     @ApiOperation(value = "根据职务id查询对应的职级信息")
     @PostMapping("/findRankInfoByPositionId")
@@ -172,86 +174,78 @@ public class OrganizationController extends BaseController {
         return ok(viewModel);
     }
 
+    /**
+     * 查询书记会成员干部列表
+     */
+    @ApiOperation(value = "查询书记会成员干部列表")
+    @PostMapping("/findSecretaryMemberList")
+    @RequiresAuthentication
+    public ResponseEntity<PaginationViewModel<SecretaryMemberViewModel>> findSecretaryMemberList(@RequestBody SecretaryMemberSearchViewModel searchViewModel) throws BusinessException {
+        PaginationViewModel<SecretaryMemberViewModel> page = secretaryMemberService.findByPageData(searchViewModel);
+        return ok(page);
+    }
 
-//    @ApiOperation(value = "查询上级纪委列表")
-//    @PostMapping("/findDisciplineUnitList")
-//    @RequiresAuthentication
-//    public ResponseEntity<PaginationViewModel<DisciplineUnitViewModel>> findDisciplineUnitList(@RequestBody DisciplineUnitSearchViewModel searchViewModel) throws BusinessException {
-//        PaginationViewModel<DisciplineUnitViewModel> disciplineUnitList = disciplineUnitService.findDisciplineUnitList(searchViewModel);
-//        return ok(disciplineUnitList);
-//    }
+    /**
+     * 新增书记会成员
+     */
+    @ApiOperation(value = "新增书记会成员")
+    @PostMapping("/addSecretaryMember")
+    @RequiresAuthentication
+    public ResponseEntity<String> addSecretaryMember(@RequestBody SecretaryMemberAddViewModel addViewModel) throws BusinessException {
+        boolean flag = secretaryMemberService.addSecretaryMember(addViewModel);
+        if (flag) return ok("操作成功！");
+        return fail("操作异常！");
+    }
 
-//    @ApiOperation(value = "新增纪委部门")
-//    @PostMapping("/addDisciplineUnit")
-//    @RequiresAuthentication
-//    public ResponseEntity<String> addDisciplineUnit(@RequestBody DisciplineUnitAddViewModel addViewModel) throws BusinessException {
-//        boolean flag = disciplineUnitService.addDisciplineUnit(addViewModel);
-//        if (flag) return ok("新增纪委部门成功！");
-//        return fail("新增上级纪委异常！");
-//    }
+    /**
+     * 修改书记会成员
+     */
+    @ApiOperation(value = "修改书记会成员")
+    @PostMapping("/modifySecretaryMember")
+    @RequiresAuthentication
+    public ResponseEntity<String> modifySecretaryMember(@RequestBody SecretaryMemberModifyViewModel modifyViewModel) throws BusinessException {
+        boolean flag = secretaryMemberService.modifySecretaryMember(modifyViewModel);
+        if (flag) return ok("操作成功！");
+        return fail("操作异常！");
+    }
 
-//    @ApiOperation(value = "修改纪委部门")
-//    @PostMapping("/modifyDisciplineUnit")
-//    @RequiresAuthentication
-//    public ResponseEntity<String> modifyDisciplineUnit(@RequestBody DisciplineUnitModifyViewModel modifyViewModel) throws BusinessException {
-//        boolean flag = disciplineUnitService.modifyDisciplineUnit(modifyViewModel);
-//        if (flag) return ok("修改纪委部门成功!");
-//        return fail("修改纪委部门异常！");
-//    }
-//
-//    @ApiOperation(value = "根据id查询纪委信息")
-//    @PostMapping("/findById")
-//    @RequiresAuthentication
-//    public ResponseEntity<DisciplineUnitViewModel> findById(String disciplineUnitId) throws BusinessException {
-//        DisciplineUnitViewModel viewModel = disciplineUnitService.findDetailById(disciplineUnitId);
-//        return ok(viewModel);
-//    }
+    /**
+     * 根据ID删除书记会成员
+     */
+    @ApiOperation(value = "根据ID删除书记会成员")
+    @PostMapping("/deleteBySecretaryMemberId")
+    @RequiresAuthentication
+    public ResponseEntity<String> deleteBySecretaryMemberId(String secretaryMemberId) throws BusinessException {
+        boolean flag = secretaryMemberService.deleteById(secretaryMemberId);
+        if (flag) return ok("操作成功！");
+        return fail("操作异常！");
+    }
 
+    /**
+     * 删除文件
+     */
+    @ApiOperation(value = "删除文件")
+    @PostMapping("/deleteFile")
+    @RequiresAuthentication
+    public ResponseEntity<String> deleteFile(@RequestBody DeleteAttachmentViewModel deleteViewModel) throws BusinessException {
+        boolean flag = businessUnitService.deleteFile(deleteViewModel);
+        if (flag) return ok("操作成功!");
+        return fail("操作异常！");
+    }
 
-
-//    @ApiOperation(value = "上传文件")
-//    @PostMapping("/uploadAttachment")
-//    @RequiresAuthentication
-//    public ResponseEntity<List<AttachmentVO>> uploadAttachment(HttpServletRequest request,
-//                                                       @RequestParam("pathName") String pathName,
-//                                                       @RequestParam(value = "businessUnitId", required = false) String businessUnitId,
-//                                                       @RequestParam("type") String type) throws BusinessException {
-//        List<MultipartFile> files = ((MultipartHttpServletRequest) request).getFiles("files");
-//        if (files.size() == 0) return fail("文件不能为空！");
-//        if (StringUtils.isBlank(pathName)) return fail("文件存储路径标识不能为空！");
-//        //获取文件存储标识
-//        pathName = attachmentService.getFilePath(pathName);
-//        List<AttachmentVO> attachmentVOList = businessUnitService.uploadAttachment(files, pathName, businessUnitId, type);
-//        return JsonSuccess(attachmentVOList);
-//    }
-
-//    /**
-//     * 删除文件
-//     *
-//     * @return
-//     */
-//    @ApiOperation(value = "删除文件")
-//    @PostMapping("/deleteFile")
-//    @RequiresAuthentication
-//    public Result<String> deleteFile(@RequestBody DeleteAttachmentViewModel deleteViewModel) {
-//        boolean flag = businessUnitService.deleteFile(deleteViewModel);
-//        if (flag) return JsonSuccess("操作成功!");
-//        return JsonError("操作异常！");
-//    }
-//
-//    @ApiOperation(value = "根据名字查询组织")
-//    @PostMapping("/findOrganizationByName")
-//    @RequiresAuthentication
-//    public Result<List<OrganizationViewModel>> findOrganizationByName(@RequestParam("name") String name
-//            , @RequestParam(required = false) String permission) {
-//        if (StringUtils.isEmpty(name)) return JsonError("名字不能为空");
-//        //permission: 1 带权限;0 不带权限
-//        //默认带权限
-//        if (StringUtils.isEmpty(permission)) {
-//            permission = "1";
-//        }
-//        List<OrganizationViewModel> organizationByName = organizationService.findOrganizationByName(name, permission);
-//        return JsonSuccess(organizationByName);
-//    }
+    @ApiOperation(value = "根据名字查询组织")
+    @PostMapping("/findOrganizationByName")
+    @RequiresAuthentication
+    public ResponseEntity<List<OrganizationViewModel>> findOrganizationByName(@RequestParam("name") String name
+            , @RequestParam(required = false) String permission) throws BusinessException {
+        if (StringUtils.isEmpty(name)) return fail("名字不能为空");
+        //permission: 1 带权限;0 不带权限
+        //默认带权限
+        if (StringUtils.isEmpty(permission)) {
+            permission = "1";
+        }
+        List<OrganizationViewModel> organizationByName = organizationService.findOrganizationByName(name, permission);
+        return ok(organizationByName);
+    }
 
 }

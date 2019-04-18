@@ -238,10 +238,12 @@ public class SysTableInfoDaoImpl implements SysTableInfoDao {
                         String defaultScript = sysTableFieldInfo.getDefaultScript();
                         Integer sysSort = sysTableFieldInfo.getSort();
                         String codeSetName = sysTableFieldInfo.getCodeSetName();
+                        String codeSetType = sysTableFieldInfo.getCodeSetType();
 
                         sysTableFieldInfoDTO.setId(sysFieldId);
                         sysTableFieldInfoDTO.setAppTableFieldGroupName(appFieldGroupName);
                         sysTableFieldInfoDTO.setCodeSetName(codeSetName);
+                        sysTableFieldInfoDTO.setCodeSetType(codeSetType);
 
                         if (StringUtils.isNotEmpty(appFieldNameCn)) {
                             sysTableFieldInfoDTO.setFieldNameCn(appFieldNameCn);

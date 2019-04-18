@@ -77,13 +77,25 @@ public class SysAppTableSetServiceImpl implements SysAppTableSetService {
                 .totalCount(page.getTotalElements())
                 .data(page.getContent().stream().map(tableSet -> {
                     SysAppTableSetModel model = SysAppTableSetMapper.INSTANCE.tableSetToTableSetModel(tableSet);
-                    //如果英文名为空，去系统表中查询
-                    if (StringUtils.isEmpty(model.getNameEn())) {
-                        model.setNameEn(jpaQueryFactory.select(qSysTable.nameEn).from(qSysTable).where(qSysTable.id.eq(model.getSysTableId())).fetchOne());
-                    }
+
+                    //如果字段值为空，取系统表中的值
+                    Optional<SysTable> tableOptional = sysTableRepository.findById(model.getSysTableId());
+                    tableOptional.ifPresent(table -> replaceValue(model, table));
+
                     return model;
                 }).collect(Collectors.toList()))
                 .build();
+    }
+
+    private void replaceValue(SysAppTableSetModel model, SysTable table) {
+        if (StringUtils.isEmpty(model.getNameEn())) {
+            model.setNameEn(table.getNameEn());
+        }
+        if (StringUtils.isEmpty(model.getName())) {
+            model.setName(table.getNameCn());
+        } else {
+            model.setNameChanged(true);
+        }
     }
 
     /**
@@ -115,8 +127,6 @@ public class SysAppTableSetServiceImpl implements SysAppTableSetService {
             tableSet.setCreateTime(mapper.getTime(null));
             tableSet.setSysAppTableGroupId(addModel.getSysAppTableGroupId());
             tableSet.setSysTableId(sysTableId);
-            tableSet.setName(sysTableOptional.get().getNameCn());
-            tableSet.setNameEn(sysTableOptional.get().getNameEn());
 
             //排序号
             Integer sort = jpaQueryFactory.select(qTableSet.sort.max()).from(qTableSet).where(qTableSet.sysAppTableGroupId.eq(tableSet.getSysAppTableGroupId())).fetchOne();
@@ -151,9 +161,19 @@ public class SysAppTableSetServiceImpl implements SysAppTableSetService {
         if (!tableSetOptional.isPresent()) {
             return false;
         }
-
         SysAppTableSet tableSet = tableSetOptional.get();
         SysAppTableSetMapper.INSTANCE.modifyModelToTableSet(modifyModel, tableSet);
+
+
+        Optional<SysTable> sysTableOptional = sysTableRepository.findById(tableSet.getSysTableId());
+        if (!sysTableOptional.isPresent()) {
+            return false;
+        }
+        //如果修改的表名和系统表中的相等，则不保存
+        if (StringUtils.equals(tableSet.getName(), sysTableOptional.get().getNameCn())) {
+            tableSet.setName(null);
+        }
+
         tableSetRepository.save(tableSet);
 
         return true;

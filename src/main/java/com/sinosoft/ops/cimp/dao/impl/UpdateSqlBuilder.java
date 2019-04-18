@@ -89,14 +89,30 @@ public class UpdateSqlBuilder implements SqlBuilder {
             Object conditionValue = conditions.getConditionValue();
             String saveField = tableFieldMap.get(conditionName);
             if (StringUtils.isNotEmpty(saveField)) {
-                conditionSqlBuilder.append(" WHERE ")
-                        .append(conditionName)
-                        .append(" ")
-                        .append(condition)
-                        .append(" ")
-                        .append("'")
-                        .append(conditionValue)
-                        .append("'");
+                conditionSqlBuilder.append(" WHERE 1=1 ");
+                if(condition.equals(Conditions.ConditionsEnum.IN))
+                {
+                    conditionSqlBuilder.append(" AND ")
+                            .append(conditionName)
+                            .append(" ")
+                            .append(condition)
+                            .append(" ")
+                            .append("(")
+                            .append(conditionValue)
+                            .append(")");
+                }
+                else
+                {
+                    conditionSqlBuilder.append(" AND ")
+                            .append(conditionName)
+                            .append(" ")
+                            .append(condition)
+                            .append(" ")
+                            .append("'")
+                            .append(conditionValue)
+                            .append("'");
+                }
+
             } else {
                 conditionSqlBuilder.append(" WHERE 1=2 ");
             }

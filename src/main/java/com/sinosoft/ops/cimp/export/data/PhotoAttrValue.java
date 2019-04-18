@@ -15,9 +15,9 @@ import java.util.Map;
  */
 public class PhotoAttrValue implements AttrValue {
     //属性与属性之间的排序，越小越靠前
-    private final int order = 0;
+    public static final int ORDER = 0;
 
-    private final String key = "photo";
+    public static final String KEY = "photo";
 
     @Override
     public Object getAttrValue(Map<String, Object> attrValueContext, String empId) throws Exception {
@@ -41,12 +41,9 @@ public class PhotoAttrValue implements AttrValue {
         }
     }
 
-    public String getKey() {
-        return key;
-    }
-
     @Override
     public int getOrder() {
-        return order;
+        return ORDER;
     }
+
 }

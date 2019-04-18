@@ -19,8 +19,8 @@ import java.util.Map;
  */
 public class FtInstituteAndSpecialtyAttrValue implements AttrValue {
 
-    private final String key = "ftInstituteAndSpecialty";
-    private final int order = 12;
+    public static final String KEY = "ftInstituteAndSpecialty";
+    public static final int ORDER = 12;
 
     @Override
     @SuppressWarnings("unchecked")
@@ -126,12 +126,9 @@ public class FtInstituteAndSpecialtyAttrValue implements AttrValue {
 //        return ftInstituteAndSpecialty.toString();
     }
 
-    public String getKey() {
-        return key;
-    }
-
     @Override
     public int getOrder() {
-        return order;
+        return ORDER;
     }
+
 }

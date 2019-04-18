@@ -20,8 +20,8 @@ import java.util.Map;
  */
 public class FamilyPartyAttrValue implements AttrValue {
 
-    private final String key = "fmParty";
-    private final int order = 26;
+    public static final String KEY = "fmParty";
+    public static final int ORDER = 26;
 
     @Override
     public Object getAttrValue(Map<String, Object> attrValueContext, String empId) throws Exception {
@@ -43,10 +43,7 @@ public class FamilyPartyAttrValue implements AttrValue {
 
     @Override
     public int getOrder() {
-        return order;
+        return ORDER;
     }
 
-    public String getKey() {
-        return key;
-    }
 }

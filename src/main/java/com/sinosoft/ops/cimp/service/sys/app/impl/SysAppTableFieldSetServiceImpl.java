@@ -76,13 +76,38 @@ public class SysAppTableFieldSetServiceImpl implements SysAppTableFieldSetServic
                 .totalCount(page.getTotalElements())
                 .data(page.getContent().stream().map(fieldSet -> {
                     SysAppTableFieldSetModel model = SysAppTableFieldSetMapper.INSTANCE.fieldSetToFieldSetModel(fieldSet);
-                    //如果英文名为空，去系统表字段表中查询
-                    if (StringUtils.isNotEmpty(model.getNameEn())) {
-                        model.setNameEn(jpaQueryFactory.select(qSysTableField.nameEn).from(qSysTableField).where(qSysTableField.id.eq(model.getSysTableFieldId())).fetchOne());
-                    }
+
+                    //如果字段值为空，则取系统表字段中的值
+                    Optional<SysTableField> tableFieldOptional = sysTableFieldRepository.findById(model.getSysTableFieldId());
+                    tableFieldOptional.ifPresent(field -> replaceValue(model, field));
+
                     return model;
                 }).collect(Collectors.toList()))
                 .build();
+    }
+
+    private void replaceValue(SysAppTableFieldSetModel model, SysTableField field) {
+        if (StringUtils.isEmpty(model.getNameEn())) {
+            model.setNameEn(field.getNameEn());
+        }
+
+        if (StringUtils.isEmpty(model.getName())) {
+            model.setName(field.getNameCn());
+        } else {
+            model.setNameChanged(true);
+        }
+
+        if (StringUtils.isEmpty(model.getHtml())) {
+            model.setHtml(field.getDefaultHtml());
+        } else {
+            model.setHtmlChanged(true);
+        }
+
+        if (StringUtils.isEmpty(model.getScript())) {
+            model.setScript(field.getDescription());
+        } else {
+            model.setScriptChanged(true);
+        }
     }
 
     /**
@@ -114,10 +139,6 @@ public class SysAppTableFieldSetServiceImpl implements SysAppTableFieldSetServic
             fieldSet.setCreateTime(mapper.getTime(null));
             fieldSet.setSysAppTableFieldGroupId(addModel.getSysAppTableFieldGroupId());
             fieldSet.setSysTableFieldId(fieldId);
-            fieldSet.setName(tableField.getNameCn());
-            fieldSet.setNameEn(tableField.getNameEn());
-            fieldSet.setScript(tableField.getDefaultScript());
-            fieldSet.setHtml(tableField.getDefaultHtml());
 
             //排序号
             Integer sort = jpaQueryFactory.select(qFieldSet.sort.max()).from(qFieldSet).where(qFieldSet.sysAppTableFieldGroupId.eq(fieldSet.getSysAppTableFieldGroupId())).fetchOne();
@@ -152,6 +173,23 @@ public class SysAppTableFieldSetServiceImpl implements SysAppTableFieldSetServic
 
         SysAppTableFieldSet fieldSet = fieldSetOptional.get();
         SysAppTableFieldSetMapper.INSTANCE.modifyModelToFieldSet(modifyModel, fieldSet);
+
+        Optional<SysTableField> tableFieldOptional = sysTableFieldRepository.findById(fieldSet.getSysTableFieldId());
+        if (!tableFieldOptional.isPresent()) {
+            return false;
+        }
+        SysTableField tableField = tableFieldOptional.get();
+        //如果修改的字段值和系统表中的相等，则不保存
+        if (StringUtils.equals(tableField.getNameCn(), fieldSet.getName())) {
+            fieldSet.setName(null);
+        }
+        if (StringUtils.equals(tableField.getDefaultHtml(), fieldSet.getHtml())) {
+            fieldSet.setHtml(null);
+        }
+        if (StringUtils.equals(tableField.getDefaultScript(), fieldSet.getScript())) {
+            fieldSet.setScript(null);
+        }
+
         fieldSetRepository.save(fieldSet);
 
         return true;

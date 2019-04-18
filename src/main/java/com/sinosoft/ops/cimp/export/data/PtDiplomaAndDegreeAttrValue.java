@@ -17,8 +17,8 @@ import java.util.*;
  */
 public class PtDiplomaAndDegreeAttrValue implements AttrValue {
 
-    private final String key = "ptDiplomaAndDegree";
-    private final int order = 13;
+    public static final String KEY = "ptDiplomaAndDegree";
+    public static final int ORDER = 13;
 
     @Override
     @SuppressWarnings("unchecked")
@@ -207,12 +207,8 @@ public class PtDiplomaAndDegreeAttrValue implements AttrValue {
 //        return diplomaAndDegreeList;
     }
 
-    public String getKey() {
-        return key;
-    }
-
     @Override
     public int getOrder() {
-        return order;
+        return ORDER;
     }
 }

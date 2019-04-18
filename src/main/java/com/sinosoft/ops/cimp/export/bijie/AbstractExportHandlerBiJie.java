@@ -3,7 +3,7 @@ package com.sinosoft.ops.cimp.export.bijie;
 
 import com.aspose.words.Document;
 import com.aspose.words.License;
-import com.sinosoft.ops.cimp.export.ExportWord;
+import com.sinosoft.ops.cimp.export.ExportHandler;
 import com.sinosoft.ops.cimp.export.data.*;
 import com.sinosoft.ops.cimp.export.processor.*;
 import com.sinosoft.ops.cimp.util.StringUtil;
@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 /**
  * 导出word(毕节)
  */
-public abstract class AbstractExportWordBiJie implements ExportWord {
+public abstract class AbstractExportHandlerBiJie implements ExportHandler {
 
     //属性-属性规则
     protected Map<String, AttrValue> attrValueMap = new LinkedHashMap<>(59);
@@ -35,7 +35,7 @@ public abstract class AbstractExportWordBiJie implements ExportWord {
     //需要添加的字符数
     protected List<Integer> addLines = new ArrayList<>();
 
-    public AbstractExportWordBiJie() {
+    public AbstractExportHandlerBiJie() {
         init();
     }
 
@@ -44,48 +44,53 @@ public abstract class AbstractExportWordBiJie implements ExportWord {
      */
     private void init() {
         //放入 属性 - 属性获取处理器
-        attrValueMap.put(new NameAttrValue().getKey(), new NameAttrValue());
-//        attrValueMap.put(new PhotoAttrValue().getKey(), new PhotoAttrValue());
-        attrValueMap.put(new GenderAttrValue().getKey(), new GenderAttrValue());
-        attrValueMap.put(new BirthdayAttrValue().getKey(), new BirthdayAttrValue());
-        attrValueMap.put(new NationAttrValue().getKey(), new NationAttrValue());
-        attrValueMap.put(new NativeAttrValue().getKey(), new NativeAttrValue());
-        attrValueMap.put(new BirthPlaceAttrValue().getKey(), new BirthPlaceAttrValue());
-        attrValueMap.put(new PartyDateAttrValue().getKey(), new PartyDateAttrValue());
-        attrValueMap.put(new JobDateAttrValue().getKey(), new JobDateAttrValue());
-        attrValueMap.put(new HealthyAttrValue().getKey(), new HealthyAttrValue());
-        attrValueMap.put(new TechnicPositionAttrValue().getKey(), new TechnicPositionAttrValue());
-        attrValueMap.put(new SpecialtyAttrValue().getKey(), new SpecialtyAttrValue());
-        attrValueMap.put(new FtDiplomaAndDegreeAttrValue().getKey(), new FtDiplomaAndDegreeAttrValue());
-        attrValueMap.put(new FtInstituteAndSpecialtyAttrValue().getKey(), new FtInstituteAndSpecialtyAttrValue());
-        attrValueMap.put(new PtDiplomaAndDegreeAttrValue().getKey(), new PtDiplomaAndDegreeAttrValue());
-        attrValueMap.put(new PtInstituteAndSpecialtyAttrValue().getKey(), new PtInstituteAndSpecialtyAttrValue());
-        attrValueMap.put(new PositionAttrValue().getKey(), new PositionAttrValue());
-        attrValueMap.put(new ResumeAttrValue().getKey(), new ResumeAttrValue());
-        attrValueMap.put(new HornorAttrValue().getKey(), new HornorAttrValue());
-        attrValueMap.put(new EvaluationAttrValue().getKey(), new EvaluationAttrValue());
-        attrValueMap.put(new FamilyRelAttrValue().getKey(), new FamilyRelAttrValue());
-        attrValueMap.put(new FamilyNameAttrValue().getKey(), new FamilyNameAttrValue());
-        attrValueMap.put(new FamilyAgeAttrValue().getKey(), new FamilyAgeAttrValue());
-        attrValueMap.put(new FamilyPartyAttrValue().getKey(), new FamilyPartyAttrValue());
-        attrValueMap.put(new FamilyImpAttrValue().getKey(), new FamilyImpAttrValue());
-        attrValueMap.put(new FamilyOrgAndJobAttrValue().getKey(), new FamilyOrgAndJobAttrValue());
+        attrValueMap.put(NameAttrValue.KEY, new NameAttrValue());
+//        attrValueMap.put(new PhotoAttrValue.KEY, new PhotoAttrValue());
+        attrValueMap.put(GenderAttrValue.KEY, new GenderAttrValue());
+        attrValueMap.put(BirthdayAttrValue.KEY, new BirthdayAttrValue());
+        attrValueMap.put(NationAttrValue.KEY, new NationAttrValue());
+        attrValueMap.put(NativeAttrValue.KEY, new NativeAttrValue());
+        attrValueMap.put(BirthPlaceAttrValue.KEY, new BirthPlaceAttrValue());
+        attrValueMap.put(PartyDateAttrValue.KEY, new PartyDateAttrValue());
+        attrValueMap.put(JobDateAttrValue.KEY, new JobDateAttrValue());
+        attrValueMap.put(HealthyAttrValue.KEY, new HealthyAttrValue());
+        attrValueMap.put(TechnicPositionAttrValue.KEY, new TechnicPositionAttrValue());
+        attrValueMap.put(SpecialtyAttrValue.KEY, new SpecialtyAttrValue());
+        attrValueMap.put(FtDiplomaAndDegreeAttrValue.KEY, new FtDiplomaAndDegreeAttrValue());
+        attrValueMap.put(FtInstituteAndSpecialtyAttrValue.KEY, new FtInstituteAndSpecialtyAttrValue());
+        attrValueMap.put(PtDiplomaAndDegreeAttrValue.KEY, new PtDiplomaAndDegreeAttrValue());
+        attrValueMap.put(PtInstituteAndSpecialtyAttrValue.KEY, new PtInstituteAndSpecialtyAttrValue());
+        attrValueMap.put(PositionAttrValue.KEY, new PositionAttrValue());
+        attrValueMap.put(ResumeAttrValue.KEY, new ResumeAttrValue());
+        attrValueMap.put(HornorAttrValue.KEY, new HornorAttrValue());
+        attrValueMap.put(EvaluationAttrValue.KEY, new EvaluationAttrValue());
+        attrValueMap.put(FamilyRelAttrValue.KEY, new FamilyRelAttrValue());
+        attrValueMap.put(FamilyNameAttrValue.KEY, new FamilyNameAttrValue());
+        attrValueMap.put(FamilyAgeAttrValue.KEY, new FamilyAgeAttrValue());
+        attrValueMap.put(FamilyPartyAttrValue.KEY, new FamilyPartyAttrValue());
+        attrValueMap.put(FamilyImpAttrValue.KEY, new FamilyImpAttrValue());
+        attrValueMap.put(FamilyOrgAndJobAttrValue.KEY, new FamilyOrgAndJobAttrValue());
         //放入 属性 - 属性值处理器
-        attrValueProcessorMap.put(new NameAttrValue().getKey(), new NameAttrValueProcessor());
-//        attrValueProcessorMap.put(new PhotoAttrValue().getKey(), new PhotoAttrValueProcessor());
-        attrValueProcessorMap.put(new NationAttrValue().getKey(), new GenericNameAttrValueProcessor());
-        attrValueProcessorMap.put(new NativeAttrValue().getKey(), new GenericNameAttrValueProcessor());
-        attrValueProcessorMap.put(new BirthPlaceAttrValue().getKey(), new GenericNameAttrValueProcessor());
-        attrValueProcessorMap.put(new TechnicPositionAttrValue().getKey(), new TechnicPositionAttrValueProcessor());
-        attrValueProcessorMap.put(new SpecialtyAttrValue().getKey(), new TechnicPositionAttrValueProcessor());
-        attrValueProcessorMap.put(new FtDiplomaAndDegreeAttrValue().getKey(), new DiplomaAndDegreeAttrValueProcessor());
-        attrValueProcessorMap.put(new PtDiplomaAndDegreeAttrValue().getKey(), new DiplomaAndDegreeAttrValueProcessor());
-        attrValueProcessorMap.put(new PositionAttrValue().getKey(), new PositionAttrValueProcessor());
-        attrValueProcessorMap.put(new ResumeAttrValue().getKey(), new ResumeAttrValueProcessor());
-        attrValueProcessorMap.put(new HornorAttrValue().getKey(), new HornorAttrValueProcessor());
-        attrValueProcessorMap.put(new EvaluationAttrValue().getKey(), new EvaluationAttrValueProcessor());
-        attrValueProcessorMap.put(new FamilyOrgAndJobAttrValue().getKey(), new FamilyOrgAndJobAttrValueProcessor());
+        attrValueProcessorMap.put(NameAttrValue.KEY, new NameAttrValueProcessor());
+//        attrValueProcessorMap.put(new PhotoAttrValue.KEY, new PhotoAttrValueProcessor());
+        attrValueProcessorMap.put(NationAttrValue.KEY, new GenericNameAttrValueProcessor());
+        attrValueProcessorMap.put(NativeAttrValue.KEY, new GenericNameAttrValueProcessor());
+        attrValueProcessorMap.put(BirthPlaceAttrValue.KEY, new GenericNameAttrValueProcessor());
+        attrValueProcessorMap.put(TechnicPositionAttrValue.KEY, new TechnicPositionAttrValueProcessor());
+        attrValueProcessorMap.put(SpecialtyAttrValue.KEY, new TechnicPositionAttrValueProcessor());
+        attrValueProcessorMap.put(FtDiplomaAndDegreeAttrValue.KEY, new DiplomaAndDegreeAttrValueProcessor());
+        attrValueProcessorMap.put(PtDiplomaAndDegreeAttrValue.KEY, new DiplomaAndDegreeAttrValueProcessor());
+        attrValueProcessorMap.put(PositionAttrValue.KEY, new PositionAttrValueProcessor());
+        attrValueProcessorMap.put(ResumeAttrValue.KEY, new ResumeAttrValueProcessor());
+        attrValueProcessorMap.put(HornorAttrValue.KEY, new HornorAttrValueProcessor());
+        attrValueProcessorMap.put(EvaluationAttrValue.KEY, new EvaluationAttrValueProcessor());
+        attrValueProcessorMap.put(FamilyOrgAndJobAttrValue.KEY, new FamilyOrgAndJobAttrValueProcessor());
         attrValueProcessorMap.put("default", new DefaultAttrValueProcessor());
+    }
+
+
+    public NameAttrValue getNameAttrValue() {
+        return (NameAttrValue) attrValueMap.get(NameAttrValue.KEY);
     }
 
 
@@ -112,6 +117,31 @@ public abstract class AbstractExportWordBiJie implements ExportWord {
         return attrValues;
     }
 
+    private int getRightLine(String resumeContent) {
+        Pattern compile = Pattern.compile("[：| ；]\\d{4}\\.");
+        Matcher matcher = compile.matcher(resumeContent);
+
+        Pattern pattern = Pattern.compile("\\d{4}\\.");
+        Matcher matcherNumber = pattern.matcher(resumeContent);
+        if (matcher.find()) {
+            int start = matcher.start();
+            if (start >= 20 && start < 27) {
+                addLines.add(27 - start);
+            }
+            if (matcherNumber.find() && (start - 8) >= 20) {
+                addLines.add(35 - start);
+            }
+            String right = resumeContent.substring(start + 1);
+            int i = getRightLine(right.trim());
+            if (i == -1) {
+                return -1;
+            }
+        } else {
+            return -1;
+        }
+        return -1;
+    }
+
     /**
      * 执行属性值样式处理器
      *
@@ -120,7 +150,7 @@ public abstract class AbstractExportWordBiJie implements ExportWord {
      * @param outputFilePath   文件输出路径
      */
     @Override
-    public String processAttrValue(String templateFilePath, Map<String, Object> attrValues, String outputFilePath) throws Exception {
+    public void processAttrValue(String templateFilePath, Map<String, Object> attrValues, String outputFilePath) throws Exception {
         //根据resume的内容更换模板
         List<Map<String, Object>> resume = (List<Map<String, Object>>) attrValues.get("resume");
 
@@ -229,32 +259,7 @@ public abstract class AbstractExportWordBiJie implements ExportWord {
         //清空标记域，防止域没有被填充而输出域
         document.getMailMerge().deleteFields();
 
-        return saveFile(document, outputFilePath);
-    }
-
-    private int getRightLine(String resumeContent) {
-        Pattern compile = Pattern.compile("[：| ；]\\d{4}\\.");
-        Matcher matcher = compile.matcher(resumeContent);
-
-        Pattern pattern = Pattern.compile("\\d{4}\\.");
-        Matcher matcherNumber = pattern.matcher(resumeContent);
-        if (matcher.find()) {
-            int start = matcher.start();
-            if (start >= 20 && start < 27) {
-                addLines.add(27 - start);
-            }
-            if (matcherNumber.find() && (start - 8) >= 20) {
-                addLines.add(35 - start);
-            }
-            String right = resumeContent.substring(start + 1);
-            int i = getRightLine(right.trim());
-            if (i == -1) {
-                return -1;
-            }
-        } else {
-            return -1;
-        }
-        return -1;
+        saveFile(document, outputFilePath);
     }
 
     /**
@@ -262,8 +267,7 @@ public abstract class AbstractExportWordBiJie implements ExportWord {
      *
      * @param doc
      * @param path
-     * @return
      * @throws Exception
      */
-    protected abstract String saveFile(Document doc, String path) throws Exception;
+    protected abstract void saveFile(Document doc, String path) throws Exception;
 }

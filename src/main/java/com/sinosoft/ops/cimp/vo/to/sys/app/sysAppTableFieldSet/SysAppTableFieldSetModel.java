@@ -29,6 +29,11 @@ public class SysAppTableFieldSetModel {
     @ApiModelProperty(value = "字段名称")
     private String name;
     /**
+     * 字段名称是否修改
+     */
+    @ApiModelProperty(value = "字段名称是否修改")
+    private boolean nameChanged;
+    /**
      * 英文字段名
      */
     @ApiModelProperty(value = "英文字段名")
@@ -44,10 +49,20 @@ public class SysAppTableFieldSetModel {
     @ApiModelProperty(value = "代码模板")
     private String html;
     /**
+     * 代码模板是否修改
+     */
+    @ApiModelProperty(value = "代码模板是否修改")
+    private boolean htmlChanged;
+    /**
      * 脚本
      */
     @ApiModelProperty(value = "脚本")
     private String script;
+    /**
+     * 脚本是否修改
+     */
+    @ApiModelProperty(value = "脚本是否修改")
+    private boolean scriptChanged;
 
     public String getId() {
         return id;
@@ -111,5 +126,29 @@ public class SysAppTableFieldSetModel {
 
     public void setNameEn(String nameEn) {
         this.nameEn = nameEn;
+    }
+
+    public boolean isNameChanged() {
+        return nameChanged;
+    }
+
+    public void setNameChanged(boolean nameChanged) {
+        this.nameChanged = nameChanged;
+    }
+
+    public boolean isHtmlChanged() {
+        return htmlChanged;
+    }
+
+    public void setHtmlChanged(boolean htmlChanged) {
+        this.htmlChanged = htmlChanged;
+    }
+
+    public boolean isScriptChanged() {
+        return scriptChanged;
+    }
+
+    public void setScriptChanged(boolean scriptChanged) {
+        this.scriptChanged = scriptChanged;
     }
 }

@@ -18,6 +18,9 @@ public class SysCodeItemModel {
     @ApiModelProperty(value = "上级代码")
     private String parentCode;
 
+    @ApiModelProperty(value = "排序字段")
+    private Integer ordinal;
+
     public Integer getId() {
         return id;
     }
@@ -48,5 +51,13 @@ public class SysCodeItemModel {
 
     public void setParentCode(String parentCode) {
         this.parentCode = parentCode;
+    }
+
+    public Integer getOrdinal() {
+        return ordinal;
+    }
+
+    public void setOrdinal(Integer ordinal) {
+        this.ordinal = ordinal;
     }
 }

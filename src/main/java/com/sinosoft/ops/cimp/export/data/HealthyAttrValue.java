@@ -17,20 +17,20 @@ import java.util.Map;
  */
 public class HealthyAttrValue implements AttrValue {
 
-    private final String key = "healthy";
-    private final int order = 8;
+    public static final String KEY = "healthy";
+    public static final int ORDER = 8;
 
     @Override
     public Object getAttrValue(Map<String, Object> attrValueContext, String empId) throws Exception {
         try {
-			Map a01Map = (Map) attrValueContext.get("A01");
-			final String healthyInfoSql = "SELECT A01028 FROM EMP_A001 A01 WHERE EMP_ID = '%s'  and status=0";
-			String healthyValue = this.getHealthyCodeStr(healthyInfoSql, empId);
-			return healthyValue;
-		} catch (Exception e) {
-			e.printStackTrace();
-		    throw new RuntimeException("任免表生成失败:[EMP_A001_A01028健康状况描述]");
-		}
+            Map a01Map = (Map) attrValueContext.get("A01");
+            final String healthyInfoSql = "SELECT A01028 FROM EMP_A001 A01 WHERE EMP_ID = '%s'  and status=0";
+            String healthyValue = this.getHealthyCodeStr(healthyInfoSql, empId);
+            return healthyValue;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("任免表生成失败:[EMP_A001_A01028健康状况描述]");
+        }
     }
 
     private String getHealthyCodeStr(String sql, String empId) throws Exception {
@@ -45,12 +45,9 @@ public class HealthyAttrValue implements AttrValue {
         return "";
     }
 
-    public String getKey() {
-        return key;
-    }
-
     @Override
     public int getOrder() {
-        return order;
+        return ORDER;
     }
+
 }

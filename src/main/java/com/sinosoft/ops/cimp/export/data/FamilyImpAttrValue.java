@@ -14,8 +14,8 @@ import java.util.Map;
  */
 public class FamilyImpAttrValue implements AttrValue {
 
-    private final String key = "fmImp";
-    private final int order = 27;
+    public static final String KEY = "fmImp";
+    public static final int ORDER = 27;
 
     @Override
     public Object getAttrValue(Map<String, Object> attrValueContext, String empId) throws Exception {
@@ -23,15 +23,15 @@ public class FamilyImpAttrValue implements AttrValue {
         Map<String, String> familyMap = new HashMap<String, String>();
         for (int i = 0; i < familyList.size(); i++) {
             Map map = (Map) familyList.get(i);
-            String A36049 = (String)map.get("A36049");
+            String A36049 = (String) map.get("A36049");
             if ("1".equals(A36049)) {
-            	familyMap.put("fmImp_" + i, "是");
+                familyMap.put("fmImp_" + i, "是");
             } else if ("0".equals(A36049)) {
-            	familyMap.put("fmImp_" + i, "否");
+                familyMap.put("fmImp_" + i, "否");
             } else if ("2".equals(A36049)) {
-            	familyMap.put("fmImp_" + i, "否");
+                familyMap.put("fmImp_" + i, "否");
             } else {
-            	familyMap.put("fmImp_" + i, "");
+                familyMap.put("fmImp_" + i, "");
             }
         }
         return familyMap;
@@ -39,10 +39,7 @@ public class FamilyImpAttrValue implements AttrValue {
 
     @Override
     public int getOrder() {
-        return order;
+        return ORDER;
     }
 
-    public String getKey() {
-        return key;
-    }
 }
