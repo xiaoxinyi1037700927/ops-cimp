@@ -46,9 +46,8 @@ public class DataPermissionController extends BaseController {
     @ApiOperation(value = "查询接口")
     @PostMapping("/findPageInterfaceVOList")
     @RequiresAuthentication
-    public ResponseEntity<List<PageInterfaceVO>> findPageInterfaceVOList(@RequestParam String permissionPageId,
-                                                                 @RequestParam(required = false) String roleId) throws BusinessException {
-        List<PageInterfaceVO> pageInterfaceVOList = dataPermissionService.findPageInterfaceVOList(permissionPageId, roleId);
+    public ResponseEntity<List<PageInterfaceVO>> findPageInterfaceVOList(@RequestParam String permissionPageId) throws BusinessException {
+        List<PageInterfaceVO> pageInterfaceVOList = dataPermissionService.findPageInterfaceVOList(permissionPageId);
         return ok(pageInterfaceVOList);
 }
 

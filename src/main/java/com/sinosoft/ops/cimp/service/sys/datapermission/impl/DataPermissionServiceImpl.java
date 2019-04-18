@@ -71,16 +71,14 @@ public class DataPermissionServiceImpl implements DataPermissionService {
     }
 
     @Override
-    public List<PageInterfaceVO> findPageInterfaceVOList(String permissionPageId, String roleId) {
+    public List<PageInterfaceVO> findPageInterfaceVOList(String permissionPageId) {
         String sql = findSearchCondition();
         BooleanBuilder booleanBuilder=new BooleanBuilder();
         booleanBuilder.and(QPageInterface.pageInterface.permissionPageId.eq(permissionPageId));
         if(!StringUtils.isEmpty(sql)){
             booleanBuilder.and(Expressions.booleanTemplate(sql));
         }
-        if(StringUtils.isEmpty(roleId)){
-            roleId="-1";
-        }
+
         JPAQuery<PageInterfaceVO> where = queryFactory.select(Projections.bean(
                 PageInterfaceVO.class,
                 QPageInterface.pageInterface.id,
@@ -88,10 +86,8 @@ public class DataPermissionServiceImpl implements DataPermissionService {
                 QPageInterface.pageInterface.showName,
                 QPageInterface.pageInterface.permissionPageId,
                 QPageInterface.pageInterface.description,
-                QPageInterface.pageInterface.sql,
-                QRolePageInterface.rolePageInterface.sql.as("roleSql")
+                QPageInterface.pageInterface.sql
         )).from(QPageInterface.pageInterface)
-                .leftJoin(QRolePageInterface.rolePageInterface).on(QRolePageInterface.rolePageInterface.pageInterfaceId.eq(QPageInterface.pageInterface.id).and(QRolePageInterface.rolePageInterface.roleId.eq(roleId)))
                 .where(booleanBuilder);
         List<PageInterfaceVO> fetch = Lists.newArrayList(where.fetch());
         return fetch;

@@ -23,7 +23,7 @@ public interface DataPermissionService {
     /**
      * 查询
      * */
-    List<PageInterfaceVO> findPageInterfaceVOList(String permissionPageId, String roleId);
+    List<PageInterfaceVO> findPageInterfaceVOList(String permissionPageId);
 
     /**
      *根据接口和角色查询
