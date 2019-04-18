@@ -1,9 +1,9 @@
 package com.sinosoft.ops.cimp.export.bijie;
 
-
 import com.aspose.words.Document;
 import com.aspose.words.License;
-import com.sinosoft.ops.cimp.export.ExportHandler;
+import com.aspose.words.PdfSaveOptions;
+import com.sinosoft.ops.cimp.export.AbstractExportHandler;
 import com.sinosoft.ops.cimp.export.data.*;
 import com.sinosoft.ops.cimp.export.processor.*;
 import com.sinosoft.ops.cimp.util.StringUtil;
@@ -13,39 +13,21 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-/**
- * 导出word(毕节)
- */
-public abstract class AbstractExportHandlerBiJie implements ExportHandler {
+public class ExportHandlerBiJie extends AbstractExportHandler {
 
-    //属性-属性规则
-    protected Map<String, AttrValue> attrValueMap = new LinkedHashMap<>(59);
-
-    //属性-解析器
-    protected Map<String, AttrValueProcessor> attrValueProcessorMap = new HashMap<>(59);
-
-    //属性值执行上下文
-    protected Map<String, Object> attrValueContext = new LinkedHashMap<>();
-
-    //需要添加的字符数
-    protected List<Integer> addLines = new ArrayList<>();
-
-    public AbstractExportHandlerBiJie() {
-        init();
-    }
-
-    /**
-     * 初始化
-     */
-    private void init() {
+    @Override
+    protected void init() {
         //放入 属性 - 属性获取处理器
         attrValueMap.put(NameAttrValue.KEY, new NameAttrValue());
-//        attrValueMap.put(new PhotoAttrValue.KEY, new PhotoAttrValue());
+//        attrValueMap.put(PhotoAttrValue.KEY, new PhotoAttrValue());
         attrValueMap.put(GenderAttrValue.KEY, new GenderAttrValue());
         attrValueMap.put(BirthdayAttrValue.KEY, new BirthdayAttrValue());
         attrValueMap.put(NationAttrValue.KEY, new NationAttrValue());
@@ -72,7 +54,7 @@ public abstract class AbstractExportHandlerBiJie implements ExportHandler {
         attrValueMap.put(FamilyOrgAndJobAttrValue.KEY, new FamilyOrgAndJobAttrValue());
         //放入 属性 - 属性值处理器
         attrValueProcessorMap.put(NameAttrValue.KEY, new NameAttrValueProcessor());
-//        attrValueProcessorMap.put(new PhotoAttrValue.KEY, new PhotoAttrValueProcessor());
+//        attrValueProcessorMap.put(PhotoAttrValue.KEY, new PhotoAttrValueProcessor());
         attrValueProcessorMap.put(NationAttrValue.KEY, new GenericNameAttrValueProcessor());
         attrValueProcessorMap.put(NativeAttrValue.KEY, new GenericNameAttrValueProcessor());
         attrValueProcessorMap.put(BirthPlaceAttrValue.KEY, new GenericNameAttrValueProcessor());
@@ -93,54 +75,6 @@ public abstract class AbstractExportHandlerBiJie implements ExportHandler {
         return (NameAttrValue) attrValueMap.get(NameAttrValue.KEY);
     }
 
-
-    /**
-     * 根据EmpId获取所有属性的值
-     *
-     * @param empId 人员唯一编号
-     * @return 属性名和属性值的键值对
-     * @throws Exception SQL执行异常
-     */
-    @Override
-    public Map<String, Object> getAllAttrValue(String empId) throws Exception {
-
-        Map<String, Object> attrValues = new HashMap<>(59);
-        //排序
-        List<Map.Entry<String, AttrValue>> sortedList = new ArrayList<>(attrValueMap.entrySet());
-        Collections.sort(sortedList, Comparator.comparingInt(o -> o.getValue().getOrder()));
-
-        for (Map.Entry<String, AttrValue> entry : sortedList) {
-            AttrValue attrRule = entry.getValue();
-            Object attrValue = attrRule.getAttrValue(attrValueContext, empId);
-            attrValues.put(entry.getKey(), attrValue);
-        }
-        return attrValues;
-    }
-
-    private int getRightLine(String resumeContent) {
-        Pattern compile = Pattern.compile("[：| ；]\\d{4}\\.");
-        Matcher matcher = compile.matcher(resumeContent);
-
-        Pattern pattern = Pattern.compile("\\d{4}\\.");
-        Matcher matcherNumber = pattern.matcher(resumeContent);
-        if (matcher.find()) {
-            int start = matcher.start();
-            if (start >= 20 && start < 27) {
-                addLines.add(27 - start);
-            }
-            if (matcherNumber.find() && (start - 8) >= 20) {
-                addLines.add(35 - start);
-            }
-            String right = resumeContent.substring(start + 1);
-            int i = getRightLine(right.trim());
-            if (i == -1) {
-                return -1;
-            }
-        } else {
-            return -1;
-        }
-        return -1;
-    }
 
     /**
      * 执行属性值样式处理器
@@ -259,15 +193,35 @@ public abstract class AbstractExportHandlerBiJie implements ExportHandler {
         //清空标记域，防止域没有被填充而输出域
         document.getMailMerge().deleteFields();
 
-        saveFile(document, outputFilePath);
+        //保存文件
+        if (outputFilePath.endsWith(".pdf")) {
+            document.save(outputFilePath, new PdfSaveOptions());
+        } else {
+            document.save(outputFilePath);
+        }
     }
 
-    /**
-     * 保存文件
-     *
-     * @param doc
-     * @param path
-     * @throws Exception
-     */
-    protected abstract void saveFile(Document doc, String path) throws Exception;
+    private int getRightLine(String resumeContent) {
+        Pattern compile = Pattern.compile("[：| ；]\\d{4}\\.");
+        Matcher matcher = compile.matcher(resumeContent);
+
+        Pattern pattern = Pattern.compile("\\d{4}\\.");
+        Matcher matcherNumber = pattern.matcher(resumeContent);
+        if (matcher.find()) {
+            int start = matcher.start();
+            if (start >= 20 && start < 27) {
+                addLines.add(27 - start);
+            }
+            if (matcherNumber.find() && (start - 8) >= 20) {
+                addLines.add(35 - start);
+            }
+            String right = resumeContent.substring(start + 1);
+            int i = getRightLine(right.trim());
+            if (i == -1) {
+                return -1;
+            }
+        }
+        return -1;
+    }
+
 }

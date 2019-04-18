@@ -20,10 +20,18 @@ public class ExportConstant {
 
     public static ExportService exportWordService;
 
+    /**
+     * pdf2html.exe的路径
+     */
     public static String PDF2HTML_PATH;
-
+    /**
+     * 导出根目录
+     */
     public static String EXPORT_BASE_PATH;
 
+    /**
+     * 导出文件路径
+     */
     public static final String TEMPLATE_WORD_GBRMB_BJ = "template/word/gbrmb_template_bj.docx";
 
     public static final String EXPORT_WORD_GBRMB = "download/word/gbrmb/";
@@ -32,6 +40,18 @@ public class ExportConstant {
 
     public static final String EXPORT_LRMX = "lrmx/";
 
+    public static final String EXPORT_LRMX_ZIP = "lrmx/zip/";
+
+    /**
+     * 导出文件后缀名
+     */
+    public static final String RMB_SUFFIX_WORD = "任免表.docx";
+
+    public static final String RMB_SUFFIX_HTML = "RMB.html";
+
+    public static final String RMB_SUFFIX_PDF = "RMB.pdf";
+
+    public static final String RMB_SUFFIX_LRMX = ".lrmx";
 
     @Autowired
     public void setExportWordService(ExportService exportWordService) {

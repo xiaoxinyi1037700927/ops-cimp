@@ -46,6 +46,12 @@ public class UpdateSqlBuilder implements SqlBuilder {
 
         //注意【List<List<String>>内List 0，1，2 分别为 属性英文名，数据库存储字段名称，数据库存储类型】
         List<List<String>> tableFieldList = tableInfo.getTableNameEnAndFieldMap().get(tableNameEn);
+        Map<String, String> fieldTypeMap = Maps.newHashMap();
+        for (List<String> fields : tableFieldList) {
+            String fieldName = fields.get(0);
+            String fieldType = fields.get(2);
+            fieldTypeMap.put(fieldName, fieldType);
+        }
         Map<String, String> tableFieldMap = Maps.newHashMap();
         tableInfo.getTableFields().forEach(f -> tableFieldMap.put(f.getNameEn(), f.getDbFieldName()));
 
@@ -68,7 +74,8 @@ public class UpdateSqlBuilder implements SqlBuilder {
             String key = entry.getKey();
             String value = entry.getValue();
             Object o = execMap.get(key);
-            params[i] = o;
+            String fieldType = fieldTypeMap.get(key);
+            params[i] = this.parseParam(fieldType, o);
             setBuilder.append(value)
                     .append(" = ")
                     .append(" ? ")
@@ -90,8 +97,7 @@ public class UpdateSqlBuilder implements SqlBuilder {
             String saveField = tableFieldMap.get(conditionName);
             if (StringUtils.isNotEmpty(saveField)) {
                 conditionSqlBuilder.append(" WHERE 1=1 ");
-                if(condition.equals(Conditions.ConditionsEnum.IN))
-                {
+                if (condition.equals(Conditions.ConditionsEnum.IN)) {
                     conditionSqlBuilder.append(" AND ")
                             .append(conditionName)
                             .append(" ")
@@ -100,9 +106,7 @@ public class UpdateSqlBuilder implements SqlBuilder {
                             .append("(")
                             .append(conditionValue)
                             .append(")");
-                }
-                else
-                {
+                } else {
                     conditionSqlBuilder.append(" AND ")
                             .append(conditionName)
                             .append(" ")
@@ -124,53 +128,6 @@ public class UpdateSqlBuilder implements SqlBuilder {
         resultSql.setSql(sqlBuilder.toString());
 
         resultSql.setData(params);
-
-        //属性只有一个存储表（属性组下的属性都在同一张表中）
-//        if (sysEntityGroupDef != null) {
-////            List<ExecParam> execParamList = daoParam.getExecParamList();
-////            List<Conditions> conditionsList = daoParam.getConditionsList();
-//
-//            Map<String, Object> sqlParam = this.prepareSqlParam(execParamList, sysEntityAttrDefs);
-//
-//            //拼接成 UPDATE TABLE_NAME SET NAME="" WHERE ID="" 形式
-//            StringBuilder sqlBuild = new StringBuilder("UPDATE ");
-//            sqlBuild.append(saveTableName).append(" SET ");
-//
-//            StringBuilder modifyColumn = new StringBuilder();
-//            for (Map.Entry<String, Object> execParam : sqlParam.entrySet()) {
-//                String fieldName = execParam.getKey();
-//                Object fieldValue = execParam.getValue();
-//                modifyColumn.append(" \"")
-//                        .append(fieldName)
-//                        .append("\"")
-//                        .append(" = ")
-//                        .append("\'")
-//                        .append(fieldValue)
-//                        .append("\'")
-//                        .append(",");
-//            }
-//            if (modifyColumn.length() > 0) {
-//                sqlBuild.append(modifyColumn.substring(0, modifyColumn.length() - 1));
-//            }
-//            sqlBuild.append(" WHERE ");
-//            if (conditionsList != null && conditionsList.size() > 0) {
-//                Conditions conditions = conditionsList.get(0);
-//                String conditionName = conditions.getConditionName();
-//                Object conditionValue = conditions.getConditionValue();
-//                String condition = conditions.getCondition();
-//                sqlBuild.append("\"")
-//                        .append(conditionName)
-//                        .append("\"")
-//                        .append(condition)
-//                        .append("\'")
-//                        .append(conditionValue)
-//                        .append("\'");
-//            } else {
-//                throw new BusinessException(OpsErrorMessage.MODULE_NAME, "更新实体信息必须传递条件");
-//            }
-//            resultSql.setData(sqlParam.values().toArray());
-//            resultSql.setSql(sqlBuild.toString());
-//        }
         return resultSql;
     }
 }
