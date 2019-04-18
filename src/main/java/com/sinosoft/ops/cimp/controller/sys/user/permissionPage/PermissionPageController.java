@@ -93,7 +93,7 @@ public class PermissionPageController extends BaseController {
     @ApiOperation(value = "增加操作")
     @PostMapping("/addPermissionPageOperation")
     @RequiresAuthentication
-    public ResponseEntity<Boolean> addPermissionPageOperation(@RequestBody List<PermissionPageOperationVO> voList) throws BusinessException {
+    public ResponseEntity<Boolean> addPermissionPageOperation(@RequestBody PermissionPageOperationVO voList) throws BusinessException {
         Boolean aBoolean = permissionPageService.addPermissionPageOperation(voList);
         return ok(aBoolean);
     }
