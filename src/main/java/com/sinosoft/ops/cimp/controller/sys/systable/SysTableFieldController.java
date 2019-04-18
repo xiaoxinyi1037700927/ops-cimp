@@ -21,7 +21,7 @@ import javax.validation.Valid;
 @SystemApiGroup
 @Api(description = "系统表下字段操纵")
 @RestController
-@RequestMapping(value = "/sys/table/field")
+@RequestMapping(value = "/sys/systable/field")
 public class SysTableFieldController extends BaseController {
 
     private final SysTableFieldService sysTableFieldService;

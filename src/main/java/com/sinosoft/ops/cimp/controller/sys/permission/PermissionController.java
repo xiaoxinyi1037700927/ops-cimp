@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 @SystemLimitsApiGroup
 @Api(description = "权限管理接口")
 @RestController
-@RequestMapping("/sys/user/permission")
+@RequestMapping("/sys/permission")
 public class PermissionController extends BaseController {
     @Autowired
     private MenuGroupRepository menuGroupRepository;

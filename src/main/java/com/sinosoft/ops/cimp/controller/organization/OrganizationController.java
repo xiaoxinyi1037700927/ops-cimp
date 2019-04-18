@@ -21,7 +21,7 @@ import java.util.List;
 @OrganizationApiGroup
 @Api(description = "单位接口")
 @RestController
-@RequestMapping(value = "/sys/organization")
+@RequestMapping(value = "/organization")
 @SuppressWarnings("unchecked")
 public class OrganizationController extends BaseController {
 

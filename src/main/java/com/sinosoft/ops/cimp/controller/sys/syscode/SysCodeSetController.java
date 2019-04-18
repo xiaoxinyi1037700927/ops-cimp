@@ -24,7 +24,7 @@ import java.util.List;
 @SystemApiGroup
 @Api(description = "代码集操作")
 @RestController
-@RequestMapping(value = "/sys/code/set")
+@RequestMapping(value = "/sys/syscode/set")
 public class SysCodeSetController extends BaseController {
 
     private final SysCodeSetService sysCodeSetService;

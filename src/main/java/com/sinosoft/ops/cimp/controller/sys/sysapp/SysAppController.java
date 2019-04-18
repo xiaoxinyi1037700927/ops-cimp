@@ -26,7 +26,7 @@ import javax.validation.Valid;
 @SystemApiGroup
 @Api(description = "系统应用操作")
 @RestController
-@RequestMapping(value = "/sys/app")
+@RequestMapping(value = "/sys/sysapp")
 public class SysAppController extends BaseController {
 
     @Autowired

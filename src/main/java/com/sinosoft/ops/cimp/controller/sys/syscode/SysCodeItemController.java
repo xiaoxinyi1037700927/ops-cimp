@@ -22,7 +22,7 @@ import java.util.Map;
 @SystemApiGroup
 @Api(description = "代码项操作")
 @RestController
-@RequestMapping(value = "/sys/code/item")
+@RequestMapping(value = "/sys/syscode/item")
 public class SysCodeItemController extends BaseController {
 
     private final SysCodeItemService sysCodeItemService;

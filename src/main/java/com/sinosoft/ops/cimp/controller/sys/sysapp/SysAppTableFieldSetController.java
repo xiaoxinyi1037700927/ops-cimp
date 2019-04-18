@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @SystemApiGroup
 @Api(description = "系统应用表字段集合操作")
 @RestController
-@RequestMapping(value = "/sys/app/fieldSet")
+@RequestMapping(value = "/sys/sysapp/fieldSet")
 public class SysAppTableFieldSetController extends BaseController {
     @Autowired
     private SysAppTableFieldSetService fieldSetService;

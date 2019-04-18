@@ -21,7 +21,7 @@ import javax.validation.Valid;
 @SystemApiGroup
 @Api(description = "系统表操纵")
 @RestController
-@RequestMapping(value = "/sys/table")
+@RequestMapping(value = "/sys/systable")
 public class SysTableController extends BaseController {
 
     private final SysTableService sysTableService;

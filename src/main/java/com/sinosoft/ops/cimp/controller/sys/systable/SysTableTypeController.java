@@ -22,7 +22,7 @@ import java.util.List;
 @SystemApiGroup
 @Api(description = "系统表类别操纵")
 @RestController
-@RequestMapping(value = "/sys/table/type")
+@RequestMapping(value = "/sys/systable/type")
 public class SysTableTypeController extends BaseController {
 
     private final SysTableTypeService sysTableTypeService;

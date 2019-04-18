@@ -25,7 +25,7 @@ import java.util.List;
 @SystemLimitsApiGroup
 @Api(description = "首页统计配置管理")
 @RestController
-@RequestMapping("/sys/user/homePageCount")
+@RequestMapping("/sys/homePageCount")
 public class HomePageCountController extends BaseController {
     @Autowired
     private HomePageCountService homePageCountService;
