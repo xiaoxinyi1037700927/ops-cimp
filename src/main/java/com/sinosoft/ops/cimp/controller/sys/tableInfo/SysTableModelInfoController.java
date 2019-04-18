@@ -1,4 +1,4 @@
-package com.sinosoft.ops.cimp.controller.sys;
+package com.sinosoft.ops.cimp.controller.sys.tableInfo;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
