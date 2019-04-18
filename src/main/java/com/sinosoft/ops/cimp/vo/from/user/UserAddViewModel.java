@@ -21,10 +21,6 @@ public class UserAddViewModel {
     @ApiModelProperty(value = "登录密码")
     private String loginPassword;
 
-    @ApiModelProperty(value = "关联干部ID", required = true)
-    @NotEmpty(message = "关联干部ID")
-    private String cadreInfoId;
-
     @ApiModelProperty(value = "单位编号", required = true)
     @NotEmpty(message = "单位编号不能为空")
     private String organizationId;
@@ -33,8 +29,6 @@ public class UserAddViewModel {
     @NotEmpty(message = "数据权限单位编号不能为空")
     private String dataOrganizationId;
 
-    @ApiModelProperty(value = "干部ID")
-    private String reserveCadreId;
 
     @ApiModelProperty(value = "电话")
     private String telePhone;
@@ -87,21 +81,6 @@ public class UserAddViewModel {
         this.organizationId = organizationId;
     }
 
-    public String getCadreInfoId() {
-        return cadreInfoId;
-    }
-
-    public void setCadreInfoId(String cadreInfoId) {
-        this.cadreInfoId = cadreInfoId;
-    }
-
-    public String getReserveCadreId() {
-        return reserveCadreId;
-    }
-
-    public void setReserveCadreId(String reserveCadreId) {
-        this.reserveCadreId = reserveCadreId;
-    }
 
     public String getTelePhone() {
         return telePhone;

@@ -18,11 +18,6 @@ public class UserViewModel {
     private String id;
 
     /**
-     * 干部ID
-     */
-    @ApiModelProperty(value = "干部ID")
-    private String cadreInfoId;
-    /**
      * 名称
      */
     @ApiModelProperty(value = "名称")
@@ -132,14 +127,6 @@ public class UserViewModel {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getCadreInfoId() {
-        return cadreInfoId;
-    }
-
-    public void setCadreInfoId(String cadreInfoId) {
-        this.cadreInfoId = cadreInfoId;
     }
 
     public String getName() {

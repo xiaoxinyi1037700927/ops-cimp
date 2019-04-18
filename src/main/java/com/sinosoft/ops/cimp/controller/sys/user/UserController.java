@@ -150,8 +150,8 @@ public class UserController extends BaseController {
     @ApiOperation(value = "生成LoginName")
     @PostMapping("/genLoginName")
     @RequiresAuthentication
-    public ResponseEntity<UserLoginViewModel> genLoginName(String organizationId, String cadreInfoId) throws BusinessException {
-        UserLoginViewModel userLoginViewModel = userService.genLoginName(organizationId, cadreInfoId);
+    public ResponseEntity<UserLoginViewModel> genLoginName(String organizationId) throws BusinessException {
+        UserLoginViewModel userLoginViewModel = userService.genLoginName(organizationId);
         return ok(userLoginViewModel);
     }
 

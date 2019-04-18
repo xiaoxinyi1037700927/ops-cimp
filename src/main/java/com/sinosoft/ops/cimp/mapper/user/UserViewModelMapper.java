@@ -3,12 +3,9 @@ package com.sinosoft.ops.cimp.mapper.user;
 
 import com.sinosoft.ops.cimp.entity.sys.oraganization.Organization;
 import com.sinosoft.ops.cimp.entity.sys.user.User;
-import com.sinosoft.ops.cimp.entity.sys.user.cadre.CadreInfo;
-import com.sinosoft.ops.cimp.repository.user.CadreInfoRepository;
 import com.sinosoft.ops.cimp.util.CachePackage.OrganizationCacheManager;
 import com.sinosoft.ops.cimp.util.PasswordEncoderHelper;
 import com.sinosoft.ops.cimp.util.SecurityUtils;
-import com.sinosoft.ops.cimp.util.SpringContextUtils;
 import com.sinosoft.ops.cimp.util.UserTask;
 import com.sinosoft.ops.cimp.vo.from.user.UserAddViewModel;
 import com.sinosoft.ops.cimp.vo.from.user.UserModifyViewModel;
@@ -20,7 +17,6 @@ import org.mapstruct.factory.Mappers;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
-import java.util.Optional;
 
 @Mapper
 public interface UserViewModelMapper {
@@ -36,7 +32,6 @@ public interface UserViewModelMapper {
             @Mapping(source = "loginPassword",target = "loginPassword", qualifiedByName = "genLoginPassword"),
             @Mapping(source = "createId", target = "createId", qualifiedByName = "genCreateId"),
             @Mapping(source = "createTime", target = "createTime", qualifiedByName ="genCreateTime" ),
-            @Mapping(source = "cadreInfoId", target = "name", qualifiedByName = "genCadreInfoName"),
             @Mapping(source = "organizationId", target = "organizationCode", qualifiedByName = "genOrganizationCode")
     })
     User UserAddViewModelToUser(UserAddViewModel userAddViewModel);
@@ -44,7 +39,6 @@ public interface UserViewModelMapper {
     @Mappings({
             @Mapping(target = "name",ignore = true),
             @Mapping(target = "loginName",ignore = true),
-            @Mapping(target = "cadreInfoId", ignore = true),
             @Mapping(target = "organizationId",ignore = true),
             @Mapping(target = "telePhone",ignore = true),
             @Mapping(target = "mobilePhone",ignore = true),
@@ -95,17 +89,6 @@ public interface UserViewModelMapper {
         return null;
     }
 
-    @Named(value = "genCadreInfoName")
-    default String genCadreInfoName(String cadreInfoId) {
-        String name = null;
-        CadreInfoRepository clazz = SpringContextUtils.getBean(CadreInfoRepository.class);
-        Optional<CadreInfo> options = clazz.findById(cadreInfoId);
-        if (options.isPresent()) {
-            CadreInfo cadreInfo = options.get();
-            name = cadreInfo.getName();
-        }
-        return name;
-    }
 
     @Named(value = "genModifyId")
     default String genModifyId(String id) {

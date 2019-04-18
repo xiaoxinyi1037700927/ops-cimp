@@ -21,10 +21,6 @@ public class User {
      */
     private String name;
     /**
-     * 非考察组关联干部ID
-     */
-    private String cadreInfoId;
-    /**
      * 登录名
      */
     private String loginName;
@@ -168,14 +164,6 @@ public class User {
         this.organizationCode = organizationCode;
     }
 
-    @Column(length = 50)
-    public String getCadreInfoId() {
-        return cadreInfoId;
-    }
-
-    public void setCadreInfoId(String cadreInfoId) {
-        this.cadreInfoId = cadreInfoId;
-    }
 
     @Column(length = 50)
     public String getReserveCadreId() {

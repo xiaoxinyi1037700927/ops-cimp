@@ -5,7 +5,6 @@ import com.sinosoft.ops.cimp.dto.PaginationViewModel;
 import com.sinosoft.ops.cimp.entity.sys.user.User;
 import com.sinosoft.ops.cimp.vo.from.user.UserModifyContactVO;
 import com.sinosoft.ops.cimp.vo.from.user.UserModifyPasswordVO;
-import com.sinosoft.ops.cimp.vo.from.user.UserTaskAddViewModel;
 import com.sinosoft.ops.cimp.vo.user.UserLoginViewModel;
 import com.sinosoft.ops.cimp.vo.user.UserSearchViewModel;
 import com.sinosoft.ops.cimp.vo.user.UserViewModel;
@@ -67,13 +66,6 @@ public interface UserService {
     PaginationViewModel<UserViewModel> findByPageData(UserSearchViewModel userSearchViewModel);
 
 
-    /**
-     * 给账号分配考察任务
-     *
-     * @param userTaskAddViewModel
-     * @return
-     */
-  //  boolean setOrganTask(UserTaskAddViewModel userTaskAddViewModel);
 
     /**
      * 根据用户ID删除
@@ -95,7 +87,7 @@ public interface UserService {
      */
     boolean isHaveChildrenOrg(String orgId);
 
-    UserLoginViewModel genLoginName(String organizationId, String cadreInfoId);
+    UserLoginViewModel genLoginName(String organizationId);
 
 
     boolean resetPassword(String userId, String password);

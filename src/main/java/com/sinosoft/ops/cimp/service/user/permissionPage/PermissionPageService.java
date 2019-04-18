@@ -35,7 +35,7 @@ public interface PermissionPageService {
     /**
      * 新增操作
      * */
-    Boolean addPermissionPageOperation(List<PermissionPageOperationVO> voList);
+    Boolean addPermissionPageOperation(PermissionPageOperationVO permissionPageOperationVO);
 
     /**
      * 查询页面操作

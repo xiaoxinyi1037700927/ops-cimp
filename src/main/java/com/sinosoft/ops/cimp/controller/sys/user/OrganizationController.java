@@ -11,26 +11,19 @@ import com.sinosoft.ops.cimp.mapper.user.OrganizationPositionViewMapper;
 import com.sinosoft.ops.cimp.service.user.*;
 import com.sinosoft.ops.cimp.swaggwegroup.RequiresAuthentication;
 import com.sinosoft.ops.cimp.util.CachePackage.OrganizationCacheManager;
-import com.sinosoft.ops.cimp.vo.base.AttachmentVO;
 import com.sinosoft.ops.cimp.vo.from.user.organization.*;
 import com.sinosoft.ops.cimp.vo.to.user.BusinessUnitListViewModel;
-import com.sinosoft.ops.cimp.vo.to.user.DisciplineUnitViewModel;
 import com.sinosoft.ops.cimp.vo.to.user.OrganizationPositionViewModel;
 import com.sinosoft.ops.cimp.vo.user.organization.OrganizationSearchViewModel;
 import com.sinosoft.ops.cimp.vo.user.organization.OrganizationViewModel;
-import com.sinosoft.ops.cimp.vo.user.organization.SecretaryMemberViewModel;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -51,10 +44,6 @@ public class OrganizationController extends BaseController {
     @Autowired
     private BusinessUnitOrgService businessUnitOrgService;
 
-    @Autowired
-    private SecretaryMemberService secretaryMemberService;
-//    @Autowired
-//    private AttachmentService attachmentService;
 
     @ApiOperation(value = "查询机构树")
     @PostMapping("/lstTreeNode")
@@ -218,70 +207,6 @@ public class OrganizationController extends BaseController {
 //        return ok(viewModel);
 //    }
 
-//    @ApiOperation(value = "根据id删除纪委信息")
-//    @PostMapping("/deleteById")
-//    @RequiresAuthentication
-//    public ResponseEntity<String> deleteById(String disciplineUnitId) throws BusinessException {
-//        boolean flag = disciplineUnitService.deleteById(disciplineUnitId);
-//        if (flag) return ok("删除成功！");
-//        return fail("操作异常！");
-//    }
-
-
-    /**
-     * 查询书记会成员干部列表
-     *
-     * @return
-     */
-    @ApiOperation(value = "查询书记会成员干部列表")
-    @PostMapping("/findSecretaryMemberList")
-    @RequiresAuthentication
-    public ResponseEntity<PaginationViewModel<SecretaryMemberViewModel>> findSecretaryMemberList(@RequestBody SecretaryMemberSearchViewModel searchViewModel) throws BusinessException {
-        PaginationViewModel<SecretaryMemberViewModel> page = secretaryMemberService.findByPageData(searchViewModel);
-        return ok(page);
-    }
-
-    /**
-     * 新增书记会成员
-     *
-     * @return
-     */
-    @ApiOperation(value = "新增书记会成员")
-    @PostMapping("/addSecretaryMember")
-    @RequiresAuthentication
-    public ResponseEntity<String> addSecretaryMember(@RequestBody SecretaryMemberAddViewModel addViewModel) throws BusinessException {
-        boolean flag = secretaryMemberService.addSecretaryMember(addViewModel);
-        if (flag) return ok("操作成功！");
-        return fail("操作异常！");
-    }
-
-    /**
-     * 修改书记会成员
-     *
-     * @return
-     */
-    @ApiOperation(value = "修改书记会成员")
-    @PostMapping("/modifySecretaryMember")
-    @RequiresAuthentication
-    public ResponseEntity<String> modifySecretaryMember(@RequestBody SecretaryMemberModifyViewModel modifyViewModel) throws BusinessException {
-        boolean flag = secretaryMemberService.modifySecretaryMember(modifyViewModel);
-        if (flag) return ok("操作成功！");
-        return fail("操作异常！");
-    }
-
-    /**
-     * 根据ID删除书记会成员
-     *
-     * @return
-     */
-    @ApiOperation(value = "根据ID删除书记会成员")
-    @PostMapping("/deleteBySecretaryMemberId")
-    @RequiresAuthentication
-    public ResponseEntity<String> deleteBySecretaryMemberId(String secretaryMemberId) throws BusinessException {
-        boolean flag = secretaryMemberService.deleteById(secretaryMemberId);
-        if (flag) return ok("操作成功！");
-        return fail("操作异常！");
-    }
 
 
 //    @ApiOperation(value = "上传文件")
