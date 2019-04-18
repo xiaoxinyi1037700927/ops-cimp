@@ -2,7 +2,7 @@ package com.sinosoft.ops.cimp.controller.user;
 
 
 import com.sinosoft.ops.cimp.config.annotation.RequiresAuthentication;
-import com.sinosoft.ops.cimp.config.annotation.SystemLimitsApiGroup;
+import com.sinosoft.ops.cimp.config.annotation.SystemUserApiGroup;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.dto.PaginationViewModel;
 import com.sinosoft.ops.cimp.entity.user.Role;
@@ -18,7 +18,6 @@ import com.sinosoft.ops.cimp.util.PasswordEncoderHelper;
 import com.sinosoft.ops.cimp.util.SecurityUtils;
 import com.sinosoft.ops.cimp.vo.from.user.*;
 import com.sinosoft.ops.cimp.vo.to.sys.role.RoleViewModel;
-import com.sinosoft.ops.cimp.vo.from.user.UserSearchViewModel;
 import com.sinosoft.ops.cimp.vo.to.user.UserViewModel;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -36,7 +35,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@SystemLimitsApiGroup
+@SystemUserApiGroup
 @Api(description = "用户部分接口")
 @RestController
 @RequestMapping("/user/user")

@@ -27,7 +27,7 @@ import java.util.List;
 @SystemLimitsApiGroup
 @Api(description = "功能数据权限")
 @RestController
-@RequestMapping("/dataPermission")
+@RequestMapping("/sys/dataPermission")
 public class DataPermissionController extends BaseController {
 
     @Autowired

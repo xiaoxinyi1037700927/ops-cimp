@@ -1,9 +1,6 @@
 package com.sinosoft.ops.cimp.config.swagger2;
 
-import com.sinosoft.ops.cimp.config.annotation.BusinessApiGroup;
-import com.sinosoft.ops.cimp.config.annotation.OrganizationApiGroup;
-import com.sinosoft.ops.cimp.config.annotation.SystemApiGroup;
-import com.sinosoft.ops.cimp.config.annotation.SystemLimitsApiGroup;
+import com.sinosoft.ops.cimp.config.annotation.*;
 import org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,7 +29,8 @@ public class Swagger2Config {
                             && !declaringClass.isAnnotationPresent(BusinessApiGroup.class)
                             && !declaringClass.isAnnotationPresent(SystemApiGroup.class)
                             && !declaringClass.isAnnotationPresent(SystemLimitsApiGroup.class)
-                            && !declaringClass.isAnnotationPresent(OrganizationApiGroup.class);
+                            && !declaringClass.isAnnotationPresent(OrganizationApiGroup.class)
+                            && !declaringClass.isAnnotationPresent(SystemUserApiGroup.class);
                 })
                 .paths(PathSelectors.any())
                 .build();
@@ -67,6 +65,22 @@ public class Swagger2Config {
                 .paths(PathSelectors.any())
                 .build();
     }
+
+    @Bean
+    public Docket createSystemUserApiGroupRestApi() {
+        return new Docket(DocumentationType.SWAGGER_2)
+                .groupName("12.系统用户部分接口分组")
+                .apiInfo(apiInfo())
+                .select()
+                .apis(input -> {
+                    assert input != null;
+                    Class<?> declaringClass = input.declaringClass();
+                    return declaringClass.isAnnotationPresent(SystemUserApiGroup.class);
+                })
+                .paths(PathSelectors.any())
+                .build();
+    }
+
 
     @Bean
     public Docket createOrganizationApiGroupRestApi() {

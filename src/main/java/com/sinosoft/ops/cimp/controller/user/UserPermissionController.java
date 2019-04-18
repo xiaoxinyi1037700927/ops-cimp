@@ -2,7 +2,7 @@ package com.sinosoft.ops.cimp.controller.user;
 
 import com.sinosoft.ops.cimp.config.annotation.RequiresAuthentication;
 import com.sinosoft.ops.cimp.config.annotation.RequiresRoles;
-import com.sinosoft.ops.cimp.config.annotation.SystemLimitsApiGroup;
+import com.sinosoft.ops.cimp.config.annotation.SystemUserApiGroup;
 import com.sinosoft.ops.cimp.constant.UserRoleConstants;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.entity.sys.permission.Permission;
@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-@SystemLimitsApiGroup
+@SystemUserApiGroup
 @Api(description = "权限管理接口")
 @RestController
 @RequestMapping("/user/userpermission")
