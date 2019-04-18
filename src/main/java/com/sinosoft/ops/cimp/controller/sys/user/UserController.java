@@ -17,7 +17,6 @@ import com.sinosoft.ops.cimp.util.PasswordEncoderHelper;
 import com.sinosoft.ops.cimp.util.SecurityUtils;
 import com.sinosoft.ops.cimp.vo.from.user.*;
 import com.sinosoft.ops.cimp.vo.user.RoleViewModel;
-import com.sinosoft.ops.cimp.vo.user.UserLoginViewModel;
 import com.sinosoft.ops.cimp.vo.user.UserSearchViewModel;
 import com.sinosoft.ops.cimp.vo.user.UserViewModel;
 import io.swagger.annotations.Api;
@@ -147,13 +146,6 @@ public class UserController extends BaseController {
         return fail("操作异常!");
     }
 
-    @ApiOperation(value = "生成LoginName")
-    @PostMapping("/genLoginName")
-    @RequiresAuthentication
-    public ResponseEntity<UserLoginViewModel> genLoginName(String organizationId) throws BusinessException {
-        UserLoginViewModel userLoginViewModel = userService.genLoginName(organizationId);
-        return ok(userLoginViewModel);
-    }
 
     @ApiOperation(value = "修改用户")
     @PostMapping("/modifyUser")
