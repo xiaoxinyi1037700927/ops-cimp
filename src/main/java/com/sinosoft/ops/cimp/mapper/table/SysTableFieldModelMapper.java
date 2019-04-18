@@ -1,8 +1,8 @@
 package com.sinosoft.ops.cimp.mapper.table;
 
-import com.sinosoft.ops.cimp.entity.sys.table.SysTableField;
-import com.sinosoft.ops.cimp.vo.from.table.SysTableFieldAddModel;
-import com.sinosoft.ops.cimp.vo.from.table.SysTableFieldModifyModel;
+import com.sinosoft.ops.cimp.entity.sys.systable.SysTableField;
+import com.sinosoft.ops.cimp.vo.from.sys.systable.SysTableFieldAddModel;
+import com.sinosoft.ops.cimp.vo.from.sys.systable.SysTableFieldModifyModel;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

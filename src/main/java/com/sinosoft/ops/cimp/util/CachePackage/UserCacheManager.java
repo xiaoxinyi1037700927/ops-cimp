@@ -1,10 +1,9 @@
 package com.sinosoft.ops.cimp.util.CachePackage;
 
 
-
-import com.sinosoft.ops.cimp.entity.sys.user.QUserRole;
-import com.sinosoft.ops.cimp.entity.sys.user.User;
-import com.sinosoft.ops.cimp.entity.sys.user.UserRole;
+import com.sinosoft.ops.cimp.entity.user.QUserRole;
+import com.sinosoft.ops.cimp.entity.user.User;
+import com.sinosoft.ops.cimp.entity.user.UserRole;
 import com.sinosoft.ops.cimp.repository.user.UserRoleRepository;
 import com.sinosoft.ops.cimp.service.user.UserService;
 import com.sinosoft.ops.cimp.util.Cache;
@@ -55,7 +54,7 @@ public class UserCacheManager {
      */
     public synchronized static void setUserInfo(String LoginName, User user) {
         Cache usercache = new Cache();
-        usercache.setKey("user");
+        usercache.setKey("permission");
         usercache.setValue(user);
         CacheManager.putCache(LoginName + X_USERINFO, usercache);
     }

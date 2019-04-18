@@ -1,7 +1,7 @@
 package com.sinosoft.ops.cimp.util;
 
 import com.google.common.collect.Lists;
-import com.sinosoft.ops.cimp.entity.sys.table.SysTableField;
+import com.sinosoft.ops.cimp.entity.sys.systable.SysTableField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -104,7 +104,7 @@ public class DDLUtil {
      * @return sql语句
      */
     private static String createColumn(String tableName, List<SysTableField> sysTableFields) {
-        StringBuilder sql = new StringBuilder("alter table " + tableName + " add (");
+        StringBuilder sql = new StringBuilder("alter systable " + tableName + " add (");
         for (int i = 0; i < sysTableFields.size(); i++) {
             sql.append(" ");
             sql.append(sysTableFields.get(i).getDbFieldName());
@@ -125,7 +125,7 @@ public class DDLUtil {
      */
     private static String createTable(String tableName, List<SysTableField> sysTableFields) {
         StringBuilder sql = new StringBuilder();
-        sql.append("create table ");
+        sql.append("create systable ");
         sql.append(tableName);
         sql.append(" (");
 

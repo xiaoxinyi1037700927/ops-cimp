@@ -1,8 +1,7 @@
 package com.sinosoft.ops.cimp.service.user;
 
-import com.sinosoft.ops.cimp.entity.sys.user.Role;
-import com.sinosoft.ops.cimp.vo.user.RoleModel;
-import org.mapstruct.Mapper;
+import com.sinosoft.ops.cimp.entity.user.Role;
+import com.sinosoft.ops.cimp.vo.from.sys.role.RoleModel;
 
 
 public interface RoleService {

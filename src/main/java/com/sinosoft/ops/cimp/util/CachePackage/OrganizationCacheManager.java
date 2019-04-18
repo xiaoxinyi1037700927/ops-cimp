@@ -1,8 +1,8 @@
 package com.sinosoft.ops.cimp.util.CachePackage;
 
 
-import com.sinosoft.ops.cimp.entity.sys.oraganization.Organization;
-import com.sinosoft.ops.cimp.repository.user.OrganizationRepository;
+import com.sinosoft.ops.cimp.entity.oraganization.Organization;
+import com.sinosoft.ops.cimp.repository.oraganization.OrganizationRepository;
 import com.sinosoft.ops.cimp.util.Cache;
 import com.sinosoft.ops.cimp.util.CacheManager;
 import com.sinosoft.ops.cimp.util.SpringContextUtils;

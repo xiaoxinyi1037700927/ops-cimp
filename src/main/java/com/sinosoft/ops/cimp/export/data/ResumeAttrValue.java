@@ -41,7 +41,7 @@ public class ResumeAttrValue extends ResumeAttrVauleHandle implements AttrValue 
 //        try {
         // shixianggui-20180411, bug: 简历合并问题
 //			final String jobInfoSql = "SELECT * FROM EMP_A02 WHERE EMP_ID = '%s'  and status=0 ORDER BY A02043,A02065";
-        final String jobInfoSql = "SELECT b001.code DepCode, a02.* FROM EMP_A02 a02 left join dep_b001 b001 on b001.dep_id=a02.A02001_B WHERE a02.EMP_ID = '%s' and a02.status=0 ORDER BY a02.A02043,a02.A02065";
+        final String jobInfoSql = "SELECT b001.syscode DepCode, a02.* FROM EMP_A02 a02 left join dep_b001 b001 on b001.dep_id=a02.A02001_B WHERE a02.EMP_ID = '%s' and a02.status=0 ORDER BY a02.A02043,a02.A02065";
 
         // 学习（培训、进修）情况
         final String trainInfoSql = "SELECT * FROM EMP_A11 WHERE EMP_ID = '%s'  and status=0 ORDER BY A11007 DESC";

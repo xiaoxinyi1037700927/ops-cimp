@@ -2,8 +2,8 @@ package com.sinosoft.ops.cimp.util;
 
 
 
-import com.sinosoft.ops.cimp.entity.sys.user.User;
-import com.sinosoft.ops.cimp.entity.sys.user.UserRole;
+import com.sinosoft.ops.cimp.entity.user.User;
+import com.sinosoft.ops.cimp.entity.user.UserRole;
 import com.sinosoft.ops.cimp.util.CachePackage.UserCacheManager;
 import io.jsonwebtoken.Claims;
 import org.springframework.util.StringUtils;

@@ -80,7 +80,7 @@ public class ExportDaoImpl extends BaseDaoImpl implements ExportDao {
         } else {//查一个单独县区的，科级及以下
             flag = true;
             sb.append(" select distinct t.emp_id from emp_a001 t inner join dep_b001 d on t.A001004_A=d.dep_id inner join emp_a02 t2 on t.emp_id=t2.emp_id ");
-            sb.append(" and t2.status = 0   and t2.A02055 = '2'  inner join pkreference p on t.emp_id=p.A0100 and d.code=p.b0110 inner join emp_a05 t5 on t.emp_id=t5.emp_id and t5.A05024='1' ");
+            sb.append(" and t2.status = 0   and t2.A02055 = '2'  inner join pkreference p on t.emp_id=p.A0100 and d.syscode=p.b0110 inner join emp_a05 t5 on t.emp_id=t5.emp_id and t5.A05024='1' ");
             sb.append(" and (t5.a05002_b like '14%' or t5.a05002_b like '15%' or t5.a05002_b like '16%' or t5.a05002_b like '19%'  or t5.a05002_b like '24%' or t5.a05002_b like '25%' ");
             sb.append("  or t5.a05002_b like '26%'  or t5.a05002_b like '29%' or t5.a05002_b like '4%')  and t5.status='0'  and d.status='0' and t.status='0' and t.A01063 = '1' and d.tree_level_code like :treeLevelCode");
         }

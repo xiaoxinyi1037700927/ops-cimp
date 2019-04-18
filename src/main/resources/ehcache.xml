@@ -4,8 +4,8 @@
          dynamicConfig="true">
     <!-- 配置说明
       diskStore: 临时文件存放位置
-             user.home          – 用户主目录
-             user.dir           – 用户当前工作目录
+             permission.home          – 用户主目录
+             permission.dir           – 用户当前工作目录
              java.io.tmpdir     – 默认临时文件路径
              webroot:xxxx/xxx   - 相对于工程路径的目录
              classpath:xxxx/xxx - classpath文件路径
@@ -29,8 +29,8 @@
       copyOnWrite:写入时新建副本写入
     -->
     <!--
-    	 user.home      – 用户主目录
-         user.dir       – 用户当前工作目录
+    	 permission.home      – 用户主目录
+         permission.dir       – 用户当前工作目录
          java.io.tmpdir – 默认临时文件路径
      -->
     <diskStore path="user.home/ehcache"/>

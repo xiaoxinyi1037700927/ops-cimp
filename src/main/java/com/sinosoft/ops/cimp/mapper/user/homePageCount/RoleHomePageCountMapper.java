@@ -1,6 +1,6 @@
 package com.sinosoft.ops.cimp.mapper.user.homePageCount;
-import com.sinosoft.ops.cimp.entity.sys.user.RoleHomePageCount;
-import com.sinosoft.ops.cimp.vo.to.homePageCount.RoleHomePageCountVO;
+import com.sinosoft.ops.cimp.entity.user.RoleHomePageCount;
+import com.sinosoft.ops.cimp.vo.to.sys.homepagecount.RoleHomePageCountVO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

@@ -1,11 +1,11 @@
 package com.sinosoft.ops.cimp.mapper.user;
 
-import com.sinosoft.ops.cimp.entity.sys.user.Permission ;
-import com.sinosoft.ops.cimp.entity.sys.user.PermissionPage ;
-import com.sinosoft.ops.cimp.entity.sys.user.PermissionPageOperation ;
-import com.sinosoft.ops.cimp.vo.user.PermissionViewModel ;
-import com.sinosoft.ops.cimp.vo.user.PermissionPageOperationVO;
-import com.sinosoft.ops.cimp.vo.user.PermissionPageVO ;
+import com.sinosoft.ops.cimp.entity.sys.permission.Permission;
+import com.sinosoft.ops.cimp.entity.sys.permission.PermissionPage;
+import com.sinosoft.ops.cimp.entity.sys.permission.PermissionPageOperation;
+import com.sinosoft.ops.cimp.vo.to.sys.permission.PermissionPageOperationVO;
+import com.sinosoft.ops.cimp.vo.to.sys.permission.PermissionPageVO;
+import com.sinosoft.ops.cimp.vo.to.sys.permission.PermissionViewModel;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

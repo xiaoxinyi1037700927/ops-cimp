@@ -1,10 +1,8 @@
 package com.sinosoft.ops.cimp.mapper.user;
 
-import com.sinosoft.ops.cimp.entity.sys.oraganization.Organization;
-import com.sinosoft.ops.cimp.entity.sys.user.BusinessUnit;
-import com.sinosoft.ops.cimp.vo.to.user.BusinessUnitListViewModel;
-import com.sinosoft.ops.cimp.vo.user.organization.BusinessUnitOrgListViewModel;
-import com.sinosoft.ops.cimp.vo.user.organization.OrganizationViewModel;
+import com.sinosoft.ops.cimp.entity.oraganization.Organization;
+import com.sinosoft.ops.cimp.vo.to.organization.BusinessUnitOrgListViewModel;
+import com.sinosoft.ops.cimp.vo.to.organization.OrganizationViewModel;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
@@ -23,9 +21,4 @@ public interface OrganizationViewMapper {
     })
     BusinessUnitOrgListViewModel organizationToBUOViewModel(Organization organization);
 
-    @Mappings({
-            @Mapping(source = "id", target = "businessUnitId"),
-            @Mapping(source = "name", target = "businessUnitName"),
-    })
-    BusinessUnitListViewModel businessUnitToViewModel(BusinessUnit businessUnit);
 }

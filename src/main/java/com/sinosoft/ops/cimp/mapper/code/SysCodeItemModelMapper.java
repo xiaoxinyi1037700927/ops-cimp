@@ -1,9 +1,9 @@
 package com.sinosoft.ops.cimp.mapper.code;
 
-import com.sinosoft.ops.cimp.entity.sys.code.SysCodeItem;
-import com.sinosoft.ops.cimp.vo.from.code.SysCodeItemAddModel;
-import com.sinosoft.ops.cimp.vo.from.code.SysCodeItemModifyModel;
-import com.sinosoft.ops.cimp.vo.to.sys.code.SysCodeItemModel;
+import com.sinosoft.ops.cimp.entity.sys.syscode.SysCodeItem;
+import com.sinosoft.ops.cimp.vo.from.sys.syscode.SysCodeItemAddModel;
+import com.sinosoft.ops.cimp.vo.from.sys.syscode.SysCodeItemModifyModel;
+import com.sinosoft.ops.cimp.vo.to.sys.syscode.SysCodeItemModel;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

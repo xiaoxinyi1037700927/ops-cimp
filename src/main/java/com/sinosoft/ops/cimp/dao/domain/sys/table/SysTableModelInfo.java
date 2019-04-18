@@ -3,9 +3,9 @@ package com.sinosoft.ops.cimp.dao.domain.sys.table;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.sinosoft.ops.cimp.constant.OpsErrorMessage;
-import com.sinosoft.ops.cimp.entity.sys.table.SysTable;
-import com.sinosoft.ops.cimp.entity.sys.table.SysTableField;
-import com.sinosoft.ops.cimp.entity.sys.table.SysTableType;
+import com.sinosoft.ops.cimp.entity.sys.systable.SysTable;
+import com.sinosoft.ops.cimp.entity.sys.systable.SysTableField;
+import com.sinosoft.ops.cimp.entity.sys.systable.SysTableType;
 import com.sinosoft.ops.cimp.exception.SystemException;
 import org.apache.commons.lang3.StringUtils;
 

@@ -2,12 +2,11 @@ package com.sinosoft.ops.cimp.service.user;
 
 
 import com.sinosoft.ops.cimp.dto.PaginationViewModel;
-import com.sinosoft.ops.cimp.entity.sys.user.User;
+import com.sinosoft.ops.cimp.entity.user.User;
 import com.sinosoft.ops.cimp.vo.from.user.UserModifyContactVO;
 import com.sinosoft.ops.cimp.vo.from.user.UserModifyPasswordVO;
-import com.sinosoft.ops.cimp.vo.user.UserLoginViewModel;
-import com.sinosoft.ops.cimp.vo.user.UserSearchViewModel;
-import com.sinosoft.ops.cimp.vo.user.UserViewModel;
+import com.sinosoft.ops.cimp.vo.from.user.UserSearchViewModel;
+import com.sinosoft.ops.cimp.vo.to.user.UserViewModel;
 
 import java.util.List;
 

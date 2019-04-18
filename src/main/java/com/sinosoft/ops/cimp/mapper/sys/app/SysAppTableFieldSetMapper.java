@@ -1,11 +1,11 @@
 package com.sinosoft.ops.cimp.mapper.sys.app;
 
-import com.sinosoft.ops.cimp.entity.sys.app.SysAppTableFieldSet;
-import com.sinosoft.ops.cimp.entity.sys.table.SysTableField;
+import com.sinosoft.ops.cimp.entity.sys.sysapp.SysAppTableFieldSet;
+import com.sinosoft.ops.cimp.entity.sys.systable.SysTableField;
 import com.sinosoft.ops.cimp.util.IdUtil;
-import com.sinosoft.ops.cimp.vo.from.sys.app.sysAppTableFieldSet.SysAppTableFieldSetModifyModel;
-import com.sinosoft.ops.cimp.vo.to.sys.app.sysAppTableFieldSet.SysAppTableFieldModel;
-import com.sinosoft.ops.cimp.vo.to.sys.app.sysAppTableFieldSet.SysAppTableFieldSetModel;
+import com.sinosoft.ops.cimp.vo.from.sys.sysapp.sysAppTableFieldSet.SysAppTableFieldSetModifyModel;
+import com.sinosoft.ops.cimp.vo.to.sys.sysapp.sysAppTableFieldSet.SysAppTableFieldModel;
+import com.sinosoft.ops.cimp.vo.to.sys.sysapp.sysAppTableFieldSet.SysAppTableFieldSetModel;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 

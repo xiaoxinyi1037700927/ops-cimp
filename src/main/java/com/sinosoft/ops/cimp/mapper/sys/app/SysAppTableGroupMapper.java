@@ -1,10 +1,10 @@
 package com.sinosoft.ops.cimp.mapper.sys.app;
 
-import com.sinosoft.ops.cimp.entity.sys.app.SysAppTableGroup;
+import com.sinosoft.ops.cimp.entity.sys.sysapp.SysAppTableGroup;
 import com.sinosoft.ops.cimp.util.IdUtil;
-import com.sinosoft.ops.cimp.vo.from.sys.app.sysAppTableGroup.SysAppTableGroupAddModel;
-import com.sinosoft.ops.cimp.vo.from.sys.app.sysAppTableGroup.SysAppTableGroupModifyModel;
-import com.sinosoft.ops.cimp.vo.to.sys.app.sysAppTableGroup.SysAppTableGroupModel;
+import com.sinosoft.ops.cimp.vo.from.sys.sysapp.sysAppTableGroup.SysAppTableGroupAddModel;
+import com.sinosoft.ops.cimp.vo.from.sys.sysapp.sysAppTableGroup.SysAppTableGroupModifyModel;
+import com.sinosoft.ops.cimp.vo.to.sys.sysapp.sysAppTableGroup.SysAppTableGroupModel;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 

@@ -1,16 +1,14 @@
 package com.sinosoft.ops.cimp.mapper.user;
 
 
-import com.sinosoft.ops.cimp.entity.sys.oraganization.Organization;
-import com.sinosoft.ops.cimp.entity.sys.user.User;
+import com.sinosoft.ops.cimp.entity.oraganization.Organization;
+import com.sinosoft.ops.cimp.entity.user.User;
 import com.sinosoft.ops.cimp.util.CachePackage.OrganizationCacheManager;
 import com.sinosoft.ops.cimp.util.PasswordEncoderHelper;
 import com.sinosoft.ops.cimp.util.SecurityUtils;
-import com.sinosoft.ops.cimp.util.UserTask;
 import com.sinosoft.ops.cimp.vo.from.user.UserAddViewModel;
 import com.sinosoft.ops.cimp.vo.from.user.UserModifyViewModel;
-import com.sinosoft.ops.cimp.vo.from.user.UserTaskAddViewModel;
-import com.sinosoft.ops.cimp.vo.user.UserViewModel;
+import com.sinosoft.ops.cimp.vo.to.user.UserViewModel;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
@@ -54,13 +52,6 @@ public interface UserViewModelMapper {
             @Mapping(source = "organizationId", target = "organizationCode", qualifiedByName = "genOrganizationCode")
     })
     User userModifyViewModelToUser(UserModifyViewModel userModifyViewModel);
-
-    @Mappings({
-            @Mapping(source = "createId", target = "createId", qualifiedByName = "genCreateId"),
-            @Mapping(source = "createTime", target = "createTime", qualifiedByName ="genCreateTime" )
-    })
-    UserTask viewModelToUserTask(UserTaskAddViewModel userTaskAddViewModel);
-
 
     @Named("genCreateId")
     default String genCreateId(String createId) {

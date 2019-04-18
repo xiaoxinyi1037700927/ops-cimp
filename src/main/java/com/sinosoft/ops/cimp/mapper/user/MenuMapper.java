@@ -2,13 +2,14 @@ package com.sinosoft.ops.cimp.mapper.user;
 
 import com.google.common.collect.Lists;
 
-import com.sinosoft.ops.cimp.entity.sys.user.*;
-import com.sinosoft.ops.cimp.repository.user.MenuGroupPerRelRepository;
-import com.sinosoft.ops.cimp.repository.user.MenuGroupRepository;
-import com.sinosoft.ops.cimp.repository.user.permissionPage.PermissionPageRepository;
+import com.sinosoft.ops.cimp.entity.sys.permission.*;
+import com.sinosoft.ops.cimp.entity.user.RoleMenuGroup;
+import com.sinosoft.ops.cimp.repository.sys.permission.MenuGroupPerRelRepository;
+import com.sinosoft.ops.cimp.repository.sys.permission.MenuGroupRepository;
+import com.sinosoft.ops.cimp.repository.sys.permission.PermissionPageRepository;
 import com.sinosoft.ops.cimp.util.SpringContextUtils;
-import com.sinosoft.ops.cimp.vo.user.role.MenuChildViewModel;
-import com.sinosoft.ops.cimp.vo.user.role.MenuParentViewModel;
+import com.sinosoft.ops.cimp.vo.to.sys.role.MenuChildViewModel;
+import com.sinosoft.ops.cimp.vo.to.sys.role.MenuParentViewModel;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
