@@ -1,12 +1,14 @@
 package com.sinosoft.ops.cimp.interceptor;
 
 import com.sinosoft.ops.cimp.context.ExecuteContext;
+import org.springframework.core.annotation.Order;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+@Order(10)
 public class WebContextInterceptor implements HandlerInterceptor {
 
     @Override

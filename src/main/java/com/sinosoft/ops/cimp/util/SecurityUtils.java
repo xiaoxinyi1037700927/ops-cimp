@@ -1,7 +1,6 @@
 package com.sinosoft.ops.cimp.util;
 
-
-
+import com.sinosoft.ops.cimp.context.ExecuteContext;
 import com.sinosoft.ops.cimp.entity.user.User;
 import com.sinosoft.ops.cimp.entity.user.UserRole;
 import com.sinosoft.ops.cimp.util.CachePackage.UserCacheManager;
@@ -29,14 +28,14 @@ public class SecurityUtils {
      * @return
      */
     public String getCurrentLoginName() {
-        if (ExecuteContext.Request.getCurrent() == null) {
+        if (ExecuteContext.Request.currentRequest() == null) {
             return "";
         }
 
         String loginName = "";
-        String accessToken = ExecuteContext.Request.getCurrent().getHeader(ACCESS_TOKEN);
+        String accessToken = ExecuteContext.Request.currentRequest().getHeader(ACCESS_TOKEN);
         if (StringUtils.isEmpty(accessToken)) {
-            Cookie cookie = CookieUtils.getCookieByName(ExecuteContext.Request.getCurrent(), ACCESS_TOKEN);
+            Cookie cookie = CookieUtils.getCookieByName(ExecuteContext.Request.currentRequest(), ACCESS_TOKEN);
             if (cookie != null) {
                 loginName = cookie.getValue();
             }
@@ -78,16 +77,17 @@ public class SecurityUtils {
 
         String token = TokenUtils.createJwtToken(loginName);
         UserCacheManager.setToken(loginName, token);
-        CookieUtils.addCookie(ExecuteContext.Response.getCurrent(), ACCESS_TOKEN, token, 0);
+        CookieUtils.addCookie(ExecuteContext.Response.currentResponse(), ACCESS_TOKEN, token, 0);
     }
 
     /**
      * 退出调用
+     *
      * @return
      */
     public void LoginOut() {
         UserCacheManager.clearUser(getCurrentLoginName());
-        CookieUtils.removeCookie(ExecuteContext.Response.getCurrent(), ACCESS_TOKEN);
+        CookieUtils.removeCookie(ExecuteContext.Response.currentResponse(), ACCESS_TOKEN);
     }
 
 }

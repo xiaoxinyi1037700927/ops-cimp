@@ -47,13 +47,14 @@ public class UpdateSqlBuilder implements SqlBuilder {
         //注意【List<List<String>>内List 0，1，2 分别为 属性英文名，数据库存储字段名称，数据库存储类型】
         List<List<String>> tableFieldList = tableInfo.getTableNameEnAndFieldMap().get(tableNameEn);
         Map<String, String> fieldTypeMap = Maps.newHashMap();
+        Map<String, String> tableFieldMap = Maps.newHashMap();
         for (List<String> fields : tableFieldList) {
             String fieldName = fields.get(0);
+            String dbFieldName = fields.get(1);
             String fieldType = fields.get(2);
             fieldTypeMap.put(fieldName, fieldType);
+            tableFieldMap.put(fieldName, dbFieldName);
         }
-        Map<String, String> tableFieldMap = Maps.newHashMap();
-        tableInfo.getTableFields().forEach(f -> tableFieldMap.put(f.getNameEn(), f.getDbFieldName()));
 
         Map<String, String> selectField = this.selectField(execTableField, tableFieldList);
 
@@ -108,7 +109,7 @@ public class UpdateSqlBuilder implements SqlBuilder {
                             .append(")");
                 } else {
                     conditionSqlBuilder.append(" AND ")
-                            .append(conditionName)
+                            .append(saveField)
                             .append(" ")
                             .append(condition)
                             .append(" ")

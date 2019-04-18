@@ -1,12 +1,14 @@
 package com.sinosoft.ops.cimp.util;
 
+import com.sinosoft.ops.cimp.context.ExecuteContext;
+
 import javax.servlet.http.HttpServletRequest;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 public class HttpUtils {
     public static String getIpAddr() {
-        HttpServletRequest request = ExecuteContext.Request.getCurrent();
+        HttpServletRequest request = ExecuteContext.Request.currentRequest();
         String ipAddress = null;
         try {
             ipAddress = request.getHeader("x-forwarded-for");
