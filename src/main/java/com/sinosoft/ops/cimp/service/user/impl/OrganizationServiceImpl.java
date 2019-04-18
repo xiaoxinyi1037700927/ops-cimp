@@ -61,7 +61,13 @@ public class OrganizationServiceImpl implements OrganizationService {
             //说明是查询树
             Organization organization = null;
             if (organizationSearchViewModel.isNoPermission()) {
-                String loginDataOrganId = SecurityUtils.getSubject().getCurrentUser().getDataOrganizationId();
+                User currentUser = SecurityUtils.getSubject().getCurrentUser();
+                String loginDataOrganId;
+                if (currentUser == null) {
+                    loginDataOrganId = "";
+                } else {
+                    loginDataOrganId = currentUser.getDataOrganizationId();
+                }
                 organization = OrganizationCacheManager.getSubject().getOrganizationById(loginDataOrganId);
             } else {
                 organization = this.findRoot("ROOT");
@@ -88,9 +94,13 @@ public class OrganizationServiceImpl implements OrganizationService {
 
 
     private Organization getRoot() {
-        String organizationId = SecurityUtils.getSubject().getCurrentUser().getDataOrganizationId();
-        Organization organization = OrganizationCacheManager.getSubject().getOrganizationById(organizationId);
-        return organization;
+        User currentUser = SecurityUtils.getSubject().getCurrentUser();
+        if (currentUser != null) {
+            String organizationId = currentUser.getDataOrganizationId();
+            return OrganizationCacheManager.getSubject().getOrganizationById(organizationId);
+        } else {
+            return OrganizationCacheManager.getSubject().getOrganizationByCode("001");
+        }
     }
 
     private List<String> getRelNodes(String parentCode) {
