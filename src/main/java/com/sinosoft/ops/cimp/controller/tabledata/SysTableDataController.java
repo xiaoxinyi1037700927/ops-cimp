@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import com.sinosoft.ops.cimp.annotation.SystemApiGroup;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.dao.SysTableInfoDao;
+import com.sinosoft.ops.cimp.dao.domain.sys.table.SysTableFieldInfo;
 import com.sinosoft.ops.cimp.dao.domain.sys.table.SysTableModelInfo;
 import com.sinosoft.ops.cimp.dto.QueryDataParamBuilder;
 import com.sinosoft.ops.cimp.dto.sys.table.SysTableInfoDTO;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @SystemApiGroup
@@ -306,7 +308,30 @@ public class SysTableDataController extends BaseController {
             return fail("清空信息集必须指定表名");
         }
 
+        SysTableModelInfo tableInfo = sysTableInfoDao.getTableInfo(tableTypeName);
+        if (tableInfo == null) {
+            return fail("请确认实体名称和项目编号存在");
+        }
+        String tableNameDB = tableInfo.getTableNameEnAndSaveTableMap().get(tableName);
+        if (StringUtils.isEmpty(tableNameDB)) {
+            return fail("请确认要删除的信息集信息存在");
+        }
+        List<SysTableFieldInfo> sysTableFieldInfos = tableInfo.getTableNameEnAndFieldListMap().get(tableName);
+        Optional<SysTableFieldInfo> primaryKeyInfo = sysTableFieldInfos.stream().filter(x -> x.isPK()).findFirst();
+        String primaryKey = new String("");
+        if (primaryKeyInfo.isPresent()) {
+            SysTableFieldInfo sysTableFieldInfo = primaryKeyInfo.get();
+            primaryKey = sysTableFieldInfo.getNameEn();
+        } else {
+            return fail("当前删除的信息项未设置主键属性");
+        }
+
         Map formMap = JsonUtil.parseStringToObject(form, HashMap.class);
+        Object keyObject = formMap.get(primaryKey);
+        if(keyObject==null)
+        {
+            return fail("当前传递的信息项未找到主键信息");
+        }
         QueryDataParamBuilder queryDataParam = new QueryDataParamBuilder();
 
         queryDataParam.setPrjCode(appCode)

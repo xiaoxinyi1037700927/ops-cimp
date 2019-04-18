@@ -72,7 +72,13 @@ public class SysTableDaoImpl implements SysTableDao {
 
     @Override
     public void deleteData(DaoParam daoParam) throws BusinessException {
+        ResultSql executeSql = deleteSqlBuilder.getExecuteSql(daoParam);
+        String sql = executeSql.getSql();
 
+        if (StringUtils.isNotEmpty(sql)) {
+            jdbcTemplate.execute(sql);
+            LOGGER.debug("执行sql为：" + sql);
+        }
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.sinosoft.ops.cimp.service.tabledata.impl;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.sinosoft.ops.cimp.constant.DeleteTypeEnum;
 import com.sinosoft.ops.cimp.constant.OpsErrorMessage;
 import com.sinosoft.ops.cimp.constant.TableFieldLogicalDeleteFlagEnum;
 import com.sinosoft.ops.cimp.dao.SysTableDao;
@@ -250,7 +251,7 @@ public class SysTableModelInfoServiceImpl implements SysTableModelInfoService {
     }
 
     @Override
-    public QueryDataParamBuilder deleteDataByFlag(QueryDataParamBuilder queryDataParam, String deleteFlagCode) throws BusinessException {
+    public QueryDataParamBuilder deleteDataByFlag(QueryDataParamBuilder queryDataParam, String deleteType, String deleteFlagCode) throws BusinessException {
         String prjCode = queryDataParam.getPrjCode();
         String tableTypeNameEn = queryDataParam.getTableTypeNameEn();
         String tableNameEn = queryDataParam.getTableNameEn();
@@ -295,39 +296,50 @@ public class SysTableModelInfoServiceImpl implements SysTableModelInfoService {
             throw new SystemException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE_100207, tableTypeNameEn);
         }
 
-        List<ExecParam> execParamList = Lists.newArrayList();
 
-        String key = deleteFlagFieldEnName;
-        String value = deleteFlagCode;
-        execParamList.add(new ExecParam(key, value));
+        if (DeleteTypeEnum.物理删除.getCode().equals(deleteType)) {
+            DaoParam daoParam = new DaoParam();
+            List<String> idList = (List<String>) saveOrUpdateFormData.get(tableNameEnPK);
+            String idJoinString = idList.stream().collect(Collectors.joining("','", "'", "'"));
+            daoParam.addTableTypeNameEn(tableTypeNameEn)
+                    .addTableNameEn(tableNameEn)
+                    .addCondition(tableNameEnPK, Conditions.ConditionsEnum.IN, idJoinString)
+                    .addCondition(deleteFlagFieldEnName, Conditions.ConditionsEnum.EQUAL,TableFieldLogicalDeleteFlagEnum.删除.getCode());
+            sysTableDao.deleteData(daoParam);
+        } else {
+            List<ExecParam> execParamList = Lists.newArrayList();
 
-        DaoParam daoParam = new DaoParam();
+            String key = deleteFlagFieldEnName;
+            String value = deleteFlagCode;
+            execParamList.add(new ExecParam(key, value));
 
-        List<String> idList = (List<String>) saveOrUpdateFormData.get(tableNameEnPK);
-        String idJoinString = idList.stream().collect(Collectors.joining("','", "'", "'"));
+            DaoParam daoParam = new DaoParam();
 
-        daoParam.addTableTypeNameEn(tableTypeNameEn)
-                .addTableNameEn(tableNameEn)
-                .addExecParamList(execParamList)
-                .addCondition(tableNameEnPK, Conditions.ConditionsEnum.IN, idJoinString);
+            List<String> idList = (List<String>) saveOrUpdateFormData.get(tableNameEnPK);
+            String idJoinString = idList.stream().collect(Collectors.joining("','", "'", "'"));
 
-        sysTableDao.updateData(daoParam);
+            daoParam.addTableTypeNameEn(tableTypeNameEn)
+                    .addTableNameEn(tableNameEn)
+                    .addExecParamList(execParamList)
+                    .addCondition(tableNameEnPK, Conditions.ConditionsEnum.IN, idJoinString);
+            sysTableDao.updateData(daoParam);
+        }
         return queryDataParam;
     }
 
     @Override
     public QueryDataParamBuilder deleteData(QueryDataParamBuilder queryDataParam) throws BusinessException {
-        return deleteDataByFlag(queryDataParam, TableFieldLogicalDeleteFlagEnum.删除.getCode());
+        return deleteDataByFlag(queryDataParam,DeleteTypeEnum.逻辑删除.getCode(), TableFieldLogicalDeleteFlagEnum.删除.getCode());
     }
 
     @Override
     public QueryDataParamBuilder deleteDataRecover(QueryDataParamBuilder queryDataParam) throws BusinessException {
-        return deleteDataByFlag(queryDataParam, TableFieldLogicalDeleteFlagEnum.有效.getCode());
+        return deleteDataByFlag(queryDataParam,DeleteTypeEnum.逻辑删除.getCode(), TableFieldLogicalDeleteFlagEnum.有效.getCode());
     }
 
     @Override
     public QueryDataParamBuilder deleteDataFinal(QueryDataParamBuilder queryDataParam) throws BusinessException {
-        return null;
+        return deleteDataByFlag(queryDataParam,DeleteTypeEnum.物理删除.getCode(),TableFieldLogicalDeleteFlagEnum.删除.getCode());
     }
 
     private TranslateField getTranslateField(Map<String, List<SysTableFieldInfoDTO>> fieldNameEnMap, String fieldName, Object fieldValue) {
