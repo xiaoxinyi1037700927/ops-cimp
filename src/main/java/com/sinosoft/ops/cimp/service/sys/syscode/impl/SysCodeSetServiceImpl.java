@@ -1,4 +1,4 @@
-package com.sinosoft.ops.cimp.service.impl.syscode;
+package com.sinosoft.ops.cimp.service.sys.syscode.impl;
 
 import com.google.common.collect.Lists;
 import com.querydsl.core.BooleanBuilder;
@@ -97,7 +97,7 @@ public class SysCodeSetServiceImpl implements SysCodeSetService {
             builder = builder.and(qSysCodeSet.name.contains(searchModel.getName()));
         }
 
-         all = sysCodeSetDao.findAll(builder, pageRequest);
+        all = sysCodeSetDao.findAll(builder, pageRequest);
         if (all.getTotalPages() == 0) {
             builder = new BooleanBuilder();
             builder = builder.and(qSysCodeSet.nameCn.contains(searchModel.getName()));

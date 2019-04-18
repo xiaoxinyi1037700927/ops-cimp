@@ -1,7 +1,6 @@
 package com.sinosoft.ops.cimp.controller.sys.syscode;
 
 import com.sinosoft.ops.cimp.annotation.SystemApiGroup;
-import com.sinosoft.ops.cimp.constant.SysCodeSetTypeEnum;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.dto.PaginationViewModel;
 import com.sinosoft.ops.cimp.exception.BusinessException;
@@ -16,8 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.HashMap;
-import java.util.Map;
 
 @SystemApiGroup
 @Api(description = "代码项操作")
@@ -81,13 +78,5 @@ public class SysCodeItemController extends BaseController {
         return ok(sysCodeItemModifyModel);
     }
 
-    @ApiOperation(value = "获取代码集类型")
-    @RequestMapping(value = "/getSysCodeItemType", method = RequestMethod.POST)
-    public ResponseEntity getSysCodeItemType() throws BusinessException {
-        Map<Integer, String> dataMap = new HashMap<>();
-        dataMap.put(SysCodeSetTypeEnum.GeneralType.getType(), SysCodeSetTypeEnum.GeneralType.getTypeName());
-        dataMap.put(SysCodeSetTypeEnum.TreeType.getType(), SysCodeSetTypeEnum.TreeType.getTypeName());
-        return ok(dataMap);
-    }
 
 }

@@ -1,4 +1,4 @@
-package com.sinosoft.ops.cimp.service.impl.syscode;
+package com.sinosoft.ops.cimp.service.sys.syscode.impl;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;

@@ -1,8 +1,9 @@
 package com.sinosoft.ops.cimp.constant;
 
 public enum SysCodeSetTypeEnum {
-    GeneralType(0,"一般类型"),
-    TreeType(1,"树类型");
+    NULL_TYPE(5,"空类型"),
+    GENERAL_TYPE(0,"一般类型"),
+    TREE_TYPE(1,"树类型");
 
     private Integer type;
 
