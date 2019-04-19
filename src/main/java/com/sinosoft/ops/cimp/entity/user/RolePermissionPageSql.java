@@ -24,15 +24,23 @@ public class RolePermissionPageSql {
 
     //执行的sql语句
     @Column(length = 4000)
-    private String execSql;
+    private String execListSql;
+
+    //执行统计sql语句
+    @Column(length = 4000)
+    private String execCountSql;
 
     //执行sql查询的select字段名称（英文），使用“,”分割
     @Column(length = 4000)
-    private String selectFieldsEn;
+    private String selectListFieldsEn;
 
     //执行sql查询的select字段名称（中文），使用“,”分割
     @Column(length = 4000)
-    private String selectFieldsCn;
+    private String selectListFieldsCn;
+
+    //执行count列名
+    @Column(length = 4000)
+    private String selectCountFieldEn;
 
     public String getId() {
         return id;
@@ -58,27 +66,43 @@ public class RolePermissionPageSql {
         this.sqlName = sqlName;
     }
 
-    public String getExecSql() {
-        return execSql;
+    public String getExecListSql() {
+        return execListSql;
     }
 
-    public void setExecSql(String execSql) {
-        this.execSql = execSql;
+    public void setExecListSql(String execListSql) {
+        this.execListSql = execListSql;
     }
 
-    public String getSelectFieldsEn() {
-        return selectFieldsEn;
+    public String getSelectListFieldsEn() {
+        return selectListFieldsEn;
     }
 
-    public void setSelectFieldsEn(String selectFieldsEn) {
-        this.selectFieldsEn = selectFieldsEn;
+    public void setSelectListFieldsEn(String selectListFieldsEn) {
+        this.selectListFieldsEn = selectListFieldsEn;
     }
 
-    public String getSelectFieldsCn() {
-        return selectFieldsCn;
+    public String getSelectListFieldsCn() {
+        return selectListFieldsCn;
     }
 
-    public void setSelectFieldsCn(String selectFieldsCn) {
-        this.selectFieldsCn = selectFieldsCn;
+    public void setSelectListFieldsCn(String selectListFieldsCn) {
+        this.selectListFieldsCn = selectListFieldsCn;
+    }
+
+    public String getExecCountSql() {
+        return execCountSql;
+    }
+
+    public void setExecCountSql(String execCountSql) {
+        this.execCountSql = execCountSql;
+    }
+
+    public String getSelectCountFieldEn() {
+        return selectCountFieldEn;
+    }
+
+    public void setSelectCountFieldEn(String selectCountFieldEn) {
+        this.selectCountFieldEn = selectCountFieldEn;
     }
 }
