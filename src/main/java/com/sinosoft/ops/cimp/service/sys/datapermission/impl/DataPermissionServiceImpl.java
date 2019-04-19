@@ -86,8 +86,11 @@ public class DataPermissionServiceImpl implements DataPermissionService {
                 QPageInterface.pageInterface.showName,
                 QPageInterface.pageInterface.permissionPageId,
                 QPageInterface.pageInterface.description,
-                QPageInterface.pageInterface.sql
-        )).from(QPageInterface.pageInterface)
+                QPageInterface.pageInterface.sql,
+                QRolePageInterface.rolePageInterface.sql.as("roleSql")
+        ))
+                .from(QPageInterface.pageInterface)
+                .leftJoin(QRolePageInterface.rolePageInterface).on(QRolePageInterface.rolePageInterface.pageInterfaceId.eq(QPageInterface.pageInterface.id))
                 .where(booleanBuilder);
         List<PageInterfaceVO> fetch = Lists.newArrayList(where.fetch());
         return fetch;
