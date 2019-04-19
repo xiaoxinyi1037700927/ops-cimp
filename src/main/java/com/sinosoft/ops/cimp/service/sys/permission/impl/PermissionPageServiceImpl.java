@@ -139,9 +139,11 @@ public class PermissionPageServiceImpl implements PermissionPageService {
                         QPermissionPageOperation.permissionPageOperation.name,
                         QPermissionPageOperation.permissionPageOperation.operationId,
                         QPermissionPageOperation.permissionPageOperation.permissionPageId,
-                        QPermissionPageOperation.permissionPageOperation.description
+                        QPermissionPageOperation.permissionPageOperation.description,
+                        QRolePermissionPage.rolePermissionPage.status.as("status")
                         ))
                 .from(QPermissionPageOperation.permissionPageOperation)
+                .leftJoin(QRolePermissionPage.rolePermissionPage).on(QRolePermissionPage.rolePermissionPage.permissionPageOperationId.eq(QPermissionPageOperation.permissionPageOperation.id))
                 .where(QPermissionPageOperation.permissionPageOperation.permissionPageId.eq(permissionPageId));
         List<PermissionPageOperationVO> permissionPageOperationVOS = where.fetch();
         return permissionPageOperationVOS;
@@ -152,7 +154,8 @@ public class PermissionPageServiceImpl implements PermissionPageService {
     @Override
     public Boolean switchPermissionPageOperation(String permissionPageOperationId, String roleId) {
         PermissionPageOperation permissionPageOperation = permissionPageOperationRepository.findById(permissionPageOperationId).get();
-        ArrayList<RolePermissionPage> rolePermissionPages = Lists.newArrayList(rolePermissionPageRepository.findAll(QRolePermissionPage.rolePermissionPage.permissionPageOperationId.eq(permissionPageOperationId).and(QRolePermissionPage.rolePermissionPage.roleId.eq(roleId))));
+        ArrayList<RolePermissionPage> rolePermissionPages = Lists.newArrayList(rolePermissionPageRepository.findAll(QRolePermissionPage.rolePermissionPage.permissionPageOperationId.eq(permissionPageOperationId)
+                .and(QRolePermissionPage.rolePermissionPage.roleId.eq(roleId))));
         if (rolePermissionPages.size() == 0) {
             RolePermissionPage rolePermissionPage = new RolePermissionPage();
             rolePermissionPage.setRoleId(roleId);
