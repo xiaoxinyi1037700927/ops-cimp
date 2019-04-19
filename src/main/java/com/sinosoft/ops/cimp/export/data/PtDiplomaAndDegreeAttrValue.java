@@ -28,11 +28,11 @@ public class PtDiplomaAndDegreeAttrValue implements AttrValue {
         List diplomaInfoList = (List) attrValueContext.get("A08");
         List degreeInfoList = (List) attrValueContext.get("A09");
         //重新组织数据结构，用来储存在职教育学历学位和学校的信息
-        Map<String, List<Map>> inServiceEduMap = new HashMap<String, List<Map>>();
+        Map<String, List<Map>> inServiceEduMap = new HashMap<>();
         //在职教育最高学历List
-        List<Map> highDiplomaList = new ArrayList<Map>();
+        List<Map> highDiplomaList = new ArrayList<>();
         //在职教育最高学位List
-        List<Map> highDegreeList = new ArrayList<Map>();
+        List<Map> highDegreeList = new ArrayList<>();
         List<Map> inServiceEdu = new ArrayList<>();   //在职教育
         if (diplomaInfoList != null && diplomaInfoList.size() > 0) {
             for (Object o : diplomaInfoList) {
@@ -60,16 +60,16 @@ public class PtDiplomaAndDegreeAttrValue implements AttrValue {
             }
         }
 
-        if (highDiplomaList != null && highDiplomaList.size() > 0) {
+        if (highDiplomaList.size() > 0) {
             inServiceEduMap.put("highDiplomaList", highDiplomaList);
         }
-        if (highDegreeList != null && highDegreeList.size() > 0) {
+        if (highDegreeList.size() > 0) {
             inServiceEduMap.put("highDegreeList", highDegreeList);
         }
         attrValueContext.put("inServiceEduMap", inServiceEduMap);
         List<String> diplomaAndDegreeList = new ArrayList<String>(2);
         StringBuffer diplomaAndDegree = new StringBuffer();
-        if (highDiplomaList != null && highDiplomaList.size() > 0) {
+        if (highDiplomaList.size() > 0) {
             for (Map inServiceMap : highDiplomaList) {
                 String a08021 = StringUtil.obj2Str(inServiceMap.get("A08021"));      //学历从学单位类别
                 String A08002A = StringUtil.obj2Str(inServiceMap.get("A08002_A"));      //学历名称
@@ -97,7 +97,7 @@ public class PtDiplomaAndDegreeAttrValue implements AttrValue {
                         diplomaAndDegree.append(A08002A).append((char) 11);
                     }
                 }
-                if (highDegreeList != null && highDegreeList.size() > 0) {
+                if (highDegreeList.size() > 0) {
 //                	for(Map degreeMap:highDegreeList) {
 //                        String degreeName = StringUtil.obj2Str(degreeMap.get("A09001_A"));
 //                        String degreeShool = StringUtil.obj2Str(degreeMap.get("A09007"));//学位授予单位
@@ -129,7 +129,7 @@ public class PtDiplomaAndDegreeAttrValue implements AttrValue {
                 }
             }
         }
-        if (highDegreeList != null && highDegreeList.size() > 0) {
+        if (highDegreeList.size() > 0) {
             for (Map degreeMap : highDegreeList) {
                 String degreeName = StringUtil.obj2Str(degreeMap.get("A09001_A"));
                 if (StringUtils.isNotEmpty(degreeName)) {

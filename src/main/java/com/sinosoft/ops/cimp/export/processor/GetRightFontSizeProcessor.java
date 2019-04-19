@@ -13,12 +13,12 @@ import java.util.List;
  */
 public class GetRightFontSizeProcessor {
 
-    private List<FontSizeAndLines> fontSizeAndLines = new ArrayList<FontSizeAndLines>();
+    private List<FontSizeAndLines> fontSizeAndLines = new ArrayList<>();
 
     public double getRightFontSize(List<Integer> linesCount) {
 
         for (int i = 0; i < fontSizeAndLines.size(); i++) {
-            FontSizeAndLines fontSizeAndLine = (FontSizeAndLines) fontSizeAndLines.get(i);
+            FontSizeAndLines fontSizeAndLine = fontSizeAndLines.get(i);
             int lines = 0;
             int maxLine = fontSizeAndLine.getMaxLine();
             double fontSize = fontSizeAndLine.getFontSize();

@@ -35,7 +35,7 @@ public class FtInstituteAndSpecialtyAttrValue implements AttrValue {
         List<Map> highDegreeList = fullEduMap.get("highDegreeList");
         StringBuffer ftInstituteAndSpecialty = new StringBuffer();
         //储存学历中的所有学校名称
-        List<String> collegeList = new ArrayList<String>();
+        List<String> collegeList = new ArrayList<>();
         String xueliCollege = "";
         if (highDiplomaList != null && highDiplomaList.size() > 0) {
             for (Map xueliMap : highDiplomaList) {
@@ -66,7 +66,7 @@ public class FtInstituteAndSpecialtyAttrValue implements AttrValue {
                 }
             }
         }
-        if (ftInstituteAndSpecialty != null && ftInstituteAndSpecialty.length() > 0) {
+        if ( ftInstituteAndSpecialty.length() > 0) {
             ftInstituteAndSpecialty.deleteCharAt(ftInstituteAndSpecialty.length() - 1);
         }
         return ftInstituteAndSpecialty;

@@ -24,7 +24,7 @@ public class FamilyNameAttrValue implements AttrValue {
     public Object getAttrValue(Map<String, Object> attrValueContext, String empId) throws Exception {
         List familyList = (List) attrValueContext.get("A36");
 
-        Map<String, String> familyMap = new HashMap<String, String>();
+        Map<String, String> familyMap = new HashMap<>();
         for (int i = 0; i < familyList.size(); i++) {
             Map map = (Map) familyList.get(i);
             String familyName = StringUtil.obj2Str(map.get("A36001"));

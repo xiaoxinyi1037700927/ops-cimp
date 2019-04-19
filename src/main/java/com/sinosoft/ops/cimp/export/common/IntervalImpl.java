@@ -10,7 +10,7 @@ import org.joda.time.Interval;
  */
 public class IntervalImpl {
 
-    Interval interval;
+    private Interval interval;
 
     public IntervalImpl(Interval interval) {
         this.interval = interval;
@@ -23,7 +23,7 @@ public class IntervalImpl {
      * @return
      */
     public boolean contains(DateTime dateTime) {
-        return dateTime == null || this.interval == null ? true : this.contains(dateTime.getMillis());
+        return dateTime == null || this.interval == null || this.contains(dateTime.getMillis());
     }
 
     /**
@@ -33,7 +33,7 @@ public class IntervalImpl {
      * @return
      */
     public boolean containsLeftGt(DateTime dateTime) {
-        return dateTime == null || this.interval == null ? true : this.containsLeftGt(dateTime.getMillis());
+        return dateTime == null || this.interval == null || this.containsLeftGt(dateTime.getMillis());
     }
 
     /*  左闭右开
@@ -41,7 +41,7 @@ public class IntervalImpl {
      * @return
      */
     public boolean containsRightLt(DateTime dateTime) {
-        return dateTime == null || this.interval == null ? true : this.containsRightLt(dateTime.getMillis());
+        return dateTime == null || this.interval == null || this.containsRightLt(dateTime.getMillis());
     }
 
     public boolean contains(long var1) {

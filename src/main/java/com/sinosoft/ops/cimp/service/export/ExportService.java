@@ -1,9 +1,6 @@
 package com.sinosoft.ops.cimp.service.export;
 
 
-import com.sinosoft.ops.cimp.export.AbstractExportHandler;
-import com.sinosoft.ops.cimp.service.common.BaseService;
-
 import java.util.List;
 import java.util.Map;
 
@@ -14,7 +11,7 @@ import java.util.Map;
  * @Date: 2017年11月13日 下午12:35:39
  * @Version 1.0.0
  */
-public interface ExportService extends BaseService {
+public interface ExportService {
 
     List<Map<String, Object>> findBySQL(String sql);
 
@@ -30,7 +27,7 @@ public interface ExportService extends BaseService {
      * 生成干部任免表html文件(毕节)
      *
      * @param empId
-     * @return
+     * @returny
      */
     String generateGbrmbHTMLBiJie(String empId);
 
@@ -41,5 +38,12 @@ public interface ExportService extends BaseService {
      * @return
      */
     String generateGbrmbLRMX(String empId);
+
+    /**
+     * 生成干部的所有任免表文件(毕节)
+     *
+     * @param empId
+     */
+    void generateGbrmbBiJieAll(String empId);
 
 }

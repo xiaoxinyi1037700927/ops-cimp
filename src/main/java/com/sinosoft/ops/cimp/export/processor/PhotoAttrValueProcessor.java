@@ -22,13 +22,11 @@ public class PhotoAttrValueProcessor extends AbstractAttrValueProcessor implemen
         }
 
         DocumentBuilder db = new DocumentBuilder(document);
-        if (attrValue != null) {
-            Shape shape = db.insertImage(attrValue, 83, 115);
-            shape.setWrapType(WrapType.SQUARE);
-            db.moveToMergeField(attrName);
-            db.insertNode(shape);
-        } else {
-            return;
-        }
+
+        Shape shape = db.insertImage(attrValue, 83, 115);
+        shape.setWrapType(WrapType.SQUARE);
+        db.moveToMergeField(attrName);
+        db.insertNode(shape);
+
     }
 }

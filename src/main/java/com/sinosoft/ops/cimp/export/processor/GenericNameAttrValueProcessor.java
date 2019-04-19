@@ -34,28 +34,28 @@ public class GenericNameAttrValueProcessor extends AbstractAttrValueProcessor im
             int length = attrValue.length();
             if (length <= 4) {
                 insertTextIntoCell(cell, attrValue, true, false, null);
-            } else if (length > 4 && length <= 8) {
+            } else if (length <= 8) {
                 String firstLine = attrValue.substring(0, 4);
                 String secondLine = attrValue.substring(4, length);
 //                attrValue = firstLine + "\n" + secondLine;
-                Map<String, Object> config = new HashMap<String, Object>(1);
+                Map<String, Object> config = new HashMap<>(1);
                 config.put("fontSize", 10.5);
                 config.put("fontPos", "CENTER");
                 insertTextIntoCell(cell, attrValue, true, false, config);
-            } else if (length > 8 && length <= 10) {
+            } else if (length <= 10) {
                 String firstLine = attrValue.substring(0, 5);
                 String secondLine = attrValue.substring(5, length);
 //                attrValue = firstLine + "\n" + secondLine;
-                Map<String, Object> config = new HashMap<String, Object>(2);
+                Map<String, Object> config = new HashMap<>(2);
                 config.put("fontSize", 10.5);
                 config.put("fontPos", "CENTER");
                 insertTextIntoCell(cell, attrValue, true, false, config);
-            } else if (length > 10 && length <= 15) {
+            } else if (length <= 15) {
                 String firstLine = attrValue.substring(0, 5);
                 String secondLine = attrValue.substring(5, 10);
                 String thirdLine = attrValue.substring(10, length);
 //                attrValue = firstLine + "\n" + secondLine + "\n" + thirdLine;
-                Map<String, Object> config = new HashMap<String, Object>(2);
+                Map<String, Object> config = new HashMap<>(2);
                 config.put("fontSize", 7.5);
                 config.put("fontPos", "CENTER");
                 insertTextIntoCell(cell, attrValue, true, false, config);
@@ -64,7 +64,7 @@ public class GenericNameAttrValueProcessor extends AbstractAttrValueProcessor im
                 String secondLine = attrValue.substring(6, 12);
                 String thirdLine = attrValue.substring(12, length);
 //                attrValue = firstLine + "\n" + secondLine + "\n" + thirdLine;
-                Map<String, Object> config = new HashMap<String, Object>(2);
+                Map<String, Object> config = new HashMap<>(2);
                 config.put("fontSize", 7.5);
                 config.put("fontPos", "CENTER");
                 insertTextIntoCell(cell, attrValue, true, false, config);

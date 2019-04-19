@@ -36,7 +36,7 @@ public class PtInstituteAndSpecialtyAttrValue implements AttrValue {
             List<Map> highDegreeList = inServiceEdu.get("highDegreeList");
             StringBuffer ptInstituteAndSpecialty = new StringBuffer();
             //储存学校名称
-            List<String> collegeList = new ArrayList<String>();
+            List<String> collegeList = new ArrayList<>();
             if (highDiplomaList != null && highDiplomaList.size() > 0) {
                 for (Map inServiceMap : highDiplomaList) {
                     String ptInstitute = StringUtil.obj2Str(inServiceMap.get("A08014"));//学校名称
@@ -68,7 +68,7 @@ public class PtInstituteAndSpecialtyAttrValue implements AttrValue {
 //            }
 
             //shixianggui-20180410, bug 377 学历学位问题: 学历集信息中，在职学习未到得学历的，其专业可以为空，让其生成任免表。
-            if (ptInstituteAndSpecialty != null && ptInstituteAndSpecialty.length() > 0) {
+            if (ptInstituteAndSpecialty.length() > 0) {
                 ptInstituteAndSpecialty.deleteCharAt(ptInstituteAndSpecialty.length() - 1);
             }
 

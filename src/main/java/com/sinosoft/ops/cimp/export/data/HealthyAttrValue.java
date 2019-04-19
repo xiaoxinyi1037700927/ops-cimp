@@ -25,15 +25,14 @@ public class HealthyAttrValue implements AttrValue {
         try {
             Map a01Map = (Map) attrValueContext.get("A01");
             final String healthyInfoSql = "SELECT A01028 FROM EMP_A001 A01 WHERE EMP_ID = '%s'  and status=0";
-            String healthyValue = this.getHealthyCodeStr(healthyInfoSql, empId);
-            return healthyValue;
+            return this.getHealthyCodeStr(healthyInfoSql, empId);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("任免表生成失败:[EMP_A001_A01028健康状况描述]");
         }
     }
 
-    private String getHealthyCodeStr(String sql, String empId) throws Exception {
+    private String getHealthyCodeStr(String sql, String empId) {
         String attrInfoSql = String.format(sql, empId);
         List attrInfoList = ExportConstant.exportWordService.findBySQL(attrInfoSql);
         if (attrInfoList != null && attrInfoList.size() > 0) {

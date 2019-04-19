@@ -52,18 +52,16 @@ public abstract class AbstractExportHandler {
         return attrValues;
     }
 
-    public boolean generate(String templateFilePath, Map<String, Object> attrValues, String outputFilePath) {
+    public void generate(String templateFilePath, Map<String, Object> attrValues, String outputFilePath) throws Exception {
         try {
             if (lock.tryLock(10, TimeUnit.SECONDS)) {
                 processAttrValue(templateFilePath, attrValues, outputFilePath);
-                return true;
+            } else {
+                throw new Exception("tryLock failed!");
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         } finally {
             lock.unlock();
         }
-        return false;
     }
 
     public abstract void processAttrValue(String templateFilePath, Map<String, Object> attrValues, String outputFilePath) throws Exception;

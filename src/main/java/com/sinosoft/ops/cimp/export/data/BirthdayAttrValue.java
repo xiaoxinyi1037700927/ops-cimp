@@ -47,7 +47,7 @@ public class BirthdayAttrValue implements AttrValue {
     }
 
 
-    private Object getBirthdayStr(String sql, String empId) throws Exception {
+    private Object getBirthdayStr(String sql, String empId) {
         String birthdayInfoSql = String.format(sql, empId);
         List birthdayInfoList = ExportConstant.exportWordService.findBySQL(birthdayInfoSql);
         if (birthdayInfoList != null && birthdayInfoList.size() > 0) {

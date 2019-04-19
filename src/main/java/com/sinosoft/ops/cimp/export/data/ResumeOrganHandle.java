@@ -50,7 +50,7 @@ public class ResumeOrganHandle {
      * 合并机构和职务
      */
     public static List<String> combineOrganAndDuty(List orgList) throws Exception {
-        SetList<String> result = new SetList();
+        SetList<String> result = new SetList<>();
         if (orgList == null || orgList.size() <= 1) {
             removeSpecialStr(orgList);
             return orgList;
@@ -171,9 +171,8 @@ public class ResumeOrganHandle {
                 stringBuilder.append(jsonStr);
             }
             inputStream.close();
-            JSONObject jsonObject = JSON.parseObject(stringBuilder.toString());
 
-            return jsonObject;
+            return JSON.parseObject(stringBuilder.toString());
         } catch (Exception e) {
 //            e.printStackTrace();
             System.out.println("按所任职务根据对应的词库进行合并失败！");

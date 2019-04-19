@@ -30,7 +30,7 @@ public class PositionAttrValue implements AttrValue {
             // shixianggui-20180411, bug: 修改现任职务和简历的最一条简历相匹配
             // shixianggui-20180308  bug331:任免表中现任职务与简历中不匹配 , 夹限制条件 A02049 <> 4 (除了 挂职任职 外)
 //            final String positionInfoSql = "SELECT * FROM EMP_A02 WHERE EMP_ID = '%s'  and A02055 = '2' and status=0 and A02049 <> 4 ORDER BY A02023";
-            final String positionInfoSql = "SELECT b001.syscode DepCode, a02.* FROM EMP_A02 a02 left join dep_b001 b001 on b001.dep_id=a02.A02001_B WHERE a02.EMP_ID = '%s'  and a02.A02055 = '2' and a02.status=0 and a02.A02049 <> 4 ORDER BY a02.A02023";
+            final String positionInfoSql = "SELECT b001.code DepCode, a02.* FROM EMP_A02 a02 left join dep_b001 b001 on b001.dep_id=a02.A02001_B WHERE a02.EMP_ID = '%s'  and a02.A02055 = '2' and a02.status=0 and a02.A02049 <> 4 ORDER BY a02.A02023";
             String a02TableSql = String.format(positionInfoSql, empId);
             List jobInfoList = ExportConstant.exportWordService.findBySQL(a02TableSql);
             if (jobInfoList == null) {
@@ -39,14 +39,14 @@ public class PositionAttrValue implements AttrValue {
             }
             attrValueContext.put("A02", jobInfoList);
 
-            List<Map> jobInDutyList = new ArrayList<Map>();
+            List<Map> jobInDutyList = new ArrayList<>();
             for (Object o : jobInfoList) {
                 Map jobInfoMap = (Map) o;
                 jobInDutyList.add(jobInfoMap);
             }
 
             //按照任职机构分组，同一个机构下任多个职多个职务应该使用“、”隔开，不同机构应使用“，”隔开
-            SetList setList = new SetList();
+            SetList<String> setList = new SetList<>();
 //			for (Map map : jobInDutyList) {
 //			    //分组key
 //			    String deptName = StringUtil.obj2Str(map.get("A02001_A"));

@@ -299,32 +299,29 @@ public class ResumeAttrVauleHandle extends ResumeOrganHandle {
      */
     public List<Map.Entry<String, List<Map>>> sortByResumeDate(Map<String, List<Map>> jobInfoList) {
 
-        return jobInfoList.entrySet().stream().sorted(new Comparator<Map.Entry<String, List<Map>>>() {
-            @Override
-            public int compare(Map.Entry<String, List<Map>> o1, Map.Entry<String, List<Map>> o2) {
-                //获取时间
-                String date1 = o1.getKey().split("_")[0];
-                String date2 = o2.getKey().split("_")[0];
-                if (new DateTime(date1.replace(".", "-")).getMillis() < new DateTime(date2.replace(".", "-")).getMillis()) {
-                    return -1;
-                } else if (new DateTime(date1.replace(".", "-")).getMillis() > new DateTime(date2.replace(".", "-")).getMillis()) {
+        return jobInfoList.entrySet().stream().sorted((Map.Entry<String, List<Map>> o1, Map.Entry<String, List<Map>> o2) -> {
+            //获取时间
+            String date1 = o1.getKey().split("_")[0];
+            String date2 = o2.getKey().split("_")[0];
+            if (new DateTime(date1.replace(".", "-")).getMillis() < new DateTime(date2.replace(".", "-")).getMillis()) {
+                return -1;
+            } else if (new DateTime(date1.replace(".", "-")).getMillis() > new DateTime(date2.replace(".", "-")).getMillis()) {
+                return 1;
+            } else {
+                if (o1.getKey().split("_").length > 1 && o2.getKey().split("_").length == 1) {
                     return 1;
+                } else if (o1.getKey().split("_").length == 1 && o2.getKey().split("_").length > 1) {
+                    return -1;
                 } else {
-                    if (o1.getKey().split("_").length > 1 && o2.getKey().split("_").length == 1) {
-                        return 1;
-                    } else if (o1.getKey().split("_").length == 1 && o2.getKey().split("_").length > 1) {
+                    String enddate1 = o1.getKey().split("_")[1];
+                    String enddate2 = o2.getKey().split("_")[1];
+                    if (new DateTime(enddate1.replace(".", "-")).getMillis() < new DateTime(enddate2.replace(".", "-")).getMillis()) {
                         return -1;
-                    } else {
-                        String enddate1 = o1.getKey().split("_")[1];
-                        String enddate2 = o2.getKey().split("_")[1];
-                        if (new DateTime(enddate1.replace(".", "-")).getMillis() < new DateTime(enddate2.replace(".", "-")).getMillis()) {
-                            return -1;
-                        } else if (new DateTime(enddate1.replace(".", "-")).getMillis() > new DateTime(enddate2.replace(".", "-")).getMillis()) {
-                            return 1;
-                        }
+                    } else if (new DateTime(enddate1.replace(".", "-")).getMillis() > new DateTime(enddate2.replace(".", "-")).getMillis()) {
+                        return 1;
                     }
-                    return 0;
                 }
+                return 0;
             }
         }).collect(Collectors.toList());
     }

@@ -8,6 +8,11 @@ import com.sinosoft.ops.cimp.export.data.*;
 import com.sinosoft.ops.cimp.export.processor.*;
 import com.sinosoft.ops.cimp.util.StringUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.stereotype.Component;
+import org.springframework.util.ResourceUtils;
 
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -21,7 +26,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
+@Component
 public class ExportHandlerBiJie extends AbstractExportHandler {
+
+    @Autowired
+    private ResourceLoader resourceLoader;
 
     @Override
     protected void init() {
@@ -84,6 +93,7 @@ public class ExportHandlerBiJie extends AbstractExportHandler {
      * @param outputFilePath   文件输出路径
      */
     @Override
+    @SuppressWarnings("unchecked")
     public void processAttrValue(String templateFilePath, Map<String, Object> attrValues, String outputFilePath) throws Exception {
         //根据resume的内容更换模板
         List<Map<String, Object>> resume = (List<Map<String, Object>>) attrValues.get("resume");
@@ -111,7 +121,7 @@ public class ExportHandlerBiJie extends AbstractExportHandler {
         GetRightFontSizeProcessor getRightFontSizeProcessor = new GetRightFontSizeProcessor();
         double rightFontSize = getRightFontSizeProcessor.getRightFontSize(lineWords);
         //如果字体大于等于12小于等于14则使用悬挂缩进为10.5的
-        Map<Double, String> fontSize2Template = new HashMap<Double, String>();
+        Map<Double, String> fontSize2Template = new HashMap<>();
         fontSize2Template.put(12d, "_11.docx");
         fontSize2Template.put(11d, "_11.docx");
         fontSize2Template.put(10.5d, "_11.docx");
@@ -139,8 +149,11 @@ public class ExportHandlerBiJie extends AbstractExportHandler {
             throw new RuntimeException("模版文件未找到");
         }
         //破解Aspose代码
+        // 凭证文件
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        InputStream license = loader.getResourceAsStream("license.xml");// 凭证文件
+        InputStream license = loader.getResourceAsStream("license.xml");
+//        InputStream license = resourceLoader.getResource("classpath:license.xml").getInputStream();
+
         License aposeLic = new License();
         aposeLic.setLicense(license);
 

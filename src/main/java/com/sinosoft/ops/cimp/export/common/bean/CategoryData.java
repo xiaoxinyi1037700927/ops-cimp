@@ -21,7 +21,7 @@ import org.jsoup.select.Elements;
  */
 public class CategoryData {
 
-    public static void initCategoryData(Document doc) throws ClassNotFoundException, IOException {
+    public static void initCategoryData(Document doc) {
         initDivStyleXYWHMap(doc);
         initAttributeBeanXYWH(doc);
     }
@@ -215,7 +215,7 @@ public class CategoryData {
 
     private static boolean isInitAttributeBeanXYWH = false;
 
-    private static void initAttributeBeanXYWH(Document doc) throws ClassNotFoundException, IOException {
+    private static void initAttributeBeanXYWH(Document doc) {
         if (!isInitAttributeBeanXYWH) {
             synchronized (CategoryData.class) {
                 if (!isInitAttributeBeanXYWH) {
@@ -252,13 +252,13 @@ public class CategoryData {
                         classValue = divElement.className();
                         classValueArray = classValue.split(" ");
                         for (String s : classValueArray) {
-                            if (s.indexOf("x") >= 0) {
+                            if (s.contains("x")) {
                                 attributeBean.setLeft(divStyleXYWHMap.get("." + s.trim()));
-                            } else if (s.indexOf("y") >= 0) {
+                            } else if (s.contains("y")) {
                                 attributeBean.setBottom(divStyleXYWHMap.get("." + s.trim()));
-                            } else if (s.indexOf("w") >= 0) {
+                            } else if (s.contains("w")) {
                                 attributeBean.setWidth(divStyleXYWHMap.get("." + s.trim()));
-                            } else if (s.indexOf("h") >= 0) {
+                            } else if (s.contains("h")) {
                                 attributeBean.setHeight(divStyleXYWHMap.get("." + s.trim()));
                             }
                         }

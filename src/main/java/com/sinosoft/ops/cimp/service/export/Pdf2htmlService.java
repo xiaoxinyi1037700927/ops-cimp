@@ -1,15 +1,13 @@
 package com.sinosoft.ops.cimp.service.export;
 
 
-import com.sinosoft.ops.cimp.service.common.BaseService;
-
 /**
  * pdf 转为 html
  *
  * @author shixianggui
  * @Date: 20180306
  */
-public interface Pdf2htmlService extends BaseService {
+public interface Pdf2htmlService{
 
     /**
      * Windows 环境下 pdf 转为 HTML

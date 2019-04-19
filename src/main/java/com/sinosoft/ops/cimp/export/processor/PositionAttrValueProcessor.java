@@ -24,7 +24,7 @@ public class PositionAttrValueProcessor extends AbstractAttrValueProcessor imple
         Cell cell = super.getAttrIndexCell(document, attrName);
         if (cell != null) {
             int len = attrValue.length();
-            Map<String, Object> config = new HashMap<String, Object>(2);
+            Map<String, Object> config = new HashMap<>(2);
             if (len > 50 && len < 65) {
                 config.put("fontSize", "10");
             } else if (len >= 65 && len <= 80) {

@@ -31,30 +31,30 @@ public class TechnicPositionAttrValueProcessor extends AbstractAttrValueProcesso
             }
             if (length <= 6) {
                 insertTextIntoCell(cell, attrValue, true, false, null);
-            } else if (length > 6 && length <= 8) {
-                Map<String, Object> config = new HashMap<String, Object>(1);
+            } else if (length <= 8) {
+                Map<String, Object> config = new HashMap<>(1);
                 config.put("fontPos", "LEFT");
                 insertTextIntoCell(cell, attrValue, true, false, config);
-            } else if (length > 8 && length <= 16) {
+            } else if (length <= 16) {
                 String firstLine = attrValue.substring(0, 8);
                 String secondLine = attrValue.substring(8, length);
                 attrValue = firstLine + "\n" + secondLine;
-                Map<String, Object> config = new HashMap<String, Object>(1);
+                Map<String, Object> config = new HashMap<>(1);
                 config.put("fontPos", "LEFT");
                 insertTextIntoCell(cell, attrValue, true, false, config);
-            } else if (length > 16 && length <= 24) {
+            } else if (length <= 24) {
                 String firstLine = attrValue.substring(0, 12);
                 String secondLine = attrValue.substring(12, length);
                 attrValue = firstLine + "\n" + secondLine;
-                Map<String, Object> config = new HashMap<String, Object>(2);
+                Map<String, Object> config = new HashMap<>(2);
                 config.put("fontSize", 10.5);
                 config.put("fontPos", "LEFT");
                 insertTextIntoCell(cell, attrValue, true, false, config);
-            } else if (length > 24 && length <= 30) {
+            } else if (length <= 30) {
                 String firstLine = attrValue.substring(0, 17);
                 String secondLine = attrValue.substring(17, length);
                 attrValue = firstLine + "\n" + secondLine;
-                Map<String, Object> config = new HashMap<String, Object>(2);
+                Map<String, Object> config = new HashMap<>(2);
                 config.put("fontSize", 7.5);
                 config.put("fontPos", "LEFT");
                 insertTextIntoCell(cell, attrValue, true, false, config);

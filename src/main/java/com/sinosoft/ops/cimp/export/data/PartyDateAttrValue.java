@@ -39,11 +39,7 @@ public class PartyDateAttrValue implements AttrValue {
                             return new DateTime(partyDateObj).toString("yyyy.MM");
                         }
                     } else if (!StringUtils.equals(partyCode, "01")) {
-                        if (StringUtils.isNotEmpty(partyName)) {
-                            return partyName;
-                        } else {
-                            return "无党派";
-                        }
+                        return StringUtils.isNotEmpty(partyName) ? partyName : "无党派";
                     }
                     if (partyDateObj != null) {
                         return new DateTime(partyDateObj).toString("yyyy.MM");
@@ -76,11 +72,7 @@ public class PartyDateAttrValue implements AttrValue {
                             result = partyBuilder.substring(1);
                         }
                     }
-                    if (StringUtils.isNotEmpty(result)) {
-                        return result;
-                    } else {
-                        return "无党派";
-                    }
+                    return StringUtils.isNotEmpty(result) ? result : "无党派";
                 }
             }
             return "无党派";

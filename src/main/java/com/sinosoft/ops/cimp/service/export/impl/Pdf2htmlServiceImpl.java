@@ -1,16 +1,10 @@
 package com.sinosoft.ops.cimp.service.export.impl;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.sinosoft.ops.cimp.export.common.ExportConstant;
+import com.sinosoft.ops.cimp.export.common.StreamGobbler;
 import com.sinosoft.ops.cimp.export.common.bean.AttributeBean;
 import com.sinosoft.ops.cimp.export.common.bean.CategoryBean;
-import com.sinosoft.ops.cimp.export.common.StreamGobbler;
 import com.sinosoft.ops.cimp.export.common.bean.CategoryData;
-import com.sinosoft.ops.cimp.service.common.impl.BaseServiceImpl;
 import com.sinosoft.ops.cimp.service.export.Pdf2htmlService;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -20,9 +14,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 
 @Service
-public class Pdf2htmlServiceImpl extends BaseServiceImpl implements Pdf2htmlService {
+public class Pdf2htmlServiceImpl implements Pdf2htmlService {
 
     private final Logger logger = LoggerFactory.getLogger(Pdf2htmlServiceImpl.class);
 
@@ -33,15 +32,6 @@ public class Pdf2htmlServiceImpl extends BaseServiceImpl implements Pdf2htmlServ
 
         StringBuilder command = new StringBuilder();
         command.append(ExportConstant.PDF2HTML_PATH).append(" ");
-
-        // pdf
-//        command.append(pdfFilePath).append("\\").append(pdfFileName).append(" ");
-
-        // html
-//        command.append(htmlFileName).append(" ");
-
-        // 生成文件存放位置
-//        command.append("--dest-dir ").append(htmlFilePath).append(" ");
 
         // 尽量减少用于文本的HTML元素的数目 (default: 0)
         command.append("--optimize-text 1 ");
@@ -55,8 +45,6 @@ public class Pdf2htmlServiceImpl extends BaseServiceImpl implements Pdf2htmlServ
 
         command.append(pdfFilePath).append(pdfFileName).append(" ");
         command.append(htmlFileName).append(" ");
-
-//		logger.debug("+++++++++ Command: " + command.toString());
 
         try {
             Runtime rt = Runtime.getRuntime();
@@ -111,13 +99,8 @@ public class Pdf2htmlServiceImpl extends BaseServiceImpl implements Pdf2htmlServ
      */
     public void analysisPfPage(Document doc) throws ClassNotFoundException, IOException {
 
-//		long initBeginTime = System.currentTimeMillis();
-
         // 初始化相关子集信息
         CategoryData.initCategoryData(doc);
-
-//		long initEndTime = System.currentTimeMillis();
-//		logger.debug("+++++++++++++++++++++++++++++ init Data Time: " + (initEndTime-initBeginTime)/1000 + "s");
 
         // 移除 <script></script>
         removeScriptElement(doc);
@@ -139,7 +122,6 @@ public class Pdf2htmlServiceImpl extends BaseServiceImpl implements Pdf2htmlServ
 
         // 写入 style
         writeInStyle(doc, buildStyle);
-//		logger.debug("+++++++++++++++++++++++++++++ analysis htnl Time: " + (System.currentTimeMillis()-initEndTime)/1000 + "s");
     }
 
     /**
@@ -232,7 +214,6 @@ public class Pdf2htmlServiceImpl extends BaseServiceImpl implements Pdf2htmlServ
             if ("".equals(divText)) {
                 continue;
             }
-//			logger.debug("====== divText=" + divText + ", index=" + divElement.elementSiblingIndex());
             if (isContainsDivText(categoryBeansPf, divText, divElement.elementSiblingIndex())) {
                 nameIndexs.add(divElement.elementSiblingIndex());
             }

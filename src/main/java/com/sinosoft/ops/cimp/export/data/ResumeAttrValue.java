@@ -41,7 +41,7 @@ public class ResumeAttrValue extends ResumeAttrVauleHandle implements AttrValue 
 //        try {
         // shixianggui-20180411, bug: 简历合并问题
 //			final String jobInfoSql = "SELECT * FROM EMP_A02 WHERE EMP_ID = '%s'  and status=0 ORDER BY A02043,A02065";
-        final String jobInfoSql = "SELECT b001.syscode DepCode, a02.* FROM EMP_A02 a02 left join dep_b001 b001 on b001.dep_id=a02.A02001_B WHERE a02.EMP_ID = '%s' and a02.status=0 ORDER BY a02.A02043,a02.A02065";
+        final String jobInfoSql = "SELECT b001.code DepCode, a02.* FROM EMP_A02 a02 left join dep_b001 b001 on b001.dep_id=a02.A02001_B WHERE a02.EMP_ID = '%s' and a02.status=0 ORDER BY a02.A02043,a02.A02065";
 
         // 学习（培训、进修）情况
         final String trainInfoSql = "SELECT * FROM EMP_A11 WHERE EMP_ID = '%s'  and status=0 ORDER BY A11007 DESC";
@@ -73,7 +73,7 @@ public class ResumeAttrValue extends ResumeAttrVauleHandle implements AttrValue 
         this.setEduInfoList(eduInfoList);
         this.setJobInfoList(jobInfoList);
         this.setTrainInfoList(trainInfoList);
-        ///
+
         this.setProfessionalInfoList(professionalInfoList);
 
 
@@ -136,7 +136,7 @@ public class ResumeAttrValue extends ResumeAttrVauleHandle implements AttrValue 
 
         //第三步 合并增任职务
         for (Map.Entry<String, List<Map>> entry : keySet) {
-            Map<String, Object> startDateAndContentMap = new HashMap<String, Object>();
+            Map<String, Object> startDateAndContentMap = new HashMap<>();
             StringBuilder resumeContentStr = new StringBuilder();
             IntervalImpl interval = null;
 
@@ -266,7 +266,7 @@ public class ResumeAttrValue extends ResumeAttrVauleHandle implements AttrValue 
                             String a06001a = StringUtil.obj2Str(a06Map.get("A06001_A"));
                             if (a06004 != null) {
                                 DateTime dateTime = new DateTime(a06004);
-                                if (interval != null && interval.contains(dateTime)) {
+                                if (interval.contains(dateTime)) {
                                     appendStringBuilder.append(dateTime.toString("yyyy.MM")).append("评为").append(a06001a).append("；");
                                 }
                             }
@@ -307,9 +307,9 @@ public class ResumeAttrValue extends ResumeAttrVauleHandle implements AttrValue 
 
     //在职教育的如果和简历中所有时间段都不重复,则单独增加这条
     public List<Map<String, Object>> Setedu2(List<Map<String, Object>> resultResumeList, Map<String, Object> attrValueContext) {
-        List<Map<String, Object>> newResult = new ArrayList<Map<String, Object>>();
+        List<Map<String, Object>> newResult = new ArrayList<>();
 
-        List<Map> needDeal = new ArrayList<Map>();
+        List<Map> needDeal = new ArrayList<>();
         for (Object eduInfo : eduInfoList) {
             Map eduMap = (Map) eduInfo;
             String eduType = StringUtil.obj2Str(eduMap.get("A08020"));
@@ -362,7 +362,7 @@ public class ResumeAttrValue extends ResumeAttrVauleHandle implements AttrValue 
         Object a09 = attrValueContext.get("A09");
         try {
             for (Map eduMap : needDeal) {
-                Map<String, Object> maptemp = new HashMap<String, Object>();
+                Map<String, Object> maptemp = new HashMap<>();
                 String a08004 = StringUtil.replaceSpeStr(StringUtil.obj2Str(eduMap.get("A08004")), " 00:00:00.0");              //入学时间
                 String a08007 = StringUtil.replaceSpeStr(StringUtil.obj2Str(eduMap.get("A08007")), " 00:00:00.0");              //毕（肄、结）业日期
                 String schoolName = StringUtil.obj2Str(eduMap.get("A08014"));  //学校

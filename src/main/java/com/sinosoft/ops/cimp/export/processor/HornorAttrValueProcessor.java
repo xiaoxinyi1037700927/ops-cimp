@@ -23,7 +23,7 @@ public class HornorAttrValueProcessor extends AbstractAttrValueProcessor impleme
         String attrValue = StringUtil.obj2Str(attrAndValue.values().toArray()[0]);
         Cell cell = super.getAttrIndexCell(document, attrName);
         if (cell != null) {
-            Map<String, Object> config = new HashMap<String, Object>(1);
+            Map<String, Object> config = new HashMap<>(1);
             config.put("fontPos", "LEFT");
             insertTextIntoCell(cell, attrValue, true, false, config);
         }

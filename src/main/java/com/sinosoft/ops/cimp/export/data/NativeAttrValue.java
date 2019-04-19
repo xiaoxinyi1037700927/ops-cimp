@@ -51,7 +51,7 @@ public class NativeAttrValue implements AttrValue {
         }
     }
 
-    private String getNativeStr(String sql, String empId) throws Exception {
+    private String getNativeStr(String sql, String empId) {
         String attrInfoSql = String.format(sql, empId);
         List attrInfoList = ExportConstant.exportWordService.findBySQL(attrInfoSql);
         if (attrInfoList != null && attrInfoList.size() > 0) {

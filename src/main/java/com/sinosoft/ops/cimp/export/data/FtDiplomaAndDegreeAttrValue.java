@@ -47,11 +47,11 @@ public class FtDiplomaAndDegreeAttrValue implements AttrValue {
             attrValueContext.put("A08", diplomaInfoList);
             attrValueContext.put("A09", degreeInfoList);
             //重新组织数据结构，用来储存全日制学历学位和学校的信息
-            Map<String, List<Map>> fullEduMap = new HashMap<String, List<Map>>();
+            Map<String, List<Map>> fullEduMap = new HashMap<>();
             //全日制最高学历List
-            List<Map> highDiplomaList = new ArrayList<Map>();
+            List<Map> highDiplomaList = new ArrayList<>();
             //全日制最高学位List
-            List<Map> highDegreeList = new ArrayList<Map>();
+            List<Map> highDegreeList = new ArrayList<>();
             //遍历，取出所有的全日制最高学历并组装在一起
             Map<String, List<Map>> eduMapList = new HashMap<String, List<Map>>(2);
             for (Object eduInfo : diplomaInfoList) {
@@ -72,9 +72,9 @@ public class FtDiplomaAndDegreeAttrValue implements AttrValue {
                 }
             }
 
-            List<String> diplomaAndDegreeList = new ArrayList<String>(2);
+            List<String> diplomaAndDegreeList = new ArrayList<>(2);
             //将组装好的最高学位集合封装到学历学位Map中
-            if (highDiplomaList != null && highDiplomaList.size() > 0) {
+            if (highDiplomaList.size() > 0) {
                 fullEduMap.put("highDiplomaList", highDiplomaList);
                 //学历
                 StringBuffer xueli = new StringBuffer();
@@ -94,7 +94,7 @@ public class FtDiplomaAndDegreeAttrValue implements AttrValue {
 
             }
             //将组装好的最高学历集合封装到学历学位Map中
-            if (highDegreeList != null && highDegreeList.size() > 0) {
+            if (highDegreeList.size() > 0) {
                 fullEduMap.put("highDegreeList", highDegreeList);
                 //学位
                 StringBuffer xuewei = new StringBuffer();

@@ -138,7 +138,6 @@ public class ExportGbrmbBiJieController extends BaseController {
         fileName = new String(fileName.getBytes("utf-8"), "utf-8");
         fileName = URLEncoder.encode(fileName, "UTF-8");
 
-//        request.setCharacterEncoding("utf-8");
         //设置向浏览器端传送的文件格式
         response.setContentType("application/x-download");
         response.addHeader("Content-Disposition", "attachment;filename=" + fileName);

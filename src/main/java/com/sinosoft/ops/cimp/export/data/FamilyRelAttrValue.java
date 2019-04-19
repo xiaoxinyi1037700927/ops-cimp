@@ -46,7 +46,7 @@ public class FamilyRelAttrValue implements AttrValue {
                 attrValueContext.put("A36", new ArrayList<Map>());
                 a36TableList = new ArrayList<Map>();
             }
-            Map<String, String> familyMap = new HashMap<String, String>();
+            Map<String, String> familyMap = new HashMap<>();
 
             Map map = null;
             Map mapNex = null;

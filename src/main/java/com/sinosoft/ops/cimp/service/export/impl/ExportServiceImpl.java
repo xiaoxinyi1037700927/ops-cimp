@@ -4,7 +4,6 @@ import com.sinosoft.ops.cimp.dao.ExportDao;
 import com.sinosoft.ops.cimp.export.bijie.ExportHandlerBiJie;
 import com.sinosoft.ops.cimp.export.common.ExportConstant;
 import com.sinosoft.ops.cimp.export.data.NameAttrValue;
-import com.sinosoft.ops.cimp.service.common.impl.BaseServiceImpl;
 import com.sinosoft.ops.cimp.service.export.ExportService;
 import com.sinosoft.ops.cimp.service.export.Pdf2htmlService;
 import com.sinosoft.ops.cimp.util.FileUtils;
@@ -27,10 +26,9 @@ import java.util.*;
 
 
 @Service
-public class ExportServiceImpl extends BaseServiceImpl implements ExportService {
+public class ExportServiceImpl implements ExportService {
 
     @Autowired
-    @Qualifier("exportDao")
     private ExportDao exportWordDao;
 
     @Autowired
@@ -61,21 +59,23 @@ public class ExportServiceImpl extends BaseServiceImpl implements ExportService 
         String templateFilePath = ExportConstant.EXPORT_BASE_PATH + ExportConstant.TEMPLATE_WORD_GBRMB_BJ;
         String exportPath = ExportConstant.EXPORT_BASE_PATH + ExportConstant.EXPORT_WORD_GBRMB;
         String exportPathZip = ExportConstant.EXPORT_BASE_PATH + ExportConstant.EXPORT_WORD_GBRMB_ZIP;
+        String outFile = "";
 
         try {
             ExportHandlerBiJie exportHandler = new ExportHandlerBiJie();
             Map<String, Object> allAttrValue = exportHandler.getAllAttrValue(empId);
-
             NameAttrValue nameAttrValue = exportHandler.getNameAttrValue();
-            String outFile = exportPath + nameAttrValue.getName() + nameAttrValue.getCardNo() + ExportConstant.RMB_SUFFIX_WORD;
+            outFile = exportPath + nameAttrValue.getName() + nameAttrValue.getCardNo() + ExportConstant.RMB_SUFFIX_WORD;
 
-            //如果html已存在 或 不存在但生成成功
-            if (FileUtils.fileExists(outFile) || exportHandler.generate(templateFilePath, allAttrValue, outFile)) {
-                return outFile;
-            }
+//            if (!FileUtils.fileExists(outFile)) {
+                exportHandler.generate(templateFilePath, allAttrValue, outFile);
+//            }
 
+            return outFile;
         } catch (Exception e) {
             e.printStackTrace();
+            //如果出现异常，删除目标文件
+            FileUtils.deleteFile(outFile);
         }
         return null;
     }
@@ -85,6 +85,7 @@ public class ExportServiceImpl extends BaseServiceImpl implements ExportService 
      * 生成干部任免表pdf文件(毕节)
      *
      * @param empId
+     * @param overwrite
      * @return
      */
     @Override
@@ -94,7 +95,7 @@ public class ExportServiceImpl extends BaseServiceImpl implements ExportService 
         String htmlFileName = empId + ExportConstant.RMB_SUFFIX_HTML;
         String htmlFilePath = exportPath + htmlFileName;
 
-        //如果html文件已存在，直接返回
+        //如果html文件已存在且无需重新生成，直接返回
         if (FileUtils.fileExists(htmlFilePath)) {
             return htmlFilePath;
         }
@@ -106,7 +107,7 @@ public class ExportServiceImpl extends BaseServiceImpl implements ExportService 
             //先生成任免表pdf文件
             ExportHandlerBiJie exportHandler = new ExportHandlerBiJie();
             Map<String, Object> allAttrValue = exportHandler.getAllAttrValue(empId);
-            exportHandler.processAttrValue(templateFilePath, allAttrValue, pdfFilePath);
+            exportHandler.generate(templateFilePath, allAttrValue, pdfFilePath);
 
             //pdf2html
             if (pdf2htmlService.pdf2Html(exportPath, pdfFileName, exportPath, htmlFileName)) {
@@ -114,6 +115,8 @@ public class ExportServiceImpl extends BaseServiceImpl implements ExportService 
             }
         } catch (Exception e) {
             e.printStackTrace();
+            //如果出现异常，删除目标文件
+            FileUtils.deleteFile(htmlFilePath);
         } finally {
             //删除生成的pdf文件
             FileUtils.deleteFile(pdfFilePath);
@@ -130,19 +133,84 @@ public class ExportServiceImpl extends BaseServiceImpl implements ExportService 
     @Override
     public String generateGbrmbLRMX(String empId) {
         String exportPath = ExportConstant.EXPORT_BASE_PATH + ExportConstant.EXPORT_LRMX;
+        String lrmxFilePath = "";
         try {
             ExportHandlerBiJie exportHandler = new ExportHandlerBiJie();
             Map<String, Object> allAttrValue = exportHandler.getAllAttrValue(empId);
             NameAttrValue nameAttrValue = exportHandler.getNameAttrValue();
-            String lrmxFilePath = exportPath + nameAttrValue.getName() + "_" + System.currentTimeMillis() + ExportConstant.RMB_SUFFIX_LRMX;
+            lrmxFilePath = exportPath + nameAttrValue.getName() + nameAttrValue.getCardNo() + ExportConstant.RMB_SUFFIX_LRMX;
 
             if (FileUtils.fileExists(lrmxFilePath) || createXMLByDOM4J(FileUtils.createFile(lrmxFilePath), allAttrValue)) {
                 return lrmxFilePath;
             }
         } catch (Exception e) {
             e.printStackTrace();
+            //如果出现异常，删除目标文件
+            FileUtils.deleteFile(lrmxFilePath);
         }
         return null;
+    }
+
+    /**
+     * 生成干部的所有任免表文件(毕节)
+     *
+     * @param empId
+     */
+    @Override
+    public void generateGbrmbBiJieAll(String empId) {
+        String templateFilePath = ExportConstant.EXPORT_BASE_PATH + ExportConstant.TEMPLATE_WORD_GBRMB_BJ;
+        String exportPath = ExportConstant.EXPORT_BASE_PATH + ExportConstant.EXPORT_WORD_GBRMB;
+        String exportPathZip = ExportConstant.EXPORT_BASE_PATH + ExportConstant.EXPORT_WORD_GBRMB_ZIP;
+        String exportPathLrmx = ExportConstant.EXPORT_BASE_PATH + ExportConstant.EXPORT_LRMX;
+
+        //获取数据
+        ExportHandlerBiJie exportHandler = new ExportHandlerBiJie();
+        Map<String, Object> allAttrValue = null;
+        try {
+            allAttrValue = exportHandler.getAllAttrValue(empId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        //生成任免表word文件
+        NameAttrValue nameAttrValue = exportHandler.getNameAttrValue();
+        String wordFile = exportPath + nameAttrValue.getName() + nameAttrValue.getCardNo() + ExportConstant.RMB_SUFFIX_WORD;
+        try {
+            exportHandler.generate(templateFilePath, allAttrValue, wordFile);
+        } catch (Exception e) {
+            e.printStackTrace();
+            //如果出现异常，删除目标文件
+            FileUtils.deleteFile(wordFile);
+        }
+
+        //生成任免表html文件
+        String htmlFileName = empId + ExportConstant.RMB_SUFFIX_HTML;
+        String htmlFilePath = exportPath + htmlFileName;
+        String pdfFileName = empId + ExportConstant.RMB_SUFFIX_PDF;
+        String pdfFilePath = exportPath + pdfFileName;
+        try {
+            //生成任免表pdf文件
+            exportHandler.generate(templateFilePath, allAttrValue, pdfFilePath);
+            //pdf2html
+            pdf2htmlService.pdf2Html(exportPath, pdfFileName, exportPath, htmlFileName);
+        } catch (Exception e) {
+            e.printStackTrace();
+            //如果出现异常，删除目标文件
+            FileUtils.deleteFile(htmlFilePath);
+        } finally {
+            //删除生成的pdf文件
+            FileUtils.deleteFile(pdfFilePath);
+        }
+
+        //生成任免表LRMX文件
+        String lrmxFile = exportPath + nameAttrValue.getName() + nameAttrValue.getCardNo() + ExportConstant.RMB_SUFFIX_LRMX;
+        try {
+            createXMLByDOM4J(FileUtils.createFile(lrmxFile), allAttrValue);
+        } catch (Exception e) {
+            e.printStackTrace();
+            //如果出现异常，删除目标文件
+            FileUtils.deleteFile(lrmxFile);
+        }
     }
 
     private boolean createXMLByDOM4J(File dest, Map<String, Object> allAttrValue) {
@@ -211,6 +279,7 @@ public class ExportServiceImpl extends BaseServiceImpl implements ExportService 
     }
 
 
+    @SuppressWarnings("unchecked")
     private void addText(Element e, String key, Map<String, Object> allAttrValue) {
         switch (key) {
             case "XingMing"://姓名
@@ -330,11 +399,11 @@ public class ExportServiceImpl extends BaseServiceImpl implements ExportService 
                 }
                 break;
             case "JiaTingChengYuan"://家庭成员
-                Map<String, String> fmRel = (HashMap<String, String>) allAttrValue.get("fmRel") == null ? new HashMap<String, String>() : (HashMap<String, String>) allAttrValue.get("fmRel");
-                Map<String, String> fmName = (HashMap<String, String>) allAttrValue.get("fmName") == null ? new HashMap<String, String>() : (HashMap<String, String>) allAttrValue.get("fmName");
-                Map<String, String> fmAge = (HashMap<String, String>) allAttrValue.get("fmAge") == null ? new HashMap<String, String>() : (HashMap<String, String>) allAttrValue.get("fmAge");
-                Map<String, String> fmParty = (HashMap<String, String>) allAttrValue.get("fmParty") == null ? new HashMap<String, String>() : (HashMap<String, String>) allAttrValue.get("fmParty");
-                Map<String, String> fmOrgAndJob = (HashMap<String, String>) allAttrValue.get("fmOrgAndJob") == null ? new HashMap<String, String>() : (HashMap<String, String>) allAttrValue.get("fmOrgAndJob");
+                Map<String, String> fmRel = allAttrValue.get("fmRel") == null ? new HashMap<>() : (HashMap) allAttrValue.get("fmRel");
+                Map<String, String> fmName = allAttrValue.get("fmName") == null ? new HashMap<>() : (HashMap) allAttrValue.get("fmName");
+                Map<String, String> fmAge = allAttrValue.get("fmAge") == null ? new HashMap<>() : (HashMap) allAttrValue.get("fmAge");
+                Map<String, String> fmParty = allAttrValue.get("fmParty") == null ? new HashMap<>() : (HashMap) allAttrValue.get("fmParty");
+                Map<String, String> fmOrgAndJob = allAttrValue.get("fmOrgAndJob") == null ? new HashMap<>() : (HashMap) allAttrValue.get("fmOrgAndJob");
                 //处理家庭成员
                 handleFamilyPerson(e, fmRel, fmName, fmAge, fmParty, fmOrgAndJob);
                 break;
@@ -407,7 +476,7 @@ public class ExportServiceImpl extends BaseServiceImpl implements ExportService 
             /*String chuShengRiQi=fmAge.get("fmAge_"+i)==null?"":fmAge.get("fmAge_"+i);//出生日期
 				item.addElement("ChuShengRiQi").addText(chuShengRiQi);*/
             //fmAge是任免表家庭成员用的年龄
-            String chuShengRiQi = fmAge.get("fmBirthday_" + i) == null ? "" : fmAge.get("fmBirthday_" + i).toString().replace("-", "");//出生日期
+            String chuShengRiQi = fmAge.get("fmBirthday_" + i) == null ? "" : fmAge.get("fmBirthday_" + i).replace("-", "");//出生日期
             item.addElement("ChuShengRiQi").addText(chuShengRiQi);
 
             String zhengZhiMianMao = fmParty.get("fmParty_" + i) == null ? "" : fmParty.get("fmParty_" + i);//政治面貌

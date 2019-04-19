@@ -45,7 +45,6 @@ public class EvaluationAttrValue implements AttrValue {
                         appraiseInfoMap = (Map) evaluationList.get(i);
                     } catch (Exception e) {
                         break;
-//                    e.printStackTrace();
                     }
                     if (appraiseInfoMap != null && appraiseInfoMap.size() > 0) {
                         String evaluateCode = StringUtil.obj2Str(appraiseInfoMap.get("A15017"));
