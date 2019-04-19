@@ -43,6 +43,14 @@ public interface PermissionPageService {
     List<PermissionPageOperationVO> findPermissionPageOperation(String permissionPageId);
 
     /**
+     * 查询页面操作(角色)
+     * @param permissionPageId
+     * @param roleId
+     * @return
+     */
+    List<PermissionPageOperationVO> findPermissionPageOperationForRole(String permissionPageId, String roleId);
+
+    /**
      * 启用/禁用操作
      * */
     Boolean switchPermissionPageOperation(String permissionPageOperationId, String roleId);

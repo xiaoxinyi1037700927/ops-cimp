@@ -8,6 +8,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sinosoft.ops.cimp.entity.sys.permission.*;
 import com.sinosoft.ops.cimp.entity.user.QRolePermissionPage;
 import com.sinosoft.ops.cimp.entity.user.RolePermissionPage;
+import com.sinosoft.ops.cimp.entity.user.UserRole;
 import com.sinosoft.ops.cimp.mapper.sys.permission.PermissionViewModelMapper;
 import com.sinosoft.ops.cimp.repository.sys.permission.PermissionPageOperationRepository;
 import com.sinosoft.ops.cimp.repository.sys.permission.PermissionPageRepository;
@@ -15,6 +16,7 @@ import com.sinosoft.ops.cimp.repository.sys.permission.PermissionRepository;
 import com.sinosoft.ops.cimp.repository.user.RolePermissionPageRepository;
 import com.sinosoft.ops.cimp.repository.user.UserRoleRepository;
 import com.sinosoft.ops.cimp.service.sys.permission.PermissionPageService;
+import com.sinosoft.ops.cimp.util.SecurityUtils;
 import com.sinosoft.ops.cimp.vo.from.sys.permission.PermissionPageSearchVO;
 import com.sinosoft.ops.cimp.vo.to.sys.permission.PermissionPageOperationVO;
 import com.sinosoft.ops.cimp.vo.to.sys.permission.PermissionPageVO;
@@ -139,11 +141,33 @@ public class PermissionPageServiceImpl implements PermissionPageService {
                         QPermissionPageOperation.permissionPageOperation.name,
                         QPermissionPageOperation.permissionPageOperation.operationId,
                         QPermissionPageOperation.permissionPageOperation.permissionPageId,
-                        QPermissionPageOperation.permissionPageOperation.description,
-                        QRolePermissionPage.rolePermissionPage.status.as("status")
+                        QPermissionPageOperation.permissionPageOperation.description
+//                        QRolePermissionPage.rolePermissionPage.status.as("status")
                         ))
                 .from(QPermissionPageOperation.permissionPageOperation)
-                .leftJoin(QRolePermissionPage.rolePermissionPage).on(QRolePermissionPage.rolePermissionPage.permissionPageOperationId.eq(QPermissionPageOperation.permissionPageOperation.id))
+//                .leftJoin(QRolePermissionPage.rolePermissionPage).on(QRolePermissionPage.rolePermissionPage.permissionPageOperationId.eq(QPermissionPageOperation.permissionPageOperation.id))
+                .where(QPermissionPageOperation.permissionPageOperation.permissionPageId.eq(permissionPageId));
+        List<PermissionPageOperationVO> permissionPageOperationVOS = where.fetch();
+        return permissionPageOperationVOS;
+    }
+
+    @Override
+    public List<PermissionPageOperationVO> findPermissionPageOperationForRole(String permissionPageId, String roleId) {
+        if(StringUtils.isEmpty(roleId)){
+            String id = SecurityUtils.getSubject().getCurrentUser().getId();
+            List<UserRole> byUserId = userRoleRepository.findByUserId(id);
+            roleId = byUserId.get(0).getRoleId();
+        }
+        JPAQuery<PermissionPageOperationVO> where = queryFactory.select(
+                Projections.bean(PermissionPageOperationVO.class,
+                        QPermissionPageOperation.permissionPageOperation.id,
+                        QPermissionPageOperation.permissionPageOperation.name,
+                        QPermissionPageOperation.permissionPageOperation.operationId,
+                        QPermissionPageOperation.permissionPageOperation.permissionPageId,
+                        QPermissionPageOperation.permissionPageOperation.description,
+                        QRolePermissionPage.rolePermissionPage.status))
+                .from(QPermissionPageOperation.permissionPageOperation)
+                .leftJoin(QRolePermissionPage.rolePermissionPage).on(QPermissionPageOperation.permissionPageOperation.id.eq(QRolePermissionPage.rolePermissionPage.permissionPageOperationId).and(QRolePermissionPage.rolePermissionPage.roleId.eq(roleId)))
                 .where(QPermissionPageOperation.permissionPageOperation.permissionPageId.eq(permissionPageId));
         List<PermissionPageOperationVO> permissionPageOperationVOS = where.fetch();
         return permissionPageOperationVOS;

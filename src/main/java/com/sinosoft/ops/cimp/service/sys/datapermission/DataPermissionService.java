@@ -26,6 +26,13 @@ public interface DataPermissionService {
     List<PageInterfaceVO> findPageInterfaceVOList(String permissionPageId);
 
     /**
+     * 查询（角色）
+     * @param permissionPageId
+     * @return
+     */
+    List<PageInterfaceVO> findPageInterfaceVOListForRole(String permissionPageId, String roleId);
+
+    /**
      *根据接口和角色查询
      * */
     String findDataByInterfaceAndRoleId(String pageInterfaceId, String roleId);

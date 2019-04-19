@@ -110,6 +110,14 @@ public class PermissionPageController extends BaseController {
         return ok(permissionPageOperation);
     }
 
+    @ApiOperation(value = "查询页面操作(角色)")
+    @PostMapping("/findPermissionPageOperationForRole")
+    @RequiresAuthentication
+    public ResponseEntity<List<PermissionPageOperationVO>> findPermissionPageOperationForRole(@RequestParam String permissionPageId, @RequestParam String roleId) throws BusinessException {
+        List<PermissionPageOperationVO> permissionPageOperation = permissionPageService.findPermissionPageOperationForRole(permissionPageId, roleId);
+        return ok(permissionPageOperation);
+    }
+
     @ApiOperation(value = "通过ID删除操作")
     @PostMapping("/deletePermissionPageOperationById")
     @RequiresAuthentication

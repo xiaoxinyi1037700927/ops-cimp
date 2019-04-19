@@ -49,7 +49,15 @@ public class DataPermissionController extends BaseController {
     public ResponseEntity<List<PageInterfaceVO>> findPageInterfaceVOList(@RequestParam String permissionPageId) throws BusinessException {
         List<PageInterfaceVO> pageInterfaceVOList = dataPermissionService.findPageInterfaceVOList(permissionPageId);
         return ok(pageInterfaceVOList);
-}
+    }
+
+    @ApiOperation(value = "查询接口（角色）")
+    @PostMapping("/findPageInterfaceVOListForRole")
+    @RequiresAuthentication
+    public ResponseEntity<List<PageInterfaceVO>> findPageInterfaceVOListForRole(@RequestParam String permissionPageId, @RequestParam String roleId) throws BusinessException {
+        List<PageInterfaceVO> pageInterfaceVOList = dataPermissionService.findPageInterfaceVOListForRole(permissionPageId, roleId);
+        return ok(pageInterfaceVOList);
+    }
 
     @ApiOperation(value = "通过ID删除操作")
     @PostMapping("/deletePageInterfaceVOById")
