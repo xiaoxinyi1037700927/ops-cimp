@@ -57,9 +57,9 @@ public class OrganizationUtil {
         organizationDao.deleteAll();
         System.out.println("del all organization");
 
-
         int deptCount = (int) depB001Dao.count();
         int batchNumber = MathUtil.divide(deptCount, BATCH_SIZE, RoundingMode.UP);
+
         for (int i = 0; i < batchNumber; i++) {
             Page<DepB001> depB001Page = depB001Dao.findAll(QDepB001.depB001.depId.isNotEmpty(), PageRequest.of(i, BATCH_SIZE));
             List<DepB001> depB001List = depB001Page.getContent();
@@ -72,11 +72,19 @@ public class OrganizationUtil {
         QOrganization qOrganization = QOrganization.organization;
         List<String> codes = queryFactory.select(qOrganization.code).from(qOrganization).fetch();
 
+        //这里执行速度慢 应该是上面的添加没有加到事务里
         for (String code : codes) {
-            String parId = queryFactory.select(qOrganization.id).from(qOrganization).where(qOrganization.code.eq(code)).fetchOne();
+//          "001.019.114.456"
+//          "001.019.929.165.123"
+            List<String> parIds = queryFactory
+                    .select(qOrganization.id)
+                    .from(qOrganization)
+                    .where(qOrganization.code.eq(code))
+                    .fetch();
             queryFactory.update(qOrganization)
-                    .set(qOrganization.parentId, parId)
-                    .where(qOrganization.code.like(code + ".___"));
+                    .set(qOrganization.parentId, parIds.get(0))
+                    .where(qOrganization.code.like(code + ".___"))
+                    .execute();
         }
     }
 
