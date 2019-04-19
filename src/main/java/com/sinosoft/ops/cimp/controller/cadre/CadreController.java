@@ -20,6 +20,7 @@ public class CadreController extends BaseController {
     @GetMapping(value = "/list")
     @RequiresAuthentication
     public ResponseEntity listCadre() {
+
         return null;
     }
 

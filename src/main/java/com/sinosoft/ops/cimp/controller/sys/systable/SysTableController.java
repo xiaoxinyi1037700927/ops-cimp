@@ -36,6 +36,7 @@ public class SysTableController extends BaseController {
     public ResponseEntity saveSysEntityDef(
             @Valid @RequestBody SysTableAddModel sysTableAddModel) throws BusinessException {
         CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
+        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
         boolean isok = sysTableService.addSysTable(sysTableAddModel);
         if (isok) return ok("操作成功");
         return fail("操作失败");
@@ -45,6 +46,7 @@ public class SysTableController extends BaseController {
     @RequestMapping(value = "/delSysTableById", method = RequestMethod.POST)
     public ResponseEntity deleteSysEntityDef(
             @RequestParam("id") String id) throws BusinessException {
+        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
         CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
         boolean isok = sysTableService.delSysTable(id);
         if (isok) {
@@ -57,6 +59,7 @@ public class SysTableController extends BaseController {
     @RequestMapping(value = "/updateSysTable", method = RequestMethod.POST)
     public ResponseEntity updateSysEntityDef(
             @RequestBody SysTableModifyModel sysTableModifyModel) throws BusinessException {
+        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
         CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
         boolean isok = sysTableService.upSysTable(sysTableModifyModel);
         if (isok) {
@@ -77,6 +80,7 @@ public class SysTableController extends BaseController {
     @RequestMapping(value = "/operatingDbTable", method = RequestMethod.POST)
     public ResponseEntity operatingDbTable(
             @RequestParam("sysTableId") String sysTableId ) throws BusinessException {
+        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
         CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
         boolean isok = sysTableService.operatingDbTable(sysTableId);
         if (isok) {

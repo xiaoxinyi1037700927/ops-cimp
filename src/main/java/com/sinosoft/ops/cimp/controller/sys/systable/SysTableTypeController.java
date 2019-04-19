@@ -37,6 +37,7 @@ public class SysTableTypeController extends BaseController {
     public ResponseEntity saveSysEntityGroupDef(
             @RequestBody SysTableTypeAddModel sysTableTypeAddModel) throws BusinessException {
         CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
+        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
         boolean isok = sysTableTypeService.addSysTableType(sysTableTypeAddModel);
         if (isok) {
             return ok("操作成功");
@@ -49,6 +50,7 @@ public class SysTableTypeController extends BaseController {
     public ResponseEntity deleteSysEntityGroupDef(
             @RequestParam String id) throws BusinessException {
         CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
+        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
         boolean isok = sysTableTypeService.delSysTableType(id);
         if (isok) {
             return ok("删除成功");
@@ -60,6 +62,7 @@ public class SysTableTypeController extends BaseController {
     @RequestMapping(value = "/updateSysTableType", method = RequestMethod.POST)
     public ResponseEntity updateSysEntityAttrDef(
             @RequestBody SysTableTypeModifyModel sysTableTypeModifyModel) throws BusinessException {
+        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
         CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
         boolean isok = sysTableTypeService.upSysTableType(sysTableTypeModifyModel);
         if (isok) {

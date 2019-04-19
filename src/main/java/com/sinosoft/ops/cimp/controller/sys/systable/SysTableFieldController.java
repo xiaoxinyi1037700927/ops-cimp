@@ -36,6 +36,7 @@ public class SysTableFieldController extends BaseController {
     public ResponseEntity saveSysEntityAttrDef(
             @RequestBody SysTableFieldAddModel sysTableFieldAddModel) throws BusinessException {
         CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
+        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
         boolean isok = sysTableFieldService.addSysTableField(sysTableFieldAddModel);
         if (isok) {
             return ok("操作成功");
@@ -48,6 +49,7 @@ public class SysTableFieldController extends BaseController {
     public ResponseEntity delById(
             @RequestParam(value = "id") String id) throws BusinessException {
         CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
+        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
         boolean isok = sysTableFieldService.delSysTableField(id);
         if (isok) {
             return ok("删除成功");
@@ -59,6 +61,7 @@ public class SysTableFieldController extends BaseController {
     @RequestMapping(value = "/updateSysTableField", method = RequestMethod.POST)
     public ResponseEntity updateSysEntityAttrDef(
             @RequestBody SysTableFieldModifyModel sysTableFieldModifyModel) throws BusinessException {
+        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
         CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
         boolean isok = sysTableFieldService.upSysTableField(sysTableFieldModifyModel);
         return ok(isok);

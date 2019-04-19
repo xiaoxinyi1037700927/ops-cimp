@@ -48,6 +48,7 @@ public class SysAppController extends BaseController {
     @PostMapping("/add")
     public ResponseEntity addSysApp(@Valid @RequestBody SysAppAddModel addModel) throws BusinessException {
         CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
+        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO_DTO);
         sysAppService.addSysApp(addModel);
         return ok("新增成功！");
     }
@@ -59,6 +60,7 @@ public class SysAppController extends BaseController {
     @PostMapping("/delete")
     public ResponseEntity deleteSysApp(@RequestBody SysAppDeleteModel deleteModel) throws BusinessException {
         CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
+        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
         sysAppService.deleteSysApp(deleteModel.getIds());
         return ok("删除成功！");
     }
@@ -69,6 +71,7 @@ public class SysAppController extends BaseController {
     @ApiOperation(value = "修改系统应用")
     @PostMapping("/modify")
     public ResponseEntity modifySysApp(@RequestBody SysAppModifyModel modifyModel) throws BusinessException {
+        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
         CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
         return sysAppService.modifySysApp(modifyModel) ? ok("修改成功！") : fail("修改失败！");
     }

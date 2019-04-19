@@ -40,6 +40,7 @@ public class SysAppTableFieldSetController extends BaseController {
     @PostMapping("/add")
     public ResponseEntity addFieldSet(@RequestBody SysAppTableFieldSetAddModel addModel) throws BusinessException {
         CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
+        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
         fieldSetService.addFieldSet(addModel);
         return ok("新增成功！");
     }
@@ -51,6 +52,7 @@ public class SysAppTableFieldSetController extends BaseController {
     @PostMapping("/delete")
     public ResponseEntity deleteFieldSet(@RequestBody SysAppTableFieldSetDeleteModel deleteModel) throws BusinessException {
         CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
+        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
         fieldSetService.deleteFieldSet(deleteModel.getIds());
         return ok("删除成功！");
     }
@@ -61,6 +63,7 @@ public class SysAppTableFieldSetController extends BaseController {
     @ApiOperation(value = "修改系统应用表字段集合")
     @PostMapping("/modify")
     public ResponseEntity modifyFieldSet(@RequestBody SysAppTableFieldSetModifyModel modifyModel) throws BusinessException {
+        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
         CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
         return fieldSetService.modifyFieldSet(modifyModel) ? ok("修改成功！") : fail("修改失败！");
     }
@@ -80,6 +83,7 @@ public class SysAppTableFieldSetController extends BaseController {
     @ApiOperation(value = "交换排序")
     @PostMapping("/sort/swap")
     public ResponseEntity swapSort(@RequestBody SysAppTableFieldSetSortModel sortModel) throws BusinessException {
+        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
         CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
         return fieldSetService.swapSort(sortModel.getIds()) ? ok("修改成功！") : fail("修改失败！");
     }

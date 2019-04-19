@@ -40,6 +40,7 @@ public class SysAppTableSetController extends BaseController {
     @PostMapping("/add")
     public ResponseEntity addTableSet(@RequestBody SysAppTableSetAddModel addModel) throws BusinessException {
         CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
+        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
         tableSetService.addTableSet(addModel);
         return ok("新增成功！");
     }
@@ -51,6 +52,7 @@ public class SysAppTableSetController extends BaseController {
     @PostMapping("/delete")
     public ResponseEntity deleteTableSet(@RequestBody SysAppTableSetDeleteModel deleteModel) throws BusinessException {
         CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
+        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
         tableSetService.deleteTableSet(deleteModel.getIds());
         return ok("删除成功！");
     }
@@ -61,6 +63,7 @@ public class SysAppTableSetController extends BaseController {
     @ApiOperation(value = "修改系统应用表集合")
     @PostMapping("/modify")
     public ResponseEntity modifyTableSet(@RequestBody SysAppTableSetModifyModel modifyModel) throws BusinessException {
+        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
         CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
         return tableSetService.modifyTableSet(modifyModel) ? ok("修改成功！") : fail("修改失败！");
     }
@@ -89,6 +92,7 @@ public class SysAppTableSetController extends BaseController {
     @ApiOperation(value = "交换排序")
     @PostMapping("/sort/swap")
     public ResponseEntity swapSort(@RequestBody SysAppTableSetSortModel sortModel) throws BusinessException {
+        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
         CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
         return tableSetService.swapSort(sortModel.getIds()) ? ok("修改成功！") : fail("修改失败！");
     }
