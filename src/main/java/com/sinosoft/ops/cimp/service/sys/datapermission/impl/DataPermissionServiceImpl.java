@@ -118,7 +118,7 @@ public class DataPermissionServiceImpl implements DataPermissionService {
             return "";
         }
         String userId = SecurityUtils.getSubject().getCurrentUser().getId();
-        Organization dataOrganization = organizationRepository.findById(SecurityUtils.getSubject().getCurrentUser().getDataOrganizationId()).get();
+        Organization dataOrganization = organizationRepository.findById(SecurityUtils.getSubject().getCurrentUser().getOrganizationId()).get();
         ArrayList<UserRole> userRoles = Lists.newArrayList(userRoleRepository.findAll(QUserRole.userRole.userId.eq(userId)));
         String roleId = userRoles.get(0).getRoleId();
         ArrayList<PageInterface> pageInterfaces = Lists.newArrayList(pageInterfaceRepository.findAll(QPageInterface.pageInterface.name.eq(requestURI)));
