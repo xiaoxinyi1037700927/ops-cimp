@@ -24,6 +24,13 @@ public interface RolePermissionPageSqlService {
     RPPageSqlViewModel findRPPageSqlByRoleId(String roleId);
 
     /**
+     * 根据roleIds查询 角色权限页面SQl
+     * @param searchModel
+     * @return
+     */
+    List<RPPageSqlViewModel> findRPPageSqlListByRoleIds(RPPageSqlSearchModel searchModel);
+
+    /**
      * 新增 角色权限页面SQl
      * @param addModel
      * @return

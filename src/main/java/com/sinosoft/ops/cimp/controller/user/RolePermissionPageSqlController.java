@@ -29,7 +29,7 @@ public class RolePermissionPageSqlController extends BaseController {
     @ApiOperation(value = "查询角色权限页面SQL列表")
     @PostMapping("/findRPPageSqlPageList")
     @RequiresAuthentication
-    public ResponseEntity<PaginationViewModel<RPPageSqlViewModel>> findRPPageSqlPageList(RPPageSqlSearchModel searchModel) throws BusinessException {
+    public ResponseEntity<PaginationViewModel<RPPageSqlViewModel>> findRPPageSqlPageList(@RequestBody RPPageSqlSearchModel searchModel) throws BusinessException {
         PaginationViewModel<RPPageSqlViewModel> rpPageSqlPageList = rolePermissionPageSqlService.findRPPageSqlPageList(searchModel);
         return ok(rpPageSqlPageList);
     }
@@ -40,6 +40,14 @@ public class RolePermissionPageSqlController extends BaseController {
     public ResponseEntity<RPPageSqlViewModel> findRPPageSqlByRoleId(@RequestParam String roleId) throws BusinessException {
         RPPageSqlViewModel rpPageSqlByRoleId = rolePermissionPageSqlService.findRPPageSqlByRoleId(roleId);
         return ok(rpPageSqlByRoleId);
+    }
+
+    @ApiOperation(value = "根据roleIds查询角色权限页面SQL列表")
+    @PostMapping("/findRPPageSqlListByRoleIds")
+    @RequiresAuthentication
+    public ResponseEntity<List<RPPageSqlViewModel>> findRPPageSqlListByRoleIds(@RequestBody RPPageSqlSearchModel searchModel) throws BusinessException {
+        List<RPPageSqlViewModel> rpPageSqlListByRoleIds = rolePermissionPageSqlService.findRPPageSqlListByRoleIds(searchModel);
+        return ok(rpPageSqlListByRoleIds);
     }
 
     @ApiOperation(value = "新增角色权限页面SQL")

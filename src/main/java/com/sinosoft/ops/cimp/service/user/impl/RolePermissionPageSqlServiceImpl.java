@@ -1,5 +1,6 @@
 package com.sinosoft.ops.cimp.service.user.impl;
 
+import com.google.common.collect.Lists;
 import com.sinosoft.ops.cimp.dto.PaginationViewModel;
 import com.sinosoft.ops.cimp.entity.user.QRolePermissionPageSql;
 import com.sinosoft.ops.cimp.entity.user.RolePermissionPageSql;
@@ -59,6 +60,14 @@ public class RolePermissionPageSqlServiceImpl implements RolePermissionPageSqlSe
         RPPageSqlViewModel rpPageSqlViewModel = RolePermissionPageSqlMapper.INSTANCE.rPPageSqlToViewModel(rolePermissionPageSql);
 
         return rpPageSqlViewModel;
+    }
+
+    @Override
+    public List<RPPageSqlViewModel> findRPPageSqlListByRoleIds(RPPageSqlSearchModel searchModel) {
+        List<String> roleIds = searchModel.getRoleIds();
+        List<RolePermissionPageSql> all = Lists.newArrayList(rolePermissionPageSqlRepository.findAll(QRolePermissionPageSql.rolePermissionPageSql.roleId.in(roleIds)));
+        List<RPPageSqlViewModel> collect = all.stream().map(x -> RolePermissionPageSqlMapper.INSTANCE.rPPageSqlToViewModel(x)).collect(Collectors.toList());
+        return collect;
     }
 
     @Override
