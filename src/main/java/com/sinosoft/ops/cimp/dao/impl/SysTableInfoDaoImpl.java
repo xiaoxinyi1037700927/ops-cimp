@@ -276,7 +276,7 @@ public class SysTableInfoDaoImpl implements SysTableInfoDao {
 
         sysTableModelInfoDTO.setTables(sysTableInfoDTOList);
 
-        CacheManager.getInstance().put(Constants.SYS_TABLE_MODEL_INFO, cacheKey, sysTableModelInfoDTO);
+        CacheManager.getInstance().put(Constants.SYS_TABLE_MODEL_INFO_DTO, cacheKey, sysTableModelInfoDTO);
         return sysTableModelInfoDTO;
         //1.将查询出app信息进行模型转换
         /*
