@@ -41,7 +41,7 @@ public class ExportGbrmbBiJieController extends BaseController {
     @ApiOperation(value = "生成干部任免表html文件(毕节)")
     @ApiImplicitParam(name = "empId", value = "empId", required = true)
     @PostMapping("/html/generate")
-    public ResponseEntity generateAndExportGbrmbHTML(HttpServletRequest request, HttpServletResponse response, String empId) throws BusinessException {
+    public ResponseEntity generateAndExportGbrmbHTML(String empId) throws BusinessException {
         if (StringUtils.isEmpty(empId)) {
             return fail("empId不能为空！");
         }
@@ -62,7 +62,7 @@ public class ExportGbrmbBiJieController extends BaseController {
     @ApiOperation(value = "生成并导出干部任免表word文件(毕节)")
     @ApiImplicitParam(name = "empIds", value = "empId列表(以','分隔)", required = true)
     @GetMapping("/word/generateAndExport")
-    public void generateAndExportGbrmb(HttpServletRequest request, HttpServletResponse response, String[] empIds) {
+    public void generateAndExportGbrmb(HttpServletResponse response, String[] empIds) {
         if (null == empIds || empIds.length == 0) {
             writeJson(response, "empIds不能为空！");
             return;
@@ -99,7 +99,7 @@ public class ExportGbrmbBiJieController extends BaseController {
     @ApiOperation(value = "生成并导出干部任免表lrmx文件(毕节)")
     @ApiImplicitParam(name = "empIds", value = "empId列表(以','分隔)", required = true)
     @GetMapping("/lrmx/generateAndExport")
-    public void generateAndExportGbrmbLRMX(HttpServletRequest request, HttpServletResponse response, String[] empIds) {
+    public void generateAndExportGbrmbLRMX(HttpServletResponse response, String[] empIds) {
         if (null == empIds || empIds.length == 0) {
             writeJson(response, "empIds不能为空！");
             return;
@@ -133,6 +133,23 @@ public class ExportGbrmbBiJieController extends BaseController {
         }
     }
 
+    /**
+     * 将所有文件压缩为zip文件
+     *
+     * @param files
+     * @param path
+     * @param name
+     * @return
+     * @throws ZipException
+     */
+    private String toZip(ArrayList<String> files, String path, String name) throws ZipException {
+        FileUtils.createDir(path);
+
+        String zipPath = path + name + System.currentTimeMillis();
+        MultiZipUtil.zip(zipPath, files);
+        return zipPath + ".zip";
+    }
+
     private void writeFileToResponse(HttpServletResponse response, String filePath) throws Exception {
         String fileName = filePath.substring(filePath.lastIndexOf("/") + 1);
         fileName = new String(fileName.getBytes("utf-8"), "utf-8");
@@ -153,22 +170,4 @@ public class ExportGbrmbBiJieController extends BaseController {
             os.flush();
         }
     }
-
-    /**
-     * 将所有文件压缩为zip文件
-     *
-     * @param files
-     * @param path
-     * @param name
-     * @return
-     * @throws ZipException
-     */
-    private String toZip(ArrayList<String> files, String path, String name) throws ZipException {
-        FileUtils.createDir(path);
-
-        String zipPath = path + name + System.currentTimeMillis();
-        MultiZipUtil.zip(zipPath, files);
-        return zipPath + ".zip";
-    }
-
 }

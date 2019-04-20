@@ -13,13 +13,13 @@ import javax.persistence.Query;
 import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings("unchecked")
 @Repository
 public class ExportDaoImpl implements ExportDao {
 
     @Autowired
     private EntityManager entityManager;
 
-    @SuppressWarnings("unchecked")
     @Override
     public List<Map<String, Object>> findBySQL(String sql) {
         return entityManager.createNativeQuery(sql)
@@ -28,22 +28,19 @@ public class ExportDaoImpl implements ExportDao {
                 .getResultList();
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public List<Map<String, Object>> findBySQL(String sql, Map<String, Object> params) {
-        Query query = entityManager.createNativeQuery(sql);
-        setParamemters(query, params);
-        return query.unwrap(SQLQuery.class)
-                .setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP)
-                .getResultList();
-    }
+    public List<Map<String, Object>> findBySQL(String sql, Object... args) {
+        Query query = entityManager.createNativeQuery(sql)
+                .unwrap(SQLQuery.class)
+                .setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
 
-    private void setParamemters(Query query, Map<String, Object> params) {
-        if (null != params) {
-            for (Map.Entry<String, Object> entry : params.entrySet()) {
-                query.setParameter(entry.getKey(), entry.getValue());
+        if (null != args) {
+            for (int i = 0; i < args.length; ++i) {
+                query.setParameter(i, args[i]);
             }
         }
+
+        return query.getResultList();
     }
 
 }

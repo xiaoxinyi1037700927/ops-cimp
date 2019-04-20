@@ -7,4 +7,5 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 
 public interface SysCodeSetRepository extends JpaRepository<SysCodeSet, Integer> , QuerydslPredicateExecutor<SysCodeSet> {
 
+    SysCodeSet getByName(String name);
 }

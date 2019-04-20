@@ -63,7 +63,7 @@ public class SysCodeItemServiceImpl implements SysCodeItemService {
         Optional<SysCodeSet> sysCodeSet = sysCodeSetDao.findById(codeSetId);
         Integer version = sysCodeSet.get().getVersion();
         queryFactory.update(qSysCodeSet)
-                .set(qSysCodeSet.version, version+1)
+                .set(qSysCodeSet.version, version + 1)
                 .where(qSysCodeSet.id.eq(codeSetId))
                 .execute();
 
@@ -83,7 +83,7 @@ public class SysCodeItemServiceImpl implements SysCodeItemService {
         Integer version = sysCodeSet.get().getVersion();
         QSysCodeSet qSysCodeSet = QSysCodeSet.sysCodeSet;
         queryFactory.update(qSysCodeSet)
-                .set(qSysCodeSet.version, version+1)
+                .set(qSysCodeSet.version, version + 1)
                 .where(qSysCodeSet.id.eq(codeSetId))
                 .execute();
 
@@ -106,7 +106,7 @@ public class SysCodeItemServiceImpl implements SysCodeItemService {
         Integer version = sysCodeSet.get().getVersion();
         QSysCodeSet qSysCodeSet = QSysCodeSet.sysCodeSet;
         queryFactory.update(qSysCodeSet)
-                .set(qSysCodeSet.version, version+1)
+                .set(qSysCodeSet.version, version + 1)
                 .where(qSysCodeSet.id.eq(codeSetId))
                 .execute();
 
@@ -158,5 +158,15 @@ public class SysCodeItemServiceImpl implements SysCodeItemService {
         }
         SysCodeItem sysCodeItem = sysCodeItems.get();
         return SysCodeItemModelMapper.INSTANCE.sysCodeItemToModifyModel(sysCodeItem);
+    }
+
+    @Override
+    public List<SysCodeItem> findByCodeSetName(String name) {
+        SysCodeSet sysCodeSet = sysCodeSetDao.getByName(name);
+
+        if (null != sysCodeSet) {
+            return sysCodeItemDao.findByCodeSetId(sysCodeSet.getId());
+        }
+        return null;
     }
 }

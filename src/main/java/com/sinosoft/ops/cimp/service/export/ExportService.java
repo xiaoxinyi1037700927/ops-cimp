@@ -15,6 +15,9 @@ public interface ExportService {
 
     List<Map<String, Object>> findBySQL(String sql);
 
+
+    List<Map<String, Object>> findBySQL(String sql, Object... args);
+
     /**
      * 生成干部任免表word文件(毕节)
      *
