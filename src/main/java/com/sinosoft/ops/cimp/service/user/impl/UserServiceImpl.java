@@ -81,6 +81,11 @@ public class UserServiceImpl implements UserService {
                 builder = builder.and(qOrganization.code.eq(userSearchViewModel.getOrganizationCode()));
             }
         }
+
+        if (StringUtils.isNotEmpty(userSearchViewModel.getName())) {
+            builder = builder.and(qUser.name.contains(userSearchViewModel.getName()).or(qUser.loginName.contains(userSearchViewModel.getName())));
+        }
+
         QueryResults<UserViewModel> queryResults = queryFactory.select(Projections.bean(
                 UserViewModel.class,
                 qUser.id,
