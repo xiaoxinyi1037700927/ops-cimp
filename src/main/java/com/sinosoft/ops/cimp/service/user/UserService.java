@@ -2,6 +2,7 @@ package com.sinosoft.ops.cimp.service.user;
 
 
 import com.sinosoft.ops.cimp.dto.PaginationViewModel;
+import com.sinosoft.ops.cimp.entity.user.Role;
 import com.sinosoft.ops.cimp.entity.user.User;
 import com.sinosoft.ops.cimp.vo.from.user.UserModifyContactVO;
 import com.sinosoft.ops.cimp.vo.from.user.UserModifyPasswordVO;
@@ -88,4 +89,11 @@ public interface UserService {
 
 
     boolean resetPassword(String userId, String password);
+
+    /**
+     * 根据用户id查询权限
+     * @param userId
+     * @return
+     */
+    List<Role> findUserRole(String userId);
 }

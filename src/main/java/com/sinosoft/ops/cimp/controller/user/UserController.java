@@ -111,7 +111,8 @@ public class UserController extends BaseController {
             return fail("未找到该ID下的用户！");
         }
         UserViewModel model = UserViewModelMapper.INSTANCE.UserToUserViewModel(user);
-
+        List<Role> userRole = userService.findUserRole(userId);
+        model.setRoleList(userRole);
         return ok(model);
     }
 

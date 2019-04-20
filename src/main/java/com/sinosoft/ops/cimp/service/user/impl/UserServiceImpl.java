@@ -132,7 +132,7 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    private List<Role> findUserRole(String userId) {
+    public List<Role> findUserRole(String userId) {
         QRole qRole = QRole.role;
         QUserRole qUserRole = QUserRole.userRole;
         List<Role> roleList = queryFactory.select(qRole).from(qRole)

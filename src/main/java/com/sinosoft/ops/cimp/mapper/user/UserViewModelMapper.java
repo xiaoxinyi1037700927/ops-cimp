@@ -21,6 +21,7 @@ public interface UserViewModelMapper {
     UserViewModelMapper INSTANCE = Mappers.getMapper(UserViewModelMapper.class);
 
     @Mappings({
+            @Mapping(source = "organizationId", target = "dataOrganizationName", qualifiedByName = "getOrganizationName"),
             @Mapping(source = "organizationId", target = "organizationName", qualifiedByName = "getOrganizationName"),
             @Mapping(source = "organizationId", target = "organizationCode", qualifiedByName = "genOrganizationCode")
     })
