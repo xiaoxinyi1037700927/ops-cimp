@@ -251,7 +251,7 @@ public final class CacheManager {
      * @return 对应类型的缓存对象
      */
     @SuppressWarnings("unchecked")
-    public <T> T get(final String cacheName, final Object key) {
+    public synchronized <T> T get(final String cacheName, final Object key) {
         if (logger.isTraceEnabled()) {
             logger.trace("调用方法【get】开始，入参：【cacheName】=【" + cacheName + "】，【key】=【" + key + "】");
         }
@@ -314,8 +314,8 @@ public final class CacheManager {
      * @param expiryTime 缓存有效期，0：永久有效， xx：xx秒后缓存失效
      * @return 缓存保存结果， True：缓存保存， False：缓存保存失效
      */
-    public boolean put(final String cacheName, final Object key, final Object value,
-                       final long expiryTime) {
+    public synchronized boolean put(final String cacheName, final Object key, final Object value,
+                                    final long expiryTime) {
         boolean cacheResult = false;
         for (OpsCache cache : this.loadCache(cacheName)) {
             try {
@@ -364,7 +364,7 @@ public final class CacheManager {
      * @param value     缓存值信息
      * @return 缓存保存结果， True：缓存保存， False：缓存保存失效
      */
-    public boolean put(final String cacheName, final Object key, final Object value) {
+    public synchronized boolean put(final String cacheName, final Object key, final Object value) {
         boolean cacheResult = false;
         for (OpsCache cache : this.loadCache(cacheName)) {
             try {
@@ -386,7 +386,7 @@ public final class CacheManager {
      * @param expiryTime 缓存失效时间 0：立即删除， xx：xx秒后缓存失效
      * @return 缓存删除结果， True：删除成功， False：删除失败
      */
-    public boolean remove(final String cacheName, final Object key, final long expiryTime) {
+    public synchronized boolean remove(final String cacheName, final Object key, final long expiryTime) {
         boolean removeResult = false;
         for (OpsCache cache : this.loadCache(cacheName)) {
             removeResult = cache.remove(cacheName, key, expiryTime);
@@ -403,7 +403,7 @@ public final class CacheManager {
      * @param key       缓存存储关键字
      * @return 缓存删除结果， True：删除成功， False：删除失败
      */
-    public boolean remove(final String cacheName, final Object key) {
+    public synchronized boolean remove(final String cacheName, final Object key) {
         return this.remove(cacheName, key, 0L);
     }
 
@@ -413,7 +413,7 @@ public final class CacheManager {
      * @param cacheName 缓存大类名称
      * @return 缓存删除结果， True：删除成功， False：删除失败
      */
-    public boolean remove(final String cacheName) {
+    public synchronized boolean remove(final String cacheName) {
         boolean removeResult = false;
         for (OpsCache cache : this.loadCache(cacheName)) {
             removeResult = cache.remove(cacheName);
@@ -430,7 +430,7 @@ public final class CacheManager {
      * @param key       缓存存储关键字
      * @return 删除结果， True：删除成功， False：删除失败
      */
-    private boolean removeListener(final String cacheName, final Object key, final Long expiryTime) {
+    private synchronized boolean removeListener(final String cacheName, final Object key, final Long expiryTime) {
         boolean removeResult = false;
         if (cacheListenerImpls != null) {
             for (CacheListener cacheListenerImpl : cacheListenerImpls) {
