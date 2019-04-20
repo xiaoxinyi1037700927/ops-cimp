@@ -200,7 +200,7 @@ public final class CacheManager {
      * @param cacheName 缓存大类
      * @return ICache 缓存实例
      */
-    private List<OpsCache> loadCache(final String cacheName) {
+    private synchronized List<OpsCache> loadCache(final String cacheName) {
         // 处理结果, 元素0存储一级缓存
         List<OpsCache> cacheEngineList = new ArrayList<>(2);
         CacheManagerInfo.CacheItems.CacheItem cacheItem = cacheItems.get(cacheName);
