@@ -3,11 +3,13 @@ package com.sinosoft.ops.cimp.entity.user;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "ROLE_PERMISSION_PAGE_SQL")
-public class RolePermissionPageSql {
+public class RolePermissionPageSql implements Serializable {
 
+    private static final long serialVersionUID = -5897633557919819807L;
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid")
@@ -18,9 +20,17 @@ public class RolePermissionPageSql {
     @Column(length = 50)
     private String roleId;
 
-    //该条sql执行的名称
+    //该条sql英文名称（0：cadreList，1：departmentList）
     @Column(length = 100)
-    private String sqlName;
+    private String sqlNameEn;
+
+    //该条sql中文名称（干部列表，单位列表）
+    @Column(length = 100)
+    private String sqlNameCn;
+
+    //是否包含下级（0：不包含下级，1：包含下级）
+    @Column(length = 100)
+    private String includeSubNode;
 
     //执行的sql语句
     @Column(length = 4000)
@@ -58,12 +68,28 @@ public class RolePermissionPageSql {
         this.roleId = roleId;
     }
 
-    public String getSqlName() {
-        return sqlName;
+    public String getSqlNameEn() {
+        return sqlNameEn;
     }
 
-    public void setSqlName(String sqlName) {
-        this.sqlName = sqlName;
+    public void setSqlNameEn(String sqlNameEn) {
+        this.sqlNameEn = sqlNameEn;
+    }
+
+    public String getSqlNameCn() {
+        return sqlNameCn;
+    }
+
+    public void setSqlNameCn(String sqlNameCn) {
+        this.sqlNameCn = sqlNameCn;
+    }
+
+    public String getIncludeSubNode() {
+        return includeSubNode;
+    }
+
+    public void setIncludeSubNode(String includeSubNode) {
+        this.includeSubNode = includeSubNode;
     }
 
     public String getExecListSql() {
@@ -72,6 +98,14 @@ public class RolePermissionPageSql {
 
     public void setExecListSql(String execListSql) {
         this.execListSql = execListSql;
+    }
+
+    public String getExecCountSql() {
+        return execCountSql;
+    }
+
+    public void setExecCountSql(String execCountSql) {
+        this.execCountSql = execCountSql;
     }
 
     public String getSelectListFieldsEn() {
@@ -88,14 +122,6 @@ public class RolePermissionPageSql {
 
     public void setSelectListFieldsCn(String selectListFieldsCn) {
         this.selectListFieldsCn = selectListFieldsCn;
-    }
-
-    public String getExecCountSql() {
-        return execCountSql;
-    }
-
-    public void setExecCountSql(String execCountSql) {
-        this.execCountSql = execCountSql;
     }
 
     public String getSelectCountFieldEn() {
