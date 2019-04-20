@@ -17,6 +17,6 @@ public interface ExportDao {
      * @param params
      * @return
      */
-    List<Map<String, Object>> findBySQL(String sql, Map<String, Object> params);
+    List<Map<String, Object>> findBySQL(String sql, Object... args);
 
 }

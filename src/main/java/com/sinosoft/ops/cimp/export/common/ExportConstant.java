@@ -34,6 +34,8 @@ public class ExportConstant {
      */
     public static final String TEMPLATE_WORD_GBRMB_BJ = "template/word/gbrmb_template_bj.docx";
 
+    public static final String TEMPLATE_GBHMC = "template/excel/hmc-1.1.xlsx";
+
     public static final String EXPORT_WORD_GBRMB = "download/word/gbrmb/";
 
     public static final String EXPORT_WORD_GBRMB_ZIP = "download/word/gbrmb/zip/";
@@ -41,6 +43,8 @@ public class ExportConstant {
     public static final String EXPORT_LRMX = "lrmx/";
 
     public static final String EXPORT_LRMX_ZIP = "lrmx/zip/";
+
+    public static final String EXPORT_EXCEL_GBHMC = "download/excel/gbhmc/";
 
     /**
      * 导出文件后缀名

@@ -48,6 +48,16 @@ public class ExportServiceImpl implements ExportService {
         }
     }
 
+    @Override
+    public List<Map<String, Object>> findBySQL(String sql, Object... args) {
+        try {
+            return exportWordDao.findBySQL(sql, args);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     /**
      * 生成干部任免表word文件(毕节)
      *
@@ -68,7 +78,7 @@ public class ExportServiceImpl implements ExportService {
             outFile = exportPath + nameAttrValue.getName() + nameAttrValue.getCardNo() + ExportConstant.RMB_SUFFIX_WORD;
 
 //            if (!FileUtils.fileExists(outFile)) {
-                exportHandler.generate(templateFilePath, allAttrValue, outFile);
+            exportHandler.generate(templateFilePath, allAttrValue, outFile);
 //            }
 
             return outFile;
