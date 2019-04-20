@@ -88,13 +88,13 @@ public class UserServiceImpl implements UserService {
                 qUser.loginName,
                 qUser.organizationId,
                 qOrganization.code.as("organizationCode"),
-                qUser.dataOrganizationId,
-                qRole.id.as("roleId")
+                qUser.dataOrganizationId
+//                qRole.id.as("roleId")
         ))
                 .from(qUser)
                 .leftJoin(qOrganization).on(qOrganization.id.eq(qUser.organizationId))
-                .leftJoin(qUserRole).on(qUser.id.eq(qUserRole.userId))
-                .leftJoin(qRole).on(qUserRole.roleId.eq(qRole.id))
+//                .leftJoin(qUserRole).on(qUser.id.eq(qUserRole.userId))
+//                .leftJoin(qRole).on(qUserRole.roleId.eq(qRole.id))
                 .where(builder)
                 .orderBy(qUser.dataOrganizationId.asc())
                 .offset((pageIndex - 1) * pageSize)
