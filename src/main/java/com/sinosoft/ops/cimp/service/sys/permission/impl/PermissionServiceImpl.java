@@ -333,7 +333,10 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public boolean saveMenuRoleSort(SaveMenuGroupSortViewModel viewModel) {
-        return false;
+        List<MenuChildViewModel> menuChildViewModelList = viewModel.getMenuChildViewModelList();
+        List<Permission> collect = menuChildViewModelList.stream().map(x -> MenuMapper.INSTANCE.permissionViewModelToEntity(x)).collect(Collectors.toList());
+        permissionRepository.saveAll(collect);
+        return true;
     }
 
 

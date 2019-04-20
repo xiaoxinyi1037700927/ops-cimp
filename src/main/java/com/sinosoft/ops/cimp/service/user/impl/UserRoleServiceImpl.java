@@ -97,7 +97,8 @@ public class UserRoleServiceImpl implements UserRoleService {
 
     @Override
     public List<MenuChildViewModel> findMenuChildViewModelByRoleIdAndMenuGroupId(String roleId, String menuGroupId) {
-        JPAQuery<Permission> where = queryFactory.select(QPermission.permission).from(QRolePermission.rolePermission)
+        JPAQuery<Permission> where = queryFactory.select(QPermission.permission)
+                .from(QRolePermission.rolePermission)
                 .leftJoin(QPermission.permission).on(QPermission.permission.id.eq(QRolePermission.rolePermission.permissionId))
                 .where(QRolePermission.rolePermission.roleMenuGroupId.eq(menuGroupId).and(QRolePermission.rolePermission.roleId.eq(roleId)));
         List<Permission> fetch = Lists.newArrayList(where.orderBy(QRolePermission.rolePermission.sortNumber.asc()).fetch());
