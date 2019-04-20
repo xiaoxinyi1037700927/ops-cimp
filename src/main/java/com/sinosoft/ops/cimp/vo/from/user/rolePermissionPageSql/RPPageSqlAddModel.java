@@ -2,6 +2,8 @@ package com.sinosoft.ops.cimp.vo.from.user.rolePermissionPageSql;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+
+import javax.persistence.Column;
 import javax.validation.constraints.NotEmpty;
 
 @ApiModel(description = "角色权限页面sql 新增类")
@@ -12,10 +14,20 @@ public class RPPageSqlAddModel {
     @NotEmpty(message = "角色id不能为空")
     private String roleId;
 
-    //该条sql执行的名称
-    @ApiModelProperty(value = "该条sql执行的名称", required = true)
-    @NotEmpty(message = "该条sql执行的名称不能为空")
-    private String sqlName;
+    //该条sql英文名称（0：cadreList，1：departmentList）
+    @ApiModelProperty(value = "该条sql英文名称（0：cadreList，1：departmentList）", required = true)
+    @NotEmpty(message = "sql英文不能为空")
+    private String sqlNameEn;
+
+    //该条sql中文名称（干部列表，单位列表）
+    @ApiModelProperty(value = "该条sql中文名称（干部列表，单位列表）", required = true)
+    @NotEmpty(message = "ql中文不能为空")
+    private String sqlNameCn;
+
+    //是否包含下级（0：不包含下级，1：包含下级）
+    @ApiModelProperty(value = "是否包含下级（0：不包含下级，1：包含下级）", required = true)
+    @NotEmpty(message = "是否包含下级不能为空")
+    private String includeSubNode;
 
     //执行的sql语句
     @ApiModelProperty(value = "执行的sql语句", required = true)
@@ -51,12 +63,28 @@ public class RPPageSqlAddModel {
         this.roleId = roleId;
     }
 
-    public String getSqlName() {
-        return sqlName;
+    public String getSqlNameEn() {
+        return sqlNameEn;
     }
 
-    public void setSqlName(String sqlName) {
-        this.sqlName = sqlName;
+    public void setSqlNameEn(String sqlNameEn) {
+        this.sqlNameEn = sqlNameEn;
+    }
+
+    public String getSqlNameCn() {
+        return sqlNameCn;
+    }
+
+    public void setSqlNameCn(String sqlNameCn) {
+        this.sqlNameCn = sqlNameCn;
+    }
+
+    public String getIncludeSubNode() {
+        return includeSubNode;
+    }
+
+    public void setIncludeSubNode(String includeSubNode) {
+        this.includeSubNode = includeSubNode;
     }
 
     public String getExecListSql() {
