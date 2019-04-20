@@ -1,4 +1,4 @@
-package com.sinosoft.ops.cimp.vo.enums;
+package com.sinosoft.ops.cimp.constant;
 
 public class RolePermissionPageSqlEnum {
 
