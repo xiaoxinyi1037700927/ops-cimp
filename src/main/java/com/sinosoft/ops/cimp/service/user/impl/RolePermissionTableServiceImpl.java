@@ -5,12 +5,15 @@ import com.querydsl.core.BooleanBuilder;
 import com.sinosoft.ops.cimp.dto.PaginationViewModel;
 import com.sinosoft.ops.cimp.entity.user.QRolePermissionTable;
 import com.sinosoft.ops.cimp.entity.user.RolePermissionTable;
+import com.sinosoft.ops.cimp.entity.user.UserRole;
 import com.sinosoft.ops.cimp.mapper.user.RolePermissionTableMapper;
 import com.sinosoft.ops.cimp.repository.user.RolePermissionTableRepository;
+import com.sinosoft.ops.cimp.repository.user.UserRoleRepository;
 import com.sinosoft.ops.cimp.service.user.RolePermissionTableService;
 import com.sinosoft.ops.cimp.vo.from.user.rolePermissionTable.RPTableAddModel;
 import com.sinosoft.ops.cimp.vo.from.user.rolePermissionTable.RPTableSearchModel;
 import com.sinosoft.ops.cimp.vo.to.user.rolePermissionTable.RPTableViewModel;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -28,7 +32,8 @@ import java.util.stream.Collectors;
 public class RolePermissionTableServiceImpl implements RolePermissionTableService {
     @Autowired
     private RolePermissionTableRepository rolePermissionTableRepository;
-
+    @Autowired
+    private UserRoleRepository userRoleRepository;
 
     @Override
     public PaginationViewModel<RPTableViewModel> findRPTablePageList(RPTableSearchModel searchModel) {
@@ -42,7 +47,21 @@ public class RolePermissionTableServiceImpl implements RolePermissionTableServic
         BooleanBuilder builder = new BooleanBuilder();
         builder = builder.and(qRolePermissionTable.roleId.eq(searchModel.getRoleId()));
         Page<RolePermissionTable> all = rolePermissionTableRepository.findAll(builder, pageRequest);
-        List<RPTableViewModel> collect = all.getContent().stream().map(x -> RolePermissionTableMapper.INSTANCE.rPTableAddModelToViewModel(x)).collect(Collectors.toList());
+
+        Map<String, List<RolePermissionTable>> map = all.getContent().stream().collect(Collectors.groupingBy(RolePermissionTable::getTableId));
+        List<RolePermissionTable> groupList = new ArrayList<>();
+        for (String key : map.keySet()) {
+            List<RolePermissionTable> rolePermissionTables = map.get(key);
+            groupList.addAll(rolePermissionTables);
+        }
+
+        List<RPTableViewModel> collect = groupList.stream().map(x -> {
+            RPTableViewModel rpTableViewModel = RolePermissionTableMapper.INSTANCE.rPTableAddModelToViewModel(x);
+            if (StringUtils.isEmpty(rpTableViewModel.getName())) {
+                rpTableViewModel.setName(x.getNameCN());
+            }
+            return rpTableViewModel;
+        }).collect(Collectors.toList());
 
         PaginationViewModel<RPTableViewModel> page = new PaginationViewModel<RPTableViewModel>();
         page.setPageIndex(searchModel.getPageIndex());
@@ -53,9 +72,26 @@ public class RolePermissionTableServiceImpl implements RolePermissionTableServic
     }
 
     @Override
-    public List<RPTableViewModel> findRPTableListByRoleId(String roleId) {
-        List<RolePermissionTable> all = Lists.newArrayList(rolePermissionTableRepository.findAll(QRolePermissionTable.rolePermissionTable.roleId.eq(roleId)));
-        List<RPTableViewModel> collect = all.stream().map(x -> RolePermissionTableMapper.INSTANCE.rPTableAddModelToViewModel(x)).collect(Collectors.toList());
+    public List<RPTableViewModel> findRPTableListByUserId(String userId) {
+        List<UserRole> byUserId = userRoleRepository.findByUserId(userId);
+        List<String> roleIds = byUserId.stream().map(x -> x.getRoleId()).collect(Collectors.toList());
+
+        List<RolePermissionTable> all = Lists.newArrayList(rolePermissionTableRepository.findAll(QRolePermissionTable.rolePermissionTable.roleId.in(roleIds)));
+        Map<String, List<RolePermissionTable>> map = all.stream().collect(Collectors.groupingBy(RolePermissionTable::getTableId));
+        List<RolePermissionTable> groupList = new ArrayList<>();
+
+        for (String key : map.keySet()) {
+            RolePermissionTable rolePermissionTable = map.get(key).get(0);
+            groupList.add(rolePermissionTable);
+        }
+
+        List<RPTableViewModel> collect = groupList.stream().map(x -> {
+            RPTableViewModel rpTableViewModel = RolePermissionTableMapper.INSTANCE.rPTableAddModelToViewModel(x);
+            if (StringUtils.isEmpty(rpTableViewModel.getName())) {
+                rpTableViewModel.setName(x.getNameCN());
+            }
+            return rpTableViewModel;
+        }).collect(Collectors.toList());
         return collect;
     }
 

@@ -35,13 +35,13 @@ public class RolePermissionTableController extends BaseController {
         return ok(rpTablePageList);
     }
 
-    @ApiOperation(value = "根据RoleId查询角色关联table列表")
-    @PostMapping("/findRPTableListByRoleId")
-    @RequiresAuthentication
-    public ResponseEntity<List<RPTableViewModel>> findRPTableListByRoleId(@RequestParam String roleId) throws BusinessException {
-        List<RPTableViewModel> rpTableListByRoleId = rolePermissionTableService.findRPTableListByRoleId(roleId);
-        return ok(rpTableListByRoleId);
-    }
+//    @ApiOperation(value = "根据RoleId查询角色关联table列表")
+//    @PostMapping("/findRPTableListByRoleId")
+//    @RequiresAuthentication
+//    public ResponseEntity<List<RPTableViewModel>> findRPTableListByRoleId(@RequestParam String roleId) throws BusinessException {
+//        List<RPTableViewModel> rpTableListByRoleId = rolePermissionTableService.findRPTableListByRoleId(roleId);
+//        return ok(rpTableListByRoleId);
+//    }
 
     @ApiOperation(value = "新增查询角色关联table")
     @PostMapping("/saveRPTable")

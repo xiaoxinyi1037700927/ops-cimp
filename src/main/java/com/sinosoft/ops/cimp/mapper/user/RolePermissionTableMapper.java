@@ -21,6 +21,7 @@ public interface RolePermissionTableMapper {
     })
     RolePermissionTable addModelToRPTableAddModel(RPTableAddModel addModel);
 
+
     RPTableViewModel rPTableAddModelToViewModel(RolePermissionTable rolePermissionTable);
 
     @Mappings({
@@ -41,4 +42,5 @@ public interface RolePermissionTableMapper {
     default Date getCreateTime(Date modifyTime) {
         return Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant());
     }
+
 }

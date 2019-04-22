@@ -26,9 +26,17 @@ public class RolePermissionTable implements Serializable {
      */
     private String tableId;
     /**
-     * table 名称
+     * nameCN
      */
-    private String tableName;
+    private String nameCN;
+    /**
+     * nameEN
+     */
+    private String nameEN;
+    /**
+     * 名称
+     */
+    private String name;
     /**
      * 排序
      * */
@@ -82,15 +90,6 @@ public class RolePermissionTable implements Serializable {
         this.tableId = tableId;
     }
 
-    @Column(length = 100)
-    public String getTableName() {
-        return tableName;
-    }
-
-    public void setTableName(String tableName) {
-        this.tableName = tableName;
-    }
-
     @Column(length = 10)
     public Integer getSortNumber() {
         return sortNumber;
@@ -136,13 +135,42 @@ public class RolePermissionTable implements Serializable {
         this.modifyTime = modifyTime;
     }
 
+    @Column(length = 100)
+    public String getNameCN() {
+        return nameCN;
+    }
+
+    public void setNameCN(String nameCN) {
+        this.nameCN = nameCN;
+    }
+
+    @Column(length = 100)
+    public String getNameEN() {
+        return nameEN;
+    }
+
+    public void setNameEN(String nameEN) {
+        this.nameEN = nameEN;
+    }
+
+    @Column(length = 100)
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     @Override
     public String toString() {
         return "RolePermissionTable{" +
                 "id='" + id + '\'' +
                 ", roleId='" + roleId + '\'' +
                 ", tableId='" + tableId + '\'' +
-                ", tableName='" + tableName + '\'' +
+                ", nameCN='" + nameCN + '\'' +
+                ", nameEN='" + nameEN + '\'' +
+                ", name='" + name + '\'' +
                 ", sortNumber=" + sortNumber +
                 ", createId='" + createId + '\'' +
                 ", createTime=" + createTime +

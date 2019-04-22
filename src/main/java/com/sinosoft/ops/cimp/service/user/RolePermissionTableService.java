@@ -18,10 +18,10 @@ public interface RolePermissionTableService {
 
     /**
      * 根据roleId 查询角色关联table列表
-     * @param roleId
+     * @param userId
      * @return
      */
-    List<RPTableViewModel> findRPTableListByRoleId(String roleId);
+    List<RPTableViewModel> findRPTableListByUserId(String userId);
 
     /**
      * 新增 角色关联table

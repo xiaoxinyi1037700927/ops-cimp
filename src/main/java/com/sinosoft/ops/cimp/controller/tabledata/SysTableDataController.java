@@ -10,12 +10,17 @@ import com.sinosoft.ops.cimp.dao.domain.sys.table.SysTableModelInfo;
 import com.sinosoft.ops.cimp.dto.QueryDataParamBuilder;
 import com.sinosoft.ops.cimp.dto.sys.table.SysTableInfoDTO;
 import com.sinosoft.ops.cimp.dto.sys.table.SysTableModelInfoDTO;
+import com.sinosoft.ops.cimp.entity.user.User;
 import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.service.tabledata.SysTableModelInfoService;
 import com.sinosoft.ops.cimp.service.sys.systable.SysTableTypeService;
+import com.sinosoft.ops.cimp.service.user.RolePermissionTableService;
 import com.sinosoft.ops.cimp.util.JsonUtil;
+import com.sinosoft.ops.cimp.util.SecurityUtils;
 import com.sinosoft.ops.cimp.vo.to.sys.systable.SysTableTypeModel;
+import com.sinosoft.ops.cimp.vo.to.user.rolePermissionTable.RPTableViewModel;
 import io.swagger.annotations.Api;
+import org.apache.catalina.security.SecurityUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -39,12 +44,17 @@ public class SysTableDataController extends BaseController {
     private final SysTableModelInfoService sysTableModelInfoService;
     private final SysTableInfoDao sysTableInfoDao;
     private final SysTableTypeService sysTableTypeService;
+    private final RolePermissionTableService rolePermissionTableService;
 
     @Autowired
-    public SysTableDataController(SysTableModelInfoService sysTableModelInfoService, SysTableInfoDao sysTableInfoDao, SysTableTypeService sysTableTypeService) {
+    public SysTableDataController(SysTableModelInfoService sysTableModelInfoService,
+                                  SysTableInfoDao sysTableInfoDao,
+                                  SysTableTypeService sysTableTypeService,
+                                  RolePermissionTableService rolePermissionTableService) {
         this.sysTableModelInfoService = sysTableModelInfoService;
         this.sysTableInfoDao = sysTableInfoDao;
         this.sysTableTypeService = sysTableTypeService;
+        this.rolePermissionTableService = rolePermissionTableService;
     }
 
     @RequestMapping(value = "/getSysTableTypes", method = RequestMethod.GET)
@@ -83,6 +93,16 @@ public class SysTableDataController extends BaseController {
             result.add(map);
         });
         return ok(result);
+    }
+
+    @RequestMapping(value = "/getRoutineTableNames", method = RequestMethod.GET)
+    public ResponseEntity getRoutineTableNames() throws BusinessException  {
+        User currentUser = SecurityUtils.getSubject().getCurrentUser();
+        String userId = currentUser.getId();
+
+        List<RPTableViewModel> rpTableListByRoleId = rolePermissionTableService.findRPTableListByUserId(userId);
+
+        return ok(rpTableListByRoleId);
     }
 
     @RequestMapping(value = "/getSysTableStructure", method = RequestMethod.GET)

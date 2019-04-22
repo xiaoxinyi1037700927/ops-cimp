@@ -20,11 +20,17 @@ public class RPTableAddModel {
     @NotEmpty(message = "table Id不能为空")
     private String tableId;
     /**
-     * table 名称
+     * nameCN
      */
-    @ApiModelProperty(value = "table 名称", required = true)
-    @NotEmpty(message = "table 名称不能为空")
-    private String tableName;
+    @ApiModelProperty(value = "nameCN")
+    private String nameCN;
+
+    @ApiModelProperty(value = "nameEN", required = true)
+    @NotEmpty(message = "nameEN名称不能为空")
+    private String nameEN;
+
+    @ApiModelProperty(value = "表名")
+    private String name;
     /**
      * 排序
      * */
@@ -57,12 +63,28 @@ public class RPTableAddModel {
         this.tableId = tableId;
     }
 
-    public String getTableName() {
-        return tableName;
+    public String getNameCN() {
+        return nameCN;
     }
 
-    public void setTableName(String tableName) {
-        this.tableName = tableName;
+    public void setNameCN(String nameCN) {
+        this.nameCN = nameCN;
+    }
+
+    public String getNameEN() {
+        return nameEN;
+    }
+
+    public void setNameEN(String nameEN) {
+        this.nameEN = nameEN;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public Integer getSortNumber() {
