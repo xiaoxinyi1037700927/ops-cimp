@@ -21,8 +21,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = "/sys/sysapp/tableGroup")
 public class SysAppTableGroupController extends BaseController {
 
+    private final SysAppTableGroupService tableGroupService;
+
     @Autowired
-    private SysAppTableGroupService tableGroupService;
+    public SysAppTableGroupController(SysAppTableGroupService tableGroupService) {
+        this.tableGroupService = tableGroupService;
+    }
 
     /**
      * 查询系统应用表分组列表

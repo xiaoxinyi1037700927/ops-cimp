@@ -1,4 +1,4 @@
-package com.sinosoft.ops.cimp.controller.sys.sysapp;
+package com.sinosoft.ops.cimp.controller.sys.sysapp.fieldAccess;
 
 import com.sinosoft.ops.cimp.annotation.SystemApiGroup;
 import com.sinosoft.ops.cimp.controller.BaseController;
@@ -13,6 +13,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,17 +22,13 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 
 @SystemApiGroup
-@Api(description = "系统应用操作")
+@Api(description = "角色对表的访问权限")
 @RestController
-@RequestMapping(value = "/sys/sysapp")
-public class SysAppController extends BaseController {
-
-    private final SysAppService sysAppService;
+@RequestMapping(value = "/sys/sysapp/tableAccess")
+public class SysAppRoleTableAccessController extends BaseController {
 
     @Autowired
-    public SysAppController(SysAppService sysAppService) {
-        this.sysAppService = sysAppService;
-    }
+    private SysAppService sysAppService;
 
     /**
      * 查询系统应用列表

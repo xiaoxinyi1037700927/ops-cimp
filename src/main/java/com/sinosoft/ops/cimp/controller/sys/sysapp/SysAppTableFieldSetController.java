@@ -20,8 +20,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(value = "/sys/sysapp/fieldSet")
 public class SysAppTableFieldSetController extends BaseController {
+    private final SysAppTableFieldSetService fieldSetService;
+
     @Autowired
-    private SysAppTableFieldSetService fieldSetService;
+    public SysAppTableFieldSetController(SysAppTableFieldSetService fieldSetService) {
+        this.fieldSetService = fieldSetService;
+    }
 
     /**
      * 查询系统应用表字段集合列表

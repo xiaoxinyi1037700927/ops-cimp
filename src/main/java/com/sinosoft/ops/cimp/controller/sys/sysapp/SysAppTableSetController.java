@@ -20,8 +20,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(value = "/sys/sysapp/tableSet")
 public class SysAppTableSetController extends BaseController {
+    private final SysAppTableSetService tableSetService;
+
     @Autowired
-    private SysAppTableSetService tableSetService;
+    public SysAppTableSetController(SysAppTableSetService tableSetService) {
+        this.tableSetService = tableSetService;
+    }
 
     /**
      * 查询系统应用表集合列表

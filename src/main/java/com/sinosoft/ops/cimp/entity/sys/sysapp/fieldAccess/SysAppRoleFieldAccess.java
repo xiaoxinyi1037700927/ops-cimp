@@ -1,4 +1,4 @@
-package com.sinosoft.ops.cimp.entity.sys.fieldAccess;
+package com.sinosoft.ops.cimp.entity.sys.sysapp.fieldAccess;
 
 import org.hibernate.annotations.GenericGenerator;
 
@@ -7,13 +7,12 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * 角色对表的访问权限
+ * 角色对表字段的访问权限
  */
 @Entity
-@Table(name = "ROLE_TABLE_ACCESS")
-public class RoleTableAccess implements Serializable {
-
-    private static final long serialVersionUID = -6270278742885643656L;
+@Table(name = "SYS_APP_ROLE_FIELD_ACCESS")
+public class SysAppRoleFieldAccess implements Serializable {
+    private static final long serialVersionUID = -1812456354180177297L;
     /**
      * 主键id
      */
@@ -23,25 +22,25 @@ public class RoleTableAccess implements Serializable {
     @Column(name = "ID", length = 36)
     private String id;
     /**
-     * 角色ID
+     * 角色对表访问权限ID
      */
-    @Column(name = "ROLE_ID", length = 36)
-    private String roleId;
+    @Column(name = "ROLE_TABLE_ACCESS_ID", length = 36)
+    private String roleTableAccessId;
     /**
-     * 系统表ID
+     * 系统应用表字段ID
      */
-    @Column(name = "SYS_TABLE_ID", length = 36)
-    private String sysTableId;
+    @Column(name = "SYS_APP_TABLE_FIELD_SET_ID", length = 36)
+    private String SysAppTableFieldSetId;
     /**
-     * 是否对表中所有字段有读权限
+     * 是否对字段有读权限
      */
-    @Column(name = "CAN_READ_ALL", length = 1)
-    private Boolean canReadAll;
+    @Column(name = "CAN_READ", length = 1)
+    private boolean canRead;
     /**
-     * 是否对表中所有字段有读权限
+     * 是否对字段有写权限
      */
-    @Column(name = "CAN_WRITE_ALL", length = 1)
-    private Boolean canWriteAll;
+    @Column(name = "CAN_WRITE", length = 1)
+    private boolean canWrite;
     /**
      * 创建人
      */
@@ -73,36 +72,36 @@ public class RoleTableAccess implements Serializable {
         this.id = id;
     }
 
-    public String getRoleId() {
-        return roleId;
+    public String getRoleTableAccessId() {
+        return roleTableAccessId;
     }
 
-    public void setRoleId(String roleId) {
-        this.roleId = roleId;
+    public void setRoleTableAccessId(String roleTableAccessId) {
+        this.roleTableAccessId = roleTableAccessId;
     }
 
-    public String getSysTableId() {
-        return sysTableId;
+    public String getSysAppTableFieldSetId() {
+        return SysAppTableFieldSetId;
     }
 
-    public void setSysTableId(String sysTableId) {
-        this.sysTableId = sysTableId;
+    public void setSysAppTableFieldSetId(String sysAppTableFieldSetId) {
+        SysAppTableFieldSetId = sysAppTableFieldSetId;
     }
 
-    public Boolean getCanReadAll() {
-        return canReadAll;
+    public boolean getCanRead() {
+        return canRead;
     }
 
-    public void setCanReadAll(Boolean canReadAll) {
-        this.canReadAll = canReadAll;
+    public void setCanRead(boolean canRead) {
+        this.canRead = canRead;
     }
 
-    public Boolean getCanWriteAll() {
-        return canWriteAll;
+    public boolean getCanWrite() {
+        return canWrite;
     }
 
-    public void setCanWriteAll(Boolean canWriteAll) {
-        this.canWriteAll = canWriteAll;
+    public void setCanWrite(boolean canWrite) {
+        this.canWrite = canWrite;
     }
 
     public String getCreateId() {

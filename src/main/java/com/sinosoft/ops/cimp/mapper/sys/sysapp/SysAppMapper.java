@@ -2,6 +2,7 @@ package com.sinosoft.ops.cimp.mapper.sys.sysapp;
 
 import com.sinosoft.ops.cimp.entity.sys.sysapp.SysApp;
 import com.sinosoft.ops.cimp.util.IdUtil;
+import com.sinosoft.ops.cimp.util.SecurityUtils;
 import com.sinosoft.ops.cimp.vo.from.sys.sysapp.sysApp.SysAppAddModel;
 import com.sinosoft.ops.cimp.vo.from.sys.sysapp.sysApp.SysAppModifyModel;
 import com.sinosoft.ops.cimp.vo.to.sys.sysapp.sysApp.SysAppModel;
@@ -35,7 +36,7 @@ public interface SysAppMapper {
 
     @Named("getCurrentId")
     default String getCurrentId(String id) {
-        return "0";
+        return SecurityUtils.getSubject().getCurrentUser().getId();
     }
 
     @Named("getTime")

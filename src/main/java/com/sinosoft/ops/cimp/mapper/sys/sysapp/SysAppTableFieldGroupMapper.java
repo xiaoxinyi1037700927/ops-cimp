@@ -2,6 +2,7 @@ package com.sinosoft.ops.cimp.mapper.sys.sysapp;
 
 import com.sinosoft.ops.cimp.entity.sys.sysapp.SysAppTableFieldGroup;
 import com.sinosoft.ops.cimp.util.IdUtil;
+import com.sinosoft.ops.cimp.util.SecurityUtils;
 import com.sinosoft.ops.cimp.vo.from.sys.sysapp.sysAppTableFieldGroup.SysAppTableFieldGroupAddModel;
 import com.sinosoft.ops.cimp.vo.from.sys.sysapp.sysAppTableFieldGroup.SysAppTableFieldGroupModifyModel;
 import com.sinosoft.ops.cimp.vo.to.sys.sysapp.sysAppTableFieldGroup.SysAppTableFieldGroupModel;
@@ -34,7 +35,7 @@ public interface SysAppTableFieldGroupMapper {
 
     @Named("getCurrentId")
     default String getCurrentId(String id) {
-        return "0";
+        return SecurityUtils.getSubject().getCurrentUser().getId();
     }
 
     @Named("getTime")

@@ -20,8 +20,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(value = "/sys/sysapp/fieldGroup")
 public class SysAppTableFieldGroupController extends BaseController {
+    private final SysAppTableFieldGroupService fieldGroupService;
+
     @Autowired
-    private SysAppTableFieldGroupService fieldGroupService;
+    public SysAppTableFieldGroupController(SysAppTableFieldGroupService fieldGroupService) {
+        this.fieldGroupService = fieldGroupService;
+    }
 
     /**
      * 查询系统应用表字段分组列表

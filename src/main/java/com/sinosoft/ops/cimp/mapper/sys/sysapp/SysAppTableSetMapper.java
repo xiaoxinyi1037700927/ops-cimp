@@ -4,6 +4,7 @@ import com.sinosoft.ops.cimp.entity.sys.sysapp.SysAppTableSet;
 import com.sinosoft.ops.cimp.entity.sys.systable.SysTable;
 import com.sinosoft.ops.cimp.entity.sys.systable.SysTableType;
 import com.sinosoft.ops.cimp.util.IdUtil;
+import com.sinosoft.ops.cimp.util.SecurityUtils;
 import com.sinosoft.ops.cimp.vo.from.sys.sysapp.sysAppTableSet.SysAppTableSetModifyModel;
 import com.sinosoft.ops.cimp.vo.to.sys.sysapp.sysAppTableSet.SysAppTableModel;
 import com.sinosoft.ops.cimp.vo.to.sys.sysapp.sysAppTableSet.SysAppTableSetModel;
@@ -33,7 +34,7 @@ public interface SysAppTableSetMapper {
 
     @Named("getCurrentId")
     default String getCurrentId(String id) {
-        return "0";
+        return SecurityUtils.getSubject().getCurrentUser().getId();
     }
 
     @Named("getTime")
