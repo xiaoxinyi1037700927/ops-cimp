@@ -66,7 +66,7 @@ public final class CacheManager {
      *
      * @param cacheManagerInfo 配置信息为Null时返回默认实例对象
      */
-    public static CacheManager getInstance(CacheManagerInfo cacheManagerInfo) {
+    public synchronized static CacheManager getInstance(CacheManagerInfo cacheManagerInfo) {
         if (cacheManagerInfo == null) {
             return getInstance();
         } else {
