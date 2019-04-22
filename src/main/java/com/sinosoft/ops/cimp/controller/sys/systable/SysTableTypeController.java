@@ -1,12 +1,11 @@
 package com.sinosoft.ops.cimp.controller.sys.systable;
 
 
-import com.sinosoft.ops.cimp.cache.CacheManager;
 import com.sinosoft.ops.cimp.annotation.SystemApiGroup;
-import com.sinosoft.ops.cimp.constant.Constants;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.service.sys.systable.SysTableTypeService;
+import com.sinosoft.ops.cimp.util.CachePackage.SysTableModelInfoManager;
 import com.sinosoft.ops.cimp.vo.from.sys.systable.SysTableTypeAddModel;
 import com.sinosoft.ops.cimp.vo.from.sys.systable.SysTableTypeModifyModel;
 import com.sinosoft.ops.cimp.vo.to.sys.systable.SysTableTypeModel;
@@ -36,8 +35,7 @@ public class SysTableTypeController extends BaseController {
     @RequestMapping(value = "/addSysTableType", method = RequestMethod.POST)
     public ResponseEntity saveSysEntityGroupDef(
             @RequestBody SysTableTypeAddModel sysTableTypeAddModel) throws BusinessException {
-        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
-        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
+        SysTableModelInfoManager.removeAllCache();
         boolean isok = sysTableTypeService.addSysTableType(sysTableTypeAddModel);
         if (isok) {
             return ok("操作成功");
@@ -49,8 +47,7 @@ public class SysTableTypeController extends BaseController {
     @RequestMapping(value = "/delSysTableType", method = RequestMethod.POST)
     public ResponseEntity deleteSysEntityGroupDef(
             @RequestParam String id) throws BusinessException {
-        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
-        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
+        SysTableModelInfoManager.removeAllCache();
         boolean isok = sysTableTypeService.delSysTableType(id);
         if (isok) {
             return ok("删除成功");
@@ -62,8 +59,7 @@ public class SysTableTypeController extends BaseController {
     @RequestMapping(value = "/updateSysTableType", method = RequestMethod.POST)
     public ResponseEntity updateSysEntityAttrDef(
             @RequestBody SysTableTypeModifyModel sysTableTypeModifyModel) throws BusinessException {
-        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
-        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
+        SysTableModelInfoManager.removeAllCache();
         boolean isok = sysTableTypeService.upSysTableType(sysTableTypeModifyModel);
         if (isok) {
             return ok("操作成功");

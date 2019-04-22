@@ -1,12 +1,11 @@
 package com.sinosoft.ops.cimp.controller.sys.systable;
 
-import com.sinosoft.ops.cimp.cache.CacheManager;
 import com.sinosoft.ops.cimp.annotation.SystemApiGroup;
-import com.sinosoft.ops.cimp.constant.Constants;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.dto.PaginationViewModel;
 import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.service.sys.systable.SysTableService;
+import com.sinosoft.ops.cimp.util.CachePackage.SysTableModelInfoManager;
 import com.sinosoft.ops.cimp.vo.from.sys.systable.SysTableAddModel;
 import com.sinosoft.ops.cimp.vo.from.sys.systable.SysTableModifyModel;
 import com.sinosoft.ops.cimp.vo.from.sys.systable.SysTableSearchModel;
@@ -35,8 +34,7 @@ public class SysTableController extends BaseController {
     @RequestMapping(value = "/addSysTable", method = RequestMethod.POST)
     public ResponseEntity saveSysEntityDef(
             @Valid @RequestBody SysTableAddModel sysTableAddModel) throws BusinessException {
-        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
-        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
+        SysTableModelInfoManager.removeAllCache();
         boolean isok = sysTableService.addSysTable(sysTableAddModel);
         if (isok) return ok("操作成功");
         return fail("操作失败");
@@ -46,8 +44,7 @@ public class SysTableController extends BaseController {
     @RequestMapping(value = "/delSysTableById", method = RequestMethod.POST)
     public ResponseEntity deleteSysEntityDef(
             @RequestParam("id") String id) throws BusinessException {
-        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
-        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
+        SysTableModelInfoManager.removeAllCache();
         boolean isok = sysTableService.delSysTable(id);
         if (isok) {
             return ok("删除成功");
@@ -59,8 +56,7 @@ public class SysTableController extends BaseController {
     @RequestMapping(value = "/updateSysTable", method = RequestMethod.POST)
     public ResponseEntity updateSysEntityDef(
             @RequestBody SysTableModifyModel sysTableModifyModel) throws BusinessException {
-        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
-        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
+        SysTableModelInfoManager.removeAllCache();
         boolean isok = sysTableService.upSysTable(sysTableModifyModel);
         if (isok) {
             return ok("操作成功");
@@ -79,9 +75,8 @@ public class SysTableController extends BaseController {
     @ApiOperation("数据库表操作")
     @RequestMapping(value = "/operatingDbTable", method = RequestMethod.POST)
     public ResponseEntity operatingDbTable(
-            @RequestParam("sysTableId") String sysTableId ) throws BusinessException {
-        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
-        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
+            @RequestParam("sysTableId") String sysTableId) throws BusinessException {
+        SysTableModelInfoManager.removeAllCache();
         boolean isok = sysTableService.operatingDbTable(sysTableId);
         if (isok) {
             return ok("提交成功");

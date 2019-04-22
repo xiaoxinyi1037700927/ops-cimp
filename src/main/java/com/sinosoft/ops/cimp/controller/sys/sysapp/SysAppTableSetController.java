@@ -1,11 +1,10 @@
 package com.sinosoft.ops.cimp.controller.sys.sysapp;
 
-import com.sinosoft.ops.cimp.cache.CacheManager;
 import com.sinosoft.ops.cimp.annotation.SystemApiGroup;
-import com.sinosoft.ops.cimp.constant.Constants;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.service.sys.sysapp.SysAppTableSetService;
+import com.sinosoft.ops.cimp.util.CachePackage.SysTableModelInfoManager;
 import com.sinosoft.ops.cimp.vo.from.sys.sysapp.sysAppTableSet.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -39,8 +38,7 @@ public class SysAppTableSetController extends BaseController {
     @ApiOperation(value = "新增系统应用表集合")
     @PostMapping("/add")
     public ResponseEntity addTableSet(@RequestBody SysAppTableSetAddModel addModel) throws BusinessException {
-        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
-        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
+        SysTableModelInfoManager.removeAllCache();
         tableSetService.addTableSet(addModel);
         return ok("新增成功！");
     }
@@ -51,8 +49,7 @@ public class SysAppTableSetController extends BaseController {
     @ApiOperation(value = "删除系统应用表集合")
     @PostMapping("/delete")
     public ResponseEntity deleteTableSet(@RequestBody SysAppTableSetDeleteModel deleteModel) throws BusinessException {
-        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
-        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
+        SysTableModelInfoManager.removeAllCache();
         tableSetService.deleteTableSet(deleteModel.getIds());
         return ok("删除成功！");
     }
@@ -63,8 +60,7 @@ public class SysAppTableSetController extends BaseController {
     @ApiOperation(value = "修改系统应用表集合")
     @PostMapping("/modify")
     public ResponseEntity modifyTableSet(@RequestBody SysAppTableSetModifyModel modifyModel) throws BusinessException {
-        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
-        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
+        SysTableModelInfoManager.removeAllCache();
         return tableSetService.modifyTableSet(modifyModel) ? ok("修改成功！") : fail("修改失败！");
     }
 
@@ -92,8 +88,7 @@ public class SysAppTableSetController extends BaseController {
     @ApiOperation(value = "交换排序")
     @PostMapping("/sort/swap")
     public ResponseEntity swapSort(@RequestBody SysAppTableSetSortModel sortModel) throws BusinessException {
-        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
-        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
+        SysTableModelInfoManager.removeAllCache();
         return tableSetService.swapSort(sortModel.getIds()) ? ok("修改成功！") : fail("修改失败！");
     }
 }

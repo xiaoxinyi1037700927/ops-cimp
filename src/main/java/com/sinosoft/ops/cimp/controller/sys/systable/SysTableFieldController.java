@@ -1,12 +1,11 @@
 package com.sinosoft.ops.cimp.controller.sys.systable;
 
-import com.sinosoft.ops.cimp.cache.CacheManager;
 import com.sinosoft.ops.cimp.annotation.SystemApiGroup;
-import com.sinosoft.ops.cimp.constant.Constants;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.dto.PaginationViewModel;
 import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.service.sys.systable.SysTableFieldService;
+import com.sinosoft.ops.cimp.util.CachePackage.SysTableModelInfoManager;
 import com.sinosoft.ops.cimp.vo.from.sys.systable.SysTableFieldAddModel;
 import com.sinosoft.ops.cimp.vo.from.sys.systable.SysTableFieldModifyModel;
 import com.sinosoft.ops.cimp.vo.from.sys.systable.SysTableFieldSearchModel;
@@ -35,8 +34,7 @@ public class SysTableFieldController extends BaseController {
     @RequestMapping(value = "/addSysTableField", method = RequestMethod.POST)
     public ResponseEntity saveSysEntityAttrDef(
             @RequestBody SysTableFieldAddModel sysTableFieldAddModel) throws BusinessException {
-        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
-        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
+        SysTableModelInfoManager.removeAllCache();
         boolean isok = sysTableFieldService.addSysTableField(sysTableFieldAddModel);
         if (isok) {
             return ok("操作成功");
@@ -48,8 +46,7 @@ public class SysTableFieldController extends BaseController {
     @RequestMapping(value = "/delSysTableFieldById", method = RequestMethod.POST)
     public ResponseEntity delById(
             @RequestParam(value = "id") String id) throws BusinessException {
-        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
-        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
+        SysTableModelInfoManager.removeAllCache();
         boolean isok = sysTableFieldService.delSysTableField(id);
         if (isok) {
             return ok("删除成功");
@@ -61,8 +58,7 @@ public class SysTableFieldController extends BaseController {
     @RequestMapping(value = "/updateSysTableField", method = RequestMethod.POST)
     public ResponseEntity updateSysEntityAttrDef(
             @RequestBody SysTableFieldModifyModel sysTableFieldModifyModel) throws BusinessException {
-        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
-        CacheManager.getInstance().remove(Constants.SYS_TABLE_MODEL_INFO);
+        SysTableModelInfoManager.removeAllCache();
         boolean isok = sysTableFieldService.upSysTableField(sysTableFieldModifyModel);
         return ok(isok);
     }
