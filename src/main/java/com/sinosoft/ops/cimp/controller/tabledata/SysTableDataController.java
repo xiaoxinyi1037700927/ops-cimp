@@ -98,11 +98,16 @@ public class SysTableDataController extends BaseController {
             return fail("查询表结构必须传递表类型名称");
         }
         SysTableModelInfoDTO tableInfo = sysTableInfoDao.getTableInfo(tableTypeName, prjCode);
+        SysTableModelInfoDTO resultTableInfo = new SysTableModelInfoDTO();
         if (StringUtils.isNotEmpty(tableName)) {
             Map<String, List<SysTableInfoDTO>> tableNameMap = tableInfo.getTables().stream().collect(Collectors.groupingBy(SysTableInfoDTO::getTableNameEn));
             List<SysTableInfoDTO> tableInfoDTOList = tableNameMap.getOrDefault(tableName, Lists.newArrayList());
-            tableInfo.setTables(tableInfoDTOList);
-            return ok(tableInfo);
+            resultTableInfo.setTables(tableInfoDTOList);
+            resultTableInfo.setTableTypeNameEn(tableInfo.getTableTypeNameEn());
+            resultTableInfo.setTableTypeNameCn(tableInfo.getTableTypeNameCn());
+            resultTableInfo.setPrjCode(tableInfo.getPrjCode());
+            resultTableInfo.setPrimaryField(tableInfo.getPrimaryField());
+            return ok(resultTableInfo);
         }
         return ok(tableInfo);
     }
@@ -328,8 +333,7 @@ public class SysTableDataController extends BaseController {
 
         Map formMap = JsonUtil.parseStringToObject(form, HashMap.class);
         Object keyObject = formMap.get(primaryKey);
-        if(keyObject==null)
-        {
+        if (keyObject == null) {
             return fail("当前传递的信息项未找到主键信息");
         }
         QueryDataParamBuilder queryDataParam = new QueryDataParamBuilder();
