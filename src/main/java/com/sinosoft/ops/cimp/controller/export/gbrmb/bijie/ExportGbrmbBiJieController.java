@@ -32,11 +32,15 @@ import java.util.ArrayList;
 @Controller
 @RequestMapping("/export/gbrmb/bj")
 public class ExportGbrmbBiJieController extends BaseController {
-    @Autowired
-    private Pdf2htmlService pdf2htmlService;
+    private final Pdf2htmlService pdf2htmlService;
+
+    private final ExportService exportService;
 
     @Autowired
-    private ExportService exportService;
+    public ExportGbrmbBiJieController(ExportService exportService, Pdf2htmlService pdf2htmlService) {
+        this.exportService = exportService;
+        this.pdf2htmlService = pdf2htmlService;
+    }
 
     @ApiOperation(value = "生成干部任免表html文件(毕节)")
     @ApiImplicitParam(name = "empId", value = "empId", required = true)

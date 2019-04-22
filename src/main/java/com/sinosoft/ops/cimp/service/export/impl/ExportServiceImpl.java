@@ -13,7 +13,6 @@ import org.dom4j.Element;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,14 +27,18 @@ import java.util.*;
 @Service
 public class ExportServiceImpl implements ExportService {
 
-    @Autowired
-    private ExportDao exportWordDao;
+    private final ExportDao exportWordDao;
 
-    @Autowired
-    private Pdf2htmlService pdf2htmlService;
+    private final Pdf2htmlService pdf2htmlService;
 
     @Value("${exportXMLElements}")
     private String exportXMLElements;
+
+    @Autowired
+    public ExportServiceImpl(ExportDao exportWordDao, Pdf2htmlService pdf2htmlService) {
+        this.exportWordDao = exportWordDao;
+        this.pdf2htmlService = pdf2htmlService;
+    }
 
     @Override
     @Transactional
@@ -60,9 +63,6 @@ public class ExportServiceImpl implements ExportService {
 
     /**
      * 生成干部任免表word文件(毕节)
-     *
-     * @param empId
-     * @return
      */
     @Override
     public String generateGbrmbWordBiJie(String empId) {
@@ -93,10 +93,6 @@ public class ExportServiceImpl implements ExportService {
 
     /**
      * 生成干部任免表pdf文件(毕节)
-     *
-     * @param empId
-     * @param overwrite
-     * @return
      */
     @Override
     public String generateGbrmbHTMLBiJie(String empId) {
@@ -136,9 +132,6 @@ public class ExportServiceImpl implements ExportService {
 
     /**
      * 生成干部任免表lrmx文件
-     *
-     * @param empId
-     * @return
      */
     @Override
     public String generateGbrmbLRMX(String empId) {
@@ -163,8 +156,6 @@ public class ExportServiceImpl implements ExportService {
 
     /**
      * 生成干部的所有任免表文件(毕节)
-     *
-     * @param empId
      */
     @Override
     public void generateGbrmbBiJieAll(String empId) {

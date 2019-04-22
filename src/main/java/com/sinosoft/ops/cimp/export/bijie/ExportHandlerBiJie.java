@@ -9,10 +9,10 @@ import com.sinosoft.ops.cimp.export.processor.*;
 import com.sinosoft.ops.cimp.util.StringUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
+import org.springframework.context.ApplicationContext;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ResourceUtils;
 
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -28,9 +28,6 @@ import java.util.regex.Pattern;
 
 @Component
 public class ExportHandlerBiJie extends AbstractExportHandler {
-
-    @Autowired
-    private ResourceLoader resourceLoader;
 
     @Override
     protected void init() {
@@ -150,9 +147,10 @@ public class ExportHandlerBiJie extends AbstractExportHandler {
         }
         //破解Aspose代码
         // 凭证文件
-        ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        InputStream license = loader.getResourceAsStream("license.xml");
-//        InputStream license = resourceLoader.getResource("classpath:license.xml").getInputStream();
+//        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+//        InputStream license = loader.getResourceAsStream("license.xml");
+
+        InputStream license = new ClassPathResource("license.xml").getInputStream();
 
         License aposeLic = new License();
         aposeLic.setLicense(license);

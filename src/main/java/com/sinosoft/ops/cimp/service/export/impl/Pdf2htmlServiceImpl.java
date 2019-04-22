@@ -28,8 +28,6 @@ public class Pdf2htmlServiceImpl implements Pdf2htmlService {
     @Override
     public boolean pdf2Html(String pdfFilePath, String pdfFileName,
                             String htmlFilePath, String htmlFileName) throws Exception {
-
-
         StringBuilder command = new StringBuilder();
         command.append(ExportConstant.PDF2HTML_PATH).append(" ");
 
@@ -46,23 +44,20 @@ public class Pdf2htmlServiceImpl implements Pdf2htmlService {
         command.append(pdfFilePath).append(pdfFileName).append(" ");
         command.append(htmlFileName).append(" ");
 
-        try {
-            Runtime rt = Runtime.getRuntime();
-            Process p = rt.exec(command.toString(), null, new File(pdfFilePath));
+        Runtime rt = Runtime.getRuntime();
+        Process p = rt.exec(command.toString(), null, new File(pdfFilePath));
 
-            StreamGobbler errorGobbler = new StreamGobbler(p.getErrorStream(), "ERROR");
-            errorGobbler.start(); // 开启屏幕标准错误流
-            StreamGobbler outGobbler = new StreamGobbler(p.getInputStream(), "STDOUT");
-            outGobbler.start(); // 开启屏幕标准输出流
+        StreamGobbler errorGobbler = new StreamGobbler(p.getErrorStream(), "ERROR");
+        errorGobbler.start(); // 开启屏幕标准错误流
+        StreamGobbler outGobbler = new StreamGobbler(p.getInputStream(), "STDOUT");
+        outGobbler.start(); // 开启屏幕标准输出流
 
-            int w = p.waitFor();
-            int v = p.exitValue();
-            if (w == 0 && v == 0) {
-                return true;
-            }
-        } catch (Exception e) {
-            throw e;
+        int w = p.waitFor();
+        int v = p.exitValue();
+        if (w == 0 && v == 0) {
+            return true;
         }
+
         return false;
     }
 
@@ -92,12 +87,8 @@ public class Pdf2htmlServiceImpl implements Pdf2htmlService {
 
     /**
      * 解析 pf page
-     *
-     * @param doc
-     * @throws IOException
-     * @throws ClassNotFoundException
      */
-    public void analysisPfPage(Document doc) throws ClassNotFoundException, IOException {
+    private void analysisPfPage(Document doc) throws ClassNotFoundException, IOException {
 
         // 初始化相关子集信息
         CategoryData.initCategoryData(doc);
@@ -126,10 +117,8 @@ public class Pdf2htmlServiceImpl implements Pdf2htmlService {
 
     /**
      * 移除 <script></script>
-     *
-     * @param doc
      */
-    public void removeScriptElement(Document doc) {
+    private void removeScriptElement(Document doc) {
         Element elementHead = doc.head();
         if (elementHead != null) {
             Elements scriptElements = elementHead.select("script");
@@ -141,11 +130,8 @@ public class Pdf2htmlServiceImpl implements Pdf2htmlService {
 
     /**
      * 写入 div
-     *
-     * @param pfChildrenElements
-     * @param buildDiv
      */
-    public void writeInDiv(Elements pfChildrenElements, StringBuffer buildDiv) {
+    private void writeInDiv(Elements pfChildrenElements, StringBuffer buildDiv) {
         Element lastElement = pfChildrenElements.get(pfChildrenElements.size() - 1);
         if (lastElement != null) {
             lastElement.after(buildDiv.toString());
@@ -155,11 +141,8 @@ public class Pdf2htmlServiceImpl implements Pdf2htmlService {
 
     /**
      * 写入 style
-     *
-     * @param doc
-     * @param buildStyle
      */
-    public void writeInStyle(Document doc, StringBuffer buildStyle) {
+    private void writeInStyle(Document doc, StringBuffer buildStyle) {
         Element titleNode = doc.getElementsByTag("title").first();
         if (titleNode != null) {
             titleNode.before("<style>" + '\n' + buildStyle.toString() + "</style>");
@@ -168,10 +151,8 @@ public class Pdf2htmlServiceImpl implements Pdf2htmlService {
 
     /**
      * 设置照片点击事件
-     *
-     * @param pfChildrenElements
      */
-    public void setPhotoEvent(Elements pfChildrenElements) {
+    private void setPhotoEvent(Elements pfChildrenElements) {
         if (pfChildrenElements == null) {
             return;
         }
@@ -187,12 +168,8 @@ public class Pdf2htmlServiceImpl implements Pdf2htmlService {
 
     /**
      * 处理 pf page
-     *
-     * @param categoryBeansPf
-     * @param pfChildrenElements
-     * @param buildStyle
      */
-    public void pfPageX(List<CategoryBean> categoryBeansPf, Elements pfChildrenElements, StringBuffer buildStyle, StringBuffer buildDiv) {
+    private void pfPageX(List<CategoryBean> categoryBeansPf, Elements pfChildrenElements, StringBuffer buildStyle, StringBuffer buildDiv) {
         // 设置 nameIndex
         List<Integer> nameIndexs = new ArrayList<>();
         setNameIndex(categoryBeansPf, pfChildrenElements, nameIndexs);
@@ -207,7 +184,7 @@ public class Pdf2htmlServiceImpl implements Pdf2htmlService {
         setStyle(buildStyle, divEventAttributeBeans);
     }
 
-    public void setNameIndex(List<CategoryBean> categoryBeansPf, Elements pfChildrenElements, List<Integer> nameIndexs) {
+    private void setNameIndex(List<CategoryBean> categoryBeansPf, Elements pfChildrenElements, List<Integer> nameIndexs) {
         String divText = null;
         for (Element divElement : pfChildrenElements) {
             divText = CategoryData.disposeDivText(divElement.text());
@@ -220,7 +197,7 @@ public class Pdf2htmlServiceImpl implements Pdf2htmlService {
         }
     }
 
-    public void setValueIndex(List<CategoryBean> categoryBeansPf, Elements pfChildrenElements, List<Integer> nameIndexs) {
+    private void setValueIndex(List<CategoryBean> categoryBeansPf, Elements pfChildrenElements, List<Integer> nameIndexs) {
         int pfChildrenElementsSize = pfChildrenElements.size();
         for (CategoryBean categoryBean : categoryBeansPf) {
             for (AttributeBean attributeBean : categoryBean.getAttributeBeans()) {
@@ -234,7 +211,7 @@ public class Pdf2htmlServiceImpl implements Pdf2htmlService {
         }
     }
 
-    public void setDivEvent(List<CategoryBean> categoryBeansPf, Elements pfChildrenElements, StringBuffer buildDiv, List<AttributeBean> divEventAttributeBeans) {
+    private void setDivEvent(List<CategoryBean> categoryBeansPf, Elements pfChildrenElements, StringBuffer buildDiv, List<AttributeBean> divEventAttributeBeans) {
         Element valueElement = null;
         for (CategoryBean categoryBean : categoryBeansPf) {
             for (AttributeBean attributeBean : categoryBean.getAttributeBeans()) {
@@ -266,7 +243,7 @@ public class Pdf2htmlServiceImpl implements Pdf2htmlService {
         }
     }
 
-    public void setStyle(StringBuffer buildStyle, List<AttributeBean> valueIndexNegativeBeans) {
+    private void setStyle(StringBuffer buildStyle, List<AttributeBean> valueIndexNegativeBeans) {
         for (AttributeBean attributeBean : valueIndexNegativeBeans) {
             if (attributeBean.getNameIndex() != -1) {
                 buildStyle.append("#");
@@ -283,7 +260,7 @@ public class Pdf2htmlServiceImpl implements Pdf2htmlService {
         }
     }
 
-    public boolean isContainsDivText(List<CategoryBean> categoryBeansPf, String divText, int attributeNameIndex) {
+    private boolean isContainsDivText(List<CategoryBean> categoryBeansPf, String divText, int attributeNameIndex) {
         for (CategoryBean categoryBean : categoryBeansPf) {
             for (AttributeBean attributeBean : categoryBean.getAttributeBeans()) {
                 if (attributeBean.getNameIndex() == -1 && divText.equals(attributeBean.getName())) {
