@@ -22,8 +22,12 @@ import java.net.URLEncoder;
 @RequestMapping("/export/gbhmc")
 public class ExportGbhmcController extends BaseController {
 
+    private final ExportGbhmcService exportGbhmcService;
+
     @Autowired
-    private ExportGbhmcService exportGbhmcService;
+    public ExportGbhmcController(ExportGbhmcService exportGbhmcService) {
+        this.exportGbhmcService = exportGbhmcService;
+    }
 
     @ApiOperation(value = "导出干部花名册")
     @GetMapping("generateAndExport")
@@ -41,7 +45,7 @@ public class ExportGbhmcController extends BaseController {
 
     }
 
-    protected void writeFileToResponse(HttpServletResponse response, String filePath) throws Exception {
+    private void writeFileToResponse(HttpServletResponse response, String filePath) throws Exception {
         String fileName = "干部花名册.xlsx";
         fileName = new String(fileName.getBytes("utf-8"), "utf-8");
         fileName = URLEncoder.encode(fileName, "UTF-8");

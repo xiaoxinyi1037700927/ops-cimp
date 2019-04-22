@@ -250,7 +250,6 @@ public class ExportGbhmcServiceImpl implements ExportGbhmcService {
                                     if (jobInfoList.get(i) != null) {
                                         Map objMap = jobInfoList.get(j);
                                         Object obja02001_a = objMap.get("A02001_A");
-                                        //									Object obja02016_a = objMap.get("A02016_A");
 
                                         if (StringUtils.equals(StringUtil.obj2Str(a02001_a),
                                                 StringUtil.obj2Str(obja02001_a))) {

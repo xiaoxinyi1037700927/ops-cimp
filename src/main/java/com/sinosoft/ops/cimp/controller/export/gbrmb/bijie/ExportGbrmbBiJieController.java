@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.FileInputStream;
 import java.io.OutputStream;
@@ -139,12 +138,6 @@ public class ExportGbrmbBiJieController extends BaseController {
 
     /**
      * 将所有文件压缩为zip文件
-     *
-     * @param files
-     * @param path
-     * @param name
-     * @return
-     * @throws ZipException
      */
     private String toZip(ArrayList<String> files, String path, String name) throws ZipException {
         FileUtils.createDir(path);
