@@ -10,6 +10,7 @@ import com.sinosoft.ops.cimp.mapper.user.RolePermissionTableMapper;
 import com.sinosoft.ops.cimp.repository.user.RolePermissionTableRepository;
 import com.sinosoft.ops.cimp.repository.user.UserRoleRepository;
 import com.sinosoft.ops.cimp.service.user.RolePermissionTableService;
+import com.sinosoft.ops.cimp.util.SecurityUtils;
 import com.sinosoft.ops.cimp.vo.from.user.rolePermissionTable.RPTableAddModel;
 import com.sinosoft.ops.cimp.vo.from.user.rolePermissionTable.RPTableSearchModel;
 import com.sinosoft.ops.cimp.vo.to.user.rolePermissionTable.RPTableModifyModel;
@@ -66,9 +67,9 @@ public class RolePermissionTableServiceImpl implements RolePermissionTableServic
     }
 
     @Override
-    public List<RPTableViewModel> findRPTableListByUserId(String userId) {
-        List<UserRole> byUserId = userRoleRepository.findByUserId(userId);
-        List<String> roleIds = byUserId.stream().map(x -> x.getRoleId()).collect(Collectors.toList());
+    public List<RPTableViewModel> findRPTableListByUserId() {
+        List<UserRole> roles = SecurityUtils.getSubject().getCurrentUserRole();
+        List<String> roleIds = roles.stream().map(x -> x.getRoleId()).collect(Collectors.toList());
 
         List<RolePermissionTable> all = Lists.newArrayList(rolePermissionTableRepository.findAll(QRolePermissionTable.rolePermissionTable.roleId.in(roleIds)));
         Map<String, List<RolePermissionTable>> map = all.stream().collect(Collectors.groupingBy(RolePermissionTable::getTableId));
