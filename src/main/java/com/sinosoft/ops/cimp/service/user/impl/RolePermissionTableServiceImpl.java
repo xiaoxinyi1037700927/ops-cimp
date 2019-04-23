@@ -71,7 +71,7 @@ public class RolePermissionTableServiceImpl implements RolePermissionTableServic
         List<UserRole> roles = SecurityUtils.getSubject().getCurrentUserRole();
         List<String> roleIds = roles.stream().map(x -> x.getRoleId()).collect(Collectors.toList());
 
-        List<RolePermissionTable> all = Lists.newArrayList(rolePermissionTableRepository.findAll(QRolePermissionTable.rolePermissionTable.roleId.in(roleIds)));
+        List<RolePermissionTable> all = rolePermissionTableRepository.findAllByRoleIdInOrderBySortNumberAsc(roleIds);
         Map<String, List<RolePermissionTable>> map = all.stream().collect(Collectors.groupingBy(RolePermissionTable::getTableId));
         List<RolePermissionTable> groupList = new ArrayList<>();
 
