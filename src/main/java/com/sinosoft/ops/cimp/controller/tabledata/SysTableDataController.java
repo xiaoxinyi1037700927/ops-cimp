@@ -109,13 +109,15 @@ public class SysTableDataController extends BaseController {
         for (RPTableViewModel viewModel : rpTableListByRoleId) {
             SysTableInfoDTO sysTableInfoDTO = collect.get(viewModel.getTableId());
             Map<String, Object> map = Maps.newHashMap();
-            map.put("tableNameEn", sysTableInfoDTO.getTableNameEn());
-            map.put("tableNameCn", viewModel.getName());
-            map.put("appGroupName", sysTableInfoDTO.getAppTableGroupName());
-            map.put("isMasterTable", sysTableInfoDTO.isMasterTable());
-            map.put("tableNamePK", sysTableInfoDTO.getTableNamePK());
-            map.put("tableNameFK", sysTableInfoDTO.getTableNameFK());
-            result.add(map);
+            if (sysTableInfoDTO != null) {
+                map.put("tableNameEn", sysTableInfoDTO.getTableNameEn());
+                map.put("tableNameCn", viewModel.getName());
+                map.put("appGroupName", sysTableInfoDTO.getAppTableGroupName());
+                map.put("isMasterTable", sysTableInfoDTO.isMasterTable());
+                map.put("tableNamePK", sysTableInfoDTO.getTableNamePK());
+                map.put("tableNameFK", sysTableInfoDTO.getTableNameFK());
+                result.add(map);
+            }
         }
 
 
