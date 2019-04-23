@@ -23,10 +23,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -72,7 +69,7 @@ public class RolePermissionTableServiceImpl implements RolePermissionTableServic
         List<String> roleIds = roles.stream().map(x -> x.getRoleId()).collect(Collectors.toList());
 
         List<RolePermissionTable> all = rolePermissionTableRepository.findAllByRoleIdInOrderBySortNumberAsc(roleIds);
-        Map<String, List<RolePermissionTable>> map = all.stream().collect(Collectors.groupingBy(RolePermissionTable::getTableId));
+        LinkedHashMap<String, List<RolePermissionTable>> map = all.stream().collect(Collectors.groupingBy(RolePermissionTable::getTableId, LinkedHashMap::new, Collectors.toList()));
         List<RolePermissionTable> groupList = new ArrayList<>();
 
         for (String key : map.keySet()) {

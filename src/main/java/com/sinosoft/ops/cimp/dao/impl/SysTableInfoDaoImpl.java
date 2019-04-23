@@ -194,6 +194,7 @@ public class SysTableInfoDaoImpl implements SysTableInfoDao {
                 boolean masterTable = sysTableInfo.isMasterTable();
                 String sysTableNameEn = sysTableInfo.getNameEn();
 
+                sysTableInfoDTO.setId(sysTableId);
                 sysTableInfoDTO.setAppTableGroupName(appGroupNameCn);
                 sysTableInfoDTO.setTableNameEn(sysTableNameEn);
                 if (StringUtils.isNotEmpty(appTableNameCn)) {
