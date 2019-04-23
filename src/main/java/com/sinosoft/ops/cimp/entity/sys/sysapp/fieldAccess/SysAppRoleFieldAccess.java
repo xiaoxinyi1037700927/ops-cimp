@@ -22,15 +22,15 @@ public class SysAppRoleFieldAccess implements Serializable {
     @Column(name = "ID", length = 36)
     private String id;
     /**
-     * 角色对表访问权限ID
+     * APP中角色对表访问权限ID
      */
-    @Column(name = "ROLE_TABLE_ACCESS_ID", length = 36)
-    private String roleTableAccessId;
+    @Column(name = "SYS_APP_ROLE_TABLE_ACCESS_ID", length = 36)
+    private String sysAppRoleTableAccessId;
     /**
      * 系统应用表字段ID
      */
     @Column(name = "SYS_APP_TABLE_FIELD_SET_ID", length = 36)
-    private String SysAppTableFieldSetId;
+    private String sysAppTableFieldSetId;
     /**
      * 是否对字段有读权限
      */
@@ -72,20 +72,20 @@ public class SysAppRoleFieldAccess implements Serializable {
         this.id = id;
     }
 
-    public String getRoleTableAccessId() {
-        return roleTableAccessId;
+    public String getSysAppRoleTableAccessId() {
+        return sysAppRoleTableAccessId;
     }
 
-    public void setRoleTableAccessId(String roleTableAccessId) {
-        this.roleTableAccessId = roleTableAccessId;
+    public void setSysAppRoleTableAccessId(String sysAppRoleTableAccessId) {
+        this.sysAppRoleTableAccessId = sysAppRoleTableAccessId;
     }
 
     public String getSysAppTableFieldSetId() {
-        return SysAppTableFieldSetId;
+        return sysAppTableFieldSetId;
     }
 
     public void setSysAppTableFieldSetId(String sysAppTableFieldSetId) {
-        SysAppTableFieldSetId = sysAppTableFieldSetId;
+        this.sysAppTableFieldSetId = sysAppTableFieldSetId;
     }
 
     public boolean getCanRead() {

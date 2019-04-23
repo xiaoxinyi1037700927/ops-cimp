@@ -26,6 +26,11 @@ public class SysAppTableFieldSetSearchModel extends RePagination {
      */
     @ApiModelProperty(value = "脚本")
     private String script;
+    /**
+     * 角色对表的访问权限id
+     */
+    @ApiModelProperty(value = "角色对表的访问权限id")
+    private String sysAppRoleTableAccessId;
 
     public String getSysAppTableFieldGroupId() {
         return sysAppTableFieldGroupId;
@@ -57,5 +62,13 @@ public class SysAppTableFieldSetSearchModel extends RePagination {
 
     public void setScript(String script) {
         this.script = script;
+    }
+
+    public String getSysAppRoleTableAccessId() {
+        return sysAppRoleTableAccessId;
+    }
+
+    public void setSysAppRoleTableAccessId(String sysAppRoleTableAccessId) {
+        this.sysAppRoleTableAccessId = sysAppRoleTableAccessId;
     }
 }

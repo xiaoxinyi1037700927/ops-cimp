@@ -1,14 +1,21 @@
 package com.sinosoft.ops.cimp.service.sys.sysapp.impl;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.QueryResults;
+import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.Coalesce;
+import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sinosoft.ops.cimp.dto.PaginationViewModel;
 import com.sinosoft.ops.cimp.entity.sys.sysapp.QSysAppTableSet;
 import com.sinosoft.ops.cimp.entity.sys.sysapp.SysAppTableSet;
+import com.sinosoft.ops.cimp.entity.sys.sysapp.fieldAccess.QSysAppRoleTableAccess;
 import com.sinosoft.ops.cimp.entity.sys.systable.QSysTable;
 import com.sinosoft.ops.cimp.entity.sys.systable.SysTable;
 import com.sinosoft.ops.cimp.mapper.sys.sysapp.SysAppTableSetMapper;
 import com.sinosoft.ops.cimp.repository.sys.sysapp.SysAppTableSetRepository;
+import com.sinosoft.ops.cimp.repository.sys.sysapp.access.SysAppTableAccessRepository;
 import com.sinosoft.ops.cimp.repository.sys.systable.SysTableRepository;
 import com.sinosoft.ops.cimp.repository.sys.systable.SysTableTypeRepository;
 import com.sinosoft.ops.cimp.service.sys.sysapp.SysAppTableFieldGroupService;
@@ -21,6 +28,9 @@ import com.sinosoft.ops.cimp.vo.to.sys.sysapp.sysAppTableSet.SysAppTableModel;
 import com.sinosoft.ops.cimp.vo.to.sys.sysapp.sysAppTableSet.SysAppTableSetModel;
 import com.sinosoft.ops.cimp.vo.to.sys.sysapp.sysAppTableSet.SysAppTableTypeModel;
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.criterion.ExistsSubqueryExpression;
+import org.hibernate.query.criteria.internal.expression.CoalesceExpression;
+import org.hibernate.query.criteria.internal.predicate.ExistsPredicate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -51,6 +61,9 @@ public class SysAppTableSetServiceImpl implements SysAppTableSetService {
     @Autowired
     private SysTableTypeRepository sysTableTypeRepository;
 
+    @Autowired
+    private SysAppTableAccessRepository tableAccessRepository;
+
     /**
      * 获取系统应用表集合列表
      */
@@ -61,21 +74,41 @@ public class SysAppTableSetServiceImpl implements SysAppTableSetService {
 
         int pageSize = searchModel.getPageSize() > 0 ? searchModel.getPageSize() : 1;
         int pageIndex = searchModel.getPageIndex() > 0 ? searchModel.getPageIndex() : 10;
-        PageRequest pageRequest = PageRequest.of(pageIndex - 1, pageSize, new Sort(Sort.Direction.ASC, qTableSet.sort.getMetadata().getName()));
+
+        JPAQuery<SysAppTableSet> query = jpaQueryFactory.select(qTableSet).from(qTableSet);
 
         BooleanBuilder builder = new BooleanBuilder();
         builder = builder.and(qTableSet.sysAppTableGroupId.eq(searchModel.getSysAppTableGroupId()));
         if (StringUtils.isNotEmpty(searchModel.getName())) {
-            builder = builder.and(qTableSet.name.contains(searchModel.getName()));
+            query.innerJoin(qSysTable).on(qTableSet.sysTableId.eq(qSysTable.id));
+
+            BooleanBuilder subBuilder = new BooleanBuilder();
+            subBuilder.and(qTableSet.name.contains(searchModel.getName()));
+            subBuilder.or(qTableSet.nameEn.contains(searchModel.getName()));
+            subBuilder.or(new BooleanBuilder().and(qTableSet.name.isNull()).and(qSysTable.nameCn.contains(searchModel.getName())));
+            subBuilder.or(new BooleanBuilder().and(qTableSet.nameEn.isNull()).and(qSysTable.nameEn.contains(searchModel.getName())));
+            builder.and(subBuilder);
         }
-        Page<SysAppTableSet> page = tableSetRepository.findAll(builder, pageRequest);
+        if (StringUtils.isNotEmpty(searchModel.getRoleId())) {
+            QSysAppRoleTableAccess qTableAccess = QSysAppRoleTableAccess.sysAppRoleTableAccess;
+            List<String> ids = jpaQueryFactory.select(qTableAccess.sysAppTableSetId).from(qTableAccess).where(qTableAccess.roleId.eq(searchModel.getRoleId())).fetch();
+            if (ids != null && ids.size() > 0) {
+                builder.and(qTableSet.id.in(ids));
+            }
+        }
+
+        QueryResults<SysAppTableSet> results = query.where(builder)
+                .orderBy(qTableSet.sort.asc())
+                .offset((pageIndex - 1) * pageSize)
+                .limit(pageSize)
+                .fetchResults();
 
         return new PaginationViewModel
                 .Builder<SysAppTableSetModel>()
                 .pageIndex(pageIndex)
                 .pageSize(pageSize)
-                .totalCount(page.getTotalElements())
-                .data(page.getContent().stream().map(tableSet -> {
+                .totalCount(results.getTotal())
+                .data(results.getResults().stream().map(tableSet -> {
                     SysAppTableSetModel model = SysAppTableSetMapper.INSTANCE.tableSetToTableSetModel(tableSet);
 
                     //如果字段值为空，取系统表中的值
@@ -103,7 +136,6 @@ public class SysAppTableSetServiceImpl implements SysAppTableSetService {
      */
     @Transactional
     @Override
-
     public void addTableSet(SysAppTableSetAddModel addModel) {
         QSysAppTableSet qTableSet = QSysAppTableSet.sysAppTableSet;
         SysAppTableSetMapper mapper = SysAppTableSetMapper.INSTANCE;
@@ -142,12 +174,20 @@ public class SysAppTableSetServiceImpl implements SysAppTableSetService {
     @Transactional
     @Override
     public void deleteTableSet(List<String> ids) {
+        if (ids == null || ids.size() == 0) {
+            return;
+        }
+
         for (String id : ids) {
             tableSetRepository.deleteById(id);
         }
 
         //删除表集合下的所有字段分组
         fieldGroupService.deleteByTableSetIds(ids);
+
+        //删除角色对该表集合的访问权限记录
+        tableAccessRepository.deleteBySysAppTableSetIdIn(ids);
+
     }
 
     /**
@@ -256,5 +296,35 @@ public class SysAppTableSetServiceImpl implements SysAppTableSetService {
         tableSetRepository.save(tableSet2);
 
         return true;
+    }
+
+    /**
+     * 根据id获取应用表信息
+     */
+    @Override
+    public SysAppTableSetModel getById(String id) {
+        Optional<SysAppTableSet> tableSetOptional = tableSetRepository.findById(id);
+
+        if (!tableSetOptional.isPresent()) {
+            return null;
+        }
+        SysAppTableSet tableSet = tableSetOptional.get();
+
+        SysAppTableSetModel tableSetModel = SysAppTableSetMapper.INSTANCE.tableSetToTableSetModel(tableSet);
+
+        //如果中文/英文名为空，取系统表中的值
+        Optional<SysTable> sysTableOptional = sysTableRepository.findById(tableSet.getSysTableId());
+        if (!sysTableOptional.isPresent()) {
+            return null;
+        }
+        SysTable sysTable = sysTableOptional.get();
+        if (StringUtils.isEmpty(tableSetModel.getName())) {
+            tableSetModel.setName(sysTable.getNameCn());
+        }
+        if (StringUtils.isEmpty(tableSetModel.getNameEn())) {
+            tableSetModel.setNameEn(sysTable.getNameEn());
+        }
+
+        return tableSetModel;
     }
 }

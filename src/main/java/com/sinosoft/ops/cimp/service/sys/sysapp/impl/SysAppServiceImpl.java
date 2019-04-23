@@ -4,8 +4,10 @@ import com.querydsl.core.BooleanBuilder;
 import com.sinosoft.ops.cimp.dto.PaginationViewModel;
 import com.sinosoft.ops.cimp.entity.sys.sysapp.QSysApp;
 import com.sinosoft.ops.cimp.entity.sys.sysapp.SysApp;
+import com.sinosoft.ops.cimp.entity.sys.sysapp.fieldAccess.SysAppRoleTableAccess;
 import com.sinosoft.ops.cimp.mapper.sys.sysapp.SysAppMapper;
 import com.sinosoft.ops.cimp.repository.sys.sysapp.SysAppRepository;
+import com.sinosoft.ops.cimp.repository.sys.sysapp.access.SysAppTableAccessRepository;
 import com.sinosoft.ops.cimp.service.sys.sysapp.SysAppService;
 import com.sinosoft.ops.cimp.service.sys.sysapp.SysAppTableGroupService;
 import com.sinosoft.ops.cimp.vo.from.sys.sysapp.sysApp.SysAppAddModel;
@@ -35,6 +37,9 @@ public class SysAppServiceImpl implements SysAppService {
     @Autowired
     private SysAppTableGroupService tableGroupService;
 
+    @Autowired
+    private SysAppTableAccessRepository tableAccessRepository;
+
     /**
      * 获取系统应用列表
      */
@@ -51,6 +56,12 @@ public class SysAppServiceImpl implements SysAppService {
         }
         if (StringUtils.isNotEmpty(searchModel.getName())) {
             builder = builder.and(qSysApp.name.contains(searchModel.getName()));
+        }
+        if (StringUtils.isNotEmpty(searchModel.getRoleId())) {
+            List<SysAppRoleTableAccess> tableAccesses = tableAccessRepository.findByRoleId(searchModel.getRoleId());
+            if (tableAccesses.size() > 0) {
+                builder = builder.and(qSysApp.id.eq(tableAccesses.get(0).getSysAppId()));
+            }
         }
 
         Page<SysApp> page = sysAppRepository.findAll(builder, pageRequest);
@@ -79,6 +90,10 @@ public class SysAppServiceImpl implements SysAppService {
     @Transactional
     @Override
     public void deleteSysApp(List<String> ids) {
+        if (ids == null || ids.size() == 0) {
+            return;
+        }
+
         for (String id : ids) {
             sysAppRepository.deleteById(id);
         }

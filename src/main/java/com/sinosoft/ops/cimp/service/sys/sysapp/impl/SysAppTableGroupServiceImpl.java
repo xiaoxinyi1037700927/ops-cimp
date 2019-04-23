@@ -86,6 +86,10 @@ public class SysAppTableGroupServiceImpl implements SysAppTableGroupService {
     @Transactional
     @Override
     public void deleteTableGroup(List<String> ids) {
+        if (ids == null || ids.size() == 0) {
+            return;
+        }
+
         for (String id : ids) {
             tableGroupRepository.deleteById(id);
         }

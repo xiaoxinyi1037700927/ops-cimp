@@ -1,11 +1,10 @@
-package com.sinosoft.ops.cimp.mapper.sys.sysapp;
+package com.sinosoft.ops.cimp.mapper.sys.sysapp.access;
 
-import com.sinosoft.ops.cimp.entity.sys.sysapp.SysApp;
-import com.sinosoft.ops.cimp.util.IdUtil;
+import com.sinosoft.ops.cimp.entity.sys.sysapp.fieldAccess.SysAppRoleFieldAccess;
 import com.sinosoft.ops.cimp.util.SecurityUtils;
-import com.sinosoft.ops.cimp.vo.from.sys.sysapp.sysApp.SysAppAddModel;
-import com.sinosoft.ops.cimp.vo.from.sys.sysapp.sysApp.SysAppModifyModel;
-import com.sinosoft.ops.cimp.vo.to.sys.sysapp.sysApp.SysAppModel;
+import com.sinosoft.ops.cimp.vo.from.sys.sysapp.access.SysAppFieldAccessAddModel;
+import com.sinosoft.ops.cimp.vo.from.sys.sysapp.access.SysAppFieldAccessModifyModel;
+import com.sinosoft.ops.cimp.vo.to.sys.sysapp.access.SysAppFieldAccessModel;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
@@ -14,25 +13,23 @@ import java.time.ZoneId;
 import java.util.Date;
 
 @Mapper
-public interface SysAppMapper {
+public interface SysAppFieldAccessMapper {
 
-    SysAppMapper INSTANCE = Mappers.getMapper(SysAppMapper.class);
+    SysAppFieldAccessMapper INSTANCE = Mappers.getMapper(SysAppFieldAccessMapper.class);
 
-    SysAppModel sysAppToSysAppModel(SysApp sysApp);
+    SysAppFieldAccessModel fieldAccessToFieldAccessModel(SysAppRoleFieldAccess FieldAccess);
 
     @Mappings({
             @Mapping(source = "createId", target = "createId", qualifiedByName = "getCurrentId"),
             @Mapping(source = "createTime", target = "createTime", qualifiedByName = "getTime"),
-            @Mapping(target = "id", qualifiedByName = "getNewId")
     })
-    SysApp addModelToSysApp(SysAppAddModel addModel);
+    SysAppRoleFieldAccess addModelToFieldAccess(SysAppFieldAccessAddModel addModel);
 
     @Mappings({
             @Mapping(source = "modifyId", target = "modifyId", qualifiedByName = "getCurrentId"),
             @Mapping(source = "modifyTime", target = "modifyTime", qualifiedByName = "getTime")
     })
-    void modifyModelToSysApp(SysAppModifyModel modifyModel, @MappingTarget SysApp sysApp);
-
+    void modifyModelToFieldAccess(SysAppFieldAccessModifyModel modifyModel, @MappingTarget SysAppRoleFieldAccess FieldAccess);
 
     @Named("getCurrentId")
     default String getCurrentId(String id) {
@@ -44,11 +41,5 @@ public interface SysAppMapper {
     default Date getTime(Date time) {
         return Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant());
     }
-
-    @Named("getNewId")
-    default String getNewId() {
-        return IdUtil.uuid();
-    }
-
 
 }

@@ -87,6 +87,10 @@ public class SysAppTableFieldGroupServiceImpl implements SysAppTableFieldGroupSe
     @Transactional
     @Override
     public void deleteFieldGroup(List<String> ids) {
+        if (ids == null || ids.size() == 0) {
+            return;
+        }
+
         for (String id : ids) {
             fieldGroupRepository.deleteById(id);
         }

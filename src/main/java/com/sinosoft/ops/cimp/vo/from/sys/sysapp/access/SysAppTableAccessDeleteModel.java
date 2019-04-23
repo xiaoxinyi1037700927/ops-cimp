@@ -1,9 +1,8 @@
-package com.sinosoft.ops.cimp.vo.from.sys.sysapp.tableAccess;
+package com.sinosoft.ops.cimp.vo.from.sys.sysapp.access;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-import java.util.Date;
 import java.util.List;
 
 
