@@ -275,7 +275,7 @@ public class SysTableModelInfoServiceImpl implements SysTableModelInfoService {
         String tableNameEnPK = new String("");
 
         //获取主键
-        Optional<SysTableField> primaryKeyField = sysTableFields.stream().filter(x -> x.getIsFK().equals("1")).findFirst();
+        Optional<SysTableField> primaryKeyField = sysTableFields.stream().filter(x -> x.getIsPK().equals("1")).findFirst();
 
         //主键字段必须存在
         if (primaryKeyField.isPresent()) {
@@ -291,7 +291,7 @@ public class SysTableModelInfoServiceImpl implements SysTableModelInfoService {
         //删除字段必须存在
         if (logicalDeleteFlagField.isPresent()) {
             SysTableField sysTableField = logicalDeleteFlagField.get();
-            deleteFlagFieldEnName = sysTableField.getNameEn();
+            deleteFlagFieldEnName = sysTableField.getDbFieldName();
         } else {
             throw new SystemException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE_100207, tableTypeNameEn);
         }
