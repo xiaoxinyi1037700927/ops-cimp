@@ -1,9 +1,8 @@
-package com.sinosoft.ops.cimp.vo.from.sys.sysapp.tableAccess;
+package com.sinosoft.ops.cimp.vo.from.sys.sysapp.access;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-import javax.persistence.Column;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
@@ -25,8 +24,9 @@ public class SysAppTableAccessAddModel {
     /**
      * 系统应用表ID列表
      */
-    @ApiModelProperty(value = "系统应用表ID列表")
-    private List<String> SysAppTableSetIds;
+    @ApiModelProperty(value = "系统应用表ID列表", required = true)
+    @NotNull(message = "系统应用表ID列表不能为空")
+    private List<String> sysAppTableSetIds;
     /**
      * 是否能读取表中所有字段
      */
@@ -65,11 +65,11 @@ public class SysAppTableAccessAddModel {
     }
 
     public List<String> getSysAppTableSetIds() {
-        return SysAppTableSetIds;
+        return sysAppTableSetIds;
     }
 
     public void setSysAppTableSetIds(List<String> sysAppTableSetIds) {
-        SysAppTableSetIds = sysAppTableSetIds;
+        this.sysAppTableSetIds = sysAppTableSetIds;
     }
 
     public boolean isCanReadAll() {

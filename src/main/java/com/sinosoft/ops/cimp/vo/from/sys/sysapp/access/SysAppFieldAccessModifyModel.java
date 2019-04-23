@@ -1,30 +1,29 @@
-package com.sinosoft.ops.cimp.vo.from.sys.sysapp.tableAccess;
+package com.sinosoft.ops.cimp.vo.from.sys.sysapp.access;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
 
 
-@ApiModel(description = "角色对表访问权限修改模型")
-public class SysAppTableAccessModifyModel {
+@ApiModel(description = "角色对表字段访问权限修改模型")
+public class SysAppFieldAccessModifyModel {
     /**
      * 主键id列表
      */
     @ApiModelProperty(value = "主键id列表")
     private List<String> ids;
     /**
-     * 是否能读取表中所有字段
+     * 是否能读取字段
      */
-    @ApiModelProperty(value = "是否能读取表中所有字段")
-    private boolean canReadAll;
+    @ApiModelProperty(value = "是否能读取字段")
+    private boolean canRead;
     /**
-     * 是否能修改表中所有字段
+     * 是否能修改字段
      */
-    @ApiModelProperty(value = "是否能修改表中所有字段")
-    private boolean canWriteAll;
+    @ApiModelProperty(value = "是否能修改字段")
+    private boolean canWrite;
     /**
      * 修改人
      */
@@ -44,20 +43,20 @@ public class SysAppTableAccessModifyModel {
         this.ids = ids;
     }
 
-    public boolean isCanReadAll() {
-        return canReadAll;
+    public boolean isCanRead() {
+        return canRead;
     }
 
-    public void setCanReadAll(boolean canReadAll) {
-        this.canReadAll = canReadAll;
+    public void setCanRead(boolean canRead) {
+        this.canRead = canRead;
     }
 
-    public boolean isCanWriteAll() {
-        return canWriteAll;
+    public boolean isCanWrite() {
+        return canWrite;
     }
 
-    public void setCanWriteAll(boolean canWriteAll) {
-        this.canWriteAll = canWriteAll;
+    public void setCanWrite(boolean canWrite) {
+        this.canWrite = canWrite;
     }
 
     public String getModifyId() {

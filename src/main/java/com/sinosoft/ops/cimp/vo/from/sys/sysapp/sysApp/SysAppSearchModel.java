@@ -16,6 +16,11 @@ public class SysAppSearchModel extends RePagination {
      */
     @ApiModelProperty(value = "应用名称")
     private String name;
+    /**
+     * 角色id
+     */
+    @ApiModelProperty(value = "角色id")
+    private String roleId;
 
     public Integer getCode() {
         return code;
@@ -31,5 +36,13 @@ public class SysAppSearchModel extends RePagination {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getRoleId() {
+        return roleId;
+    }
+
+    public void setRoleId(String roleId) {
+        this.roleId = roleId;
     }
 }

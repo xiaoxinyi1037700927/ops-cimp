@@ -1,15 +1,21 @@
 package com.sinosoft.ops.cimp.service.sys.sysapp.impl;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.QueryResults;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sinosoft.ops.cimp.dto.PaginationViewModel;
 import com.sinosoft.ops.cimp.entity.sys.sysapp.*;
+import com.sinosoft.ops.cimp.entity.sys.sysapp.fieldAccess.QSysAppRoleFieldAccess;
+import com.sinosoft.ops.cimp.entity.sys.sysapp.fieldAccess.QSysAppRoleTableAccess;
+import com.sinosoft.ops.cimp.entity.sys.sysapp.fieldAccess.SysAppRoleFieldAccess;
 import com.sinosoft.ops.cimp.entity.sys.systable.QSysTableField;
 import com.sinosoft.ops.cimp.entity.sys.systable.SysTableField;
 import com.sinosoft.ops.cimp.mapper.sys.sysapp.SysAppTableFieldSetMapper;
 import com.sinosoft.ops.cimp.repository.sys.sysapp.SysAppTableFieldGroupRepository;
 import com.sinosoft.ops.cimp.repository.sys.sysapp.SysAppTableFieldSetRepository;
 import com.sinosoft.ops.cimp.repository.sys.sysapp.SysAppTableSetRepository;
+import com.sinosoft.ops.cimp.repository.sys.sysapp.access.SysAppFieldAccessRepository;
 import com.sinosoft.ops.cimp.repository.sys.systable.SysTableFieldRepository;
 import com.sinosoft.ops.cimp.service.sys.sysapp.SysAppTableFieldSetService;
 import com.sinosoft.ops.cimp.vo.from.sys.sysapp.sysAppTableFieldSet.SysAppTableFieldSearchModel;
@@ -49,6 +55,8 @@ public class SysAppTableFieldSetServiceImpl implements SysAppTableFieldSetServic
     @Autowired
     private SysAppTableSetRepository tableSetRepository;
 
+    @Autowired
+    private SysAppFieldAccessRepository fieldAccessRepository;
 
     /**
      * 获取系统应用字段集合列表
@@ -60,21 +68,41 @@ public class SysAppTableFieldSetServiceImpl implements SysAppTableFieldSetServic
 
         int pageSize = searchModel.getPageSize() > 0 ? searchModel.getPageSize() : 1;
         int pageIndex = searchModel.getPageIndex() > 0 ? searchModel.getPageIndex() : 10;
-        PageRequest pageRequest = PageRequest.of(pageIndex - 1, pageSize, new Sort(Sort.Direction.ASC, qFieldSet.sort.getMetadata().getName()));
+
+        JPAQuery<SysAppTableFieldSet> query = jpaQueryFactory.select(qFieldSet).from(qFieldSet);
 
         BooleanBuilder builder = new BooleanBuilder();
         builder = builder.and(qFieldSet.sysAppTableFieldGroupId.eq(searchModel.getSysAppTableFieldGroupId()));
         if (StringUtils.isNotEmpty(searchModel.getName())) {
-            builder = builder.and(qFieldSet.name.contains(searchModel.getName()));
+            query.innerJoin(qSysTableField).on(qFieldSet.sysTableFieldId.eq(qSysTableField.id));
+
+            BooleanBuilder subBuilder = new BooleanBuilder();
+            subBuilder.and(qFieldSet.name.contains(searchModel.getName()));
+            subBuilder.or(qFieldSet.nameEn.contains(searchModel.getName()));
+            subBuilder.or(new BooleanBuilder().and(qFieldSet.name.isNull()).and(qSysTableField.nameCn.contains(searchModel.getName())));
+            subBuilder.or(new BooleanBuilder().and(qFieldSet.nameEn.isNull()).and(qSysTableField.nameEn.contains(searchModel.getName())));
+            builder.and(subBuilder);
         }
-        Page<SysAppTableFieldSet> page = fieldSetRepository.findAll(builder, pageRequest);
+        if (StringUtils.isNotEmpty(searchModel.getSysAppRoleTableAccessId())) {
+            QSysAppRoleFieldAccess qFieldAccess = QSysAppRoleFieldAccess.sysAppRoleFieldAccess;
+            List<String> ids = jpaQueryFactory.select(qFieldAccess.sysAppTableFieldSetId).from(qFieldAccess).where(qFieldAccess.sysAppRoleTableAccessId.eq(searchModel.getSysAppRoleTableAccessId())).fetch();
+            if (ids != null && ids.size() > 0) {
+                builder.and(qFieldSet.id.in(ids));
+            }
+        }
+
+        QueryResults<SysAppTableFieldSet> results = query.where(builder)
+                .orderBy(qFieldSet.sort.asc())
+                .offset((pageIndex - 1) * pageSize)
+                .limit(pageSize)
+                .fetchResults();
 
         return new PaginationViewModel
                 .Builder<SysAppTableFieldSetModel>()
                 .pageIndex(pageIndex)
                 .pageSize(pageSize)
-                .totalCount(page.getTotalElements())
-                .data(page.getContent().stream().map(fieldSet -> {
+                .totalCount(results.getTotal())
+                .data(results.getResults().stream().map(fieldSet -> {
                     SysAppTableFieldSetModel model = SysAppTableFieldSetMapper.INSTANCE.fieldSetToFieldSetModel(fieldSet);
 
                     //如果字段值为空，则取系统表字段中的值
@@ -154,9 +182,16 @@ public class SysAppTableFieldSetServiceImpl implements SysAppTableFieldSetServic
     @Transactional
     @Override
     public void deleteFieldSet(List<String> ids) {
+        if (ids == null || ids.size() == 0) {
+            return;
+        }
+
         for (String id : ids) {
             fieldSetRepository.deleteById(id);
         }
+
+        //删除角色对系统应用表字段的访问权限信息
+        fieldAccessRepository.deleteBySysAppTableFieldSetIdIn(ids);
     }
 
     /**
@@ -272,6 +307,35 @@ public class SysAppTableFieldSetServiceImpl implements SysAppTableFieldSetServic
         fieldSetRepository.save(fieldSet2);
 
         return true;
+    }
+
+    /**
+     * 根据id获取应用表字段信息
+     */
+    @Override
+    public SysAppTableFieldSetModel getById(String id) {
+        Optional<SysAppTableFieldSet> fieldSetOptional = fieldSetRepository.findById(id);
+        if (!fieldSetOptional.isPresent()) {
+            return null;
+        }
+
+        SysAppTableFieldSetModel fieldSetModel = SysAppTableFieldSetMapper.INSTANCE.fieldSetToFieldSetModel(fieldSetOptional.get());
+
+        //如果字段英文/中文名为空，取系统表字段中的值
+        Optional<SysTableField> tableFieldOptional = sysTableFieldRepository.findById(fieldSetModel.getSysTableFieldId());
+        if (!tableFieldOptional.isPresent()) {
+            return null;
+        }
+        SysTableField tableField = tableFieldOptional.get();
+
+        if (StringUtils.isEmpty(fieldSetModel.getName())) {
+            fieldSetModel.setName(tableField.getNameCn());
+        }
+        if (StringUtils.isEmpty(fieldSetModel.getNameEn())) {
+            fieldSetModel.setNameEn(tableField.getNameEn());
+        }
+
+        return fieldSetModel;
     }
 }
 

@@ -98,9 +98,9 @@ public class UpdateSqlBuilder implements SqlBuilder {
             String saveField = tableFieldMap.get(conditionName);
             if (StringUtils.isNotEmpty(saveField)) {
                 conditionSqlBuilder.append(" WHERE 1=1 ");
-                if (condition.equals(Conditions.ConditionsEnum.IN)) {
+                if (condition.equals(Conditions.ConditionsEnum.IN.getCondition())) {
                     conditionSqlBuilder.append(" AND ")
-                            .append(conditionName)
+                            .append(saveField)
                             .append(" ")
                             .append(condition)
                             .append(" ")

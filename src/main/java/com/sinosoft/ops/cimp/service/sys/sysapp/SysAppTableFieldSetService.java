@@ -46,4 +46,9 @@ public interface SysAppTableFieldSetService {
      */
     boolean swapSort(List<String> ids);
 
+    /**
+     * 根据id获取应用表字段信息
+     */
+    SysAppTableFieldSetModel getById(String id);
+
 }

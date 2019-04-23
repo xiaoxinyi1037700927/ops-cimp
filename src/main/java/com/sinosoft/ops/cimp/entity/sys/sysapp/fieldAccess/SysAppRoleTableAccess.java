@@ -36,7 +36,7 @@ public class SysAppRoleTableAccess implements Serializable {
      * 系统应用表ID
      */
     @Column(name = "SYS_APP_TABLE_SET_ID", length = 36)
-    private String SysAppTableSetId;
+    private String sysAppTableSetId;
     /**
      * 是否对表中所有字段有读权限
      */
@@ -95,11 +95,11 @@ public class SysAppRoleTableAccess implements Serializable {
     }
 
     public String getSysAppTableSetId() {
-        return SysAppTableSetId;
+        return sysAppTableSetId;
     }
 
     public void setSysAppTableSetId(String sysAppTableSetId) {
-        SysAppTableSetId = sysAppTableSetId;
+        this.sysAppTableSetId = sysAppTableSetId;
     }
 
     public boolean getCanReadAll() {
