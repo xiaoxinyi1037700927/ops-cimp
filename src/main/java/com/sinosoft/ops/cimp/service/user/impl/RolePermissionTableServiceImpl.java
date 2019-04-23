@@ -12,6 +12,7 @@ import com.sinosoft.ops.cimp.repository.user.UserRoleRepository;
 import com.sinosoft.ops.cimp.service.user.RolePermissionTableService;
 import com.sinosoft.ops.cimp.vo.from.user.rolePermissionTable.RPTableAddModel;
 import com.sinosoft.ops.cimp.vo.from.user.rolePermissionTable.RPTableSearchModel;
+import com.sinosoft.ops.cimp.vo.to.user.rolePermissionTable.RPTableModifyModel;
 import com.sinosoft.ops.cimp.vo.to.user.rolePermissionTable.RPTableViewModel;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,14 +49,7 @@ public class RolePermissionTableServiceImpl implements RolePermissionTableServic
         builder = builder.and(qRolePermissionTable.roleId.eq(searchModel.getRoleId()));
         Page<RolePermissionTable> all = rolePermissionTableRepository.findAll(builder, pageRequest);
 
-        Map<String, List<RolePermissionTable>> map = all.getContent().stream().collect(Collectors.groupingBy(RolePermissionTable::getTableId));
-        List<RolePermissionTable> groupList = new ArrayList<>();
-        for (String key : map.keySet()) {
-            List<RolePermissionTable> rolePermissionTables = map.get(key);
-            groupList.addAll(rolePermissionTables);
-        }
-
-        List<RPTableViewModel> collect = groupList.stream().map(x -> {
+        List<RPTableViewModel> collect = all.getContent().stream().map(x -> {
             RPTableViewModel rpTableViewModel = RolePermissionTableMapper.INSTANCE.rPTableAddModelToViewModel(x);
             if (StringUtils.isEmpty(rpTableViewModel.getName())) {
                 rpTableViewModel.setName(x.getNameCN());
@@ -93,6 +87,24 @@ public class RolePermissionTableServiceImpl implements RolePermissionTableServic
             return rpTableViewModel;
         }).collect(Collectors.toList());
         return collect;
+    }
+
+    @Override
+    public List<RPTableViewModel> findRPTableListByRoleId(String roleId) {
+        List<RolePermissionTable> all = Lists.newArrayList(rolePermissionTableRepository.findAll(QRolePermissionTable.rolePermissionTable.roleId.eq(roleId)));
+        List<RPTableViewModel> collect = all.stream().map(x -> RolePermissionTableMapper.INSTANCE.rPTableAddModelToViewModel(x)).collect(Collectors.toList());
+        return collect;
+    }
+
+    @Override
+    public RPTableModifyModel findRPTableById(String id) {
+        Optional<RolePermissionTable> rolePermissionTableOptional = rolePermissionTableRepository.findById(id);
+        if (!rolePermissionTableOptional.isPresent()) {
+            return null;
+        }
+        RolePermissionTable rolePermissionTable = rolePermissionTableOptional.get();
+        RPTableModifyModel rpTableModifyModel = RolePermissionTableMapper.INSTANCE.rPTableAddModelToModifyModel(rolePermissionTable);
+        return rpTableModifyModel;
     }
 
     @Override

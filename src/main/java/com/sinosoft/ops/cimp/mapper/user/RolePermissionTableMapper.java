@@ -3,6 +3,7 @@ package com.sinosoft.ops.cimp.mapper.user;
 import com.sinosoft.ops.cimp.entity.user.RolePermissionTable;
 import com.sinosoft.ops.cimp.util.SecurityUtils;
 import com.sinosoft.ops.cimp.vo.from.user.rolePermissionTable.RPTableAddModel;
+import com.sinosoft.ops.cimp.vo.to.user.rolePermissionTable.RPTableModifyModel;
 import com.sinosoft.ops.cimp.vo.to.user.rolePermissionTable.RPTableViewModel;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
@@ -23,6 +24,8 @@ public interface RolePermissionTableMapper {
 
 
     RPTableViewModel rPTableAddModelToViewModel(RolePermissionTable rolePermissionTable);
+
+    RPTableModifyModel rPTableAddModelToModifyModel(RolePermissionTable rolePermissionTable);
 
     @Mappings({
             @Mapping(source = "modifyId", target = "modifyId", qualifiedByName = "getCreateId"),

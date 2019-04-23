@@ -10,6 +10,7 @@ import com.sinosoft.ops.cimp.service.user.RolePermissionTableService;
 import com.sinosoft.ops.cimp.vo.from.user.rolePermissionTable.RPTableAddModel;
 import com.sinosoft.ops.cimp.vo.from.user.rolePermissionTable.RPTableDeleteModel;
 import com.sinosoft.ops.cimp.vo.from.user.rolePermissionTable.RPTableSearchModel;
+import com.sinosoft.ops.cimp.vo.to.user.rolePermissionTable.RPTableModifyModel;
 import com.sinosoft.ops.cimp.vo.to.user.rolePermissionTable.RPTableViewModel;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -42,6 +43,14 @@ public class RolePermissionTableController extends BaseController {
 //        List<RPTableViewModel> rpTableListByRoleId = rolePermissionTableService.findRPTableListByRoleId(roleId);
 //        return ok(rpTableListByRoleId);
 //    }
+
+    @ApiOperation(value = "根据id查询角色关联table")
+    @PostMapping("/findRPTableById")
+    @RequiresAuthentication
+    public ResponseEntity<RPTableModifyModel> findRPTableById(@RequestParam String id) throws BusinessException {
+        RPTableModifyModel rpTableById = rolePermissionTableService.findRPTableById(id);
+        return ok(rpTableById);
+    }
 
     @ApiOperation(value = "新增查询角色关联table")
     @PostMapping("/saveRPTable")

@@ -230,7 +230,7 @@ public class UserRoleServiceImpl implements UserRoleService {
         List<Role> roleList = userRoleService.getRolesByUserId(currentUser.getId());
         List<RoleViewModel> roleViewModelList = roleList.stream().map(role -> RoleViewModelMapper.INSTANCE.roleToRoleViewModel(role)).collect(Collectors.toList());
         List<String> collect = roleViewModelList.stream().map(x -> x.getId()).collect(Collectors.toList());
-        List<MenuParentViewModel> menuParentViewModelByRoleId = userRoleService.findMenuParentViewModelByRoleId(String.valueOf(collect));
+        List<MenuParentViewModel> menuParentViewModelByRoleId = userRoleService.findMenuParentViewModelByRoleId(collect);
 
         Object statisticsViewModel = null;
 //        if ("1".equals(type)) {

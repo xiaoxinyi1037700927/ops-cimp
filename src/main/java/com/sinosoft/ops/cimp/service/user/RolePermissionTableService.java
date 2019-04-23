@@ -3,6 +3,7 @@ package com.sinosoft.ops.cimp.service.user;
 import com.sinosoft.ops.cimp.dto.PaginationViewModel;
 import com.sinosoft.ops.cimp.vo.from.user.rolePermissionTable.RPTableAddModel;
 import com.sinosoft.ops.cimp.vo.from.user.rolePermissionTable.RPTableSearchModel;
+import com.sinosoft.ops.cimp.vo.to.user.rolePermissionTable.RPTableModifyModel;
 import com.sinosoft.ops.cimp.vo.to.user.rolePermissionTable.RPTableViewModel;
 
 import java.util.List;
@@ -17,11 +18,25 @@ public interface RolePermissionTableService {
     PaginationViewModel<RPTableViewModel> findRPTablePageList(RPTableSearchModel searchModel);
 
     /**
-     * 根据roleId 查询角色关联table列表
+     * userId 查询角色关联table列表
      * @param userId
      * @return
      */
     List<RPTableViewModel> findRPTableListByUserId(String userId);
+
+    /**
+     * 根据 roleId查询角色关联table列表
+     * @param roleId
+     * @return
+     */
+    List<RPTableViewModel> findRPTableListByRoleId(String roleId);
+
+    /**
+     * 根据id查询
+     * @param id
+     * @return
+     */
+    RPTableModifyModel findRPTableById(String id);
 
     /**
      * 新增 角色关联table

@@ -3,6 +3,7 @@ package com.sinosoft.ops.cimp.vo.to.user.rolePermissionTable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 
@@ -10,15 +11,19 @@ import java.util.Date;
 public class RPTableViewModel {
 
     @ApiModelProperty(value = "角色关联Tableid", required = true)
+    @NotNull(message = "id不能为空！")
     private String id;
 
-    @ApiModelProperty(value = "关联角色id", required = true)
+    @ApiModelProperty(value = "roleId", required = true)
+    @NotNull(message = "roleId不能为空！")
     private String roleId;
 
     @ApiModelProperty(value = "table Id", required = true)
+    @NotNull(message = "table Id不能为空！")
     private String tableId;
 
     @ApiModelProperty(value = "nameEN", required = true)
+    @NotNull(message = "nameEN不能为空！")
     private String nameEN;
 
     @ApiModelProperty(value = "表名")

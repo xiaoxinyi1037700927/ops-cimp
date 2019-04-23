@@ -96,13 +96,32 @@ public class SysTableDataController extends BaseController {
     }
 
     @RequestMapping(value = "/getRoutineTableNames", method = RequestMethod.GET)
-    public ResponseEntity getRoutineTableNames() throws BusinessException  {
+    public ResponseEntity getRoutineTableNames(
+            @RequestParam("appCode") String prjCode,
+            @RequestParam("tableTypeName") String tableTypeName) throws BusinessException {
         User currentUser = SecurityUtils.getSubject().getCurrentUser();
         String userId = currentUser.getId();
 
+        List<Map<String, Object>> result = Lists.newArrayList();
         List<RPTableViewModel> rpTableListByRoleId = rolePermissionTableService.findRPTableListByUserId(userId);
+        List<String> tableIds = rpTableListByRoleId.stream().map(x -> x.getTableId()).collect(Collectors.toList());
+        SysTableModelInfoDTO tableInfo = sysTableInfoDao.getTableInfo(tableTypeName, prjCode);
+        List<SysTableInfoDTO> tables = tableInfo.getTables();
+        Map<String, SysTableInfoDTO> collect = tables.stream().collect(Collectors.toMap(SysTableInfoDTO::getId, a -> a, (k1, k2) -> k1));
+        for (String tableId : tableIds) {
+            SysTableInfoDTO sysTableInfoDTO = collect.get(tableId);
+            Map<String, Object> map = Maps.newHashMap();
+            map.put("tableNameEn", sysTableInfoDTO.getTableNameEn());
+            map.put("tableNameCn", sysTableInfoDTO.getTableNameCn());
+            map.put("appGroupName", sysTableInfoDTO.getAppTableGroupName());
+            map.put("isMasterTable", sysTableInfoDTO.isMasterTable());
+            map.put("tableNamePK", sysTableInfoDTO.getTableNamePK());
+            map.put("tableNameFK", sysTableInfoDTO.getTableNameFK());
+            result.add(map);
+        }
 
-        return ok(rpTableListByRoleId);
+
+        return ok(result);
     }
 
     @RequestMapping(value = "/getSysTableStructure", method = RequestMethod.GET)
