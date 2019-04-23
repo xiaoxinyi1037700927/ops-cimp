@@ -8,7 +8,6 @@ import com.sinosoft.ops.cimp.entity.user.RolePermissionTable;
 import com.sinosoft.ops.cimp.entity.user.UserRole;
 import com.sinosoft.ops.cimp.mapper.user.RolePermissionTableMapper;
 import com.sinosoft.ops.cimp.repository.user.RolePermissionTableRepository;
-import com.sinosoft.ops.cimp.repository.user.UserRoleRepository;
 import com.sinosoft.ops.cimp.service.user.RolePermissionTableService;
 import com.sinosoft.ops.cimp.util.SecurityUtils;
 import com.sinosoft.ops.cimp.vo.from.user.rolePermissionTable.RPTableAddModel;
@@ -31,8 +30,7 @@ import java.util.stream.Collectors;
 public class RolePermissionTableServiceImpl implements RolePermissionTableService {
     @Autowired
     private RolePermissionTableRepository rolePermissionTableRepository;
-    @Autowired
-    private UserRoleRepository userRoleRepository;
+
 
     @Override
     public PaginationViewModel<RPTableViewModel> findRPTablePageList(RPTableSearchModel searchModel) {

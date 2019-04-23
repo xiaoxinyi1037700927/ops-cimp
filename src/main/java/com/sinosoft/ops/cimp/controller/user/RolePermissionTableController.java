@@ -52,7 +52,7 @@ public class RolePermissionTableController extends BaseController {
         return ok(rpTableById);
     }
 
-    @ApiOperation(value = "新增查询角色关联table")
+    @ApiOperation(value = "新增角色关联table")
     @PostMapping("/saveRPTable")
     @RequiresAuthentication
     public ResponseEntity<Boolean> saveRPTable(@RequestBody RPTableAddModel addModel) throws BusinessException {
@@ -64,7 +64,7 @@ public class RolePermissionTableController extends BaseController {
         }
     }
 
-    @ApiOperation(value = "修改查询角色关联table")
+    @ApiOperation(value = "修改角色关联table")
     @PostMapping("/modifyRPTable")
     @RequiresAuthentication
     public ResponseEntity<Boolean> modifyRPTable(@RequestBody RPTableViewModel modifyModel) throws BusinessException {
@@ -76,7 +76,7 @@ public class RolePermissionTableController extends BaseController {
         }
     }
 
-    @ApiOperation(value = "删除查询角色关联table")
+    @ApiOperation(value = "删除角色关联table")
     @PostMapping("/deleteRPTable")
     @RequiresAuthentication
     public ResponseEntity<Boolean> deleteRPTable(@RequestBody RPTableDeleteModel deleteModel) throws BusinessException {
@@ -91,7 +91,7 @@ public class RolePermissionTableController extends BaseController {
         }
     }
 
-    @ApiOperation(value = "修改查询角色关联table排序")
+    @ApiOperation(value = "修改角色关联table排序")
     @PostMapping("/changeRPTableSort")
     @RequiresAuthentication
     public ResponseEntity<Boolean> changeRPTableSort(@RequestBody RPTableDeleteModel deleteModel) throws BusinessException {

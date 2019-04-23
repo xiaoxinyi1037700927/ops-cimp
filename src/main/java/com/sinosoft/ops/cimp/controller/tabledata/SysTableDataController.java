@@ -15,10 +15,12 @@ import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.service.tabledata.SysTableModelInfoService;
 import com.sinosoft.ops.cimp.service.sys.systable.SysTableTypeService;
 import com.sinosoft.ops.cimp.service.user.RolePermissionTableService;
+import com.sinosoft.ops.cimp.service.user.UserCollectionTableService;
 import com.sinosoft.ops.cimp.util.JsonUtil;
 import com.sinosoft.ops.cimp.util.SecurityUtils;
 import com.sinosoft.ops.cimp.vo.to.sys.systable.SysTableTypeModel;
 import com.sinosoft.ops.cimp.vo.to.user.rolePermissionTable.RPTableViewModel;
+import com.sinosoft.ops.cimp.vo.to.user.userCollectionTable.UCTableViewModel;
 import io.swagger.annotations.Api;
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -45,16 +47,19 @@ public class SysTableDataController extends BaseController {
     private final SysTableInfoDao sysTableInfoDao;
     private final SysTableTypeService sysTableTypeService;
     private final RolePermissionTableService rolePermissionTableService;
+    private final UserCollectionTableService userCollectionTableService;
 
     @Autowired
     public SysTableDataController(SysTableModelInfoService sysTableModelInfoService,
                                   SysTableInfoDao sysTableInfoDao,
                                   SysTableTypeService sysTableTypeService,
-                                  RolePermissionTableService rolePermissionTableService) {
+                                  RolePermissionTableService rolePermissionTableService,
+                                  UserCollectionTableService userCollectionTableService) {
         this.sysTableModelInfoService = sysTableModelInfoService;
         this.sysTableInfoDao = sysTableInfoDao;
         this.sysTableTypeService = sysTableTypeService;
         this.rolePermissionTableService = rolePermissionTableService;
+        this.userCollectionTableService = userCollectionTableService;
     }
 
     @RequestMapping(value = "/getSysTableTypes", method = RequestMethod.GET)
@@ -107,6 +112,35 @@ public class SysTableDataController extends BaseController {
         List<SysTableInfoDTO> tables = tableInfo.getTables();
         Map<String, SysTableInfoDTO> collect = tables.stream().collect(Collectors.toMap(SysTableInfoDTO::getId, a -> a, (k1, k2) -> k1));
         for (RPTableViewModel viewModel : rpTableListByRoleId) {
+            SysTableInfoDTO sysTableInfoDTO = collect.get(viewModel.getTableId());
+            Map<String, Object> map = Maps.newHashMap();
+            if (sysTableInfoDTO != null) {
+                map.put("tableNameEn", sysTableInfoDTO.getTableNameEn());
+                map.put("tableNameCn", viewModel.getName());
+                map.put("appGroupName", sysTableInfoDTO.getAppTableGroupName());
+                map.put("isMasterTable", sysTableInfoDTO.isMasterTable());
+                map.put("tableNamePK", sysTableInfoDTO.getTableNamePK());
+                map.put("tableNameFK", sysTableInfoDTO.getTableNameFK());
+                result.add(map);
+            }
+        }
+
+
+        return ok(result);
+    }
+
+    @RequestMapping(value = "/getCollectionTableNames", method = RequestMethod.GET)
+    public ResponseEntity getCollectionTableNames(
+            @RequestParam("appCode") String prjCode,
+            @RequestParam("tableTypeName") String tableTypeName) throws BusinessException {
+        String userId = SecurityUtils.getSubject().getCurrentUser().getId();
+
+        List<Map<String, Object>> result = Lists.newArrayList();
+        List<UCTableViewModel> ucTableListByUserId = userCollectionTableService.findUCTableListByUserId(userId);
+        SysTableModelInfoDTO tableInfo = sysTableInfoDao.getTableInfo(tableTypeName, prjCode);
+        List<SysTableInfoDTO> tables = tableInfo.getTables();
+        Map<String, SysTableInfoDTO> collect = tables.stream().collect(Collectors.toMap(SysTableInfoDTO::getId, a -> a, (k1, k2) -> k1));
+        for (UCTableViewModel viewModel : ucTableListByUserId) {
             SysTableInfoDTO sysTableInfoDTO = collect.get(viewModel.getTableId());
             Map<String, Object> map = Maps.newHashMap();
             if (sysTableInfoDTO != null) {
