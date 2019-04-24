@@ -6,6 +6,7 @@ import com.sinosoft.ops.cimp.annotation.SystemApiGroup;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.dao.SysTableInfoDao;
 import com.sinosoft.ops.cimp.dao.domain.sys.table.SysTableFieldInfo;
+import com.sinosoft.ops.cimp.dao.domain.sys.table.SysTableInfo;
 import com.sinosoft.ops.cimp.dao.domain.sys.table.SysTableModelInfo;
 import com.sinosoft.ops.cimp.dto.QueryDataParamBuilder;
 import com.sinosoft.ops.cimp.dto.sys.table.SysTableFieldInfoDTO;
@@ -14,8 +15,8 @@ import com.sinosoft.ops.cimp.dto.sys.table.SysTableModelInfoDTO;
 import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.service.sys.sysapp.acess.SysAppFieldAccessService;
 import com.sinosoft.ops.cimp.service.sys.sysapp.acess.SysAppTableAccessService;
-import com.sinosoft.ops.cimp.service.tabledata.SysTableModelInfoService;
 import com.sinosoft.ops.cimp.service.sys.systable.SysTableTypeService;
+import com.sinosoft.ops.cimp.service.tabledata.SysTableModelInfoService;
 import com.sinosoft.ops.cimp.service.user.RolePermissionTableService;
 import com.sinosoft.ops.cimp.service.user.UserCollectionTableService;
 import com.sinosoft.ops.cimp.util.JsonUtil;
@@ -131,6 +132,7 @@ public class SysTableDataController extends BaseController {
                 map.put("isMasterTable", sysTableInfoDTO.isMasterTable());
                 map.put("tableNamePK", sysTableInfoDTO.getTableNamePK());
                 map.put("tableNameFK", sysTableInfoDTO.getTableNameFK());
+                map.put("sysTableId", sysTableInfoDTO.getId());
                 result.add(map);
             }
         }
@@ -160,6 +162,7 @@ public class SysTableDataController extends BaseController {
                 map.put("isMasterTable", sysTableInfoDTO.isMasterTable());
                 map.put("tableNamePK", sysTableInfoDTO.getTableNamePK());
                 map.put("tableNameFK", sysTableInfoDTO.getTableNameFK());
+                map.put("sysTableId", sysTableInfoDTO.getId());
                 result.add(map);
             }
         }
@@ -193,19 +196,19 @@ public class SysTableDataController extends BaseController {
             }
 
             boolean canWriteAll = tableAccessMap.get(table.getId()).getCanWriteAll();
-            if(!canWriteAll){
+            if (!canWriteAll) {
                 Map<String, SysAppFieldAccessModel> fieldAccessMap = fieldAccessService.getFieldAccess(prjCode, table.getId());
                 for (Iterator<SysTableFieldInfoDTO> itField = table.getFields().iterator(); itField.hasNext(); ) {
                     SysTableFieldInfoDTO field = itField.next();
                     //没有该字段的访问权限,过滤掉
-                    if(!fieldAccessMap.containsKey(field.getId())){
+                    if (!fieldAccessMap.containsKey(field.getId())) {
                         itField.remove();
                         continue;
                     }
 
                     SysAppFieldAccessModel fieldAccessModel = fieldAccessMap.get(field.getId());
                     //没有该字段的读写权限,过滤掉
-                    if(!fieldAccessModel.getCanWrite() && !fieldAccessModel.getCanRead()){
+                    if (!fieldAccessModel.getCanWrite() && !fieldAccessModel.getCanRead()) {
                         itField.remove();
                         continue;
                     }
@@ -261,7 +264,32 @@ public class SysTableDataController extends BaseController {
             }
         }
 
-        Map formMap = JsonUtil.parseStringToObject(form, HashMap.class);
+        //权限判断
+        Map<String, SysAppTableAccessModel> tableAccessMap = tableAccessService.getTableAccess(appCode);
+        Map<String, SysTableInfo> tableNameEnMap = tableInfo.getTables().stream().collect(Collectors.toMap(SysTableInfo::getNameEn, (v) -> v, (s1, s2) -> s1));
+        SysTableInfo sysTableInfo = tableNameEnMap.get(tableName);
+        if (sysTableInfo == null) {
+            return fail("操作的信息集未配置");
+        }
+        SysAppTableAccessModel sysAppTableAccessModel = tableAccessMap.get(sysTableInfo.getId());
+        if (sysAppTableAccessModel == null) {
+            return fail("没有操作信息集的权限");
+        }
+        Map formMap = null;
+        if (sysAppTableAccessModel.getCanWriteAll()) {
+            formMap = JsonUtil.parseStringToObject(form, HashMap.class);
+        } else {
+            HashMap<String, Object> saveFormData = JsonUtil.parseStringToObject(form, HashMap.class);
+            Map<String, SysAppFieldAccessModel> fieldAccessMap = fieldAccessService.getFieldAccess(appCode, sysTableInfo.getId());
+            List<String> nameEnList = fieldAccessMap.values().stream().map(SysAppFieldAccessModel::getNameEn).collect(Collectors.toList());
+
+            ArrayList formDataKeys = Lists.newArrayList(saveFormData.keySet());
+            for (Object formDataKey : formDataKeys) {
+                if (!nameEnList.contains(formDataKey)) {
+                    saveFormData.entrySet().removeIf(e -> StringUtils.equals(e.getKey(), String.valueOf(formDataKey)));
+                }
+            }
+        }
         QueryDataParamBuilder queryDataParam = new QueryDataParamBuilder();
 
         queryDataParam.setPrjCode(appCode)
