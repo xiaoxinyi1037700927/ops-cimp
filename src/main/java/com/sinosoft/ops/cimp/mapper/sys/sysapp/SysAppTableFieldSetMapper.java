@@ -18,8 +18,6 @@ import java.util.Date;
 public interface SysAppTableFieldSetMapper {
     SysAppTableFieldSetMapper INSTANCE = Mappers.getMapper(SysAppTableFieldSetMapper.class);
 
-    SysAppTableFieldSetModel fieldSetToFieldSetModel(SysAppTableFieldSet fieldSet);
-
     @Mappings({
             @Mapping(source = "modifyId", target = "modifyId", qualifiedByName = "getCurrentId"),
             @Mapping(source = "modifyTime", target = "modifyTime", qualifiedByName = "getTime")

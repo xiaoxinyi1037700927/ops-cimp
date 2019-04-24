@@ -27,12 +27,12 @@ public class SysAppFieldAccessModel {
      * 是否对字段有读权限
      */
     @ApiModelProperty(value = "是否对字段有读权限")
-    private boolean canReadAll;
+    private boolean canRead;
     /**
      * 是否对字段有写权限
      */
     @ApiModelProperty(value = "是否对字段有写权限")
-    private boolean canWriteAll;
+    private boolean canWrite;
 
     public String getId() {
         return id;
@@ -58,19 +58,19 @@ public class SysAppFieldAccessModel {
         this.nameEn = nameEn;
     }
 
-    public boolean isCanReadAll() {
-        return canReadAll;
+    public boolean isCanRead() {
+        return canRead;
     }
 
-    public void setCanReadAll(boolean canReadAll) {
-        this.canReadAll = canReadAll;
+    public void setCanRead(boolean canRead) {
+        this.canRead = canRead;
     }
 
-    public boolean isCanWriteAll() {
-        return canWriteAll;
+    public boolean isCanWrite() {
+        return canWrite;
     }
 
-    public void setCanWriteAll(boolean canWriteAll) {
-        this.canWriteAll = canWriteAll;
+    public void setCanWrite(boolean canWrite) {
+        this.canWrite = canWrite;
     }
 }

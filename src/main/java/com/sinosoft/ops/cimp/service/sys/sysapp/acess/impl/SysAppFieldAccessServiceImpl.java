@@ -2,52 +2,42 @@ package com.sinosoft.ops.cimp.service.sys.sysapp.acess.impl;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.QueryResults;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sinosoft.ops.cimp.dto.PaginationViewModel;
 import com.sinosoft.ops.cimp.entity.sys.sysapp.QSysAppTableFieldSet;
-import com.sinosoft.ops.cimp.entity.sys.sysapp.SysAppTableFieldSet;
 import com.sinosoft.ops.cimp.entity.sys.sysapp.fieldAccess.QSysAppRoleFieldAccess;
-import com.sinosoft.ops.cimp.entity.sys.sysapp.fieldAccess.QSysAppRoleTableAccess;
 import com.sinosoft.ops.cimp.entity.sys.sysapp.fieldAccess.SysAppRoleFieldAccess;
-import com.sinosoft.ops.cimp.entity.sys.sysapp.fieldAccess.SysAppRoleTableAccess;
 import com.sinosoft.ops.cimp.entity.sys.systable.QSysTableField;
 import com.sinosoft.ops.cimp.mapper.sys.sysapp.access.SysAppFieldAccessMapper;
-import com.sinosoft.ops.cimp.mapper.sys.sysapp.access.SysAppTableAccessMapper;
-import com.sinosoft.ops.cimp.repository.sys.sysapp.SysAppTableFieldSetRepository;
 import com.sinosoft.ops.cimp.repository.sys.sysapp.access.SysAppFieldAccessRepository;
-import com.sinosoft.ops.cimp.service.sys.sysapp.SysAppTableFieldSetService;
 import com.sinosoft.ops.cimp.service.sys.sysapp.acess.SysAppFieldAccessService;
 import com.sinosoft.ops.cimp.util.IdUtil;
 import com.sinosoft.ops.cimp.vo.from.sys.sysapp.access.SysAppFieldAccessAddModel;
 import com.sinosoft.ops.cimp.vo.from.sys.sysapp.access.SysAppFieldAccessModifyModel;
 import com.sinosoft.ops.cimp.vo.from.sys.sysapp.access.SysAppFieldAccessSearchModel;
 import com.sinosoft.ops.cimp.vo.to.sys.sysapp.access.SysAppFieldAccessModel;
-import com.sinosoft.ops.cimp.vo.to.sys.sysapp.access.SysAppTableAccessModel;
-import com.sinosoft.ops.cimp.vo.to.sys.sysapp.sysAppTableFieldSet.SysAppTableFieldSetModel;
-import com.sinosoft.ops.cimp.vo.to.sys.sysapp.sysAppTableSet.SysAppTableSetModel;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class SysAppFieldAccessServiceImpl implements SysAppFieldAccessService {
 
-    @Autowired
-    private SysAppFieldAccessRepository fieldAccessRepository;
+    private final SysAppFieldAccessRepository fieldAccessRepository;
+
+    private final JPAQueryFactory jpaQueryFactory;
 
     @Autowired
-    private SysAppTableFieldSetService fieldSetService;
-
-    @Autowired
-    private JPAQueryFactory jpaQueryFactory;
+    public SysAppFieldAccessServiceImpl(JPAQueryFactory jpaQueryFactory, SysAppFieldAccessRepository fieldAccessRepository) {
+        this.jpaQueryFactory = jpaQueryFactory;
+        this.fieldAccessRepository = fieldAccessRepository;
+    }
 
     /**
      * 获取对表字段的访问权限列表
@@ -60,14 +50,19 @@ public class SysAppFieldAccessServiceImpl implements SysAppFieldAccessService {
         int pageSize = searchModel.getPageSize() > 0 ? searchModel.getPageSize() : 1;
         int pageIndex = searchModel.getPageIndex() > 0 ? searchModel.getPageIndex() : 10;
 
-        JPAQuery<SysAppRoleFieldAccess> query = jpaQueryFactory.select(qFieldAccess).from(qFieldAccess)
-                .innerJoin(qFieldSet).on(qFieldSet.id.eq(qFieldAccess.sysAppTableFieldSetId));
+        JPAQuery<SysAppFieldAccessModel> query = jpaQueryFactory.select(Projections.bean(
+                SysAppFieldAccessModel.class,
+                qFieldAccess.id,
+                qFieldSet.name.coalesce(qSysTableField.nameCn).as("nameCn"),
+                qFieldSet.nameEn.coalesce(qSysTableField.nameEn).as("nameEn"),
+                qFieldAccess.canRead,
+                qFieldAccess.canWrite
+        )).from(qFieldAccess).innerJoin(qFieldSet).on(qFieldSet.id.eq(qFieldAccess.sysAppTableFieldSetId))
+                .innerJoin(qSysTableField).on(qFieldSet.sysTableFieldId.eq(qSysTableField.id));
 
         BooleanBuilder builder = new BooleanBuilder();
         builder.and(qFieldAccess.sysAppRoleTableAccessId.eq(searchModel.getSysAppRoleTableAccessId()));
         if (StringUtils.isNotEmpty(searchModel.getName())) {
-            query.innerJoin(qSysTableField).on(qFieldSet.sysTableFieldId.eq(qSysTableField.id));
-
             BooleanBuilder subBuilder = new BooleanBuilder();
             subBuilder.and(qFieldSet.name.contains(searchModel.getName()));
             subBuilder.or(qFieldSet.nameEn.contains(searchModel.getName()));
@@ -75,7 +70,7 @@ public class SysAppFieldAccessServiceImpl implements SysAppFieldAccessService {
             subBuilder.or(new BooleanBuilder().and(qFieldSet.nameEn.isNull()).and(qSysTableField.nameEn.contains(searchModel.getName())));
             builder.and(subBuilder);
         }
-        QueryResults<SysAppRoleFieldAccess> results = query.where(builder)
+        QueryResults<SysAppFieldAccessModel> results = query.where(builder)
                 .orderBy(qFieldSet.sort.asc())
                 .offset((pageIndex - 1) * pageSize)
                 .limit(pageSize)
@@ -86,16 +81,7 @@ public class SysAppFieldAccessServiceImpl implements SysAppFieldAccessService {
                 .pageIndex(pageIndex)
                 .pageSize(pageSize)
                 .totalCount(results.getTotal())
-                .data(results.getResults().stream().map(fieldAccess -> {
-                    SysAppFieldAccessModel fieldAccessModel = SysAppFieldAccessMapper.INSTANCE.fieldAccessToFieldAccessModel(fieldAccess);
-
-                    SysAppTableFieldSetModel fieldSetModel = fieldSetService.getById(fieldAccess.getSysAppTableFieldSetId());
-                    if (null != fieldSetModel) {
-                        fieldAccessModel.setNameCn(fieldSetModel.getName());
-                        fieldAccessModel.setNameEn(fieldSetModel.getNameEn());
-                    }
-                    return fieldAccessModel;
-                }).collect(Collectors.toList()))
+                .data(results.getResults())
                 .build();
     }
 

@@ -1,13 +1,12 @@
 package com.sinosoft.ops.cimp.service.sys.sysapp;
 
 import com.sinosoft.ops.cimp.dto.PaginationViewModel;
-import com.sinosoft.ops.cimp.entity.sys.sysapp.SysAppTableSet;
+import com.sinosoft.ops.cimp.vo.from.sys.sysapp.sysAppTableSet.SysAppTableSearchModel;
 import com.sinosoft.ops.cimp.vo.from.sys.sysapp.sysAppTableSet.SysAppTableSetAddModel;
 import com.sinosoft.ops.cimp.vo.from.sys.sysapp.sysAppTableSet.SysAppTableSetModifyModel;
 import com.sinosoft.ops.cimp.vo.from.sys.sysapp.sysAppTableSet.SysAppTableSetSearchModel;
-import com.sinosoft.ops.cimp.vo.from.sys.sysapp.sysAppTableSet.SysAppTableSearchModel;
-import com.sinosoft.ops.cimp.vo.to.sys.sysapp.sysAppTableSet.SysAppTableSetModel;
 import com.sinosoft.ops.cimp.vo.to.sys.sysapp.sysAppTableSet.SysAppTableModel;
+import com.sinosoft.ops.cimp.vo.to.sys.sysapp.sysAppTableSet.SysAppTableSetModel;
 import com.sinosoft.ops.cimp.vo.to.sys.sysapp.sysAppTableSet.SysAppTableTypeModel;
 
 import java.util.List;
@@ -52,9 +51,4 @@ public interface SysAppTableSetService {
      * 交换排序
      */
     boolean swapSort(List<String> ids);
-
-    /**
-     * 根据id获取应用表信息
-     */
-    SysAppTableSetModel getById(String id);
 }

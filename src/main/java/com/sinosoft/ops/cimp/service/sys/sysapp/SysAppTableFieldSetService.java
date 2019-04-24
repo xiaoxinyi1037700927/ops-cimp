@@ -1,10 +1,10 @@
 package com.sinosoft.ops.cimp.service.sys.sysapp;
 
 import com.sinosoft.ops.cimp.dto.PaginationViewModel;
+import com.sinosoft.ops.cimp.vo.from.sys.sysapp.sysAppTableFieldSet.SysAppTableFieldSearchModel;
 import com.sinosoft.ops.cimp.vo.from.sys.sysapp.sysAppTableFieldSet.SysAppTableFieldSetAddModel;
 import com.sinosoft.ops.cimp.vo.from.sys.sysapp.sysAppTableFieldSet.SysAppTableFieldSetModifyModel;
 import com.sinosoft.ops.cimp.vo.from.sys.sysapp.sysAppTableFieldSet.SysAppTableFieldSetSearchModel;
-import com.sinosoft.ops.cimp.vo.from.sys.sysapp.sysAppTableFieldSet.SysAppTableFieldSearchModel;
 import com.sinosoft.ops.cimp.vo.to.sys.sysapp.sysAppTableFieldSet.SysAppTableFieldModel;
 import com.sinosoft.ops.cimp.vo.to.sys.sysapp.sysAppTableFieldSet.SysAppTableFieldSetModel;
 
@@ -45,10 +45,5 @@ public interface SysAppTableFieldSetService {
      * 交换排序
      */
     boolean swapSort(List<String> ids);
-
-    /**
-     * 根据id获取应用表字段信息
-     */
-    SysAppTableFieldSetModel getById(String id);
 
 }

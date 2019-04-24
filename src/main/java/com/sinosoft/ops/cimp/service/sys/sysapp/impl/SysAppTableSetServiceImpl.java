@@ -3,8 +3,7 @@ package com.sinosoft.ops.cimp.service.sys.sysapp.impl;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.Coalesce;
-import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sinosoft.ops.cimp.dto.PaginationViewModel;
@@ -28,12 +27,7 @@ import com.sinosoft.ops.cimp.vo.to.sys.sysapp.sysAppTableSet.SysAppTableModel;
 import com.sinosoft.ops.cimp.vo.to.sys.sysapp.sysAppTableSet.SysAppTableSetModel;
 import com.sinosoft.ops.cimp.vo.to.sys.sysapp.sysAppTableSet.SysAppTableTypeModel;
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.criterion.ExistsSubqueryExpression;
-import org.hibernate.query.criteria.internal.expression.CoalesceExpression;
-import org.hibernate.query.criteria.internal.predicate.ExistsPredicate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -75,13 +69,20 @@ public class SysAppTableSetServiceImpl implements SysAppTableSetService {
         int pageSize = searchModel.getPageSize() > 0 ? searchModel.getPageSize() : 1;
         int pageIndex = searchModel.getPageIndex() > 0 ? searchModel.getPageIndex() : 10;
 
-        JPAQuery<SysAppTableSet> query = jpaQueryFactory.select(qTableSet).from(qTableSet);
+        JPAQuery<SysAppTableSetModel> query = jpaQueryFactory.select(Projections.bean(
+                SysAppTableSetModel.class,
+                qTableSet.id,
+                qTableSet.sysAppTableGroupId,
+                qTableSet.sysTableId,
+                qTableSet.name.coalesce(qSysTable.nameCn).as("name"),
+                Expressions.cases().when(qTableSet.name.isNull()).then(false).otherwise(true).as("nameChanged"),
+                qTableSet.nameEn.coalesce(qSysTable.nameEn).as("nameEn"),
+                qTableSet.sort
+        )).from(qTableSet).innerJoin(qSysTable).on(qTableSet.sysTableId.eq(qSysTable.id));
 
         BooleanBuilder builder = new BooleanBuilder();
         builder = builder.and(qTableSet.sysAppTableGroupId.eq(searchModel.getSysAppTableGroupId()));
         if (StringUtils.isNotEmpty(searchModel.getName())) {
-            query.innerJoin(qSysTable).on(qTableSet.sysTableId.eq(qSysTable.id));
-
             BooleanBuilder subBuilder = new BooleanBuilder();
             subBuilder.and(qTableSet.name.contains(searchModel.getName()));
             subBuilder.or(qTableSet.nameEn.contains(searchModel.getName()));
@@ -97,7 +98,7 @@ public class SysAppTableSetServiceImpl implements SysAppTableSetService {
             }
         }
 
-        QueryResults<SysAppTableSet> results = query.where(builder)
+        QueryResults<SysAppTableSetModel> results = query.where(builder)
                 .orderBy(qTableSet.sort.asc())
                 .offset((pageIndex - 1) * pageSize)
                 .limit(pageSize)
@@ -108,27 +109,8 @@ public class SysAppTableSetServiceImpl implements SysAppTableSetService {
                 .pageIndex(pageIndex)
                 .pageSize(pageSize)
                 .totalCount(results.getTotal())
-                .data(results.getResults().stream().map(tableSet -> {
-                    SysAppTableSetModel model = SysAppTableSetMapper.INSTANCE.tableSetToTableSetModel(tableSet);
-
-                    //如果字段值为空，取系统表中的值
-                    Optional<SysTable> tableOptional = sysTableRepository.findById(model.getSysTableId());
-                    tableOptional.ifPresent(table -> replaceValue(model, table));
-
-                    return model;
-                }).collect(Collectors.toList()))
+                .data(results.getResults())
                 .build();
-    }
-
-    private void replaceValue(SysAppTableSetModel model, SysTable table) {
-        if (StringUtils.isEmpty(model.getNameEn())) {
-            model.setNameEn(table.getNameEn());
-        }
-        if (StringUtils.isEmpty(model.getName())) {
-            model.setName(table.getNameCn());
-        } else {
-            model.setNameChanged(true);
-        }
     }
 
     /**
@@ -296,35 +278,5 @@ public class SysAppTableSetServiceImpl implements SysAppTableSetService {
         tableSetRepository.save(tableSet2);
 
         return true;
-    }
-
-    /**
-     * 根据id获取应用表信息
-     */
-    @Override
-    public SysAppTableSetModel getById(String id) {
-        Optional<SysAppTableSet> tableSetOptional = tableSetRepository.findById(id);
-
-        if (!tableSetOptional.isPresent()) {
-            return null;
-        }
-        SysAppTableSet tableSet = tableSetOptional.get();
-
-        SysAppTableSetModel tableSetModel = SysAppTableSetMapper.INSTANCE.tableSetToTableSetModel(tableSet);
-
-        //如果中文/英文名为空，取系统表中的值
-        Optional<SysTable> sysTableOptional = sysTableRepository.findById(tableSet.getSysTableId());
-        if (!sysTableOptional.isPresent()) {
-            return null;
-        }
-        SysTable sysTable = sysTableOptional.get();
-        if (StringUtils.isEmpty(tableSetModel.getName())) {
-            tableSetModel.setName(sysTable.getNameCn());
-        }
-        if (StringUtils.isEmpty(tableSetModel.getNameEn())) {
-            tableSetModel.setNameEn(sysTable.getNameEn());
-        }
-
-        return tableSetModel;
     }
 }

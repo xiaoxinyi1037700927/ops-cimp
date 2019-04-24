@@ -20,8 +20,6 @@ import java.util.Date;
 public interface SysAppTableSetMapper {
     SysAppTableSetMapper INSTANCE = Mappers.getMapper(SysAppTableSetMapper.class);
 
-    SysAppTableSetModel tableSetToTableSetModel(SysAppTableSet tableSet);
-
     @Mappings({
             @Mapping(source = "modifyId", target = "modifyId", qualifiedByName = "getCurrentId"),
             @Mapping(source = "modifyTime", target = "modifyTime", qualifiedByName = "getTime")

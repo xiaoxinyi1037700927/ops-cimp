@@ -2,13 +2,13 @@ package com.sinosoft.ops.cimp.service.sys.sysapp.impl;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.QueryResults;
+import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sinosoft.ops.cimp.dto.PaginationViewModel;
 import com.sinosoft.ops.cimp.entity.sys.sysapp.*;
 import com.sinosoft.ops.cimp.entity.sys.sysapp.fieldAccess.QSysAppRoleFieldAccess;
-import com.sinosoft.ops.cimp.entity.sys.sysapp.fieldAccess.QSysAppRoleTableAccess;
-import com.sinosoft.ops.cimp.entity.sys.sysapp.fieldAccess.SysAppRoleFieldAccess;
 import com.sinosoft.ops.cimp.entity.sys.systable.QSysTableField;
 import com.sinosoft.ops.cimp.entity.sys.systable.SysTableField;
 import com.sinosoft.ops.cimp.mapper.sys.sysapp.SysAppTableFieldSetMapper;
@@ -26,9 +26,6 @@ import com.sinosoft.ops.cimp.vo.to.sys.sysapp.sysAppTableFieldSet.SysAppTableFie
 import com.sinosoft.ops.cimp.vo.to.sys.sysapp.sysAppTableFieldSet.SysAppTableFieldSetModel;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -69,13 +66,24 @@ public class SysAppTableFieldSetServiceImpl implements SysAppTableFieldSetServic
         int pageSize = searchModel.getPageSize() > 0 ? searchModel.getPageSize() : 1;
         int pageIndex = searchModel.getPageIndex() > 0 ? searchModel.getPageIndex() : 10;
 
-        JPAQuery<SysAppTableFieldSet> query = jpaQueryFactory.select(qFieldSet).from(qFieldSet);
+        JPAQuery<SysAppTableFieldSetModel> query = jpaQueryFactory.select(Projections.bean(
+                SysAppTableFieldSetModel.class,
+                qFieldSet.id,
+                qFieldSet.sysAppTableFieldGroupId,
+                qFieldSet.sysTableFieldId,
+                qFieldSet.name.coalesce(qSysTableField.nameCn).as("name"),
+                Expressions.cases().when(qFieldSet.isNull()).then(false).otherwise(true).as("nameChanged"),
+                qFieldSet.nameEn.coalesce(qSysTableField.nameEn).as("nameEn"),
+                qFieldSet.sort,
+                qFieldSet.html.coalesce(qSysTableField.defaultHtml).as("html"),
+                Expressions.cases().when(qFieldSet.html.isNull()).then(false).otherwise(true).as("htmlChanged"),
+                qFieldSet.script.coalesce(qSysTableField.defaultScript).as("script"),
+                Expressions.cases().when(qFieldSet.script.isNull()).then(false).otherwise(true).as("scriptChanged")
+        )).from(qFieldSet).innerJoin(qSysTableField).on(qFieldSet.sysTableFieldId.eq(qSysTableField.id));
 
         BooleanBuilder builder = new BooleanBuilder();
         builder = builder.and(qFieldSet.sysAppTableFieldGroupId.eq(searchModel.getSysAppTableFieldGroupId()));
         if (StringUtils.isNotEmpty(searchModel.getName())) {
-            query.innerJoin(qSysTableField).on(qFieldSet.sysTableFieldId.eq(qSysTableField.id));
-
             BooleanBuilder subBuilder = new BooleanBuilder();
             subBuilder.and(qFieldSet.name.contains(searchModel.getName()));
             subBuilder.or(qFieldSet.nameEn.contains(searchModel.getName()));
@@ -91,7 +99,7 @@ public class SysAppTableFieldSetServiceImpl implements SysAppTableFieldSetServic
             }
         }
 
-        QueryResults<SysAppTableFieldSet> results = query.where(builder)
+        QueryResults<SysAppTableFieldSetModel> results = query.where(builder)
                 .orderBy(qFieldSet.sort.asc())
                 .offset((pageIndex - 1) * pageSize)
                 .limit(pageSize)
@@ -102,41 +110,10 @@ public class SysAppTableFieldSetServiceImpl implements SysAppTableFieldSetServic
                 .pageIndex(pageIndex)
                 .pageSize(pageSize)
                 .totalCount(results.getTotal())
-                .data(results.getResults().stream().map(fieldSet -> {
-                    SysAppTableFieldSetModel model = SysAppTableFieldSetMapper.INSTANCE.fieldSetToFieldSetModel(fieldSet);
-
-                    //如果字段值为空，则取系统表字段中的值
-                    Optional<SysTableField> tableFieldOptional = sysTableFieldRepository.findById(model.getSysTableFieldId());
-                    tableFieldOptional.ifPresent(field -> replaceValue(model, field));
-
-                    return model;
-                }).collect(Collectors.toList()))
+                .data(results.getResults())
                 .build();
     }
 
-    private void replaceValue(SysAppTableFieldSetModel model, SysTableField field) {
-        if (StringUtils.isEmpty(model.getNameEn())) {
-            model.setNameEn(field.getNameEn());
-        }
-
-        if (StringUtils.isEmpty(model.getName())) {
-            model.setName(field.getNameCn());
-        } else {
-            model.setNameChanged(true);
-        }
-
-        if (StringUtils.isEmpty(model.getHtml())) {
-            model.setHtml(field.getDefaultHtml());
-        } else {
-            model.setHtmlChanged(true);
-        }
-
-        if (StringUtils.isEmpty(model.getScript())) {
-            model.setScript(field.getDescription());
-        } else {
-            model.setScriptChanged(true);
-        }
-    }
 
     /**
      * 添加系统应用字段集合
@@ -307,35 +284,6 @@ public class SysAppTableFieldSetServiceImpl implements SysAppTableFieldSetServic
         fieldSetRepository.save(fieldSet2);
 
         return true;
-    }
-
-    /**
-     * 根据id获取应用表字段信息
-     */
-    @Override
-    public SysAppTableFieldSetModel getById(String id) {
-        Optional<SysAppTableFieldSet> fieldSetOptional = fieldSetRepository.findById(id);
-        if (!fieldSetOptional.isPresent()) {
-            return null;
-        }
-
-        SysAppTableFieldSetModel fieldSetModel = SysAppTableFieldSetMapper.INSTANCE.fieldSetToFieldSetModel(fieldSetOptional.get());
-
-        //如果字段英文/中文名为空，取系统表字段中的值
-        Optional<SysTableField> tableFieldOptional = sysTableFieldRepository.findById(fieldSetModel.getSysTableFieldId());
-        if (!tableFieldOptional.isPresent()) {
-            return null;
-        }
-        SysTableField tableField = tableFieldOptional.get();
-
-        if (StringUtils.isEmpty(fieldSetModel.getName())) {
-            fieldSetModel.setName(tableField.getNameCn());
-        }
-        if (StringUtils.isEmpty(fieldSetModel.getNameEn())) {
-            fieldSetModel.setNameEn(tableField.getNameEn());
-        }
-
-        return fieldSetModel;
     }
 }
 
