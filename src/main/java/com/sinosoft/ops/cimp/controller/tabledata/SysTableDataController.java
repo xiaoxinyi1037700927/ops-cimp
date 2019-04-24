@@ -8,21 +8,24 @@ import com.sinosoft.ops.cimp.dao.SysTableInfoDao;
 import com.sinosoft.ops.cimp.dao.domain.sys.table.SysTableFieldInfo;
 import com.sinosoft.ops.cimp.dao.domain.sys.table.SysTableModelInfo;
 import com.sinosoft.ops.cimp.dto.QueryDataParamBuilder;
+import com.sinosoft.ops.cimp.dto.sys.table.SysTableFieldInfoDTO;
 import com.sinosoft.ops.cimp.dto.sys.table.SysTableInfoDTO;
 import com.sinosoft.ops.cimp.dto.sys.table.SysTableModelInfoDTO;
-import com.sinosoft.ops.cimp.entity.user.User;
 import com.sinosoft.ops.cimp.exception.BusinessException;
+import com.sinosoft.ops.cimp.service.sys.sysapp.acess.SysAppFieldAccessService;
+import com.sinosoft.ops.cimp.service.sys.sysapp.acess.SysAppTableAccessService;
 import com.sinosoft.ops.cimp.service.tabledata.SysTableModelInfoService;
 import com.sinosoft.ops.cimp.service.sys.systable.SysTableTypeService;
 import com.sinosoft.ops.cimp.service.user.RolePermissionTableService;
 import com.sinosoft.ops.cimp.service.user.UserCollectionTableService;
 import com.sinosoft.ops.cimp.util.JsonUtil;
 import com.sinosoft.ops.cimp.util.SecurityUtils;
+import com.sinosoft.ops.cimp.vo.to.sys.sysapp.access.SysAppFieldAccessModel;
+import com.sinosoft.ops.cimp.vo.to.sys.sysapp.access.SysAppTableAccessModel;
 import com.sinosoft.ops.cimp.vo.to.sys.systable.SysTableTypeModel;
 import com.sinosoft.ops.cimp.vo.to.user.rolePermissionTable.RPTableViewModel;
 import com.sinosoft.ops.cimp.vo.to.user.userCollectionTable.UCTableViewModel;
 import io.swagger.annotations.Api;
-import org.apache.catalina.security.SecurityUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -31,10 +34,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @SystemApiGroup
@@ -48,18 +48,22 @@ public class SysTableDataController extends BaseController {
     private final SysTableTypeService sysTableTypeService;
     private final RolePermissionTableService rolePermissionTableService;
     private final UserCollectionTableService userCollectionTableService;
+    private final SysAppTableAccessService tableAccessService;
+    private final SysAppFieldAccessService fieldAccessService;
 
     @Autowired
     public SysTableDataController(SysTableModelInfoService sysTableModelInfoService,
                                   SysTableInfoDao sysTableInfoDao,
                                   SysTableTypeService sysTableTypeService,
                                   RolePermissionTableService rolePermissionTableService,
-                                  UserCollectionTableService userCollectionTableService) {
+                                  UserCollectionTableService userCollectionTableService, SysAppTableAccessService tableAccessService, SysAppFieldAccessService fieldAccessService) {
         this.sysTableModelInfoService = sysTableModelInfoService;
         this.sysTableInfoDao = sysTableInfoDao;
         this.sysTableTypeService = sysTableTypeService;
         this.rolePermissionTableService = rolePermissionTableService;
         this.userCollectionTableService = userCollectionTableService;
+        this.tableAccessService = tableAccessService;
+        this.fieldAccessService = fieldAccessService;
     }
 
     @RequestMapping(value = "/getSysTableTypes", method = RequestMethod.GET)
@@ -87,15 +91,20 @@ public class SysTableDataController extends BaseController {
         SysTableModelInfoDTO tableInfo = sysTableInfoDao.getTableInfo(tableTypeName, prjCode);
         List<Map<String, Object>> result = Lists.newArrayList();
 
+        //获取当前用户在app中的表访问权限
+        Map<String, SysAppTableAccessModel> perMap = tableAccessService.getTableAccess(prjCode);
+
         tableInfo.getTables().forEach(table -> {
-            Map<String, Object> map = Maps.newHashMap();
-            map.put("tableNameEn", table.getTableNameEn());
-            map.put("tableNameCn", table.getTableNameCn());
-            map.put("appGroupName", table.getAppTableGroupName());
-            map.put("isMasterTable", table.isMasterTable());
-            map.put("tableNamePK", table.getTableNamePK());
-            map.put("tableNameFK", table.getTableNameFK());
-            result.add(map);
+            if (perMap.containsKey(table.getId())) {
+                Map<String, Object> map = Maps.newHashMap();
+                map.put("tableNameEn", table.getTableNameEn());
+                map.put("tableNameCn", table.getTableNameCn());
+                map.put("appGroupName", table.getAppTableGroupName());
+                map.put("isMasterTable", table.isMasterTable());
+                map.put("tableNamePK", table.getTableNamePK());
+                map.put("tableNameFK", table.getTableNameFK());
+                result.add(map);
+            }
         });
         return ok(result);
     }
@@ -171,6 +180,40 @@ public class SysTableDataController extends BaseController {
             return fail("查询表结构必须传递表类型名称");
         }
         SysTableModelInfoDTO tableInfo = sysTableInfoDao.getTableInfo(tableTypeName, prjCode);
+
+        //权限判断
+        Map<String, SysAppTableAccessModel> tableAccessMap = tableAccessService.getTableAccess(prjCode);
+        for (Iterator<SysTableInfoDTO> itTable = tableInfo.getTables().iterator(); itTable.hasNext(); ) {
+            SysTableInfoDTO table = itTable.next();
+            //没有该表的访问权限,过滤掉
+            if (!tableAccessMap.containsKey(table.getId())) {
+                itTable.remove();
+                continue;
+            }
+
+            boolean canWriteAll = tableAccessMap.get(table.getId()).getCanWriteAll();
+            if(!canWriteAll){
+                Map<String, SysAppFieldAccessModel> fieldAccessMap = fieldAccessService.getFieldAccess(prjCode, table.getId());
+                for (Iterator<SysTableFieldInfoDTO> itField = table.getFields().iterator(); itField.hasNext(); ) {
+                    SysTableFieldInfoDTO field = itField.next();
+                    //没有该字段的访问权限,过滤掉
+                    if(!fieldAccessMap.containsKey(field.getId())){
+                        itField.remove();
+                        continue;
+                    }
+
+                    SysAppFieldAccessModel fieldAccessModel = fieldAccessMap.get(field.getId());
+                    //没有该字段的读写权限,过滤掉
+                    if(!fieldAccessModel.getCanWrite() && !fieldAccessModel.getCanRead()){
+                        itField.remove();
+                        continue;
+                    }
+                    field.setReadOnly(!fieldAccessModel.getCanWrite());
+                }
+            }
+        }
+
+
         SysTableModelInfoDTO resultTableInfo = new SysTableModelInfoDTO();
         if (StringUtils.isNotEmpty(tableName)) {
             Map<String, List<SysTableInfoDTO>> tableNameMap = tableInfo.getTables().stream().collect(Collectors.groupingBy(SysTableInfoDTO::getTableNameEn));

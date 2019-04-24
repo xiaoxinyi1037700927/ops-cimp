@@ -70,7 +70,7 @@ public class SysAppFieldAccessModel {
         this.nameEn = nameEn;
     }
 
-    public boolean isCanRead() {
+    public boolean getCanRead() {
         return canRead;
     }
 
@@ -78,7 +78,7 @@ public class SysAppFieldAccessModel {
         this.canRead = canRead;
     }
 
-    public boolean isCanWrite() {
+    public boolean getCanWrite() {
         return canWrite;
     }
 

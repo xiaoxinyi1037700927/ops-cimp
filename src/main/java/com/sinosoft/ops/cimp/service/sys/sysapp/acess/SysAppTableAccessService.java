@@ -7,6 +7,7 @@ import com.sinosoft.ops.cimp.vo.from.sys.sysapp.access.SysAppTableAccessSearchMo
 import com.sinosoft.ops.cimp.vo.to.sys.sysapp.access.SysAppTableAccessModel;
 
 import java.util.List;
+import java.util.Map;
 
 public interface SysAppTableAccessService {
 
@@ -29,4 +30,9 @@ public interface SysAppTableAccessService {
      * 修改对表的访问权限
      */
     boolean modifyTableAccess(SysAppTableAccessModifyModel modifyModel);
+
+    /**
+     * 获取当前用户对app的表访问权限
+     */
+    Map<String, SysAppTableAccessModel> getTableAccess(String appCode);
 }

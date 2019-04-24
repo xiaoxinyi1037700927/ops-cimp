@@ -6,25 +6,30 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sinosoft.ops.cimp.dto.PaginationViewModel;
+import com.sinosoft.ops.cimp.entity.sys.sysapp.QSysApp;
 import com.sinosoft.ops.cimp.entity.sys.sysapp.QSysAppTableFieldSet;
+import com.sinosoft.ops.cimp.entity.sys.sysapp.QSysAppTableSet;
 import com.sinosoft.ops.cimp.entity.sys.sysapp.fieldAccess.QSysAppRoleFieldAccess;
+import com.sinosoft.ops.cimp.entity.sys.sysapp.fieldAccess.QSysAppRoleTableAccess;
 import com.sinosoft.ops.cimp.entity.sys.sysapp.fieldAccess.SysAppRoleFieldAccess;
 import com.sinosoft.ops.cimp.entity.sys.systable.QSysTableField;
+import com.sinosoft.ops.cimp.entity.user.UserRole;
 import com.sinosoft.ops.cimp.mapper.sys.sysapp.access.SysAppFieldAccessMapper;
 import com.sinosoft.ops.cimp.repository.sys.sysapp.access.SysAppFieldAccessRepository;
 import com.sinosoft.ops.cimp.service.sys.sysapp.acess.SysAppFieldAccessService;
 import com.sinosoft.ops.cimp.util.IdUtil;
+import com.sinosoft.ops.cimp.util.SecurityUtils;
 import com.sinosoft.ops.cimp.vo.from.sys.sysapp.access.SysAppFieldAccessAddModel;
 import com.sinosoft.ops.cimp.vo.from.sys.sysapp.access.SysAppFieldAccessModifyModel;
 import com.sinosoft.ops.cimp.vo.from.sys.sysapp.access.SysAppFieldAccessSearchModel;
 import com.sinosoft.ops.cimp.vo.to.sys.sysapp.access.SysAppFieldAccessModel;
+import com.sinosoft.ops.cimp.vo.to.sys.sysapp.access.SysAppTableAccessModel;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class SysAppFieldAccessServiceImpl implements SysAppFieldAccessService {
@@ -135,5 +140,48 @@ public class SysAppFieldAccessServiceImpl implements SysAppFieldAccessService {
         fieldAccessRepository.saveAll(fieldtableAccesses);
 
         return true;
+    }
+
+    /**
+     * 获取用户对app下表字段的访问权限
+     */
+    @Override
+    public Map<String, SysAppFieldAccessModel> getFieldAccess(String appCode, String sysTableId) {
+        //获取登录用户的所有角色id
+        List<String> roleIds = SecurityUtils.getSubject().getCurrentUserRole()
+                .stream().map(UserRole::getRoleId).collect(Collectors.toList());
+
+        QSysApp qSysApp = QSysApp.sysApp;
+        QSysAppTableSet qTableSet = QSysAppTableSet.sysAppTableSet;
+        QSysAppTableFieldSet qFieldSet = QSysAppTableFieldSet.sysAppTableFieldSet;
+        QSysAppRoleTableAccess qTableAccess = QSysAppRoleTableAccess.sysAppRoleTableAccess;
+        QSysAppRoleFieldAccess qFieldAccess = QSysAppRoleFieldAccess.sysAppRoleFieldAccess;
+
+        Map<String, SysAppFieldAccessModel> result = new HashMap<>();
+
+        jpaQueryFactory.select(Projections.bean(
+                SysAppFieldAccessModel.class,
+                qFieldAccess.canRead,
+                qFieldAccess.canWrite,
+                qFieldSet.sysTableFieldId
+        )).from(qTableAccess).innerJoin(qSysApp).on(qTableAccess.sysAppId.eq(qSysApp.id))
+                .innerJoin(qTableSet).on(qTableSet.id.eq(qTableAccess.sysAppTableSetId))
+                .innerJoin(qFieldAccess).on(qFieldAccess.sysAppRoleTableAccessId.eq(qTableAccess.id))
+                .innerJoin(qFieldSet).on(qFieldSet.id.eq(qFieldAccess.sysAppTableFieldSetId))
+                .where(new BooleanBuilder().and(qSysApp.code.eq(Integer.parseInt(appCode)))
+                        .and(qTableAccess.roleId.in(roleIds))
+                        .and(qTableSet.sysTableId.eq(sysTableId))
+                ).fetch().forEach(model -> {
+            if (result.containsKey(model.getSysTableFieldId())) {
+                //合并权限
+                SysAppFieldAccessModel old = result.get(model.getSysTableFieldId());
+                old.setCanRead(old.getCanRead() | model.getCanRead());
+                old.setCanWrite(old.getCanWrite() | model.getCanWrite());
+            } else {
+                result.put(model.getSysTableFieldId(), model);
+            }
+        });
+
+        return result;
     }
 }

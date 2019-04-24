@@ -6,15 +6,18 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sinosoft.ops.cimp.dto.PaginationViewModel;
+import com.sinosoft.ops.cimp.entity.sys.sysapp.QSysApp;
 import com.sinosoft.ops.cimp.entity.sys.sysapp.QSysAppTableSet;
 import com.sinosoft.ops.cimp.entity.sys.sysapp.fieldAccess.QSysAppRoleTableAccess;
 import com.sinosoft.ops.cimp.entity.sys.sysapp.fieldAccess.SysAppRoleTableAccess;
 import com.sinosoft.ops.cimp.entity.sys.systable.QSysTable;
+import com.sinosoft.ops.cimp.entity.user.UserRole;
 import com.sinosoft.ops.cimp.mapper.sys.sysapp.access.SysAppTableAccessMapper;
 import com.sinosoft.ops.cimp.repository.sys.sysapp.access.SysAppFieldAccessRepository;
 import com.sinosoft.ops.cimp.repository.sys.sysapp.access.SysAppTableAccessRepository;
 import com.sinosoft.ops.cimp.service.sys.sysapp.acess.SysAppTableAccessService;
 import com.sinosoft.ops.cimp.util.IdUtil;
+import com.sinosoft.ops.cimp.util.SecurityUtils;
 import com.sinosoft.ops.cimp.vo.from.sys.sysapp.access.SysAppTableAccessAddModel;
 import com.sinosoft.ops.cimp.vo.from.sys.sysapp.access.SysAppTableAccessModifyModel;
 import com.sinosoft.ops.cimp.vo.from.sys.sysapp.access.SysAppTableAccessSearchModel;
@@ -25,9 +28,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class SysAppTableAccessServiceImpl implements SysAppTableAccessService {
@@ -146,6 +148,45 @@ public class SysAppTableAccessServiceImpl implements SysAppTableAccessService {
         tableAccessRepository.saveAll(tableAccesses);
 
         return true;
+    }
+
+    /**
+     * 获取当前用户对app的表访问权限
+     */
+    @Override
+    public Map<String, SysAppTableAccessModel> getTableAccess(String appCode) {
+        //获取登录用户的所有角色id
+        List<String> roleIds = SecurityUtils.getSubject().getCurrentUserRole()
+                .stream().map(UserRole::getRoleId).collect(Collectors.toList());
+
+        QSysApp qSysApp = QSysApp.sysApp;
+        QSysAppTableSet qTableSet = QSysAppTableSet.sysAppTableSet;
+        QSysAppRoleTableAccess qTableAccess = QSysAppRoleTableAccess.sysAppRoleTableAccess;
+
+        Map<String, SysAppTableAccessModel> result = new HashMap<>();
+
+        jpaQueryFactory.select(Projections.bean(
+                SysAppTableAccessModel.class,
+                qTableAccess.canReadAll,
+                qTableAccess.canWriteAll,
+                qTableSet.id.as("sysAppTableSetId"),
+                qTableSet.sysTableId
+        )).from(qTableAccess).innerJoin(qSysApp).on(qTableAccess.sysAppId.eq(qSysApp.id))
+                .innerJoin(qTableSet).on(qTableSet.id.eq(qTableAccess.sysAppTableSetId))
+                .where(new BooleanBuilder().and(qSysApp.code.eq(Integer.parseInt(appCode)))
+                        .and(qTableAccess.roleId.in(roleIds))).fetch()
+                .forEach(model -> {
+                    if (result.containsKey(model.getSysTableId())) {
+                        //合并权限
+                        SysAppTableAccessModel old = result.get(model.getSysTableId());
+                        old.setCanReadAll(old.getCanReadAll() | model.getCanReadAll());
+                        old.setCanWriteAll(old.getCanWriteAll() | model.getCanWriteAll());
+                    } else {
+                        result.put(model.getSysTableId(), model);
+                    }
+                });
+
+        return result;
     }
 
 }

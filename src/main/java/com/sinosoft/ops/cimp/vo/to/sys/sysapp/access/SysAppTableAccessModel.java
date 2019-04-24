@@ -70,7 +70,7 @@ public class SysAppTableAccessModel {
         this.nameEn = nameEn;
     }
 
-    public boolean isCanReadAll() {
+    public boolean getCanReadAll() {
         return canReadAll;
     }
 
@@ -78,7 +78,7 @@ public class SysAppTableAccessModel {
         this.canReadAll = canReadAll;
     }
 
-    public boolean isCanWriteAll() {
+    public boolean getCanWriteAll() {
         return canWriteAll;
     }
 

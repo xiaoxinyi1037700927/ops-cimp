@@ -25,6 +25,8 @@ public class SysTableFieldInfoDTO implements Serializable {
     private String codeSetType;
     @ApiModelProperty(value = "表字段分组名称")
     private String appTableFieldGroupName;
+    @ApiModelProperty(value = "是否只读")
+    private boolean readOnly;
 
     public String getId() {
         return id;
@@ -96,5 +98,13 @@ public class SysTableFieldInfoDTO implements Serializable {
 
     public void setAppTableFieldGroupName(String appTableFieldGroupName) {
         this.appTableFieldGroupName = appTableFieldGroupName;
+    }
+
+    public boolean isReadOnly() {
+        return readOnly;
+    }
+
+    public void setReadOnly(boolean readOnly) {
+        this.readOnly = readOnly;
     }
 }
