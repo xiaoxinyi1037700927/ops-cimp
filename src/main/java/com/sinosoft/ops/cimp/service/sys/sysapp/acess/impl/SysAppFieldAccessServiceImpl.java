@@ -47,8 +47,8 @@ public class SysAppFieldAccessServiceImpl implements SysAppFieldAccessService {
         QSysAppRoleFieldAccess qFieldAccess = QSysAppRoleFieldAccess.sysAppRoleFieldAccess;
         QSysAppTableFieldSet qFieldSet = QSysAppTableFieldSet.sysAppTableFieldSet;
         QSysTableField qSysTableField = QSysTableField.sysTableField;
-        int pageSize = searchModel.getPageSize() > 0 ? searchModel.getPageSize() : 1;
-        int pageIndex = searchModel.getPageIndex() > 0 ? searchModel.getPageIndex() : 10;
+        int pageSize = searchModel.getPageSize();
+        int pageIndex = searchModel.getPageIndex();
 
         JPAQuery<SysAppFieldAccessModel> query = jpaQueryFactory.select(Projections.bean(
                 SysAppFieldAccessModel.class,
@@ -72,11 +72,12 @@ public class SysAppFieldAccessServiceImpl implements SysAppFieldAccessService {
             subBuilder.or(new BooleanBuilder().and(qFieldSet.nameEn.isNull()).and(qSysTableField.nameEn.contains(searchModel.getName())));
             builder.and(subBuilder);
         }
-        QueryResults<SysAppFieldAccessModel> results = query.where(builder)
-                .orderBy(qFieldSet.sort.asc())
-                .offset((pageIndex - 1) * pageSize)
-                .limit(pageSize)
-                .fetchResults();
+
+        query = query.where(builder).orderBy(qFieldSet.sort.asc());
+        if (pageSize > 0 && pageIndex > 0) {
+            query = query.offset((pageIndex - 1) * pageSize).limit(pageSize);
+        }
+        QueryResults<SysAppFieldAccessModel> results = query.fetchResults();
 
         return new PaginationViewModel
                 .Builder<SysAppFieldAccessModel>()

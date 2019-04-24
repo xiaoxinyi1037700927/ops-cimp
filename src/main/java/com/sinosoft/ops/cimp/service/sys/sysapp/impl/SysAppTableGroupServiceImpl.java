@@ -24,6 +24,7 @@ import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 public class SysAppTableGroupServiceImpl implements SysAppTableGroupService {
@@ -43,10 +44,11 @@ public class SysAppTableGroupServiceImpl implements SysAppTableGroupService {
     @Override
     public PaginationViewModel<SysAppTableGroupModel> listTableGroup(SysAppTableGroupSearchModel searchModel) {
         QSysAppTableGroup qTableGroup = QSysAppTableGroup.sysAppTableGroup;
-
-        int pageSize = searchModel.getPageSize() > 0 ? searchModel.getPageSize() : 1;
-        int pageIndex = searchModel.getPageIndex() > 0 ? searchModel.getPageIndex() : 10;
-        PageRequest pageRequest = PageRequest.of(pageIndex - 1, pageSize, new Sort(Sort.Direction.ASC, qTableGroup.sort.getMetadata().getName()));
+        int pageSize = searchModel.getPageSize();
+        int pageIndex = searchModel.getPageIndex();
+        Sort sort = new Sort(Sort.Direction.ASC, qTableGroup.sort.getMetadata().getName());
+        //是否分页
+        boolean isPaging = pageSize > 0 && pageIndex > 0;
 
         BooleanBuilder builder = new BooleanBuilder();
         builder = builder.and(qTableGroup.sysAppId.eq(searchModel.getSysAppId()));
@@ -54,14 +56,25 @@ public class SysAppTableGroupServiceImpl implements SysAppTableGroupService {
             builder = builder.and(qTableGroup.name.contains(searchModel.getName()));
         }
 
-        Page<SysAppTableGroup> page = tableGroupRepository.findAll(builder, pageRequest);
+        List<SysAppTableGroupModel> tableGroupModels = null;
+        long total = 0;
+        if (isPaging) {
+            PageRequest pageRequest = PageRequest.of(pageIndex - 1, pageSize, sort);
+            Page<SysAppTableGroup> page = tableGroupRepository.findAll(builder, pageRequest);
+            tableGroupModels = page.getContent().stream().map(SysAppTableGroupMapper.INSTANCE::tableGroupToTableGroupModel).collect(Collectors.toList());
+            total = page.getTotalElements();
+        } else {
+            Iterable<SysAppTableGroup> iterable = tableGroupRepository.findAll(builder, sort);
+            tableGroupModels = StreamSupport.stream(iterable.spliterator(), false).map(SysAppTableGroupMapper.INSTANCE::tableGroupToTableGroupModel).collect(Collectors.toList());
+            total = tableGroupModels.size();
+        }
 
         return new PaginationViewModel
                 .Builder<SysAppTableGroupModel>()
                 .pageIndex(pageIndex)
                 .pageSize(pageSize)
-                .totalCount(page.getTotalElements())
-                .data(page.getContent().stream().map(SysAppTableGroupMapper.INSTANCE::tableGroupToTableGroupModel).collect(Collectors.toList()))
+                .totalCount(total)
+                .data(tableGroupModels)
                 .build();
     }
 

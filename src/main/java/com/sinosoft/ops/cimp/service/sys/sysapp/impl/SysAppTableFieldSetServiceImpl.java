@@ -63,8 +63,8 @@ public class SysAppTableFieldSetServiceImpl implements SysAppTableFieldSetServic
         QSysAppTableFieldSet qFieldSet = QSysAppTableFieldSet.sysAppTableFieldSet;
         QSysTableField qSysTableField = QSysTableField.sysTableField;
 
-        int pageSize = searchModel.getPageSize() > 0 ? searchModel.getPageSize() : 1;
-        int pageIndex = searchModel.getPageIndex() > 0 ? searchModel.getPageIndex() : 10;
+        int pageSize = searchModel.getPageSize();
+        int pageIndex = searchModel.getPageIndex();
 
         JPAQuery<SysAppTableFieldSetModel> query = jpaQueryFactory.select(Projections.bean(
                 SysAppTableFieldSetModel.class,
@@ -98,12 +98,11 @@ public class SysAppTableFieldSetServiceImpl implements SysAppTableFieldSetServic
                 builder.and(qFieldSet.id.in(ids));
             }
         }
-
-        QueryResults<SysAppTableFieldSetModel> results = query.where(builder)
-                .orderBy(qFieldSet.sort.asc())
-                .offset((pageIndex - 1) * pageSize)
-                .limit(pageSize)
-                .fetchResults();
+        query = query.where(builder).orderBy(qFieldSet.sort.asc());
+        if (pageSize > 0 && pageIndex > 0) {
+            query = query.offset((pageIndex - 1) * pageSize).limit(pageSize);
+        }
+        QueryResults<SysAppTableFieldSetModel> results = query.fetchResults();
 
         return new PaginationViewModel
                 .Builder<SysAppTableFieldSetModel>()

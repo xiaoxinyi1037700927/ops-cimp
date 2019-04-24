@@ -65,9 +65,8 @@ public class SysAppTableSetServiceImpl implements SysAppTableSetService {
     public PaginationViewModel<SysAppTableSetModel> listTableSet(SysAppTableSetSearchModel searchModel) {
         QSysAppTableSet qTableSet = QSysAppTableSet.sysAppTableSet;
         QSysTable qSysTable = QSysTable.sysTable;
-
-        int pageSize = searchModel.getPageSize() > 0 ? searchModel.getPageSize() : 1;
-        int pageIndex = searchModel.getPageIndex() > 0 ? searchModel.getPageIndex() : 10;
+        int pageSize = searchModel.getPageSize();
+        int pageIndex = searchModel.getPageIndex();
 
         JPAQuery<SysAppTableSetModel> query = jpaQueryFactory.select(Projections.bean(
                 SysAppTableSetModel.class,
@@ -98,11 +97,11 @@ public class SysAppTableSetServiceImpl implements SysAppTableSetService {
             }
         }
 
-        QueryResults<SysAppTableSetModel> results = query.where(builder)
-                .orderBy(qTableSet.sort.asc())
-                .offset((pageIndex - 1) * pageSize)
-                .limit(pageSize)
-                .fetchResults();
+        query = query.where(builder).orderBy(qTableSet.sort.asc());
+        if (pageSize > 0 && pageIndex > 0) {
+            query = query.offset((pageIndex - 1) * pageSize).limit(pageSize);
+        }
+        QueryResults<SysAppTableSetModel> results = query.fetchResults();
 
         return new PaginationViewModel
                 .Builder<SysAppTableSetModel>()

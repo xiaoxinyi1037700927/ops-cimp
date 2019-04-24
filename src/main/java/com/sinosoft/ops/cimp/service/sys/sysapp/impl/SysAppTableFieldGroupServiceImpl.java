@@ -24,6 +24,7 @@ import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 public class SysAppTableFieldGroupServiceImpl implements SysAppTableFieldGroupService {
@@ -44,10 +45,12 @@ public class SysAppTableFieldGroupServiceImpl implements SysAppTableFieldGroupSe
     @Override
     public PaginationViewModel<SysAppTableFieldGroupModel> listFieldGroup(SysAppTableFieldGroupSearchModel searchModel) {
         QSysAppTableFieldGroup qFieldGroup = QSysAppTableFieldGroup.sysAppTableFieldGroup;
+        int pageSize = searchModel.getPageSize();
+        int pageIndex = searchModel.getPageIndex();
+        //是否分页
+        boolean isPaging = pageSize > 0 && pageIndex > 0;
+        Sort sort = new Sort(Sort.Direction.ASC, qFieldGroup.sort.getMetadata().getName());
 
-        int pageSize = searchModel.getPageSize() > 0 ? searchModel.getPageSize() : 1;
-        int pageIndex = searchModel.getPageIndex() > 0 ? searchModel.getPageIndex() : 10;
-        PageRequest pageRequest = PageRequest.of(pageIndex - 1, pageSize, new Sort(Sort.Direction.ASC, qFieldGroup.sort.getMetadata().getName()));
 
         BooleanBuilder builder = new BooleanBuilder();
         builder = builder.and(qFieldGroup.sysAppTableSetId.eq(searchModel.getSysAppTableSetId()));
@@ -55,14 +58,25 @@ public class SysAppTableFieldGroupServiceImpl implements SysAppTableFieldGroupSe
             builder = builder.and(qFieldGroup.name.contains(searchModel.getName()));
         }
 
-        Page<SysAppTableFieldGroup> page = fieldGroupRepository.findAll(builder, pageRequest);
+        List<SysAppTableFieldGroupModel> fieldGroupModels = null;
+        long total = 0;
+        if (isPaging) {
+            PageRequest pageRequest = PageRequest.of(pageIndex - 1, pageSize, sort);
+            Page<SysAppTableFieldGroup> page = fieldGroupRepository.findAll(builder, pageRequest);
+            fieldGroupModels = page.getContent().stream().map(SysAppTableFieldGroupMapper.INSTANCE::fieldGroupToFieldGroupModel).collect(Collectors.toList());
+            total = page.getTotalElements();
+        } else {
+            Iterable<SysAppTableFieldGroup> iterable = fieldGroupRepository.findAll(builder, sort);
+            fieldGroupModels = StreamSupport.stream(iterable.spliterator(), false).map(SysAppTableFieldGroupMapper.INSTANCE::fieldGroupToFieldGroupModel).collect(Collectors.toList());
+            total = fieldGroupModels.size();
+        }
 
         return new PaginationViewModel
                 .Builder<SysAppTableFieldGroupModel>()
                 .pageIndex(pageIndex)
                 .pageSize(pageSize)
-                .totalCount(page.getTotalElements())
-                .data(page.getContent().stream().map(SysAppTableFieldGroupMapper.INSTANCE::fieldGroupToFieldGroupModel).collect(Collectors.toList()))
+                .totalCount(total)
+                .data(fieldGroupModels)
                 .build();
     }
 

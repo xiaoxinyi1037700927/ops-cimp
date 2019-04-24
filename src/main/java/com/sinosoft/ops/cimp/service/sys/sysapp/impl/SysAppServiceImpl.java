@@ -18,12 +18,16 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * 系统应用服务实现类
@@ -45,9 +49,10 @@ public class SysAppServiceImpl implements SysAppService {
      */
     @Override
     public PaginationViewModel<SysAppModel> listSysApp(SysAppSearchModel searchModel) {
-        int pageSize = searchModel.getPageSize() > 0 ? searchModel.getPageSize() : 1;
-        int pageIndex = searchModel.getPageIndex() > 0 ? searchModel.getPageIndex() : 10;
-        PageRequest pageRequest = PageRequest.of(pageIndex - 1, pageSize);
+        int pageSize = searchModel.getPageSize();
+        int pageIndex = searchModel.getPageIndex();
+        //是否分页
+        boolean isPaging = pageSize > 0 && pageIndex > 0;
 
         QSysApp qSysApp = QSysApp.sysApp;
         BooleanBuilder builder = new BooleanBuilder();
@@ -64,14 +69,25 @@ public class SysAppServiceImpl implements SysAppService {
             }
         }
 
-        Page<SysApp> page = sysAppRepository.findAll(builder, pageRequest);
+        List<SysAppModel> sysAppModels = null;
+        long total = 0;
+        if (isPaging) {
+            PageRequest pageRequest = PageRequest.of(pageIndex - 1, pageSize);
+            Page<SysApp> page = sysAppRepository.findAll(builder, pageRequest);
+            sysAppModels = page.getContent().stream().map(SysAppMapper.INSTANCE::sysAppToSysAppModel).collect(Collectors.toList());
+            total = page.getTotalElements();
+        } else {
+            Iterable<SysApp> iterable = sysAppRepository.findAll(builder);
+            sysAppModels = StreamSupport.stream(iterable.spliterator(), false).map(SysAppMapper.INSTANCE::sysAppToSysAppModel).collect(Collectors.toList());
+            total = sysAppModels.size();
+        }
 
         return new PaginationViewModel
                 .Builder<SysAppModel>()
                 .pageIndex(pageIndex)
                 .pageSize(pageSize)
-                .totalCount(page.getTotalElements())
-                .data(page.getContent().stream().map(SysAppMapper.INSTANCE::sysAppToSysAppModel).collect(Collectors.toList()))
+                .totalCount(total)
+                .data(sysAppModels)
                 .build();
     }
 

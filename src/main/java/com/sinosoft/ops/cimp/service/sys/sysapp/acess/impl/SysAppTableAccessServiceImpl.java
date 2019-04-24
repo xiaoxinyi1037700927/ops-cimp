@@ -19,6 +19,7 @@ import com.sinosoft.ops.cimp.vo.from.sys.sysapp.access.SysAppTableAccessAddModel
 import com.sinosoft.ops.cimp.vo.from.sys.sysapp.access.SysAppTableAccessModifyModel;
 import com.sinosoft.ops.cimp.vo.from.sys.sysapp.access.SysAppTableAccessSearchModel;
 import com.sinosoft.ops.cimp.vo.to.sys.sysapp.access.SysAppTableAccessModel;
+import com.sinosoft.ops.cimp.vo.to.sys.sysapp.sysAppTableFieldSet.SysAppTableFieldSetModel;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -53,8 +54,8 @@ public class SysAppTableAccessServiceImpl implements SysAppTableAccessService {
         QSysAppTableSet qTableSet = QSysAppTableSet.sysAppTableSet;
         QSysTable qSysTable = QSysTable.sysTable;
 
-        int pageSize = searchModel.getPageSize() > 0 ? searchModel.getPageSize() : 1;
-        int pageIndex = searchModel.getPageIndex() > 0 ? searchModel.getPageIndex() : 10;
+        int pageSize = searchModel.getPageSize();
+        int pageIndex = searchModel.getPageIndex();
 
         JPAQuery<SysAppTableAccessModel> query = jpaQueryFactory.select(Projections.bean(
                 SysAppTableAccessModel.class,
@@ -78,11 +79,11 @@ public class SysAppTableAccessServiceImpl implements SysAppTableAccessService {
             subBuilder.or(new BooleanBuilder().and(qTableSet.nameEn.isNull()).and(qSysTable.nameEn.contains(searchModel.getName())));
             builder.and(subBuilder);
         }
-        QueryResults<SysAppTableAccessModel> results = query.where(builder)
-                .orderBy(qTableSet.sort.asc())
-                .offset((pageIndex - 1) * pageSize)
-                .limit(pageSize)
-                .fetchResults();
+        query = query.where(builder).orderBy(qTableSet.sort.asc());
+        if (pageSize > 0 && pageIndex > 0) {
+            query = query.offset((pageIndex - 1) * pageSize).limit(pageSize);
+        }
+        QueryResults<SysAppTableAccessModel> results = query.fetchResults();
 
         return new PaginationViewModel
                 .Builder<SysAppTableAccessModel>()
