@@ -103,6 +103,7 @@ public class SysTableDataController extends BaseController {
                 map.put("isMasterTable", table.isMasterTable());
                 map.put("tableNamePK", table.getTableNamePK());
                 map.put("tableNameFK", table.getTableNameFK());
+                map.put("sysTableId", table.getId());
                 result.add(map);
             }
         });
