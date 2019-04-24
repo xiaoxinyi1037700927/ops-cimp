@@ -62,7 +62,9 @@ public class SysAppTableAccessServiceImpl implements SysAppTableAccessService {
                 qTableSet.name.coalesce(qSysTable.nameCn).as("nameCn"),
                 qTableSet.nameEn.coalesce(qSysTable.nameEn).as("nameEn"),
                 qTableAccess.canReadAll,
-                qTableAccess.canWriteAll
+                qTableAccess.canWriteAll,
+                qTableSet.id.as("sysAppTableSetId"),
+                qTableSet.sysTableId
         )).from(qTableAccess).innerJoin(qTableSet).on(qTableSet.id.eq(qTableAccess.sysAppTableSetId))
                 .innerJoin(qSysTable).on(qSysTable.id.eq(qTableSet.sysTableId));
 

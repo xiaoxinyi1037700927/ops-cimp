@@ -56,7 +56,9 @@ public class SysAppFieldAccessServiceImpl implements SysAppFieldAccessService {
                 qFieldSet.name.coalesce(qSysTableField.nameCn).as("nameCn"),
                 qFieldSet.nameEn.coalesce(qSysTableField.nameEn).as("nameEn"),
                 qFieldAccess.canRead,
-                qFieldAccess.canWrite
+                qFieldAccess.canWrite,
+                qFieldSet.id.as("sysAppTableFieldSetId"),
+                qFieldSet.sysTableFieldId
         )).from(qFieldAccess).innerJoin(qFieldSet).on(qFieldSet.id.eq(qFieldAccess.sysAppTableFieldSetId))
                 .innerJoin(qSysTableField).on(qFieldSet.sysTableFieldId.eq(qSysTableField.id));
 

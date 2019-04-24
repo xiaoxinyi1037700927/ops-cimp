@@ -3,6 +3,8 @@ package com.sinosoft.ops.cimp.vo.to.sys.sysapp.access;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import javax.persistence.Column;
+
 /**
  * app中角色对表字段的访问权限模型
  */
@@ -18,6 +20,16 @@ public class SysAppFieldAccessModel {
      */
     @ApiModelProperty(value = "表字段中文名称")
     private String nameCn;
+    /**
+     * 系统表字段ID
+     */
+    @ApiModelProperty(value = "系统表字段ID")
+    private String sysTableFieldId;
+    /**
+     * 系统应用表字段ID
+     */
+    @ApiModelProperty(value = "系统应用表字段ID")
+    private String sysAppTableFieldSetId;
     /**
      * 表字段英文名称
      */
@@ -72,5 +84,21 @@ public class SysAppFieldAccessModel {
 
     public void setCanWrite(boolean canWrite) {
         this.canWrite = canWrite;
+    }
+
+    public String getSysTableFieldId() {
+        return sysTableFieldId;
+    }
+
+    public void setSysTableFieldId(String sysTableFieldId) {
+        this.sysTableFieldId = sysTableFieldId;
+    }
+
+    public String getSysAppTableFieldSetId() {
+        return sysAppTableFieldSetId;
+    }
+
+    public void setSysAppTableFieldSetId(String sysAppTableFieldSetId) {
+        this.sysAppTableFieldSetId = sysAppTableFieldSetId;
     }
 }
