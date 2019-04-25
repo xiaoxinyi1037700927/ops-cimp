@@ -127,6 +127,12 @@ public class SysTableDataController extends BaseController {
         SysTableModelInfoDTO tableInfo = sysTableInfoDao.getTableInfo(tableTypeName, prjCode);
         List<SysTableInfoDTO> tables = tableInfo.getTables();
         Map<String, SysTableInfoDTO> collect = tables.stream().collect(Collectors.toMap(SysTableInfoDTO::getId, a -> a, (k1, k2) -> k1));
+
+        //用户收藏的表id
+        String userId = SecurityUtils.getSubject().getCurrentUser().getId();
+        List<String> ucSysTableIds = userCollectionTableService.findUCTableListByUserId(userId).stream().map(UCTableViewModel::getTableId).collect(Collectors.toList());
+
+
         for (RPTableViewModel viewModel : rpTableListByRoleId) {
             SysTableInfoDTO sysTableInfoDTO = collect.get(viewModel.getTableId());
             Map<String, Object> map = Maps.newHashMap();
@@ -138,6 +144,7 @@ public class SysTableDataController extends BaseController {
                 map.put("tableNamePK", sysTableInfoDTO.getTableNamePK());
                 map.put("tableNameFK", sysTableInfoDTO.getTableNameFK());
                 map.put("sysTableId", sysTableInfoDTO.getId());
+                map.put("isCollect", ucSysTableIds.contains(sysTableInfoDTO.getId()));
                 result.add(map);
             }
         }
