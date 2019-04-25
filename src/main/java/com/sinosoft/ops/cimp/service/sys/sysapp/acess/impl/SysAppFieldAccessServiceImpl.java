@@ -153,6 +153,7 @@ public class SysAppFieldAccessServiceImpl implements SysAppFieldAccessService {
         QSysApp qSysApp = QSysApp.sysApp;
         QSysAppTableSet qTableSet = QSysAppTableSet.sysAppTableSet;
         QSysAppTableFieldSet qFieldSet = QSysAppTableFieldSet.sysAppTableFieldSet;
+        QSysTableField qSysTableField = QSysTableField.sysTableField;
         QSysAppRoleTableAccess qTableAccess = QSysAppRoleTableAccess.sysAppRoleTableAccess;
         QSysAppRoleFieldAccess qFieldAccess = QSysAppRoleFieldAccess.sysAppRoleFieldAccess;
 
@@ -160,6 +161,7 @@ public class SysAppFieldAccessServiceImpl implements SysAppFieldAccessService {
 
         jpaQueryFactory.select(Projections.bean(
                 SysAppFieldAccessModel.class,
+                qFieldSet.nameEn.coalesce(qSysTableField.nameEn).as("nameEn"),
                 qFieldAccess.canRead,
                 qFieldAccess.canWrite,
                 qFieldSet.sysTableFieldId
@@ -167,6 +169,7 @@ public class SysAppFieldAccessServiceImpl implements SysAppFieldAccessService {
                 .innerJoin(qTableSet).on(qTableSet.id.eq(qTableAccess.sysAppTableSetId))
                 .innerJoin(qFieldAccess).on(qFieldAccess.sysAppRoleTableAccessId.eq(qTableAccess.id))
                 .innerJoin(qFieldSet).on(qFieldSet.id.eq(qFieldAccess.sysAppTableFieldSetId))
+                .innerJoin(qSysTableField).on(qFieldSet.sysTableFieldId.eq(qSysTableField.id))
                 .where(new BooleanBuilder().and(qSysApp.code.eq(Integer.parseInt(appCode)))
                         .and(qTableAccess.roleId.in(roleIds))
                         .and(qTableSet.sysTableId.eq(sysTableId))
