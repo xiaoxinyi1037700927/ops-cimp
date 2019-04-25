@@ -93,7 +93,7 @@ public class SysAppTableSetServiceImpl implements SysAppTableSetService {
             QSysAppRoleTableAccess qTableAccess = QSysAppRoleTableAccess.sysAppRoleTableAccess;
             List<String> ids = jpaQueryFactory.select(qTableAccess.sysAppTableSetId).from(qTableAccess).where(qTableAccess.roleId.eq(searchModel.getRoleId())).fetch();
             if (ids != null && ids.size() > 0) {
-                builder.and(qTableSet.id.in(ids));
+                builder.and(qTableSet.id.notIn(ids));
             }
         }
 

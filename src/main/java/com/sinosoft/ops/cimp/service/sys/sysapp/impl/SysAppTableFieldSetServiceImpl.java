@@ -95,7 +95,7 @@ public class SysAppTableFieldSetServiceImpl implements SysAppTableFieldSetServic
             QSysAppRoleFieldAccess qFieldAccess = QSysAppRoleFieldAccess.sysAppRoleFieldAccess;
             List<String> ids = jpaQueryFactory.select(qFieldAccess.sysAppTableFieldSetId).from(qFieldAccess).where(qFieldAccess.sysAppRoleTableAccessId.eq(searchModel.getSysAppRoleTableAccessId())).fetch();
             if (ids != null && ids.size() > 0) {
-                builder.and(qFieldSet.id.in(ids));
+                builder.and(qFieldSet.id.notIn(ids));
             }
         }
         query = query.where(builder).orderBy(qFieldSet.sort.asc());

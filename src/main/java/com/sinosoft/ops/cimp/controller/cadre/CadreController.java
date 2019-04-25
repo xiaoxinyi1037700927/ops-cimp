@@ -9,6 +9,7 @@ import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.entity.user.User;
 import com.sinosoft.ops.cimp.entity.user.UserRole;
 import com.sinosoft.ops.cimp.exception.BusinessException;
+import com.sinosoft.ops.cimp.service.cadre.CadreService;
 import com.sinosoft.ops.cimp.service.user.RolePermissionPageSqlService;
 import com.sinosoft.ops.cimp.util.JsonUtil;
 import com.sinosoft.ops.cimp.util.SecurityUtils;
@@ -28,6 +29,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URLEncoder;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,11 +48,13 @@ public class CadreController extends BaseController {
 
     private final RolePermissionPageSqlService rolePermissionPageSqlService;
     private final JdbcTemplate jdbcTemplate;
+    private final CadreService cadreService;
 
     @Autowired
-    public CadreController(RolePermissionPageSqlService rolePermissionPageSqlService, JdbcTemplate jdbcTemplate) {
+    public CadreController(RolePermissionPageSqlService rolePermissionPageSqlService, JdbcTemplate jdbcTemplate, CadreService cadreService) {
         this.rolePermissionPageSqlService = rolePermissionPageSqlService;
         this.jdbcTemplate = jdbcTemplate;
+        this.cadreService = cadreService;
     }
 
     @ApiOperation(value = "查询干部列表")
@@ -127,5 +135,43 @@ public class CadreController extends BaseController {
             throw new BusinessException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE, "请检查角色配置的干部信息数据权限");
         }
     }
+
+
+    @ApiOperation(value = "查询干部基本信息")
+    @GetMapping(value = "/basicInfo")
+    @RequiresAuthentication
+    public ResponseEntity getCadreBasicInfo(@RequestParam("EMP_ID") String empId) throws BusinessException {
+        return ok(cadreService.getCadreBasicInfo(empId));
+    }
+
+    @ApiOperation(value = "获取干部图片")
+    @GetMapping(value = "/photo")
+    public void getPhoto(@RequestParam("photoId") String photoId, HttpServletResponse response) {
+        try {
+            byte[] photo = cadreService.getPhoto(photoId);
+
+            String fileName = photoId;
+            fileName = new String(fileName.getBytes("utf-8"), "utf-8");
+            fileName = URLEncoder.encode(fileName, "UTF-8");
+
+            //设置向浏览器端传送的文件格式
+            response.setContentType("application/x-download");
+            response.addHeader("Content-Disposition", "attachment;filename=" + fileName);
+
+            //写入流
+            try (InputStream in = new ByteArrayInputStream(photo);
+                 OutputStream os = response.getOutputStream()) {
+                byte[] b = new byte[1024 * 10];
+                int i = 0;
+                while ((i = in.read(b)) > 0) {
+                    os.write(b, 0, i);
+                }
+                os.flush();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
 }

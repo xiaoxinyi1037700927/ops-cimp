@@ -3,8 +3,6 @@ package com.sinosoft.ops.cimp.vo.to.sys.sysapp.access;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-import javax.persistence.Column;
-
 /**
  * app中角色对表字段的访问权限模型
  */
