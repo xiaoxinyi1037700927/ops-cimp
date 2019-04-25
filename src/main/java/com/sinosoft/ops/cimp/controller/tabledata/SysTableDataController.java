@@ -95,6 +95,10 @@ public class SysTableDataController extends BaseController {
         //获取当前用户在app中的表访问权限
         Map<String, SysAppTableAccessModel> perMap = tableAccessService.getTableAccess(prjCode);
 
+        //用户收藏的表id
+        String userId = SecurityUtils.getSubject().getCurrentUser().getId();
+        List<String> ucSysTableIds = userCollectionTableService.findUCTableListByUserId(userId).stream().map(UCTableViewModel::getTableId).collect(Collectors.toList());
+
         tableInfo.getTables().forEach(table -> {
             if (perMap.containsKey(table.getId())) {
                 Map<String, Object> map = Maps.newHashMap();
@@ -105,6 +109,7 @@ public class SysTableDataController extends BaseController {
                 map.put("tableNamePK", table.getTableNamePK());
                 map.put("tableNameFK", table.getTableNameFK());
                 map.put("sysTableId", table.getId());
+                map.put("isCollect", ucSysTableIds.contains(table.getId()));
                 result.add(map);
             }
         });
