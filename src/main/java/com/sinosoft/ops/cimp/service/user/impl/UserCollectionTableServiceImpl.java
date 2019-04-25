@@ -8,6 +8,7 @@ import com.sinosoft.ops.cimp.entity.user.UserCollectionTable;
 import com.sinosoft.ops.cimp.mapper.user.UserCollectionTableMapper;
 import com.sinosoft.ops.cimp.repository.user.UserCollectionTableRepository;
 import com.sinosoft.ops.cimp.service.user.UserCollectionTableService;
+import com.sinosoft.ops.cimp.util.SecurityUtils;
 import com.sinosoft.ops.cimp.vo.from.user.userCollectionTable.UCTableAddModel;
 import com.sinosoft.ops.cimp.vo.from.user.userCollectionTable.UCTableSearchModel;
 import com.sinosoft.ops.cimp.vo.to.user.userCollectionTable.UCTableModifyModel;
@@ -110,9 +111,11 @@ public class UserCollectionTableServiceImpl implements UserCollectionTableServic
 
     @Override
     public Boolean deleteUCTable(List<String> ids) {
-        for (String id : ids) {
-            userCollectionTableRepository.deleteById(id);
-        }
+        String userId = SecurityUtils.getSubject().getCurrentUser().getId();
+        Iterable<UserCollectionTable> all = userCollectionTableRepository.findAll(QUserCollectionTable.userCollectionTable.userId.eq(userId)
+                .and(QUserCollectionTable.userCollectionTable.tableId.in(ids)));
+        userCollectionTableRepository.deleteAll(all);
+
         return true;
     }
 
