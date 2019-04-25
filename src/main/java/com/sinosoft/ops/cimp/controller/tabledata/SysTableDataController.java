@@ -3,6 +3,7 @@ package com.sinosoft.ops.cimp.controller.tabledata;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.sinosoft.ops.cimp.annotation.SystemApiGroup;
+import com.sinosoft.ops.cimp.constant.RolePermissionPageSqlEnum;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.dao.SysTableInfoDao;
 import com.sinosoft.ops.cimp.dao.domain.sys.table.SysTableFieldInfo;
@@ -12,24 +13,33 @@ import com.sinosoft.ops.cimp.dto.QueryDataParamBuilder;
 import com.sinosoft.ops.cimp.dto.sys.table.SysTableFieldInfoDTO;
 import com.sinosoft.ops.cimp.dto.sys.table.SysTableInfoDTO;
 import com.sinosoft.ops.cimp.dto.sys.table.SysTableModelInfoDTO;
+import com.sinosoft.ops.cimp.entity.user.User;
+import com.sinosoft.ops.cimp.entity.user.UserRole;
 import com.sinosoft.ops.cimp.exception.BusinessException;
+import com.sinosoft.ops.cimp.service.oraganization.OrganizationService;
 import com.sinosoft.ops.cimp.service.sys.sysapp.acess.SysAppFieldAccessService;
 import com.sinosoft.ops.cimp.service.sys.sysapp.acess.SysAppTableAccessService;
 import com.sinosoft.ops.cimp.service.sys.systable.SysTableTypeService;
 import com.sinosoft.ops.cimp.service.tabledata.SysTableModelInfoService;
+import com.sinosoft.ops.cimp.service.user.RolePermissionPageSqlService;
 import com.sinosoft.ops.cimp.service.user.RolePermissionTableService;
 import com.sinosoft.ops.cimp.service.user.UserCollectionTableService;
 import com.sinosoft.ops.cimp.util.JsonUtil;
 import com.sinosoft.ops.cimp.util.SecurityUtils;
+import com.sinosoft.ops.cimp.vo.from.user.rolePermissionPageSql.RPPageSqlSearchModel;
+import com.sinosoft.ops.cimp.vo.to.organization.OrganizationSearchViewModel;
+import com.sinosoft.ops.cimp.vo.to.organization.OrganizationViewModel;
 import com.sinosoft.ops.cimp.vo.to.sys.sysapp.access.SysAppFieldAccessModel;
 import com.sinosoft.ops.cimp.vo.to.sys.sysapp.access.SysAppTableAccessModel;
 import com.sinosoft.ops.cimp.vo.to.sys.systable.SysTableTypeModel;
+import com.sinosoft.ops.cimp.vo.to.user.rolePermissionPageSql.RPPageSqlViewModel;
 import com.sinosoft.ops.cimp.vo.to.user.rolePermissionTable.RPTableViewModel;
 import com.sinosoft.ops.cimp.vo.to.user.userCollectionTable.UCTableViewModel;
 import io.swagger.annotations.Api;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -51,13 +61,16 @@ public class SysTableDataController extends BaseController {
     private final UserCollectionTableService userCollectionTableService;
     private final SysAppTableAccessService tableAccessService;
     private final SysAppFieldAccessService fieldAccessService;
+    private final OrganizationService organizationService;
+    private final RolePermissionPageSqlService rolePermissionPageSqlService;
+    private final JdbcTemplate jdbcTemplate;
 
     @Autowired
     public SysTableDataController(SysTableModelInfoService sysTableModelInfoService,
                                   SysTableInfoDao sysTableInfoDao,
                                   SysTableTypeService sysTableTypeService,
                                   RolePermissionTableService rolePermissionTableService,
-                                  UserCollectionTableService userCollectionTableService, SysAppTableAccessService tableAccessService, SysAppFieldAccessService fieldAccessService) {
+                                  UserCollectionTableService userCollectionTableService, SysAppTableAccessService tableAccessService, SysAppFieldAccessService fieldAccessService, OrganizationService organizationService, RolePermissionPageSqlService rolePermissionPageSqlService, JdbcTemplate jdbcTemplate) {
         this.sysTableModelInfoService = sysTableModelInfoService;
         this.sysTableInfoDao = sysTableInfoDao;
         this.sysTableTypeService = sysTableTypeService;
@@ -65,6 +78,9 @@ public class SysTableDataController extends BaseController {
         this.userCollectionTableService = userCollectionTableService;
         this.tableAccessService = tableAccessService;
         this.fieldAccessService = fieldAccessService;
+        this.organizationService = organizationService;
+        this.rolePermissionPageSqlService = rolePermissionPageSqlService;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     @RequestMapping(value = "/getSysTableTypes", method = RequestMethod.GET)
@@ -502,5 +518,43 @@ public class SysTableDataController extends BaseController {
 
         sysTableModelInfoService.deleteDataFinal(queryDataParam);
         return ok("回收站删除成功");
+    }
+
+    @RequestMapping(value = "getSysTableCount")
+    public ResponseEntity getSysTableCount() throws BusinessException {
+        Map<String, Object> resultMap = Maps.newHashMap();
+
+        User currentUser = SecurityUtils.getSubject().getCurrentUser();
+        String dataOrganizationId = currentUser.getDataOrganizationId();
+        List<UserRole> currentUserRole = SecurityUtils.getSubject().getCurrentUserRole();
+        List<String> roleIds = currentUserRole.stream().map(UserRole::getRoleId).collect(Collectors.toList());
+
+        OrganizationSearchViewModel searchViewModel = new OrganizationSearchViewModel();
+        searchViewModel.setOrganizationId(dataOrganizationId);
+        OrganizationViewModel organizationViewModel = organizationService.lstTreeNode(searchViewModel);
+
+        int organizationCount = organizationViewModel.getSubTreeNode().size();
+        resultMap.put("organizationCount", organizationCount);
+
+        RPPageSqlSearchModel searchModel = new RPPageSqlSearchModel();
+        searchModel.setRoleIds(roleIds);
+        List<RPPageSqlViewModel> pageSqlListByRoleIds = rolePermissionPageSqlService.findRPPageSqlListByRoleIds(searchModel);
+        Optional<RPPageSqlViewModel> pageSqlViewModel = pageSqlListByRoleIds.stream().filter(s -> StringUtils.equals(s.getIncludeSubNode(), "1")).filter(s -> StringUtils.equals(s.getSqlNameEn(), RolePermissionPageSqlEnum.NAME_EN.干部集合.value)).findFirst();
+
+        if (pageSqlViewModel.isPresent()) {
+            RPPageSqlViewModel viewModel = pageSqlViewModel.get();
+            String execCountSql = viewModel.getExecCountSql();
+            String selectCountFieldEn = viewModel.getSelectCountFieldEn();
+            String execCadreCountSql = execCountSql.replaceAll("\\$\\{deptId\\}", dataOrganizationId);
+
+            Map<String, Object> countMap = jdbcTemplate.queryForMap(execCadreCountSql);
+            Object cadreCount = countMap.get(selectCountFieldEn);
+            if (cadreCount == null) {
+                resultMap.put("cadreCount", 0L);
+            } else {
+                resultMap.put("cadreCount", Long.parseLong(String.valueOf(cadreCount)));
+            }
+        }
+        return ok(resultMap);
     }
 }
