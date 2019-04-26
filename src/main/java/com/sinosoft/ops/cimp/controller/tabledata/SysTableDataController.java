@@ -303,7 +303,7 @@ public class SysTableDataController extends BaseController {
         if (sysAppTableAccessModel == null) {
             return fail("没有操作信息集的权限");
         }
-        Map formMap = null;
+        Map formMap;
         if (sysAppTableAccessModel.getCanWriteAll()) {
             formMap = JsonUtil.parseStringToObject(form, HashMap.class);
         } else {
@@ -317,6 +317,7 @@ public class SysTableDataController extends BaseController {
                     saveFormData.entrySet().removeIf(e -> StringUtils.equals(e.getKey(), String.valueOf(formDataKey)));
                 }
             }
+            formMap = saveFormData;
         }
         QueryDataParamBuilder queryDataParam = new QueryDataParamBuilder();
 
