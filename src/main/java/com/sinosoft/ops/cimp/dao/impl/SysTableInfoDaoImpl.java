@@ -254,6 +254,10 @@ public class SysTableInfoDaoImpl implements SysTableInfoDao {
                         sysTableFieldInfoDTO.setAppTableFieldGroupName(appFieldGroupName);
                         sysTableFieldInfoDTO.setCodeSetName(codeSetName);
                         sysTableFieldInfoDTO.setCodeSetType(codeSetType);
+                        sysTableFieldInfoDTO.setSortInList(sysTableFieldInfo.getSortInList());
+                        sysTableFieldInfoDTO.setShowInList(sysTableFieldInfo.isShowInList());
+                        sysTableFieldInfoDTO.setNecessary(sysTableFieldInfo.isNecessary());
+                        sysTableFieldInfoDTO.setDbFieldDataType(sysTableFieldInfo.getDbFieldDataType());
 
                         if (StringUtils.isNotEmpty(appFieldNameCn)) {
                             sysTableFieldInfoDTO.setFieldNameCn(appFieldNameCn);

@@ -77,9 +77,9 @@ public class ExportServiceImpl implements ExportService {
             NameAttrValue nameAttrValue = exportHandler.getNameAttrValue();
             outFile = exportPath + nameAttrValue.getName() + nameAttrValue.getCardNo() + ExportConstant.RMB_SUFFIX_WORD;
 
-//            if (!FileUtils.fileExists(outFile)) {
-            exportHandler.generate(templateFilePath, allAttrValue, outFile);
-//            }
+            if (!FileUtils.fileExists(outFile)) {
+                exportHandler.generate(templateFilePath, allAttrValue, outFile);
+            }
 
             return outFile;
         } catch (Exception e) {

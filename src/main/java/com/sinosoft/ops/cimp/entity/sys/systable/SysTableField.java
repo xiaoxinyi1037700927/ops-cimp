@@ -136,6 +136,24 @@ public class SysTableField implements Serializable {
     private String sysCodeSetType;
 
     /**
+     * 在列表中的排序
+     */
+    @Column(name = "SORT_IN_LIST", length = 10)
+    private Integer sortInList;
+
+    /**
+     * 在列表中是否显示
+     */
+    @Column(name = "IS_SHOW_IN_LIST", length = 1)
+    private String isShowInList;
+
+    /**
+     * 是否必填
+     */
+    @Column(name = "IS_NECESSARY", length = 1)
+    private String isNecessary;
+
+    /**
      * 创建人
      */
     @Column(name = "CREATE_ID", length = 36)
@@ -360,5 +378,29 @@ public class SysTableField implements Serializable {
 
     public void setModifyTime(Date modifyTime) {
         this.modifyTime = modifyTime;
+    }
+
+    public Integer getSortInList() {
+        return sortInList;
+    }
+
+    public void setSortInList(Integer sortInList) {
+        this.sortInList = sortInList;
+    }
+
+    public String getIsShowInList() {
+        return isShowInList;
+    }
+
+    public void setIsShowInList(String isShowInList) {
+        this.isShowInList = isShowInList;
+    }
+
+    public String getIsNecessary() {
+        return isNecessary;
+    }
+
+    public void setIsNecessary(String isNecessary) {
+        this.isNecessary = isNecessary;
     }
 }

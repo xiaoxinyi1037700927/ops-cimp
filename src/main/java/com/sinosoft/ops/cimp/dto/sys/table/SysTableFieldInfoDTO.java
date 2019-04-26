@@ -27,6 +27,14 @@ public class SysTableFieldInfoDTO implements Serializable {
     private String appTableFieldGroupName;
     @ApiModelProperty(value = "是否只读")
     private boolean readOnly;
+    @ApiModelProperty(value = "在列表中的排序")
+    private Integer sortInList;
+    @ApiModelProperty(value = "在列表中是否显示")
+    private boolean isShowInList;
+    @ApiModelProperty(value = "是否必填")
+    private boolean isNecessary;
+    @ApiModelProperty(value = "字段类型")
+    private String dbFieldDataType;
 
     public String getId() {
         return id;
@@ -106,5 +114,37 @@ public class SysTableFieldInfoDTO implements Serializable {
 
     public void setReadOnly(boolean readOnly) {
         this.readOnly = readOnly;
+    }
+
+    public Integer getSortInList() {
+        return sortInList;
+    }
+
+    public void setSortInList(Integer sortInList) {
+        this.sortInList = sortInList;
+    }
+
+    public boolean isShowInList() {
+        return isShowInList;
+    }
+
+    public void setShowInList(boolean showInList) {
+        isShowInList = showInList;
+    }
+
+    public boolean isNecessary() {
+        return isNecessary;
+    }
+
+    public void setNecessary(boolean necessary) {
+        isNecessary = necessary;
+    }
+
+    public String getDbFieldDataType() {
+        return dbFieldDataType;
+    }
+
+    public void setDbFieldDataType(String dbFieldDataType) {
+        this.dbFieldDataType = dbFieldDataType;
     }
 }

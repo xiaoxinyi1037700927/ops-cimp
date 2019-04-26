@@ -45,6 +45,12 @@ public class SysTableFieldInfo implements Serializable {
     private String codeSetName;
     //代码集类型
     private String codeSetType;
+    //在列表中的排序
+    private Integer sortInList;
+    //在列表中是否显示
+    private boolean isShowInList;
+    //是否必填
+    private boolean isNecessary;
 
     public String getId() {
         return id;
@@ -206,29 +212,27 @@ public class SysTableFieldInfo implements Serializable {
         this.codeSetType = codeSetType;
     }
 
-    @Override
-    public String toString() {
-        return "SysTableFieldInfo{" +
-                "id='" + id + '\'' +
-                ", nameCn='" + nameCn + '\'' +
-                ", nameEn='" + nameEn + '\'' +
-                ", description='" + description + '\'' +
-                ", dbTableName='" + dbTableName + '\'' +
-                ", dbFieldName='" + dbFieldName + '\'' +
-                ", dbFieldDataType='" + dbFieldDataType + '\'' +
-                ", isPK=" + isPK +
-                ", isFK=" + isFK +
-                ", logicalDeleteFlag=" + logicalDeleteFlag +
-                ", deleteCascadeFlag=" + deleteCascadeFlag +
-                ", attrValueMonitor='" + attrValueMonitor + '\'' +
-                ", canResultFlag=" + canResultFlag +
-                ", canConditionFlag=" + canConditionFlag +
-                ", canOrderFlag=" + canOrderFlag +
-                ", defaultHtml='" + defaultHtml + '\'' +
-                ", defaultScript='" + defaultScript + '\'' +
-                ", sort=" + sort +
-                ", codeSetName='" + codeSetName + '\'' +
-                ", codeSetType='" + codeSetType + '\'' +
-                '}';
+    public Integer getSortInList() {
+        return sortInList;
+    }
+
+    public void setSortInList(Integer sortInList) {
+        this.sortInList = sortInList;
+    }
+
+    public boolean isShowInList() {
+        return isShowInList;
+    }
+
+    public void setShowInList(boolean showInList) {
+        isShowInList = showInList;
+    }
+
+    public boolean isNecessary() {
+        return isNecessary;
+    }
+
+    public void setNecessary(boolean necessary) {
+        isNecessary = necessary;
     }
 }
