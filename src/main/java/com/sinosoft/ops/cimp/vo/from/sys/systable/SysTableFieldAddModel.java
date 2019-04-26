@@ -4,7 +4,9 @@ package com.sinosoft.ops.cimp.vo.from.sys.systable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-@ApiModel(value = "SysTableFieldAddModel",description = "系统表字段添加")
+import javax.persistence.Column;
+
+@ApiModel(value = "SysTableFieldAddModel", description = "系统表字段添加")
 public class SysTableFieldAddModel {
     /**
      * 系统表ID
@@ -113,6 +115,21 @@ public class SysTableFieldAddModel {
 
     @ApiModelProperty(value = " 默认引用代码集类型")
     private String sysCodeSetType;
+    /**
+     * 在列表中的排序
+     */
+    @ApiModelProperty(value = " 在列表中的排序")
+    private Integer sortInList;
+    /**
+     * 在列表中是否显示
+     */
+    @ApiModelProperty(value = " 在列表中是否显示")
+    private String isShowInList;
+    /**
+     * 是否必填
+     */
+    @ApiModelProperty(value = " 是否必填")
+    private String isNecessary;
 
     public String getSysTableId() {
         return sysTableId;
@@ -272,5 +289,29 @@ public class SysTableFieldAddModel {
 
     public void setSysCodeSetType(String sysCodeSetType) {
         this.sysCodeSetType = sysCodeSetType;
+    }
+
+    public Integer getSortInList() {
+        return sortInList;
+    }
+
+    public void setSortInList(Integer sortInList) {
+        this.sortInList = sortInList;
+    }
+
+    public String getIsShowInList() {
+        return isShowInList;
+    }
+
+    public void setIsShowInList(String isShowInList) {
+        this.isShowInList = isShowInList;
+    }
+
+    public String getIsNecessary() {
+        return isNecessary;
+    }
+
+    public void setIsNecessary(String isNecessary) {
+        this.isNecessary = isNecessary;
     }
 }

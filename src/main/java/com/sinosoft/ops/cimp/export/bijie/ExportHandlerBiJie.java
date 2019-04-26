@@ -147,11 +147,7 @@ public class ExportHandlerBiJie extends AbstractExportHandler {
         }
         //破解Aspose代码
         // 凭证文件
-//        ClassLoader loader = Thread.currentThread().getContextClassLoader();
-//        InputStream license = loader.getResourceAsStream("license.xml");
-
         InputStream license = new ClassPathResource("license.xml").getInputStream();
-
         License aposeLic = new License();
         aposeLic.setLicense(license);
 
