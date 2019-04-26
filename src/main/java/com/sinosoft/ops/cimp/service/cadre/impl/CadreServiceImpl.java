@@ -15,11 +15,9 @@ public class CadreServiceImpl implements CadreService {
 
     private final JdbcTemplate jdbcTemplate;
 
-
     public CadreServiceImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
-
 
     @Override
     public CadreBasicInfoVO getCadreBasicInfo(String empId) {
@@ -29,7 +27,7 @@ public class CadreServiceImpl implements CadreService {
                 "  (select name from SYS_CODE_ITEM where CODE_SET_ID = 18 and code = a001.A01004) as \"gender\",  " +
                 " to_char(A01007,'yyyy-mm-dd') as \"birthday\", " +
                 "  a001.A01011_A as \"birthPlace\", " +
-                "  photo.PHOTO_UUID as \"photoId\" " +
+                "  photo.SUB_ID as \"photoId\" " +
                 " from EMP_A001 a001 left join EMP_PHOTO photo on a001.EMP_ID = photo.EMP_ID " +
                 " where a001.EMP_ID = '%s' ", empId);
 
@@ -53,7 +51,7 @@ public class CadreServiceImpl implements CadreService {
 
     @Override
     public byte[] getPhoto(String photoId) {
-        Map<String, Object> data = jdbcTemplate.queryForMap(String.format("select PHOTO_FILE from EMP_PHOTO where PHOTO_UUID = '%s'", photoId));
+        Map<String, Object> data = jdbcTemplate.queryForMap(String.format("select PHOTO_FILE from EMP_PHOTO where SUB_ID = '%s'", photoId));
         return (byte[]) data.get("PHOTO_FILE");
     }
 
