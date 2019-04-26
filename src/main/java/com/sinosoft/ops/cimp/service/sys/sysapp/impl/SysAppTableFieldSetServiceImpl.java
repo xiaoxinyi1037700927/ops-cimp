@@ -4,6 +4,7 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sinosoft.ops.cimp.dto.PaginationViewModel;
@@ -226,6 +227,7 @@ public class SysAppTableFieldSetServiceImpl implements SysAppTableFieldSetServic
         QSysTableField qSysTableField = QSysTableField.sysTableField;
         QSysAppTableFieldSet qFieldSet = QSysAppTableFieldSet.sysAppTableFieldSet;
         QSysAppTableSet qTableSet = QSysAppTableSet.sysAppTableSet;
+        QSysAppTableFieldGroup qFieldGroup = QSysAppTableFieldGroup.sysAppTableFieldGroup;
 
         //获取系统表ID
         Optional<SysAppTableFieldGroup> fieldGroupOptional = fieldGroupRepository.findById(searchModel.getSysAppTableFieldGroupId());
@@ -238,8 +240,12 @@ public class SysAppTableFieldSetServiceImpl implements SysAppTableFieldSetServic
         }
         String sysTableId = tableSetOptional.get().getSysTableId();
 
-        //获取字段集合中已存在的字段ID
-        List<String> sysTableFieldIds = jpaQueryFactory.select(qFieldSet.sysTableFieldId).from(qFieldSet).where(qFieldSet.sysAppTableFieldGroupId.eq(searchModel.getSysAppTableFieldGroupId())).fetchResults().getResults();
+        //获取字段集合中app已添加的字段ID
+        List<String> sysTableFieldIds = jpaQueryFactory.select(qFieldSet.sysTableFieldId).from(qFieldSet)
+                .where(qFieldSet.sysAppTableFieldGroupId.in(
+                        JPAExpressions.select(qFieldGroup.id).from(qFieldGroup).where(qFieldGroup.sysAppTableSetId.eq(
+                                JPAExpressions.select(qFieldGroup.sysAppTableSetId).from(qFieldGroup).where(qFieldGroup.id.eq(searchModel.getSysAppTableFieldGroupId()))))))
+                .fetch();
 
         BooleanBuilder builder = new BooleanBuilder();
         builder = builder.and(qSysTableField.sysTableId.eq(sysTableId));
