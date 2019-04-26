@@ -159,14 +159,16 @@ public class CadreController extends BaseController {
             response.addHeader("Content-Disposition", "attachment;filename=" + fileName);
 
             //写入流
-            try (InputStream in = new ByteArrayInputStream(photo);
-                 OutputStream os = response.getOutputStream()) {
-                byte[] b = new byte[1024 * 10];
-                int i = 0;
-                while ((i = in.read(b)) > 0) {
-                    os.write(b, 0, i);
+            if (photo != null) {
+                try (InputStream in = new ByteArrayInputStream(photo);
+                     OutputStream os = response.getOutputStream()) {
+                    byte[] b = new byte[1024 * 10];
+                    int i = 0;
+                    while ((i = in.read(b)) > 0) {
+                        os.write(b, 0, i);
+                    }
+                    os.flush();
                 }
-                os.flush();
             }
         } catch (Exception e) {
             e.printStackTrace();
