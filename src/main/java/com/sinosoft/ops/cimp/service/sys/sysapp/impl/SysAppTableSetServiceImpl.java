@@ -4,9 +4,11 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sinosoft.ops.cimp.dto.PaginationViewModel;
+import com.sinosoft.ops.cimp.entity.sys.sysapp.QSysAppTableGroup;
 import com.sinosoft.ops.cimp.entity.sys.sysapp.QSysAppTableSet;
 import com.sinosoft.ops.cimp.entity.sys.sysapp.SysAppTableSet;
 import com.sinosoft.ops.cimp.entity.sys.sysapp.fieldAccess.QSysAppRoleTableAccess;
@@ -229,9 +231,15 @@ public class SysAppTableSetServiceImpl implements SysAppTableSetService {
     public List<SysAppTableModel> listSysTable(SysAppTableSearchModel searchModel) {
         QSysTable qSysTable = QSysTable.sysTable;
         QSysAppTableSet qTableSet = QSysAppTableSet.sysAppTableSet;
+        QSysAppTableGroup qTableGroup = QSysAppTableGroup.sysAppTableGroup;
 
-        //获取集合中已存在的系统表ID
-        List<String> sysTableIds = jpaQueryFactory.select(qTableSet.sysTableId).from(qTableSet).where(qTableSet.sysAppTableGroupId.eq(searchModel.getSysAppTableGroupId())).fetchResults().getResults();
+        //获取集合中app已添加的系统表ID
+        List<String> sysTableIds = jpaQueryFactory.select(qTableSet.sysTableId)
+                .from(qTableSet)
+                .where(qTableSet.sysAppTableGroupId.in(
+                        JPAExpressions.select(qTableGroup.id).from(qTableGroup).where(qTableGroup.sysAppId.eq(
+                                JPAExpressions.select(qTableGroup.sysAppId).from(qTableGroup).where(qTableGroup.id.eq(searchModel.getSysAppTableGroupId()))))))
+                .fetch();
 
         BooleanBuilder builder = new BooleanBuilder();
         builder = builder.and(qSysTable.sysTableTypeId.eq(searchModel.getSysTableTypeId()));

@@ -33,7 +33,7 @@ public class ExportHandlerBiJie extends AbstractExportHandler {
     protected void init() {
         //放入 属性 - 属性获取处理器
         attrValueMap.put(NameAttrValue.KEY, new NameAttrValue());
-//        attrValueMap.put(PhotoAttrValue.KEY, new PhotoAttrValue());
+        attrValueMap.put(PhotoAttrValue.KEY, new PhotoAttrValue());
         attrValueMap.put(GenderAttrValue.KEY, new GenderAttrValue());
         attrValueMap.put(BirthdayAttrValue.KEY, new BirthdayAttrValue());
         attrValueMap.put(NationAttrValue.KEY, new NationAttrValue());
@@ -60,7 +60,7 @@ public class ExportHandlerBiJie extends AbstractExportHandler {
         attrValueMap.put(FamilyOrgAndJobAttrValue.KEY, new FamilyOrgAndJobAttrValue());
         //放入 属性 - 属性值处理器
         attrValueProcessorMap.put(NameAttrValue.KEY, new NameAttrValueProcessor());
-//        attrValueProcessorMap.put(PhotoAttrValue.KEY, new PhotoAttrValueProcessor());
+        attrValueProcessorMap.put(PhotoAttrValue.KEY, new PhotoAttrValueProcessor());
         attrValueProcessorMap.put(NationAttrValue.KEY, new GenericNameAttrValueProcessor());
         attrValueProcessorMap.put(NativeAttrValue.KEY, new GenericNameAttrValueProcessor());
         attrValueProcessorMap.put(BirthPlaceAttrValue.KEY, new GenericNameAttrValueProcessor());

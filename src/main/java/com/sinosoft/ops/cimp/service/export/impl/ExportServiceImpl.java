@@ -427,7 +427,7 @@ public class ExportServiceImpl implements ExportService {
                 e.addText(allAttrValue.get("") == null ? "" : allAttrValue.get("").toString());
                 break;
             case "ZhaoPian":
-//                e.addText(Base64.getEncoder().encodeToString((byte[]) allAttrValue.get("photo")).trim());
+                e.addText(Base64.getEncoder().encodeToString((byte[]) allAttrValue.get("photo")).trim());
                 break;
             case "Version":
                 e.addText("3.2.1.6");
