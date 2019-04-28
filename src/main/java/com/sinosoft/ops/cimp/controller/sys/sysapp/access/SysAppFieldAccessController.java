@@ -39,25 +39,25 @@ public class SysAppFieldAccessController extends BaseController {
         return ok(fieldAccessService.listFieldAccess(searchModel));
     }
 
-    /**
-     * 新增对表字段的访问权限
-     */
-    @ApiOperation(value = "新增对表字段的访问权限")
-    @PostMapping("/add")
-    public ResponseEntity addFieldAccess(@RequestBody SysAppFieldAccessAddModel addModel) throws BusinessException {
-        fieldAccessService.addFieldAccess(addModel);
-        return ok("新增成功！");
-    }
+//    /**
+//     * 新增对表字段的访问权限
+//     */
+//    @ApiOperation(value = "新增对表字段的访问权限")
+//    @PostMapping("/add")
+//    public ResponseEntity addFieldAccess(@RequestBody SysAppFieldAccessAddModel addModel) throws BusinessException {
+//        fieldAccessService.addFieldAccess(addModel);
+//        return ok("新增成功！");
+//    }
 
-    /**
-     * 删除对表字段的访问权限
-     */
-    @ApiOperation(value = "删除对表字段的访问权限")
-    @PostMapping("/delete")
-    public ResponseEntity deleteFieldAccess(@RequestBody SysAppFieldAccessDeleteModel deleteModel) throws BusinessException {
-        fieldAccessService.deleteFieldAccess(deleteModel.getIds());
-        return ok("删除成功！");
-    }
+//    /**
+//     * 删除对表字段的访问权限
+//     */
+//    @ApiOperation(value = "删除对表字段的访问权限")
+//    @PostMapping("/delete")
+//    public ResponseEntity deleteFieldAccess(@RequestBody SysAppFieldAccessDeleteModel deleteModel) throws BusinessException {
+//        fieldAccessService.deleteFieldAccess(deleteModel.getIds());
+//        return ok("删除成功！");
+//    }
 
     /**
      * 修改对表字段的访问权限

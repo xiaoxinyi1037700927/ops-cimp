@@ -22,6 +22,11 @@ public class SysAppTableAccessAddModel {
     @ApiModelProperty(value = "系统应用ID")
     private String sysAppId;
     /**
+     * 系统应用分组ID
+     */
+    @ApiModelProperty(value = "系统应用分组ID")
+    private String sysAppTableGroupId;
+    /**
      * 系统应用表ID列表
      */
     @ApiModelProperty(value = "系统应用表ID列表", required = true)
@@ -102,5 +107,13 @@ public class SysAppTableAccessAddModel {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public String getSysAppTableGroupId() {
+        return sysAppTableGroupId;
+    }
+
+    public void setSysAppTableGroupId(String sysAppTableGroupId) {
+        this.sysAppTableGroupId = sysAppTableGroupId;
     }
 }

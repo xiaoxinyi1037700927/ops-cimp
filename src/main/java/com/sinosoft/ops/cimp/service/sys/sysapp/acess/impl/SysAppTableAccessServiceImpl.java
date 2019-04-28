@@ -7,21 +7,29 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sinosoft.ops.cimp.dto.PaginationViewModel;
 import com.sinosoft.ops.cimp.entity.sys.sysapp.QSysApp;
+import com.sinosoft.ops.cimp.entity.sys.sysapp.QSysAppTableFieldGroup;
+import com.sinosoft.ops.cimp.entity.sys.sysapp.QSysAppTableFieldSet;
 import com.sinosoft.ops.cimp.entity.sys.sysapp.QSysAppTableSet;
 import com.sinosoft.ops.cimp.entity.sys.sysapp.fieldAccess.QSysAppRoleTableAccess;
 import com.sinosoft.ops.cimp.entity.sys.sysapp.fieldAccess.SysAppRoleTableAccess;
 import com.sinosoft.ops.cimp.entity.sys.systable.QSysTable;
 import com.sinosoft.ops.cimp.entity.user.UserRole;
 import com.sinosoft.ops.cimp.mapper.sys.sysapp.access.SysAppTableAccessMapper;
+import com.sinosoft.ops.cimp.repository.sys.sysapp.SysAppRepository;
+import com.sinosoft.ops.cimp.repository.sys.sysapp.SysAppTableGroupRepository;
 import com.sinosoft.ops.cimp.repository.sys.sysapp.access.SysAppFieldAccessRepository;
 import com.sinosoft.ops.cimp.repository.sys.sysapp.access.SysAppTableAccessRepository;
+import com.sinosoft.ops.cimp.service.sys.sysapp.acess.SysAppFieldAccessService;
 import com.sinosoft.ops.cimp.service.sys.sysapp.acess.SysAppTableAccessService;
 import com.sinosoft.ops.cimp.util.IdUtil;
 import com.sinosoft.ops.cimp.util.SecurityUtils;
+import com.sinosoft.ops.cimp.vo.from.sys.sysapp.access.SysAppFieldAccessAddModel;
 import com.sinosoft.ops.cimp.vo.from.sys.sysapp.access.SysAppTableAccessAddModel;
 import com.sinosoft.ops.cimp.vo.from.sys.sysapp.access.SysAppTableAccessModifyModel;
 import com.sinosoft.ops.cimp.vo.from.sys.sysapp.access.SysAppTableAccessSearchModel;
 import com.sinosoft.ops.cimp.vo.to.sys.sysapp.access.SysAppTableAccessModel;
+import com.sinosoft.ops.cimp.vo.to.sys.sysapp.sysApp.SysAppTreeModel;
+import com.sinosoft.ops.cimp.vo.to.sys.sysapp.sysAppTableGroup.SysAppTableGroupModel;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,16 +42,20 @@ import java.util.stream.Collectors;
 public class SysAppTableAccessServiceImpl implements SysAppTableAccessService {
 
     private final SysAppTableAccessRepository tableAccessRepository;
-
     private final JPAQueryFactory jpaQueryFactory;
-
     private final SysAppFieldAccessRepository fieldAccessRepository;
+    private final SysAppFieldAccessService fieldAccessService;
+    private final SysAppRepository sysAppRepository;
+    private final SysAppTableGroupRepository tableGroupRepository;
 
     @Autowired
-    public SysAppTableAccessServiceImpl(SysAppTableAccessRepository tableAccessRepository, JPAQueryFactory jpaQueryFactory, SysAppFieldAccessRepository fieldAccessRepository) {
+    public SysAppTableAccessServiceImpl(SysAppTableAccessRepository tableAccessRepository, JPAQueryFactory jpaQueryFactory, SysAppFieldAccessRepository fieldAccessRepository, SysAppFieldAccessService fieldAccessService, SysAppRepository sysAppRepository, SysAppTableGroupRepository tableGroupRepository) {
         this.tableAccessRepository = tableAccessRepository;
         this.jpaQueryFactory = jpaQueryFactory;
         this.fieldAccessRepository = fieldAccessRepository;
+        this.fieldAccessService = fieldAccessService;
+        this.sysAppRepository = sysAppRepository;
+        this.tableGroupRepository = tableGroupRepository;
     }
 
     /**
@@ -72,6 +84,9 @@ public class SysAppTableAccessServiceImpl implements SysAppTableAccessService {
 
         BooleanBuilder builder = new BooleanBuilder();
         builder.and(qTableAccess.roleId.eq(searchModel.getRoleId()));
+        if (StringUtils.isNotEmpty(searchModel.getSysAppTableGroupId())) {
+            builder.and(qTableAccess.sysAppTableGroupId.eq(searchModel.getSysAppTableGroupId()));
+        }
         if (StringUtils.isNotEmpty(searchModel.getName())) {
             BooleanBuilder subBuilder = new BooleanBuilder();
             subBuilder.and(qTableSet.name.contains(searchModel.getName()));
@@ -101,16 +116,27 @@ public class SysAppTableAccessServiceImpl implements SysAppTableAccessService {
     @Transactional
     @Override
     public void addTableAccess(SysAppTableAccessAddModel addModel) {
-        List<SysAppRoleTableAccess> tableAccesses = new ArrayList<>();
+        QSysAppTableFieldGroup qFieldGroup = QSysAppTableFieldGroup.sysAppTableFieldGroup;
+        QSysAppTableFieldSet qFieldSet = QSysAppTableFieldSet.sysAppTableFieldSet;
 
         for (String tableSetId : addModel.getSysAppTableSetIds()) {
             SysAppRoleTableAccess tableAccess = SysAppTableAccessMapper.INSTANCE.addModelToTableAccess(addModel);
             tableAccess.setId(IdUtil.uuid());
             tableAccess.setSysAppTableSetId(tableSetId);
-            tableAccesses.add(tableAccess);
-        }
+            tableAccessRepository.save(tableAccess);
 
-        tableAccessRepository.saveAll(tableAccesses);
+            //默认添加对表所有字段的读写权限
+            List<String> fieldSetIds = jpaQueryFactory.select(qFieldSet.id).from(qFieldGroup)
+                    .innerJoin(qFieldSet).on(qFieldGroup.id.eq(qFieldSet.sysAppTableFieldGroupId))
+                    .where(qFieldGroup.sysAppTableSetId.eq(tableSetId)).fetch();
+
+            SysAppFieldAccessAddModel fieldAddModel = new SysAppFieldAccessAddModel();
+            fieldAddModel.setSysAppRoleTableAccessId(tableAccess.getId());
+            fieldAddModel.setSysAppTableFieldSetIds(fieldSetIds);
+            fieldAddModel.setCanRead(true);
+            fieldAddModel.setCanWrite(true);
+            fieldAccessService.addFieldAccess(fieldAddModel);
+        }
     }
 
     /**
@@ -186,6 +212,27 @@ public class SysAppTableAccessServiceImpl implements SysAppTableAccessService {
                 });
 
         return result;
+    }
+
+    @Override
+    public List<SysAppTreeModel> getTree() {
+        return sysAppRepository.findAll().stream().map(sysApp -> {
+            SysAppTreeModel model = new SysAppTreeModel();
+            model.setId(sysApp.getId());
+            model.setName(sysApp.getName());
+            model.setSysAppTableGroups(tableGroupRepository.findBySysAppIdOrderBySort(sysApp.getId()).stream()
+                    .map(tableGroup -> {
+                        SysAppTableGroupModel tgModel = new SysAppTableGroupModel();
+                        tgModel.setId(tableGroup.getId());
+                        tgModel.setName(tableGroup.getName());
+                        tgModel.setSort(tableGroup.getSort());
+                        tgModel.setSysAppId(sysApp.getId());
+
+                        return tgModel;
+                    }).collect(Collectors.toList()));
+
+            return model;
+        }).collect(Collectors.toList());
     }
 
 }

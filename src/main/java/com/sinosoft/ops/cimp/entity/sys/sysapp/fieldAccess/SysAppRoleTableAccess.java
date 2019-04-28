@@ -33,6 +33,11 @@ public class SysAppRoleTableAccess implements Serializable {
     @Column(name = "SYS_APP_ID", length = 36)
     private String sysAppId;
     /**
+     * 系统应用分组ID
+     */
+    @Column(name = "SYS_APP_TABLE_GROUP_ID", length = 36)
+    private String sysAppTableGroupId;
+    /**
      * 系统应用表ID
      */
     @Column(name = "SYS_APP_TABLE_SET_ID", length = 36)
@@ -148,5 +153,13 @@ public class SysAppRoleTableAccess implements Serializable {
 
     public void setModifyTime(Date modifyTime) {
         this.modifyTime = modifyTime;
+    }
+
+    public String getSysAppTableGroupId() {
+        return sysAppTableGroupId;
+    }
+
+    public void setSysAppTableGroupId(String sysAppTableGroupId) {
+        this.sysAppTableGroupId = sysAppTableGroupId;
     }
 }

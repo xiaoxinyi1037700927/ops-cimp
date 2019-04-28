@@ -16,6 +16,11 @@ public class SysAppTableAccessSearchModel extends RePagination {
     @NotNull(message = "角色ID不能为空")
     private String roleId;
     /**
+     * 系统应用分组ID
+     */
+    @ApiModelProperty(value = "系统应用分组ID")
+    private String sysAppTableGroupId;
+    /**
      * 表名
      */
     @ApiModelProperty(value = "表名", required = true)
@@ -35,5 +40,13 @@ public class SysAppTableAccessSearchModel extends RePagination {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getSysAppTableGroupId() {
+        return sysAppTableGroupId;
+    }
+
+    public void setSysAppTableGroupId(String sysAppTableGroupId) {
+        this.sysAppTableGroupId = sysAppTableGroupId;
     }
 }

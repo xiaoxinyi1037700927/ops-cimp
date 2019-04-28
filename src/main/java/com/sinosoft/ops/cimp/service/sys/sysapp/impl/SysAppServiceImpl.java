@@ -4,7 +4,6 @@ import com.querydsl.core.BooleanBuilder;
 import com.sinosoft.ops.cimp.dto.PaginationViewModel;
 import com.sinosoft.ops.cimp.entity.sys.sysapp.QSysApp;
 import com.sinosoft.ops.cimp.entity.sys.sysapp.SysApp;
-import com.sinosoft.ops.cimp.entity.sys.sysapp.fieldAccess.SysAppRoleTableAccess;
 import com.sinosoft.ops.cimp.mapper.sys.sysapp.SysAppMapper;
 import com.sinosoft.ops.cimp.repository.sys.sysapp.SysAppRepository;
 import com.sinosoft.ops.cimp.repository.sys.sysapp.access.SysAppTableAccessRepository;
@@ -18,15 +17,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 /**
@@ -61,12 +57,6 @@ public class SysAppServiceImpl implements SysAppService {
         }
         if (StringUtils.isNotEmpty(searchModel.getName())) {
             builder = builder.and(qSysApp.name.contains(searchModel.getName()));
-        }
-        if (StringUtils.isNotEmpty(searchModel.getRoleId())) {
-            List<SysAppRoleTableAccess> tableAccesses = tableAccessRepository.findByRoleId(searchModel.getRoleId());
-            if (tableAccesses.size() > 0) {
-                builder = builder.and(qSysApp.id.eq(tableAccesses.get(0).getSysAppId()));
-            }
         }
 
         List<SysAppModel> sysAppModels = null;

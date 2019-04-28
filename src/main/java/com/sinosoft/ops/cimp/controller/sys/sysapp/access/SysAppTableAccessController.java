@@ -6,7 +6,6 @@ import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.service.sys.sysapp.acess.SysAppTableAccessService;
 import com.sinosoft.ops.cimp.vo.from.sys.sysapp.access.SysAppTableAccessAddModel;
 import com.sinosoft.ops.cimp.vo.from.sys.sysapp.access.SysAppTableAccessDeleteModel;
-import com.sinosoft.ops.cimp.vo.from.sys.sysapp.access.SysAppTableAccessModifyModel;
 import com.sinosoft.ops.cimp.vo.from.sys.sysapp.access.SysAppTableAccessSearchModel;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -59,13 +58,22 @@ public class SysAppTableAccessController extends BaseController {
         return ok("删除成功！");
     }
 
+//    /**
+//     * 修改对表的访问权限
+//     */
+//    @ApiOperation(value = "修改对表的访问权限")
+//    @PostMapping("/modify")
+//    public ResponseEntity modifyTableAccess(@RequestBody SysAppTableAccessModifyModel modifyModel) throws BusinessException {
+//        return tableAccessService.modifyTableAccess(modifyModel) ? ok("修改成功！") : fail("修改失败！");
+//    }
+
     /**
-     * 修改对表的访问权限
+     * 系统表分组树
      */
-    @ApiOperation(value = "修改对表的访问权限")
-    @PostMapping("/modify")
-    public ResponseEntity modifyTableAccess(@RequestBody SysAppTableAccessModifyModel modifyModel) throws BusinessException {
-        return tableAccessService.modifyTableAccess(modifyModel) ? ok("修改成功！") : fail("修改失败！");
+    @ApiOperation(value = "系统表分组树")
+    @PostMapping("/tree")
+    public ResponseEntity getTree() throws BusinessException {
+        return ok(tableAccessService.getTree());
     }
 
 }
