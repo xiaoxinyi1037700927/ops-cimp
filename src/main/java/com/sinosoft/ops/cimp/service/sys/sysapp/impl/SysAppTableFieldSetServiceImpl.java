@@ -63,6 +63,7 @@ public class SysAppTableFieldSetServiceImpl implements SysAppTableFieldSetServic
     public PaginationViewModel<SysAppTableFieldSetModel> listFieldSet(SysAppTableFieldSetSearchModel searchModel) {
         QSysAppTableFieldSet qFieldSet = QSysAppTableFieldSet.sysAppTableFieldSet;
         QSysTableField qSysTableField = QSysTableField.sysTableField;
+        QSysAppTableFieldGroup qFieldGroup = QSysAppTableFieldGroup.sysAppTableFieldGroup;
 
         int pageSize = searchModel.getPageSize();
         int pageIndex = searchModel.getPageIndex();
@@ -83,7 +84,12 @@ public class SysAppTableFieldSetServiceImpl implements SysAppTableFieldSetServic
         )).from(qFieldSet).innerJoin(qSysTableField).on(qFieldSet.sysTableFieldId.eq(qSysTableField.id));
 
         BooleanBuilder builder = new BooleanBuilder();
-        builder = builder.and(qFieldSet.sysAppTableFieldGroupId.eq(searchModel.getSysAppTableFieldGroupId()));
+        if (StringUtils.isNotEmpty(searchModel.getSysAppTableFieldGroupId())) {
+            builder.and(qFieldSet.sysAppTableFieldGroupId.eq(searchModel.getSysAppTableFieldGroupId()));
+        }
+        if (StringUtils.isNotEmpty(searchModel.getSysAppTableSetId())) {
+            builder.and(qFieldSet.sysAppTableFieldGroupId.in(JPAExpressions.select(qFieldGroup.id).from(qFieldGroup).where(qFieldGroup.sysAppTableSetId.eq(searchModel.getSysAppTableSetId()))));
+        }
         if (StringUtils.isNotEmpty(searchModel.getName())) {
             BooleanBuilder subBuilder = new BooleanBuilder();
             subBuilder.and(qFieldSet.name.contains(searchModel.getName()));

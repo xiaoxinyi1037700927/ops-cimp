@@ -12,6 +12,11 @@ public class SysAppTableFieldSetSearchModel extends RePagination {
     @ApiModelProperty(value = "字段分组ID")
     private String sysAppTableFieldGroupId;
     /**
+     * 表集合ID
+     */
+    @ApiModelProperty(value = "表集合ID")
+    private String sysAppTableSetId;
+    /**
      * 字段名称
      */
     @ApiModelProperty(value = "字段名称")
@@ -70,5 +75,13 @@ public class SysAppTableFieldSetSearchModel extends RePagination {
 
     public void setSysAppRoleTableAccessId(String sysAppRoleTableAccessId) {
         this.sysAppRoleTableAccessId = sysAppRoleTableAccessId;
+    }
+
+    public String getSysAppTableSetId() {
+        return sysAppTableSetId;
+    }
+
+    public void setSysAppTableSetId(String sysAppTableSetId) {
+        this.sysAppTableSetId = sysAppTableSetId;
     }
 }
