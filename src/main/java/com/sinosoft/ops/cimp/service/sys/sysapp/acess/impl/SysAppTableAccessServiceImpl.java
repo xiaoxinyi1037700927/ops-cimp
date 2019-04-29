@@ -121,9 +121,8 @@ public class SysAppTableAccessServiceImpl implements SysAppTableAccessService {
 
         for (String tableSetId : addModel.getSysAppTableSetIds()) {
             SysAppRoleTableAccess tableAccess = SysAppTableAccessMapper.INSTANCE.addModelToTableAccess(addModel);
-            tableAccess.setId(IdUtil.uuid());
             tableAccess.setSysAppTableSetId(tableSetId);
-            tableAccessRepository.save(tableAccess);
+            tableAccessRepository.saveAndFlush(tableAccess);
 
             //默认添加对表所有字段的读写权限
             List<String> fieldSetIds = jpaQueryFactory.select(qFieldSet.id).from(qFieldGroup)
