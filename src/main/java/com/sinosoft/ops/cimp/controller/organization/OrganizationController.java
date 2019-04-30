@@ -1,22 +1,36 @@
 package com.sinosoft.ops.cimp.controller.organization;
 
+import com.google.common.collect.Lists;
 import com.sinosoft.ops.cimp.annotation.OrganizationApiGroup;
 import com.sinosoft.ops.cimp.annotation.RequiresAuthentication;
+import com.sinosoft.ops.cimp.constant.OpsErrorMessage;
+import com.sinosoft.ops.cimp.constant.RolePermissionPageSqlEnum;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.entity.oraganization.Organization;
+import com.sinosoft.ops.cimp.entity.user.User;
+import com.sinosoft.ops.cimp.entity.user.UserRole;
 import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.service.oraganization.OrganizationService;
+import com.sinosoft.ops.cimp.service.user.RolePermissionPageSqlService;
 import com.sinosoft.ops.cimp.util.CachePackage.OrganizationCacheManager;
-import com.sinosoft.ops.cimp.vo.to.organization.OrganizationSearchViewModel;
-import com.sinosoft.ops.cimp.vo.to.organization.OrganizationViewModel;
+import com.sinosoft.ops.cimp.util.JsonUtil;
+import com.sinosoft.ops.cimp.util.SecurityUtils;
+import com.sinosoft.ops.cimp.vo.from.user.rolePermissionPageSql.RPPageSqlSearchModel;
+import com.sinosoft.ops.cimp.vo.to.organization.*;
+import com.sinosoft.ops.cimp.vo.to.user.rolePermissionPageSql.RPPageSqlViewModel;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @OrganizationApiGroup
 @Api(description = "单位接口")
@@ -25,13 +39,21 @@ import java.util.List;
 @SuppressWarnings("unchecked")
 public class OrganizationController extends BaseController {
 
+    private final OrganizationService organizationService;
+    private final RolePermissionPageSqlService rolePermissionPageSqlService;
+    private final JdbcTemplate jdbcTemplate;
+
     @Autowired
-    private OrganizationService organizationService;
+    public OrganizationController(RolePermissionPageSqlService rolePermissionPageSqlService, OrganizationService organizationService, JdbcTemplate jdbcTemplate) {
+        this.rolePermissionPageSqlService = rolePermissionPageSqlService;
+        this.organizationService = organizationService;
+        this.jdbcTemplate = jdbcTemplate;
+    }
 
 
     @ApiOperation(value = "查询机构树")
     @PostMapping("/lstTreeNode")
-//    @RequiresAuthentication
+    @RequiresAuthentication
     public ResponseEntity<OrganizationViewModel> lstTreeNode(@RequestBody OrganizationSearchViewModel searchViewModel) throws BusinessException {
         OrganizationViewModel viewModel = organizationService.lstTreeNode(searchViewModel);
         return ok(viewModel);
@@ -75,13 +97,80 @@ public class OrganizationController extends BaseController {
     @ApiOperation(value = "查询单位列表")
     @GetMapping(value = "/list")
     @RequiresAuthentication
-    public ResponseEntity listCadre(
+    public ResponseEntity listDep(
             @RequestParam("deptId") String deptId,
             @RequestParam("includeSubNode") String includeSubNode,
             @RequestParam("pageIndex") String pageIndex,
             @RequestParam("pageSize") String pageSize) throws BusinessException {
+        if (StringUtils.isEmpty(pageIndex) || StringUtils.equals(pageIndex, "0")) {
+            pageIndex = "1";
+        }
+        if (StringUtils.isEmpty(pageSize)) {
+            pageSize = "10";
+        }
+        String startIndex = String.valueOf((Integer.parseInt(pageIndex) - 1) * Integer.parseInt(pageSize));
+        String endIndex = String.valueOf(Integer.parseInt(pageIndex) * Integer.parseInt(pageSize));
 
-        return null;
+        User currentUser = SecurityUtils.getSubject().getCurrentUser();
+        if (currentUser == null) {
+            throw new BusinessException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE, "请登陆之后访问接口");
+        }
+        List<UserRole> currentUserRole = SecurityUtils.getSubject().getCurrentUserRole();
+        List<String> roleIds = currentUserRole.stream().map(UserRole::getRoleId).collect(Collectors.toList());
+
+        RPPageSqlSearchModel rpPageSqlSearchModel = new RPPageSqlSearchModel();
+        rpPageSqlSearchModel.setRoleIds(roleIds);
+
+        List<RPPageSqlViewModel> pageSqlByRoleList = rolePermissionPageSqlService.findRPPageSqlListByRoleIds(rpPageSqlSearchModel);
+        Optional<RPPageSqlViewModel> sqlViewModel = pageSqlByRoleList.stream().filter(s -> StringUtils.equals(s.getSqlNameEn(), RolePermissionPageSqlEnum.NAME_EN.单位集合.value)).filter(s -> StringUtils.equals(s.getIncludeSubNode(), includeSubNode)).findFirst();
+        if (sqlViewModel.isPresent()) {
+            RPPageSqlViewModel rpPageSqlViewModel = sqlViewModel.get();
+            String execListSql = rpPageSqlViewModel.getExecListSql();
+            String execCountSql = rpPageSqlViewModel.getExecCountSql();
+            String selectCountFieldEn = rpPageSqlViewModel.getSelectCountFieldEn();
+            String selectListFieldsEn = rpPageSqlViewModel.getSelectListFieldsEn();
+
+            String execDepListSql = execListSql.replaceAll("\\$\\{deptId\\}", deptId)
+                    .replaceAll("\\$\\{startIndex\\}", startIndex)
+                    .replaceAll("\\$\\{endIndex\\}", endIndex);
+
+            String execDepCountSql = execCountSql.replaceAll("\\$\\{deptId\\}", deptId);
+
+            List<Map<String, Object>> mapList = jdbcTemplate.queryForList(execDepListSql);
+            Map<String, Object> countMap = jdbcTemplate.queryForMap(execDepCountSql);
+
+            DepDataVO depDataVO = new DepDataVO();
+            depDataVO.setPageIndex(Integer.parseInt(pageIndex));
+            depDataVO.setPageSize(Integer.parseInt(pageSize));
+            Object depCount = countMap.get(selectCountFieldEn);
+            if (depCount == null) {
+                depDataVO.setDataCount(0L);
+            } else {
+                depDataVO.setDataCount(Long.parseLong(String.valueOf(depCount)));
+            }
+
+            List<DepVO> depVOS = Lists.newArrayList();
+            Map selectFields = JsonUtil.parseStringToObject(selectListFieldsEn, LinkedHashMap.class);
+
+            for (Map<String, Object> map : mapList) {
+                DepVO depVO = new DepVO();
+                List<DepFieldVO> fieldVOS = Lists.newArrayList();
+                selectFields.forEach((k, v) -> {
+                    DepFieldVO fieldVO = new DepFieldVO();
+                    Object o = map.get(k);
+                    fieldVO.setFieldNameEn(k);
+                    fieldVO.setFieldNameCn(v);
+                    fieldVO.setFieldValue(o);
+                    fieldVOS.add(fieldVO);
+                });
+                depVO.setFields(fieldVOS);
+                depVOS.add(depVO);
+            }
+            depDataVO.setDeps(depVOS);
+            return ok(depDataVO);
+        } else {
+            throw new BusinessException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE, "请检查角色配置的权限");
+        }
     }
 
 }
