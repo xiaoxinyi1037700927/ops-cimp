@@ -4,6 +4,8 @@ import com.sinosoft.ops.cimp.entity.sys.check.QSysCheckItem;
 import com.sinosoft.ops.cimp.entity.sys.check.SysCheckItem;
 import com.sinosoft.ops.cimp.repository.sys.check.SysCheckConditionRepository;
 import com.sinosoft.ops.cimp.repository.sys.check.SysCheckItemRepository;
+import com.sinosoft.ops.cimp.schedule.beans.SysCheckResultTables;
+import com.sinosoft.ops.cimp.schedule.tasks.DataStatisticsTask;
 import com.sinosoft.ops.cimp.service.sys.check.SysCheckService;
 import com.sinosoft.ops.cimp.util.SecurityUtils;
 import com.sinosoft.ops.cimp.vo.from.sys.check.SysCheckQueryDataModel;
@@ -66,8 +68,8 @@ public class SysCheckServiceImpl implements SysCheckService {
             depCodeSqlWhere += "pptr in (select B001001_A from dep_b001 where dep_id ='" + queryModel.getOrgId() + "') ";
         } else {
             //当前用户的数据权限
-//            String dataOrgId = SecurityUtils.getSubject().getCurrentUser().getDataOrganizationId();
-            String dataOrgId = "DC5C7986DAEF50C1E02AB09B442EE34F";
+            String dataOrgId = SecurityUtils.getSubject().getCurrentUser().getDataOrganizationId();
+//            String dataOrgId = "DC5C7986DAEF50C1E02AB09B442EE34F";
             depCodeSqlWhere += "DEP_ID ='" + dataOrgId + "'";
         }
 
@@ -102,13 +104,23 @@ public class SysCheckServiceImpl implements SysCheckService {
     }
 
     private String getQuerySqlAB(String depCodeSqlWhere, String checkConditionId, String type) {
+        //获取结果集的表名
+        String id = jdbcTemplate.queryForMap("SELECT RESULT_TABLES FROM SYS_CHECK_RESULT_TABLES WHERE ROWNUM = 1").get("RESULT_TABLES").toString();
+        SysCheckResultTables resultTables = SysCheckResultTables.getAnotherTables(id);
+        if (resultTables == null) {
+            return "";
+        }
 
-        StringBuilder sql = new StringBuilder("");
+        StringBuilder sql = new StringBuilder();
         sql.append("select r.total total, nvl(rt.num, 0) num, db.dep_id id, db.B01001 name, ");
         sql.append(" nvl((select count(1) countNum from dep_b001 where pptr = r.tree_level_code),0) childNum ");
-        sql.append(" from SYS_CHECK_RESULTS r ");
+        sql.append(" from ");
+        sql.append(resultTables.getResultsName());
+        sql.append(" r ");
         sql.append(" inner join dep_b001 db on db.B001001_A = r.tree_level_code ");
-        sql.append(" left join SYS_CHECK_RESULTTEMP rt ");
+        sql.append(" left join ");
+        sql.append(resultTables.getResultsTempName());
+        sql.append(" rt ");
         sql.append("  on r.tree_level_code = rt.tree_level_code and rt.type='");
         sql.append(type);
         sql.append("' and rt.CHECK_CONDITION_ID = '");

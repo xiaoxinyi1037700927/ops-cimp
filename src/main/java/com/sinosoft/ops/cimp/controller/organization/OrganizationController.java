@@ -31,7 +31,7 @@ public class OrganizationController extends BaseController {
 
     @ApiOperation(value = "查询机构树")
     @PostMapping("/lstTreeNode")
-    @RequiresAuthentication
+//    @RequiresAuthentication
     public ResponseEntity<OrganizationViewModel> lstTreeNode(@RequestBody OrganizationSearchViewModel searchViewModel) throws BusinessException {
         OrganizationViewModel viewModel = organizationService.lstTreeNode(searchViewModel);
         return ok(viewModel);
@@ -70,6 +70,18 @@ public class OrganizationController extends BaseController {
         }
         List<OrganizationViewModel> organizationByName = organizationService.findOrganizationByName(name, permission);
         return ok(organizationByName);
+    }
+
+    @ApiOperation(value = "查询单位列表")
+    @GetMapping(value = "/list")
+    @RequiresAuthentication
+    public ResponseEntity listCadre(
+            @RequestParam("deptId") String deptId,
+            @RequestParam("includeSubNode") String includeSubNode,
+            @RequestParam("pageIndex") String pageIndex,
+            @RequestParam("pageSize") String pageSize) throws BusinessException {
+
+        return null;
     }
 
 }
