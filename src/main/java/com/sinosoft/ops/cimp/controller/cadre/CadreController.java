@@ -24,20 +24,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URLEncoder;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @BusinessApiGroup
@@ -136,6 +130,21 @@ public class CadreController extends BaseController {
         }
     }
 
+    @ApiOperation(value = "查询干部列表")
+    @PostMapping(value = "/search")
+    @RequiresAuthentication
+    public ResponseEntity searchCadre(
+            @RequestParam("cadreTagIds") String cadreTagIds,
+            @RequestParam("tableConditions") String tableConditions
+    ) throws BusinessException {
+        List<String> cadreTagIdList = Lists.newArrayList();
+        if (StringUtils.isNotEmpty(cadreTagIds)) {
+            cadreTagIdList = Arrays.asList(cadreTagIds.split(","));
+        }
+        HashMap<String, Object> searchMap = JsonUtil.parseStringToObject(tableConditions, HashMap.class);
+        System.out.println(searchMap);
+        return ok("111");
+    }
 
     @ApiOperation(value = "查询干部基本信息")
     @GetMapping(value = "/basicInfo")

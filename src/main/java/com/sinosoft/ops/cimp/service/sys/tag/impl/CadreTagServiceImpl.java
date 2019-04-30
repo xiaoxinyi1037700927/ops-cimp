@@ -76,7 +76,7 @@ public class CadreTagServiceImpl implements CadreTagService {
                     cadreTagList.add(cadreTag);
                 }
                 cadreTagRepository.saveAll(cadreTagList);
-
+                cadreTagRepository.flush();
             }
         }
         if (batchNumber * FETCH_BATCH_COUNT < tagCountNumber) {
@@ -99,7 +99,7 @@ public class CadreTagServiceImpl implements CadreTagService {
                 cadreTagList.add(cadreTag);
             }
             cadreTagRepository.saveAll(cadreTagList);
-
+            cadreTagRepository.flush();
         }
         return tagCountNumber;
     }
@@ -113,7 +113,7 @@ public class CadreTagServiceImpl implements CadreTagService {
                 completionService.submit(() -> markingTag(sysTag), 0L);
             }
             int finishJobCount = 0;
-            while (finishJobCount < jobCount) { // 等待三个任务完成
+            while (finishJobCount < jobCount) { // 判断提交线程数和完成线程数是否相等
                 if (completionService.poll() != null) {
                     finishJobCount++;
                 }

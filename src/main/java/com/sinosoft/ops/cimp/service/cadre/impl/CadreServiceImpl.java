@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -57,5 +59,11 @@ public class CadreServiceImpl implements CadreService {
         } else {
             return null;
         }
+    }
+
+    @Override
+    public Map<String, Object> searchCadres(List<String> cadreTagIds, HashMap<String, Object> tableConditions) {
+
+        return null;
     }
 }
