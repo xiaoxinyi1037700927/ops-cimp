@@ -34,7 +34,7 @@ public class DataStatisticsTask implements Task {
     }
 
     @Override
-    public void exec() {
+    public boolean exec() {
         long beginTime = System.currentTimeMillis();
         logger.info("DataStatisticsTask begin...");
         try {
@@ -55,9 +55,11 @@ public class DataStatisticsTask implements Task {
 
             long endTime = System.currentTimeMillis();
             logger.info("DataStatisticsTask end. totalTime = " + (endTime - beginTime) + "ms");
+            return true;
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
+        return false;
     }
 
     /**

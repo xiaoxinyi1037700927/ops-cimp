@@ -5,9 +5,9 @@ package com.sinosoft.ops.cimp.schedule;
  */
 public interface Task {
 
-    void exec();
+    boolean exec();
 
-    default int getOrder(){
+    default int getOrder() {
         return 0;
     }
 }

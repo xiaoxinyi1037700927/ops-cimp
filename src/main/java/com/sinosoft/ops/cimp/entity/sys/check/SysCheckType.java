@@ -9,8 +9,8 @@ import java.util.Date;
  * 查错条件
  */
 @Entity
-@Table(name = "SYS_CHECK_CONDITION")
-public class SysCheckCondition implements java.io.Serializable {
+@Table(name = "SYS_CHECK_TYPE")
+public class SysCheckType implements java.io.Serializable {
     private static final long serialVersionUID = -4349472866278743093L;
 
     /**
@@ -22,25 +22,10 @@ public class SysCheckCondition implements java.io.Serializable {
     @Column(name = "ID", length = 36)
     private String id;
     /**
-     * 查错条件名称
+     * 查错类型名称
      */
     @Column(name = "NAME", length = 120)
     private String name;
-    /**
-     * 查错条件类型
-     */
-    @Column(name = "TYPE_ID", length = 36)
-    private String typeId;
-    /**
-     * 查询条件部分
-     */
-    @Column(name = "WHERE_PART", length = 4000)
-    private String wherePart;
-    /**
-     * 排序
-     */
-    @Column(name = "SORT", length = 10)
-    private Integer sort;
     /**
      * 创建人
      */
@@ -80,14 +65,6 @@ public class SysCheckCondition implements java.io.Serializable {
         this.name = name;
     }
 
-    public Integer getSort() {
-        return sort;
-    }
-
-    public void setSort(Integer sort) {
-        this.sort = sort;
-    }
-
     public String getCreateId() {
         return createId;
     }
@@ -118,21 +95,5 @@ public class SysCheckCondition implements java.io.Serializable {
 
     public void setModifyTime(Date modifyTime) {
         this.modifyTime = modifyTime;
-    }
-
-    public String getTypeId() {
-        return typeId;
-    }
-
-    public void setTypeId(String typeId) {
-        this.typeId = typeId;
-    }
-
-    public String getWherePart() {
-        return wherePart;
-    }
-
-    public void setWherePart(String wherePart) {
-        this.wherePart = wherePart;
     }
 }

@@ -1,26 +1,39 @@
 package com.sinosoft.ops.cimp.service.sys.check.impl;
 
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.sinosoft.ops.cimp.dto.PaginationViewModel;
+import com.sinosoft.ops.cimp.entity.sys.check.QSysCheckCondition;
 import com.sinosoft.ops.cimp.entity.sys.check.QSysCheckItem;
+import com.sinosoft.ops.cimp.entity.sys.check.SysCheckCondition;
 import com.sinosoft.ops.cimp.entity.sys.check.SysCheckItem;
+import com.sinosoft.ops.cimp.mapper.sys.check.SysCheckConditionMapper;
 import com.sinosoft.ops.cimp.repository.sys.check.SysCheckConditionRepository;
 import com.sinosoft.ops.cimp.repository.sys.check.SysCheckItemRepository;
+import com.sinosoft.ops.cimp.repository.sys.check.SysCheckTypeRepository;
 import com.sinosoft.ops.cimp.schedule.beans.SysCheckResultTables;
-import com.sinosoft.ops.cimp.schedule.tasks.DataStatisticsTask;
 import com.sinosoft.ops.cimp.service.sys.check.SysCheckService;
 import com.sinosoft.ops.cimp.util.SecurityUtils;
+import com.sinosoft.ops.cimp.vo.from.sys.check.SysCheckConditionAddModel;
+import com.sinosoft.ops.cimp.vo.from.sys.check.SysCheckConditionModifyModel;
+import com.sinosoft.ops.cimp.vo.from.sys.check.SysCheckConditionSearchModel;
 import com.sinosoft.ops.cimp.vo.from.sys.check.SysCheckQueryDataModel;
 import com.sinosoft.ops.cimp.vo.to.sys.check.SysCheckConditionModel;
 import com.sinosoft.ops.cimp.vo.to.sys.check.SysCheckStatisticsData;
 import com.sinosoft.ops.cimp.vo.to.sys.check.SysCheckStatisticsDataItem;
+import com.sinosoft.ops.cimp.vo.to.sys.check.SysCheckTypeModel;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 public class SysCheckServiceImpl implements SysCheckService {
@@ -28,28 +41,117 @@ public class SysCheckServiceImpl implements SysCheckService {
     private final SysCheckConditionRepository sysCheckConditionRepository;
 
     private final SysCheckItemRepository sysCheckItemRepository;
+    private final SysCheckTypeRepository sysCheckTypeRepository;
     private final JdbcTemplate jdbcTemplate;
+    private final JPAQueryFactory jpaQueryFactory;
 
     @Autowired
-    public SysCheckServiceImpl(SysCheckConditionRepository sysCheckConditionRepository, SysCheckItemRepository sysCheckItemRepository, JdbcTemplate jdbcTemplate) {
+    public SysCheckServiceImpl(SysCheckConditionRepository sysCheckConditionRepository, SysCheckItemRepository sysCheckItemRepository, SysCheckTypeRepository sysCheckTypeRepository, JdbcTemplate jdbcTemplate, JPAQueryFactory jpaQueryFactory) {
         this.sysCheckConditionRepository = sysCheckConditionRepository;
         this.sysCheckItemRepository = sysCheckItemRepository;
+        this.sysCheckTypeRepository = sysCheckTypeRepository;
         this.jdbcTemplate = jdbcTemplate;
+        this.jpaQueryFactory = jpaQueryFactory;
+    }
+
+    /**
+     * 系统查错类型
+     */
+    @Override
+    public List<SysCheckTypeModel> listSysCheckType() {
+        return sysCheckTypeRepository.findAll().stream().map(type -> {
+            SysCheckTypeModel model = new SysCheckTypeModel();
+            model.setId(type.getId());
+            model.setName(type.getName());
+            return model;
+        }).collect(Collectors.toList());
     }
 
     /**
      * 系统查错条件列表
      */
     @Override
-    public List<SysCheckConditionModel> listSysCheckCondition() {
-        return sysCheckConditionRepository.findAll(new Sort(Sort.Direction.ASC, "sort"))
-                .stream().map(condition -> {
-                    SysCheckConditionModel model = new SysCheckConditionModel();
-                    model.setId(condition.getId());
-                    model.setName(condition.getName());
+    public PaginationViewModel<SysCheckConditionModel> listSysCheckCondition(SysCheckConditionSearchModel searchModel) {
+        int pageSize = searchModel.getPageSize();
+        int pageIndex = searchModel.getPageIndex();
+        //是否分页
+        boolean isPaging = pageSize > 0 && pageIndex > 0;
 
-                    return model;
-                }).collect(Collectors.toList());
+        QSysCheckCondition qCondition = QSysCheckCondition.sysCheckCondition;
+        BooleanBuilder builder = new BooleanBuilder();
+        if (StringUtils.isNotEmpty(searchModel.getTypeId())) {
+            builder.and(qCondition.typeId.eq(searchModel.getTypeId()));
+        }
+        if (StringUtils.isNotEmpty(searchModel.getName())) {
+            builder.and(qCondition.name.contains(searchModel.getName()));
+        }
+
+        List<SysCheckConditionModel> models = null;
+        long total = 0;
+        if (isPaging) {
+            PageRequest pageRequest = PageRequest.of(pageIndex - 1, pageSize);
+            Page<SysCheckCondition> page = sysCheckConditionRepository.findAll(builder, pageRequest);
+            models = page.getContent().stream().map(SysCheckConditionMapper.INSTANCE::sysCheckConditionToModel).collect(Collectors.toList());
+            total = page.getTotalElements();
+        } else {
+            Iterable<SysCheckCondition> iterable = sysCheckConditionRepository.findAll(builder);
+            models = StreamSupport.stream(iterable.spliterator(), false).map(SysCheckConditionMapper.INSTANCE::sysCheckConditionToModel).collect(Collectors.toList());
+            total = models.size();
+        }
+
+        return new PaginationViewModel
+                .Builder<SysCheckConditionModel>()
+                .pageIndex(pageIndex)
+                .pageSize(pageSize)
+                .totalCount(total)
+                .data(models)
+                .build();
+    }
+
+    /**
+     * 添加查错条件
+     */
+    @Override
+    public void addSysCheckCondition(SysCheckConditionAddModel addModel) {
+        SysCheckCondition condition = SysCheckConditionMapper.INSTANCE.addModelToSysCheckCondition(addModel);
+
+        QSysCheckCondition qCondition = QSysCheckCondition.sysCheckCondition;
+        Integer sort = jpaQueryFactory.select(qCondition.sort.max()).from(qCondition).fetchOne();
+        condition.setSort(sort != null ? ++sort : 0);
+
+        sysCheckConditionRepository.save(condition);
+    }
+
+    /**
+     * 修改查错条件
+     */
+    @Override
+    public boolean modifySysCheckCondition(SysCheckConditionModifyModel modifyModel) {
+        Optional<SysCheckCondition> conditionOptional = sysCheckConditionRepository.findById(modifyModel.getId());
+
+        if (!conditionOptional.isPresent()) {
+            return false;
+        }
+
+        SysCheckCondition condition = conditionOptional.get();
+        SysCheckConditionMapper.INSTANCE.modifyModelToSysCheckCondition(modifyModel, condition);
+        sysCheckConditionRepository.save(condition);
+
+        return true;
+    }
+
+    /**
+     * 删除查错条件
+     */
+    @Override
+    public void deleteSysCheckCondition(List<String> ids) {
+        if (ids == null || ids.size() == 0) {
+            return;
+        }
+
+        for (String id : ids) {
+            sysCheckConditionRepository.deleteById(id);
+        }
     }
 
     /**
