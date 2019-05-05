@@ -138,7 +138,7 @@ public class UserRoleServiceImpl implements UserRoleService {
                 .leftJoin(QPermission.permission).on(QPermission.permission.id.eq(QRolePermission.rolePermission.permissionId))
                 .leftJoin(QRoleMenuGroup.roleMenuGroup).on(QRoleMenuGroup.roleMenuGroup.id.eq(QRolePermission.rolePermission.roleMenuGroupId))
                 .where(QRolePermission.rolePermission.roleMenuGroupId.eq(menuGroupId).and(QRolePermission.rolePermission.roleId.in(roleIds)));
-        ArrayList<MenuChildViewModel> menuChildViewModels1 = Lists.newArrayList(where.orderBy(QRoleMenuGroup.roleMenuGroup.sortNumber.asc()).fetch());
+        ArrayList<MenuChildViewModel> menuChildViewModels1 = Lists.newArrayList(where.orderBy(QPermission.permission.sortNumber.asc()).fetch());
 //        if(roleIds.size()>1){
 //            fetch=removeDuplicate(fetch);
 //        }
