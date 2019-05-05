@@ -32,8 +32,8 @@ public class HornorAttrValue implements AttrValue {
             final String onJobInfoSql = "SELECT * FROM EMP_A05 WHERE EMP_ID = '%s' AND A05024 = '1'  and status=0 ";
             String a14TableSql = String.format(hornorInfoSql, empId);
             String a05TableSql = String.format(onJobInfoSql, empId);
-            List hornorInfoList = ExportConstant.exportWordService.findBySQL(a14TableSql);
-            List jobInfoList = ExportConstant.exportWordService.findBySQL(a05TableSql);
+            List hornorInfoList = ExportConstant.exportService.findBySQL(a14TableSql);
+            List jobInfoList = ExportConstant.exportService.findBySQL(a05TableSql);
             if (hornorInfoList == null) {
                 attrValueContext.put("A14", new ArrayList<Map>());
                 hornorInfoList = new ArrayList<Map>();

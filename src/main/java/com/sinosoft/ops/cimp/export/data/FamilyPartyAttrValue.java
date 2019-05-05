@@ -35,7 +35,7 @@ public class FamilyPartyAttrValue implements AttrValue {
             if (StringUtils.isNotEmpty(fmParty)) {
                 familyMap.put("fmParty_" + i, fmParty);
             } else {
-                familyMap.put("fmParty_" + i, CodeTranslateUtil.codeToName("GB/T4762-1984", fmPartyCode, ExportConstant.exportWordService));
+                familyMap.put("fmParty_" + i, CodeTranslateUtil.codeToName("GB/T4762-1984", fmPartyCode, ExportConstant.exportService));
             }
         }
         return familyMap;

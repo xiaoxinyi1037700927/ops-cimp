@@ -1,18 +1,13 @@
-package com.sinosoft.ops.cimp.export.bijie;
+package com.sinosoft.ops.cimp.export.handlers;
 
 import com.aspose.words.Document;
 import com.aspose.words.License;
-import com.aspose.words.PdfSaveOptions;
-import com.sinosoft.ops.cimp.export.AbstractExportHandler;
+import com.sinosoft.ops.cimp.export.common.ExportConstant;
 import com.sinosoft.ops.cimp.export.data.*;
 import com.sinosoft.ops.cimp.export.processor.*;
 import com.sinosoft.ops.cimp.util.StringUtil;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.ResourceLoader;
-import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -25,12 +20,11 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+public abstract class AbstractExportGbrmbBiJie extends AbstractExportWithAsposeWords {
 
-@Component
-public class ExportHandlerBiJie extends AbstractExportHandler {
+    public AbstractExportGbrmbBiJie(String empId) {
+        this.empId = empId;
 
-    @Override
-    protected void init() {
         //放入 属性 - 属性获取处理器
         attrValueMap.put(NameAttrValue.KEY, new NameAttrValue());
         attrValueMap.put(PhotoAttrValue.KEY, new PhotoAttrValue());
@@ -77,21 +71,11 @@ public class ExportHandlerBiJie extends AbstractExportHandler {
     }
 
 
-    public NameAttrValue getNameAttrValue() {
-        return (NameAttrValue) attrValueMap.get(NameAttrValue.KEY);
-    }
-
-
-    /**
-     * 执行属性值样式处理器
-     *
-     * @param templateFilePath 模板文件路径
-     * @param attrValues       属性名和属性值的键值对
-     * @param outputFilePath   文件输出路径
-     */
-    @Override
     @SuppressWarnings("unchecked")
-    public void processAttrValue(String templateFilePath, Map<String, Object> attrValues, String outputFilePath) throws Exception {
+    @Override
+    public void processAttrValue(Map<String, Object> attrValues) throws Exception {
+        String templateFilePath = ExportConstant.EXPORT_BASE_PATH + ExportConstant.TEMPLATE_WORD_GBRMB_BJ;
+
         //根据resume的内容更换模板
         List<Map<String, Object>> resume = (List<Map<String, Object>>) attrValues.get("resume");
 
@@ -201,12 +185,11 @@ public class ExportHandlerBiJie extends AbstractExportHandler {
         document.getMailMerge().deleteFields();
 
         //保存文件
-        if (outputFilePath.endsWith(".pdf")) {
-            document.save(outputFilePath, new PdfSaveOptions());
-        } else {
-            document.save(outputFilePath);
-        }
+        saveFile(document);
     }
+
+    protected abstract void saveFile(Document doc) throws Exception;
+
 
     private int getRightLine(String resumeContent) {
         Pattern compile = Pattern.compile("[：| ；]\\d{4}\\.");
@@ -231,4 +214,8 @@ public class ExportHandlerBiJie extends AbstractExportHandler {
         return -1;
     }
 
+    @Override
+    protected void processFile() throws Exception {
+
+    }
 }

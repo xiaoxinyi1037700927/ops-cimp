@@ -1,4 +1,4 @@
-package com.sinosoft.ops.cimp.service.export.impl;
+package com.sinosoft.ops.cimp.export.handlers.impl;
 
 import com.sinosoft.ops.cimp.common.excel.ExcelType;
 import com.sinosoft.ops.cimp.common.excel.SExcelWriter;
@@ -7,9 +7,7 @@ import com.sinosoft.ops.cimp.export.common.EnumType;
 import com.sinosoft.ops.cimp.export.common.ExportConstant;
 import com.sinosoft.ops.cimp.export.common.SetList;
 import com.sinosoft.ops.cimp.export.data.ResumeOrganHandleNew;
-import com.sinosoft.ops.cimp.service.export.ExportGbhmcService;
-import com.sinosoft.ops.cimp.service.export.ExportService;
-import com.sinosoft.ops.cimp.service.sys.syscode.SysCodeItemService;
+import com.sinosoft.ops.cimp.export.handlers.AbstractExportWithPoi;
 import com.sinosoft.ops.cimp.util.FileUtils;
 import com.sinosoft.ops.cimp.util.ParticularUtils;
 import com.sinosoft.ops.cimp.util.StringUtil;
@@ -24,8 +22,6 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.joda.time.DateTime;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.util.*;
@@ -33,9 +29,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @SuppressWarnings("unchecked")
-@Service
-public class ExportGbhmcServiceImpl implements ExportGbhmcService {
-
+public class ExportGbHmc extends AbstractExportWithPoi {
     private static final String INCLUD_CHILD_PRESON_ORDER = " order by A05002_B_C,A01060_C,length(PPTR_C),DEP_ORDINAL_C,A02025_C,";
     private static final String INCLUD_CHILD_PRESON_FROM = ",a1.A05002_B A05002_B_C,a1.A02025 A02025_C,(case a1.pptrs when null then null else (case when instr(a1.pptrs, ',') >= 1 then substr(a1.pptrs, 1, instr(a1.pptrs, ',') - 1) else a1.pptrs end) end) PPTR_C," +
             "(case a1.dep_ordinals when null then null else (case when instr(a1.dep_ordinals, ',') >= 1 then substr(a1.dep_ordinals, 1, instr(a1.dep_ordinals, ',') - 1) else a1.dep_ordinals end) end) DEP_ORDINAL_C," +
@@ -52,26 +46,42 @@ public class ExportGbhmcServiceImpl implements ExportGbhmcService {
             "where emp_a02.status=0 and emp_a02.A02055='2' and dep_b001.tree_level_code like :code order by A05002_B,length(dep_b001.pptr),dep_b001.ordinal) a2 " +
             "on a2.emp_id=emp_a001.emp_id group by emp_a001.emp_id) a1 on a1.emp_id=t1.emp_id ";
 
-    private final ExportService exportService;
+    private ExportGbhmcModel model;
+    private String filePath;
 
-    private final SysCodeItemService sysCodeItemService;
-
-    @Autowired
-    public ExportGbhmcServiceImpl(ExportService exportService, SysCodeItemService sysCodeItemService) {
-        this.exportService = exportService;
-        this.sysCodeItemService = sysCodeItemService;
+    public ExportGbHmc(ExportGbhmcModel model) {
+        this.model = model;
     }
 
 
     /**
-     * 生成干部花名册
+     * 生成文件
      */
     @Override
-    public String generateGbhmc(ExportGbhmcModel model) {
+    public boolean generate() {
         //获取导出数据
         Map<String, List<Map<Integer, String>>> data = model.getContainDutyDepart() ? dutyMc(model) : getHmcData(model);
+        generateExcel(data, model);
+        return true;
+    }
 
-        return generateExcel(data, model);
+    /**
+     * 获取生成的文件路径
+     */
+    @Override
+    public String getFilePath() {
+        if (filePath == null) {
+            String fileDir = ExportConstant.EXPORT_BASE_PATH + ExportConstant.EXPORT_GBHMC_EXCEL;
+            FileUtils.createDir(fileDir);
+            filePath = fileDir + "花名册_" + System.currentTimeMillis() + ExportConstant.SUFFIX_XLSX;
+        }
+
+        return filePath;
+    }
+
+    @Override
+    public boolean isReuse() {
+        return false;
     }
 
     private Map<String, List<Map<Integer, String>>> dutyMc(ExportGbhmcModel model) {
@@ -96,10 +106,10 @@ public class ExportGbhmcServiceImpl implements ExportGbhmcService {
         Map<String, List<Map<Integer, String>>> stringListMap = new LinkedHashMap<>();
         if (StringUtils.isNotEmpty(model.getOrgId())) {
             //性别
-            List<SysCodeItem> codeItemsGender = sysCodeItemService.findByCodeSetName("GB/T2261.1-2003");
+            List<SysCodeItem> codeItemsGender = ExportConstant.sysCodeItemService.findByCodeSetName("GB/T2261.1-2003");
 
             //民族
-            List<SysCodeItem> codeItemsNationality = sysCodeItemService.findByCodeSetName("GB/T3304-1991");
+            List<SysCodeItem> codeItemsNationality = ExportConstant.sysCodeItemService.findByCodeSetName("GB/T3304-1991");
 
             Map<String, List> empIdStrMap = model.getContainDutyDepart() ? getDutyEmpIdsByTreeId(model) : getEmpIds(model);
             List<String[]> organEmpList = new ArrayList<>();
@@ -426,7 +436,7 @@ public class ExportGbhmcServiceImpl implements ExportGbhmcService {
         strQuery = strQuery.substring(0, posFrom) + INCLUD_CHILD_PRESON_FROM.replace(":code", "'001%'") + strQuery.substring(posFrom + srcFrom.length());
         strQuery += INCLUD_CHILD_PRESON_ORDER + "t1.ordinal";
 
-        List<Map<String, Object>> res = exportService.findBySQL(strQuery);
+        List<Map<String, Object>> res = ExportConstant.exportService.findBySQL(strQuery);
 
         //按机构名称分组，采用Map<String,List<Object></>></> 存储，key 为机构，value 为 机构对应的每条记录
         Map<String, List> listMap = new LinkedHashMap<>();
@@ -484,7 +494,7 @@ public class ExportGbhmcServiceImpl implements ExportGbhmcService {
         if (model.getContainChild()) {
             String code = "";
             String sql = "select TREE_LEVEL_CODE from DEP_B001 where dep_id='" + model.getOrgId() + "'";
-            List<Map<String, Object>> codeList = exportService.findBySQL(sql);
+            List<Map<String, Object>> codeList = ExportConstant.exportService.findBySQL(sql);
             if (codeList != null && codeList.size() > 0) {
                 code = (String) codeList.get(0).get("TREE_LEVEL_CODE");
             }
@@ -499,7 +509,7 @@ public class ExportGbhmcServiceImpl implements ExportGbhmcService {
                 "and t1.emp_id in (select t2.emp_id from EMP_A001 t2 left join DEP_B001 b02 on t2.a001004_a= b02.dep_id where t2.status=0 " + codeCondition1 +
                 " union all select a02.emp_id from EMP_A02 a02 left join DEP_B001 b03 on a02.A02001_B=b03.dep_id where a02.status=0 and a02.A02055='2' " + codeCondition2 + ") " +
                 INCLUD_CHILD_PRESON_ORDER + "t1.ordinal";
-        List<Map<String, Object>> res = exportService.findBySQL(sql);
+        List<Map<String, Object>> res = ExportConstant.exportService.findBySQL(sql);
         //职集单位
         Map<String, List> listMap = new LinkedHashMap<>();
         if (res != null && res.size() > 0) {
@@ -543,7 +553,7 @@ public class ExportGbhmcServiceImpl implements ExportGbhmcService {
         String rootName = "";
         String rootCode = "";
         String sql = "select B001001_B,TREE_LEVEL_CODE from DEP_B001 where DEP_ID='" + treeId + "'";
-        List<Map<String, Object>> rootNameList = exportService.findBySQL(sql);
+        List<Map<String, Object>> rootNameList = ExportConstant.exportService.findBySQL(sql);
         if (rootNameList != null && rootNameList.size() > 0) {
             rootName = (String) rootNameList.get(0).get("B001001_B");
             rootCode = (String) rootNameList.get(0).get("TREE_LEVEL_CODE");
@@ -554,7 +564,7 @@ public class ExportGbhmcServiceImpl implements ExportGbhmcService {
         }
         if (rootCode != null) {
             sql = "select DEP_ID,TREE_LEVEL_CODE,PPTR,ORDINAL,B001001_B,B01094 from DEP_B001 where status=0 and TREE_LEVEL_CODE like '" + rootCode + "%' order by pptr,ordinal";
-            List<Map<String, Object>> depList = exportService.findBySQL(sql);
+            List<Map<String, Object>> depList = ExportConstant.exportService.findBySQL(sql);
             Map<String, String[]> tempMap = new HashMap<>();
             for (Map<String, Object> aMap : depList) {
                 String codeKey = (String) aMap.get("TREE_LEVEL_CODE");
@@ -643,7 +653,7 @@ public class ExportGbhmcServiceImpl implements ExportGbhmcService {
             ids += ")";
             allSql = allSql.substring(0, pos1) + ids + allSql.substring(pos2);
         }
-        return exportService.findBySQL(allSql);
+        return ExportConstant.exportService.findBySQL(allSql);
     }
 
     private List<List<String>>[] getIdBatchLists(List<String> ids) {
@@ -750,12 +760,10 @@ public class ExportGbhmcServiceImpl implements ExportGbhmcService {
     /**
      * 生成花名册excel文件
      */
-    private String generateExcel(Map<String, List<Map<Integer, String>>> data, ExportGbhmcModel model) {
+    private void generateExcel(Map<String, List<Map<Integer, String>>> data, ExportGbhmcModel model) {
         String templateFile = ExportConstant.EXPORT_BASE_PATH + ExportConstant.TEMPLATE_GBHMC;
-        String excelPath = ExportConstant.EXPORT_BASE_PATH + ExportConstant.EXPORT_EXCEL_GBHMC;
-        String outFile = excelPath + "花名册_" + System.currentTimeMillis() + ".xlsx";
+        String outFile = getFilePath();
 
-        FileUtils.createDir(excelPath);
 
         final int PAGE_DEP_SIZE = 5000;
         SExcelWriter excelWriter = new SExcelWriter(new File(outFile), new File(templateFile), 3);
@@ -830,6 +838,5 @@ public class ExportGbhmcServiceImpl implements ExportGbhmcService {
         }
         excelWriter.close();
 
-        return outFile;
     }
 }

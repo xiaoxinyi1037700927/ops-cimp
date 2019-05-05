@@ -26,7 +26,7 @@ public class TechnicPositionAttrValue implements AttrValue {
     public Object getAttrValue(Map<String, Object> attrValueContext, String empId) throws Exception {
         try {
             final String technicPositionInfoSql = "SELECT * FROM EMP_A06 A06 WHERE EMP_ID = '%s'  and status=0 ORDER BY A06.A06002 ASC, A06.A06025 DESC";
-            List techPositionList = ExportConstant.exportWordService.findBySQL(String.format(technicPositionInfoSql, empId));
+            List techPositionList = ExportConstant.exportService.findBySQL(String.format(technicPositionInfoSql, empId));
             //使用码表 代码类型为：GB/T12407-2008
             // 410 高级
             // 411 正高级

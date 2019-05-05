@@ -2,11 +2,11 @@ package com.sinosoft.ops.cimp.controller.export.gbhmc;
 
 import com.sinosoft.ops.cimp.annotation.BusinessApiGroup;
 import com.sinosoft.ops.cimp.controller.BaseController;
-import com.sinosoft.ops.cimp.service.export.ExportGbhmcService;
+import com.sinosoft.ops.cimp.export.ExportManager;
+import com.sinosoft.ops.cimp.export.handlers.impl.ExportGbHmc;
 import com.sinosoft.ops.cimp.vo.from.export.ExportGbhmcModel;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,22 +22,13 @@ import java.net.URLEncoder;
 @RequestMapping("/export/gbhmc")
 public class ExportGbhmcController extends BaseController {
 
-    private final ExportGbhmcService exportGbhmcService;
-
-    @Autowired
-    public ExportGbhmcController(ExportGbhmcService exportGbhmcService) {
-        this.exportGbhmcService = exportGbhmcService;
-    }
-
     @ApiOperation(value = "导出干部花名册")
     @GetMapping("generateAndExport")
     public void generateAndExportGbhmc(ExportGbhmcModel model, HttpServletResponse response) {
         try {
-            String filePath = exportGbhmcService.generateGbhmc(model);
-            if (null != filePath) {
-                writeFileToResponse(response, filePath);
-                return;
-            }
+            String outFile = ExportManager.generate(new ExportGbHmc(model));
+            writeFileToResponse(response, outFile);
+            return;
         } catch (Exception e) {
             e.printStackTrace();
         }

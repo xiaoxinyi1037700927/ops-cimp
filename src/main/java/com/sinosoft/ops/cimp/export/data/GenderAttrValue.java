@@ -49,14 +49,14 @@ public class GenderAttrValue implements AttrValue {
     private String getGenderStr(String sql, String empId, String genderCode) throws Exception {
         String genderInfoSql = String.format(sql, empId);
         if (StringUtils.isNotEmpty(genderCode)) {
-            return CodeTranslateUtil.codeToName("GB/T2261.1-2003", genderCode, ExportConstant.exportWordService);
+            return CodeTranslateUtil.codeToName("GB/T2261.1-2003", genderCode, ExportConstant.exportService);
         } else {
-            List genderInfoList = ExportConstant.exportWordService.findBySQL(genderInfoSql);
+            List genderInfoList = ExportConstant.exportService.findBySQL(genderInfoSql);
             if (genderInfoList != null && genderInfoList.size() > 0) {
                 Map genderMap = (Map) genderInfoList.get(0);
                 if (genderMap != null) {
                     String gender_code = StringUtil.obj2Str(genderMap.get("A01004"));
-                    return CodeTranslateUtil.codeToName("GB/T2261.1-2003", gender_code, ExportConstant.exportWordService);
+                    return CodeTranslateUtil.codeToName("GB/T2261.1-2003", gender_code, ExportConstant.exportService);
                 }
             }
         }

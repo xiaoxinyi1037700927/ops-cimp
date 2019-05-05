@@ -212,23 +212,6 @@ public class DataStatisticsTask implements Task {
 
 
     /**
-     * 统计单位临时表(本单位及其上级单位的code)
-     */
-    private void statisticsDepTemp() {
-        logger.info("statisticsDepTemp begin...");
-
-        //清空单位临时表的数据
-        deleteTableData("DEP_TEMP");
-        deleteTableData("DEP_TEMP_NUM");
-
-        String sql = "INSERT INTO dep_temp(ID, dep_id, tree_level_code, pptr)" +
-                " SELECT rownum, d.dep_id, d.B001001_A, d.pptr FROM dep_b001 d ";
-        int count = jdbcTemplate.update(sql);
-        logger.info("insert " + count + "rows into DEP_TEMP table ");
-        logger.info("statisticsDepTemp success");
-    }
-
-    /**
      * 统计单位权限
      */
     private void statisticsDepLevel() {

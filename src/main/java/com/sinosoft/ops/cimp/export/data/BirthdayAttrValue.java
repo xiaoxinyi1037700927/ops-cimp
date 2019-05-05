@@ -49,7 +49,7 @@ public class BirthdayAttrValue implements AttrValue {
 
     private Object getBirthdayStr(String sql, String empId) {
         String birthdayInfoSql = String.format(sql, empId);
-        List birthdayInfoList = ExportConstant.exportWordService.findBySQL(birthdayInfoSql);
+        List birthdayInfoList = ExportConstant.exportService.findBySQL(birthdayInfoSql);
         if (birthdayInfoList != null && birthdayInfoList.size() > 0) {
             Map birthdayMap = (Map) birthdayInfoList.get(0);
             if (birthdayMap != null) {

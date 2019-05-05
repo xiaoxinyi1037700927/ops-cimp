@@ -24,7 +24,7 @@ public class PhotoAttrValue implements AttrValue {
         try {
             String photoTableSql = "SELECT * FROM emp_photo WHERE EMP_ID = '%s'";
             photoTableSql = String.format(photoTableSql, empId);
-            List photoTableList = ExportConstant.exportWordService.findBySQL(photoTableSql);
+            List photoTableList = ExportConstant.exportService.findBySQL(photoTableSql);
 
             if (photoTableList != null && photoTableList.size() > 0) {
                 Map map = (Map) photoTableList.get(0);

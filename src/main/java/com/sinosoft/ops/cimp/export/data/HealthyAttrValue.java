@@ -34,7 +34,7 @@ public class HealthyAttrValue implements AttrValue {
 
     private String getHealthyCodeStr(String sql, String empId) {
         String attrInfoSql = String.format(sql, empId);
-        List attrInfoList = ExportConstant.exportWordService.findBySQL(attrInfoSql);
+        List attrInfoList = ExportConstant.exportService.findBySQL(attrInfoSql);
         if (attrInfoList != null && attrInfoList.size() > 0) {
             Map map = (Map) attrInfoList.get(0);
             if (map != null) {
