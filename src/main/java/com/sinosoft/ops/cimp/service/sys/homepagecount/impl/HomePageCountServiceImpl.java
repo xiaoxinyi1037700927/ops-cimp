@@ -75,7 +75,7 @@ public class HomePageCountServiceImpl implements HomePageCountService {
         QRoleHomePageCount qRoleHomePageCount = QRoleHomePageCount.roleHomePageCount;
 
         //查询角色对应的统计信息
-        Iterable<RoleHomePageCount> roleHomePageCounts = roleHomePageCountRepository.findAll(qRoleHomePageCount.roleId.in(roleIdList));
+        Iterable<RoleHomePageCount> roleHomePageCounts = roleHomePageCountRepository.findAll(qRoleHomePageCount.roleId.in(roleIdList), qRoleHomePageCount.createTime.asc());
         List<RoleHomePageCount> roleHomePageCountList = Lists.newArrayList(roleHomePageCounts);
 
         return roleHomePageCountList;
@@ -106,14 +106,16 @@ public class HomePageCountServiceImpl implements HomePageCountService {
         String currentUserId = currentUser.getId();
         String currentUserOrgId = currentUser.getOrganizationId();
         String currentReserveCadreId = currentUser.getReserveCadreId();
+        String dataOrganizationId = currentUser.getDataOrganizationId();
 
         countSql = countSql.replace("{$我的账户编号}", currentUserId);
         countSql = countSql.replace("{$我的账户单位}", currentUserOrgId);
         if (!StringUtils.isEmpty(currentReserveCadreId)) {
             countSql = countSql.replace("{$我的账户干部编号}", currentReserveCadreId);
         }
+        countSql = countSql.replace("${deptId}", dataOrganizationId);
 
-        long count = jdbc.queryForObject(countSql,Long.class);
+        long count = jdbc.queryForObject(countSql, Long.class);
         return count;
     }
 
