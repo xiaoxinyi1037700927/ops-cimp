@@ -1,9 +1,7 @@
 package com.sinosoft.ops.cimp.service.sys.homepagecount.impl;
 
-import com.google.common.collect.Lists;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sinosoft.ops.cimp.entity.sys.homepagecount.HomePageCount;
-import com.sinosoft.ops.cimp.entity.user.QRoleHomePageCount;
 import com.sinosoft.ops.cimp.entity.user.RoleHomePageCount;
 import com.sinosoft.ops.cimp.entity.user.User;
 import com.sinosoft.ops.cimp.mapper.sys.homepagecount.HomePageCountMapper;
@@ -24,6 +22,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class HomePageCountServiceImpl implements HomePageCountService {
@@ -72,13 +71,19 @@ public class HomePageCountServiceImpl implements HomePageCountService {
     }
 
     public List<RoleHomePageCount> findHomePageCountListByRoleIdList(List<String> roleIdList) {
-        QRoleHomePageCount qRoleHomePageCount = QRoleHomePageCount.roleHomePageCount;
-
         //查询角色对应的统计信息
-        Iterable<RoleHomePageCount> roleHomePageCounts = roleHomePageCountRepository.findAll(qRoleHomePageCount.roleId.in(roleIdList), qRoleHomePageCount.createTime.asc());
-        List<RoleHomePageCount> roleHomePageCountList = Lists.newArrayList(roleHomePageCounts);
+        String sql = "select COUNT_NAME as countName, LISTAGG(COUNT_SQL, ' union all ') within group ( order by ID) as countSql, min(CREATE_TIME) time " +
+                " from ROLE_HOME_PAGE_COUNT " +
+                " where ROLE_ID in (" + roleIdList.stream().collect(Collectors.joining("','", "'", "'")) + ") " +
+                " group by COUNT_NAME " +
+                " order by time ";
 
-        return roleHomePageCountList;
+        return jdbc.queryForList(sql).stream().map(map -> {
+            RoleHomePageCount count = new RoleHomePageCount();
+            count.setCountName(map.get("countName").toString());
+            count.setCountSql(map.get("countSql").toString());
+            return count;
+        }).collect(Collectors.toList());
     }
 
     public List<HomePageCountQueryVO> findHomePageCountQueryList(List<RoleHomePageCount> roleHomePageCountList) {
@@ -114,6 +119,9 @@ public class HomePageCountServiceImpl implements HomePageCountService {
             countSql = countSql.replace("{$我的账户干部编号}", currentReserveCadreId);
         }
         countSql = countSql.replace("${deptId}", dataOrganizationId);
+
+
+        countSql = "SELECT count(DISTINCT EMP_ID) from(" + countSql + ")";
 
         long count = jdbc.queryForObject(countSql, Long.class);
         return count;
