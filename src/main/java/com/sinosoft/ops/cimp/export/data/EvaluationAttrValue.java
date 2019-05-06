@@ -29,7 +29,7 @@ public class EvaluationAttrValue implements AttrValue {
         try {
             final String evaluationInfoSql = "SELECT * FROM EMP_A15 where EMP_ID = '%s'  and status=0 ORDER BY A15021";
             String a15TableSql = String.format(evaluationInfoSql, empId);
-            List evaluationList = ExportConstant.exportWordService.findBySQL(a15TableSql);
+            List evaluationList = ExportConstant.exportService.findBySQL(a15TableSql);
             if (evaluationList == null) {
                 attrValueContext.put("A15", new ArrayList<Map>());
                 evaluationList = new ArrayList();
@@ -48,7 +48,7 @@ public class EvaluationAttrValue implements AttrValue {
                     }
                     if (appraiseInfoMap != null && appraiseInfoMap.size() > 0) {
                         String evaluateCode = StringUtil.obj2Str(appraiseInfoMap.get("A15017"));
-                        String evaluateResult = CodeTranslateUtil.codeToName("DM018", evaluateCode, ExportConstant.exportWordService);
+                        String evaluateResult = CodeTranslateUtil.codeToName("DM018", evaluateCode, ExportConstant.exportService);
                         String evaluateDate = StringUtil.replaceSpeStr(StringUtil.obj2Str(appraiseInfoMap.get("A15021")), " 00:00:00.0");
                         if (StringUtils.isNotEmpty(evaluateDate)) {
                             int year = LocalDate.parse(new DateTime(String.valueOf(evaluateDate)).toString("yyyy")).getYear();

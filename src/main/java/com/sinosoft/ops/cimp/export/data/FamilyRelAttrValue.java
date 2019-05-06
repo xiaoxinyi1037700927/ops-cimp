@@ -40,7 +40,7 @@ public class FamilyRelAttrValue implements AttrValue {
 //			String a36TableSql = "SELECT * FROM EMP_A36 WHERE EMP_ID = '%s'  and status=0 ORDER BY A36047 ASC";
 
             a36TableSql = String.format(a36TableSql, empId);
-            List a36TableList = ExportConstant.exportWordService.findBySQL(a36TableSql);
+            List a36TableList = ExportConstant.exportService.findBySQL(a36TableSql);
 
             if (a36TableList == null) {
                 attrValueContext.put("A36", new ArrayList<Map>());

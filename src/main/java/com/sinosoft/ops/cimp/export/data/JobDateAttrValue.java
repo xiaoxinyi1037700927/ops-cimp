@@ -47,7 +47,7 @@ public class JobDateAttrValue implements AttrValue {
 
     private Object getJobDateObj(String sql, String empId) {
         String attrInfoSql = String.format(sql, empId);
-        List attrInfoList = ExportConstant.exportWordService.findBySQL(attrInfoSql);
+        List attrInfoList = ExportConstant.exportService.findBySQL(attrInfoSql);
         if (attrInfoList != null && attrInfoList.size() > 0) {
             Map map = (Map) attrInfoList.get(0);
             if (map != null) {

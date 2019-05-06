@@ -32,7 +32,7 @@ public class PositionAttrValue implements AttrValue {
 //            final String positionInfoSql = "SELECT * FROM EMP_A02 WHERE EMP_ID = '%s'  and A02055 = '2' and status=0 and A02049 <> 4 ORDER BY A02023";
             final String positionInfoSql = "SELECT b001.code DepCode, a02.* FROM EMP_A02 a02 left join dep_b001 b001 on b001.dep_id=a02.A02001_B WHERE a02.EMP_ID = '%s'  and a02.A02055 = '2' and a02.status=0 and a02.A02049 <> 4 ORDER BY a02.A02023";
             String a02TableSql = String.format(positionInfoSql, empId);
-            List jobInfoList = ExportConstant.exportWordService.findBySQL(a02TableSql);
+            List jobInfoList = ExportConstant.exportService.findBySQL(a02TableSql);
             if (jobInfoList == null) {
                 attrValueContext.put("A02", new ArrayList<Map<String, Object>>());
                 jobInfoList = new ArrayList<Map<String, Object>>();

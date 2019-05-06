@@ -38,14 +38,14 @@ public class NativeAttrValue implements AttrValue {
             }
             String nativeValue = "";
             if (StringUtils.isNotEmpty(nativeCode)) {
-                nativeValue = CodeTranslateUtil.codeToName("GB/T2260-2007", nativeCode, ExportConstant.exportWordService);
+                nativeValue = CodeTranslateUtil.codeToName("GB/T2260-2007", nativeCode, ExportConstant.exportService);
             }
             return nativeValue;
         } else {
             String nativeCode = getNativeStr(nativeInfoSql, empId);
             String nativeValue = "";
             if (StringUtils.isNotEmpty(nativeCode)) {
-                nativeValue = CodeTranslateUtil.codeToName("GB/T2260-2007", nativeCode, ExportConstant.exportWordService);
+                nativeValue = CodeTranslateUtil.codeToName("GB/T2260-2007", nativeCode, ExportConstant.exportService);
             }
             return nativeValue;
         }
@@ -53,7 +53,7 @@ public class NativeAttrValue implements AttrValue {
 
     private String getNativeStr(String sql, String empId) {
         String attrInfoSql = String.format(sql, empId);
-        List attrInfoList = ExportConstant.exportWordService.findBySQL(attrInfoSql);
+        List attrInfoList = ExportConstant.exportService.findBySQL(attrInfoSql);
         if (attrInfoList != null && attrInfoList.size() > 0) {
             Map map = (Map) attrInfoList.get(0);
             if (map != null) {

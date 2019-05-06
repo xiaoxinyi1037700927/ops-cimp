@@ -33,8 +33,8 @@ public class FtDiplomaAndDegreeAttrValue implements AttrValue {
             String a08TableSql = String.format(diplomaInfoSql, empId);
             String a09TableSql = String.format(degreeInfoSql, empId);
 
-            List diplomaInfoList = ExportConstant.exportWordService.findBySQL(a08TableSql);
-            List degreeInfoList = ExportConstant.exportWordService.findBySQL(a09TableSql);
+            List diplomaInfoList = ExportConstant.exportService.findBySQL(a08TableSql);
+            List degreeInfoList = ExportConstant.exportService.findBySQL(a09TableSql);
 
             if (diplomaInfoList == null) {
                 attrValueContext.put("A08", new ArrayList<Map>());

@@ -48,15 +48,15 @@ public class NationAttrValue implements AttrValue {
         String attrInfoSql = String.format(sql, empId);
 
         if (StringUtils.isNotEmpty(nationCode)) {
-            return CodeTranslateUtil.codeToName("GB/T3304-1991", nationCode, ExportConstant.exportWordService);
+            return CodeTranslateUtil.codeToName("GB/T3304-1991", nationCode, ExportConstant.exportService);
         } else {
-            List attrInfoList = ExportConstant.exportWordService.findBySQL(attrInfoSql);
+            List attrInfoList = ExportConstant.exportService.findBySQL(attrInfoSql);
             if (attrInfoList != null && attrInfoList.size() > 0) {
                 Map map = (Map) attrInfoList.get(0);
                 if (map != null) {
                     //GB/T3304-1991
                     String nation_code = StringUtil.obj2Str(map.get("A01017"));
-                    return CodeTranslateUtil.codeToName("GB/T3304-1991", nation_code, ExportConstant.exportWordService);
+                    return CodeTranslateUtil.codeToName("GB/T3304-1991", nation_code, ExportConstant.exportService);
                 }
             }
         }

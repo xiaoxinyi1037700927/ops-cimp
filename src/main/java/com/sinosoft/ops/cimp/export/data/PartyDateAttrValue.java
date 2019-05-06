@@ -26,7 +26,7 @@ public class PartyDateAttrValue implements AttrValue {
         try {
             final String partyDateInfoSql = "SELECT * FROM EMP_A58 A58 WHERE EMP_ID = '%s'  and status=0";
             String a58TableSql = String.format(partyDateInfoSql, empId);
-            List a58TableList = ExportConstant.exportWordService.findBySQL(a58TableSql);
+            List a58TableList = ExportConstant.exportService.findBySQL(a58TableSql);
             if (a58TableList != null && a58TableList.size() > 0) {
                 if (a58TableList.size() == 1) {
                     Map map = (Map) a58TableList.get(0);

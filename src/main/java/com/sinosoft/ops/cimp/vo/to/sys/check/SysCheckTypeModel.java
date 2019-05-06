@@ -4,25 +4,20 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 /**
- * 系统查错条件模型
+ * 系统查错条件类型模型
  */
-@ApiModel(description = "系统查错条件模型")
-public class SysCheckConditionModel {
+@ApiModel(description = "系统查错条件类型模型")
+public class SysCheckTypeModel {
     /**
      * id
      */
     @ApiModelProperty(value = "主键ID")
     private String id;
     /**
-     * 条件名称
+     * 类型名称
      */
-    @ApiModelProperty(value = "条件名称")
+    @ApiModelProperty(value = "类型名称")
     private String name;
-    /**
-     * 查询条件部分
-     */
-    @ApiModelProperty(value = "条件名称")
-    private String wherePart;
 
     public String getId() {
         return id;
@@ -40,11 +35,4 @@ public class SysCheckConditionModel {
         this.name = name;
     }
 
-    public String getWherePart() {
-        return wherePart;
-    }
-
-    public void setWherePart(String wherePart) {
-        this.wherePart = wherePart;
-    }
 }

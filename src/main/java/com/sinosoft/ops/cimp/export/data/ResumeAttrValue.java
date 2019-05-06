@@ -51,11 +51,11 @@ public class ResumeAttrValue extends ResumeAttrVauleHandle implements AttrValue 
         ///专业技术信息
         final String professionalInfoSql = "SELECT * FROM EMP_A06 WHERE EMP_ID = '%s'  and status=0 ORDER BY A06004 ASC";
 
-        List trainInfoList = ExportConstant.exportWordService.findBySQL(String.format(trainInfoSql, empId));
-        List jobInfoList = ExportConstant.exportWordService.findBySQL(String.format(jobInfoSql, empId));
-        List eduInfoList = ExportConstant.exportWordService.findBySQL(String.format(eduInfoSql, empId));
+        List trainInfoList = ExportConstant.exportService.findBySQL(String.format(trainInfoSql, empId));
+        List jobInfoList = ExportConstant.exportService.findBySQL(String.format(jobInfoSql, empId));
+        List eduInfoList = ExportConstant.exportService.findBySQL(String.format(eduInfoSql, empId));
         ///wft 20180228 简历中添加专业技术信息集
-        List professionalInfoList = ExportConstant.exportWordService.findBySQL(String.format(professionalInfoSql, empId));
+        List professionalInfoList = ExportConstant.exportService.findBySQL(String.format(professionalInfoSql, empId));
 
         if (professionalInfoList == null) {
             attrValueContext.put("A06", new ArrayList<Map>());
