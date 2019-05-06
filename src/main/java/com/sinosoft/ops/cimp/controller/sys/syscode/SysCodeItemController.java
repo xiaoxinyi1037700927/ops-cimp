@@ -1,6 +1,8 @@
 package com.sinosoft.ops.cimp.controller.sys.syscode;
 
 import com.sinosoft.ops.cimp.annotation.SystemApiGroup;
+import com.sinosoft.ops.cimp.cache.CacheManager;
+import com.sinosoft.ops.cimp.constant.Constants;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.dto.PaginationViewModel;
 import com.sinosoft.ops.cimp.exception.BusinessException;
@@ -33,6 +35,8 @@ public class SysCodeItemController extends BaseController {
     @ApiOperation(value = "删除代码项")
     @RequestMapping(value = "/delSysCodeItem", method = RequestMethod.POST)
     public ResponseEntity delSysCodeSet(@RequestParam("id") Integer id) throws BusinessException {
+        CacheManager.getInstance().remove(Constants.SYS_CODE_SET_CACHE);
+
         boolean isok = sysCodeItemService.delSysCodeItemById(id);
         if (isok) {
             return ok("删除成功");
@@ -44,6 +48,8 @@ public class SysCodeItemController extends BaseController {
     @RequestMapping(value = "/upSysCodeItem", method = RequestMethod.POST)
     public ResponseEntity upSysCodeSet(
             @Valid @RequestBody SysCodeItemModifyModel sysCodeItemModifyModel) throws BusinessException {
+        CacheManager.getInstance().remove(Constants.SYS_CODE_SET_CACHE);
+
         boolean isok = sysCodeItemService.upSysCodeItem(sysCodeItemModifyModel);
         if (isok) {
             return ok("修改成功");
@@ -55,6 +61,8 @@ public class SysCodeItemController extends BaseController {
     @RequestMapping(value = "/saveSysCodeItem", method = RequestMethod.POST)
     public ResponseEntity saveSysCodeSet(
             @Valid @RequestBody SysCodeItemAddModel sysCodeItemAddModel) throws BusinessException {
+        CacheManager.getInstance().remove(Constants.SYS_CODE_SET_CACHE);
+
         boolean isok = sysCodeItemService.saveSysCodeItem(sysCodeItemAddModel);
         if (isok) {
             return ok("添加成功");

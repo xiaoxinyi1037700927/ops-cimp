@@ -1,6 +1,8 @@
 package com.sinosoft.ops.cimp.controller.sys.syscode;
 
 import com.sinosoft.ops.cimp.annotation.SystemApiGroup;
+import com.sinosoft.ops.cimp.cache.CacheManager;
+import com.sinosoft.ops.cimp.constant.Constants;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.dto.PaginationViewModel;
 import com.sinosoft.ops.cimp.exception.BusinessException;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @SystemApiGroup
 @Api(description = "代码集操作")
@@ -54,6 +57,8 @@ public class SysCodeSetController extends BaseController {
     @ApiOperation(value = "删除代码集")
     @RequestMapping(value = "/delSysCodeSet", method = RequestMethod.POST)
     public ResponseEntity delSysCodeSet(@RequestParam("id") Integer id) throws BusinessException {
+        CacheManager.getInstance().remove(Constants.SYS_CODE_SET_CACHE);
+
         boolean isok = sysCodeSetService.delSysCodeSetById(id);
         if (isok) {
             return ok("删除成功");
@@ -65,6 +70,8 @@ public class SysCodeSetController extends BaseController {
     @RequestMapping(value = "/upSysCodeSet", method = RequestMethod.POST)
     public ResponseEntity upSysCodeSet(
             @Valid @RequestBody SysCodeSetModifyModel sysCodeSetModifyModel) throws BusinessException {
+        CacheManager.getInstance().remove(Constants.SYS_CODE_SET_CACHE);
+
         boolean isok = sysCodeSetService.upSysCodeSet(sysCodeSetModifyModel);
         if (isok) {
             return ok("修改成功");
@@ -76,6 +83,8 @@ public class SysCodeSetController extends BaseController {
     @RequestMapping(value = "/saveSysCodeSet", method = RequestMethod.POST)
     public ResponseEntity saveSysCodeSet(
             @Valid @RequestBody SysCodeSetAddModel sysCodeSetAddModel) throws BusinessException {
+        CacheManager.getInstance().remove(Constants.SYS_CODE_SET_CACHE);
+
         boolean isok = sysCodeSetService.saveSysCodeSet(sysCodeSetAddModel);
         if (isok) {
             return ok("添加成功");
@@ -87,8 +96,15 @@ public class SysCodeSetController extends BaseController {
     @RequestMapping(value = "/getSysCodeSetAndSysCodeIem", method = RequestMethod.POST)
     public ResponseEntity getSysCodeSetAndSysCodeIem(
             @Valid @RequestBody SysCodeSetSearchListModel sysCodeSetSearchListModel) throws BusinessException {
-        List<SysCodeSetObtainModel> sysCodeSetObtainModels = sysCodeSetService.getSysCodeSetAndSysCodeItem(sysCodeSetSearchListModel);
-        return ok(sysCodeSetObtainModels);
+        String cacheKey = sysCodeSetSearchListModel.getIds().stream().map(Object::toString).collect(Collectors.joining(","));
+        Object o = CacheManager.getInstance().get(Constants.SYS_CODE_SET_CACHE, cacheKey);
+        if (o != null) {
+            return ok(o);
+        } else {
+            List<SysCodeSetObtainModel> sysCodeSetObtainModels = sysCodeSetService.getSysCodeSetAndSysCodeItem(sysCodeSetSearchListModel);
+            CacheManager.getInstance().put(Constants.SYS_CODE_SET_CACHE, cacheKey, sysCodeSetObtainModels);
+            return ok(sysCodeSetObtainModels);
+        }
     }
 
 
