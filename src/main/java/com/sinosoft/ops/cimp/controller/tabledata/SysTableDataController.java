@@ -16,6 +16,8 @@ import com.sinosoft.ops.cimp.dto.sys.table.SysTableModelInfoDTO;
 import com.sinosoft.ops.cimp.entity.user.User;
 import com.sinosoft.ops.cimp.entity.user.UserRole;
 import com.sinosoft.ops.cimp.exception.BusinessException;
+import com.sinosoft.ops.cimp.export.ExportManager;
+import com.sinosoft.ops.cimp.export.handlers.impl.ExportGbrmbHtmlBiJie;
 import com.sinosoft.ops.cimp.service.oraganization.OrganizationService;
 import com.sinosoft.ops.cimp.service.sys.sysapp.acess.SysAppFieldAccessService;
 import com.sinosoft.ops.cimp.service.sys.sysapp.acess.SysAppTableAccessService;
@@ -46,6 +48,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 @SystemApiGroup
@@ -64,6 +68,7 @@ public class SysTableDataController extends BaseController {
     private final OrganizationService organizationService;
     private final RolePermissionPageSqlService rolePermissionPageSqlService;
     private final JdbcTemplate jdbcTemplate;
+    private ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
 
     @Autowired
     public SysTableDataController(SysTableModelInfoService sysTableModelInfoService,
@@ -329,7 +334,33 @@ public class SysTableDataController extends BaseController {
                 .setTableNameEnFKValue(tableNameFKValue)
                 .setSaveOrUpdateFormData(formMap);
 
-        sysTableModelInfoService.saveData(queryDataParam);
+        QueryDataParamBuilder dataParamBuilder = sysTableModelInfoService.saveData(queryDataParam);
+
+        if (StringUtils.equalsIgnoreCase(tableTypeName, "CadreInfo")) {
+            //如果primaryKey和tableNamePK不一致则表明保存的是子集
+            if (!StringUtils.equals(primaryKey, tableNamePK)) {
+                if (StringUtils.isNotEmpty(tableNameFKValue)) {
+                    executorService.submit(() -> {
+                        try {
+                            ExportManager.generate(new ExportGbrmbHtmlBiJie(tableNameFKValue));
+                        } catch (Exception e) {
+                            LOGGER.error("异步生成干部任免表html失败", e);
+                        }
+                    });
+                }
+            } else {
+                Object tableNameEnPKValue = dataParamBuilder.getTableNameEnPKValue();
+                executorService.submit(() -> {
+                    try {
+                        ExportManager.generate(new ExportGbrmbHtmlBiJie(String.valueOf(tableNameEnPKValue)));
+                    } catch (Exception e) {
+                        LOGGER.error("异步生成干部任免表html失败", e);
+                    }
+                });
+            }
+        }
+
+
         return ok("保存成功");
     }
 
