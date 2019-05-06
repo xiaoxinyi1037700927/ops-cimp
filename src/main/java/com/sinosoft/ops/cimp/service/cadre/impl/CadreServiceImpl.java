@@ -1,9 +1,13 @@
 package com.sinosoft.ops.cimp.service.cadre.impl;
 
+import com.sinosoft.ops.cimp.entity.emp.EmpPhoto;
+import com.sinosoft.ops.cimp.repository.emp.EmpPhotoRepository;
 import com.sinosoft.ops.cimp.service.cadre.CadreService;
+import com.sinosoft.ops.cimp.util.IdUtil;
 import com.sinosoft.ops.cimp.vo.to.cadre.CadreBasicInfoVO;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.beans.BeanInfo;
 import java.beans.Introspector;
@@ -16,9 +20,11 @@ import java.util.Map;
 public class CadreServiceImpl implements CadreService {
 
     private final JdbcTemplate jdbcTemplate;
+    private final EmpPhotoRepository empPhotoRepository;
 
-    public CadreServiceImpl(JdbcTemplate jdbcTemplate) {
+    public CadreServiceImpl(JdbcTemplate jdbcTemplate, EmpPhotoRepository empPhotoRepository) {
         this.jdbcTemplate = jdbcTemplate;
+        this.empPhotoRepository = empPhotoRepository;
     }
 
     @Override
@@ -65,5 +71,29 @@ public class CadreServiceImpl implements CadreService {
     public Map<String, Object> searchCadres(List<String> cadreTagIds, HashMap<String, Object> tableConditions) {
 
         return null;
+    }
+
+    /**
+     * 上传干部照片
+     */
+    @Override
+    public boolean uploadPhoto(String empId, MultipartFile photo) {
+        EmpPhoto empPhoto = empPhotoRepository.getByEmpId(empId);
+
+        try {
+            if (empPhoto == null) {
+                empPhoto = new EmpPhoto();
+                empPhoto.setSubId(IdUtil.uuid());
+                empPhoto.setEmpId(empId);
+                empPhoto.setSeqid(100);
+            }
+            empPhoto.setPhotoFile(photo.getBytes());
+            empPhotoRepository.save(empPhoto);
+
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }

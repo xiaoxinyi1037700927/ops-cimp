@@ -1,11 +1,12 @@
 package com.sinosoft.ops.cimp.schedule.tasks;
 
 import com.sinosoft.ops.cimp.entity.sys.check.SysCheckCondition;
-import com.sinosoft.ops.cimp.entity.sys.check.SysCheckItem;
+import com.sinosoft.ops.cimp.entity.sys.check.SysCheckType;
 import com.sinosoft.ops.cimp.repository.sys.check.SysCheckConditionRepository;
-import com.sinosoft.ops.cimp.repository.sys.check.SysCheckItemRepository;
+import com.sinosoft.ops.cimp.repository.sys.check.SysCheckTypeRepository;
 import com.sinosoft.ops.cimp.schedule.Task;
-import com.sinosoft.ops.cimp.schedule.beans.SysCheckResultTables;
+import com.sinosoft.ops.cimp.schedule.syscheck.SysCheckResultTables;
+import com.sinosoft.ops.cimp.schedule.syscheck.SysCheckTypeAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -23,14 +24,16 @@ public class DataStatisticsTask implements Task {
 
     private final JdbcTemplate jdbcTemplate;
     private final SysCheckConditionRepository sysCheckConditionRepository;
-    private final SysCheckItemRepository sysCheckItemRepository;
+    private final SysCheckTypeRepository sysCheckTypeRepository;
+    private final SysCheckTypeAdapter[] typeAdapters;
 
     private static SysCheckResultTables resultTables;
 
-    public DataStatisticsTask(JdbcTemplate jdbcTemplate, SysCheckConditionRepository sysCheckConditionRepository, SysCheckItemRepository sysCheckItemRepository) {
+    public DataStatisticsTask(JdbcTemplate jdbcTemplate, SysCheckConditionRepository sysCheckConditionRepository, SysCheckTypeRepository sysCheckTypeRepository, SysCheckTypeAdapter[] typeAdapters) {
         this.jdbcTemplate = jdbcTemplate;
         this.sysCheckConditionRepository = sysCheckConditionRepository;
-        this.sysCheckItemRepository = sysCheckItemRepository;
+        this.sysCheckTypeRepository = sysCheckTypeRepository;
+        this.typeAdapters = typeAdapters;
     }
 
     @Override
@@ -40,9 +43,8 @@ public class DataStatisticsTask implements Task {
         try {
             init();
 
-            //统计A B各类总数
-            statisticsEmpNumOfDep();
-            statisticsNumOfDep();
+            //统计各类总数
+            statisticsTotalNum();
 
             //统计查错数
             statisticsWrongNum();
@@ -60,133 +62,6 @@ public class DataStatisticsTask implements Task {
             logger.error(e.getMessage(), e);
         }
         return false;
-    }
-
-    /**
-     * 切换使用的结果表
-     */
-    private void switchResultTables() {
-        logger.info("switchResultTables begin...");
-
-        String sql = "UPDATE SYS_CHECK_RESULT_TABLES SET RESULT_TABLES = " + resultTables.getId() + ",UPDATE_DATE = sysdate";
-        jdbcTemplate.update(sql);
-
-        logger.info("switchResultTables success");
-    }
-
-    /**
-     * 统计查错数
-     */
-    private void statisticsWrongNum() {
-        logger.info("statisticsWrongNum begin...");
-
-        //获取所有的查错条件
-        List<SysCheckCondition> checkConditions = sysCheckConditionRepository.findAll();
-
-        List<SysCheckItem> sysCheckItems;
-        for (SysCheckCondition condition : checkConditions) {
-            sysCheckItems = sysCheckItemRepository.findBySysCheckConditionId(condition.getId());
-            for (SysCheckItem item : sysCheckItems) {
-                switch (item.getType()) {
-                    case "A":
-                        doStatisticsWrongNumA(item);
-                        break;
-                    case "B":
-                        doStatisticsWrongNumB(item);
-                        break;
-                }
-            }
-        }
-        logger.info("statisticsWrongNum success");
-    }
-
-    /**
-     * 统计查错数 -- A
-     */
-    private void doStatisticsWrongNumA(SysCheckItem item) {
-        String sql = "insert into RESULT_WRONG_NUMBER(org_id, tree_level_code, pptr, num, Type, check_condition_id) " +
-                " select b001.dep_id,max(b001.B001001_A),max(b001.pptr), count(1), 'A', '" + item.getSysCheckConditionId() +
-                "' from dep_b001 b001 left join emp_a001 t1 on t1.A001004_A = b001.dep_id " +
-                " where b001.status=0 and t1.status = 0 and " + item.getWherePart() +
-                " group by b001.dep_id  ";
-
-        int count = jdbcTemplate.update(sql);
-
-        logger.info("doStatisticsA:insert " + count + "rows into RESULT_WRONG_NUMBER table ");
-    }
-
-    /**
-     * 统计查错数 -- B
-     */
-    private void doStatisticsWrongNumB(SysCheckItem item) {
-        String sql = "insert into RESULT_WRONG_NUMBER(org_id, tree_level_code, pptr, num, Type, check_condition_id) " +
-                " select b001.dep_id,max(b001.B001001_A),max(b001.pptr), count(1), 'B', '" + item.getSysCheckConditionId() +
-                "' from dep_b001 b001 " +
-                " where b001.status=0 and " + item.getWherePart() +
-                " group by b001.dep_id  ";
-
-        int count = jdbcTemplate.update(sql);
-
-        logger.info("doStatisticsB:insert " + count + "rows into RESULT_WRONG_NUMBER table ");
-    }
-
-    /**
-     * 统计查错总数
-     */
-    private void statisticsTotalWrongNum() {
-        //获取所有的查错条件
-        List<SysCheckCondition> checkConditions = sysCheckConditionRepository.findAll();
-
-        List<SysCheckItem> sysCheckItems;
-        String type;
-        for (SysCheckCondition condition : checkConditions) {
-            sysCheckItems = sysCheckItemRepository.findBySysCheckConditionId(condition.getId());
-            for (SysCheckItem item : sysCheckItems) {
-                switch (item.getType()) {
-                    case "A":
-                        doStatisticsTotalWrongNumA(item);
-                        break;
-                    case "B":
-                        doStatisticsTotalWrongNumB(item);
-                        break;
-                }
-
-            }
-
-        }
-
-    }
-
-    /**
-     * 统计查错总数 -- A
-     */
-    private void doStatisticsTotalWrongNumA(SysCheckItem item) {
-        String sql = " insert into " + resultTables.getResultsTempName() + "(Tree_Level_Code,num,Type,check_condition_id) " +
-                " select dl.root, nvl(sum(rwn.num), 0), 'A', '" + item.getSysCheckConditionId() +
-                "' from RESULT_WRONG_NUMBER rwn " +
-                " inner join DEP_LEVEL dl on dl.DEP_ID = rwn.org_id " +
-                " where rwn.Type = 'A' and rwn.check_condition_id = '" + item.getSysCheckConditionId() + "'" +
-                " group by dl.root ";
-
-        int count = jdbcTemplate.update(sql);
-
-        logger.info("doStatisticsTotalWrongNumA:insert " + count + "rows into " + resultTables.getResultsTempName() + " table ");
-    }
-
-    /**
-     * 统计查错总数 -- B
-     */
-    private void doStatisticsTotalWrongNumB(SysCheckItem item) {
-        String sql = " insert into " + resultTables.getResultsTempName() + "(Tree_Level_Code,num,Type,check_condition_id) " +
-                " select dl.root, nvl(sum(rwn.num), 0), 'B', '" + item.getSysCheckConditionId() +
-                "' from RESULT_WRONG_NUMBER rwn " +
-                " inner join DEP_LEVEL dl on dl.DEP_ID = rwn.org_id " +
-                " where rwn.Type = 'B' and rwn.check_condition_id = '" + item.getSysCheckConditionId() + "'" +
-                " group by dl.root ";
-
-        int count = jdbcTemplate.update(sql);
-
-        logger.info("doStatisticsTotalWrongNumB:insert " + count + "rows into " + resultTables.getResultsTempName() + " table ");
     }
 
     /**
@@ -212,6 +87,46 @@ public class DataStatisticsTask implements Task {
         logger.info("init success");
     }
 
+    /**
+     * 统计各类总数
+     */
+    private void statisticsTotalNum() throws Exception {
+        for (SysCheckType type : sysCheckTypeRepository.findAll()) {
+            SysCheckTypeAdapter typeAdapter = getTypeAdapter(type.getId());
+            typeAdapter.statisticsTotalNum(jdbcTemplate, resultTables.getResultsName());
+        }
+    }
+
+
+    /**
+     * 统计查错数
+     */
+    private void statisticsWrongNum() throws Exception {
+        logger.info("statisticsWrongNum begin...");
+
+        //获取所有的查错条件
+        List<SysCheckCondition> checkConditions = sysCheckConditionRepository.findAll();
+
+        for (SysCheckCondition condition : checkConditions) {
+            SysCheckTypeAdapter typeAdapter = getTypeAdapter(condition.getTypeId());
+            typeAdapter.statisticsWrongNum(jdbcTemplate, condition);
+        }
+        logger.info("statisticsWrongNum success");
+    }
+
+    /**
+     * 统计查错总数
+     */
+    private void statisticsTotalWrongNum() throws Exception {
+        //获取所有的查错条件
+        List<SysCheckCondition> checkConditions = sysCheckConditionRepository.findAll();
+
+        for (SysCheckCondition condition : checkConditions) {
+            SysCheckTypeAdapter typeAdapter = getTypeAdapter(condition.getTypeId());
+            typeAdapter.statisticsTotalWrongNum(jdbcTemplate, condition, resultTables.getResultsTempName());
+        }
+
+    }
 
     /**
      * 统计单位权限
@@ -233,41 +148,16 @@ public class DataStatisticsTask implements Task {
 
 
     /**
-     * 统计单位总人数 --A
+     * 根据查错类型获取适配器
      */
-    private void statisticsEmpNumOfDep() {
-        logger.info("statisticsEmpNumOfDep begin...");
+    private SysCheckTypeAdapter getTypeAdapter(String typeId) throws Exception {
+        for (SysCheckTypeAdapter typeAdapter : typeAdapters) {
+            if (typeAdapter.support(typeId)) {
+                return typeAdapter;
+            }
+        }
 
-        String sql = "INSERT INTO " + resultTables.getResultsName() + "(Tree_Level_Code,Total,type) " +
-                "WITH a AS(" +
-                " SELECT dep_id, description, tree_level_code,pptr,LEVEL_NUM, root FROM DEP_LEVEL " +
-                ")," +
-                "b AS(SELECT A001004_A dep_id, count(*) pn FROM emp_a001 WHERE status = 0 GROUP BY A001004_A) " +
-                " SELECT a.root, nvl(sum(b.pn), 0), 'A' FROM a LEFT JOIN b ON a.dep_id = b.dep_id " +
-                " GROUP BY root";
-
-        int count = jdbcTemplate.update(sql);
-        logger.info("insert " + count + "rows into SYS_CHECK_RESULTS table ");
-        logger.info("statisticsEmpNumOfDep success");
-    }
-
-    /**
-     * 统计单位数量 --B
-     */
-    private void statisticsNumOfDep() {
-        logger.info("statisticsNumOfDep begin...");
-
-        String sql = "INSERT INTO " + resultTables.getResultsName() + "(Tree_Level_Code,Total,type) " +
-                "WITH a AS(" +
-                " SELECT dep_id, description, tree_level_code,pptr,LEVEL_NUM, root FROM DEP_LEVEL " +
-                ")," +
-                "b AS(SELECT dep_id, count(1) pn FROM dep_b001 WHERE status = 0 GROUP BY dep_id)" +
-                " SELECT a.root, sum(nvl(b.pn, 0)), 'B' FROM a LEFT JOIN b ON a.dep_id = b.dep_id " +
-                " GROUP BY root";
-
-        int count = jdbcTemplate.update(sql);
-        logger.info("insert " + count + "rows into SYS_CHECK_RESULTS table ");
-        logger.info("statisticsNumOfDep success");
+        throw new Exception("no adapter for type " + typeId);
     }
 
 
@@ -277,6 +167,19 @@ public class DataStatisticsTask implements Task {
     private void deleteTableData(String tableName) {
         int count = jdbcTemplate.update("delete from " + tableName);
         logger.info("delete " + count + "rows from " + tableName + " table ");
+    }
+
+
+    /**
+     * 切换使用的结果表
+     */
+    private void switchResultTables() {
+        logger.info("switchResultTables begin...");
+
+        String sql = "UPDATE SYS_CHECK_RESULT_TABLES SET RESULT_TABLES = " + resultTables.getId() + ",UPDATE_DATE = sysdate";
+        jdbcTemplate.update(sql);
+
+        logger.info("switchResultTables success");
     }
 
 }

@@ -4,23 +4,19 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sinosoft.ops.cimp.dto.PaginationViewModel;
 import com.sinosoft.ops.cimp.entity.sys.check.QSysCheckCondition;
-import com.sinosoft.ops.cimp.entity.sys.check.QSysCheckItem;
 import com.sinosoft.ops.cimp.entity.sys.check.SysCheckCondition;
-import com.sinosoft.ops.cimp.entity.sys.check.SysCheckItem;
 import com.sinosoft.ops.cimp.mapper.sys.check.SysCheckConditionMapper;
 import com.sinosoft.ops.cimp.repository.sys.check.SysCheckConditionRepository;
-import com.sinosoft.ops.cimp.repository.sys.check.SysCheckItemRepository;
 import com.sinosoft.ops.cimp.repository.sys.check.SysCheckTypeRepository;
-import com.sinosoft.ops.cimp.schedule.beans.SysCheckResultTables;
+import com.sinosoft.ops.cimp.schedule.syscheck.SysCheckResultTables;
+import com.sinosoft.ops.cimp.schedule.syscheck.SysCheckTypeAdapter;
 import com.sinosoft.ops.cimp.service.sys.check.SysCheckService;
-import com.sinosoft.ops.cimp.util.SecurityUtils;
 import com.sinosoft.ops.cimp.vo.from.sys.check.SysCheckConditionAddModel;
 import com.sinosoft.ops.cimp.vo.from.sys.check.SysCheckConditionModifyModel;
 import com.sinosoft.ops.cimp.vo.from.sys.check.SysCheckConditionSearchModel;
 import com.sinosoft.ops.cimp.vo.from.sys.check.SysCheckQueryDataModel;
 import com.sinosoft.ops.cimp.vo.to.sys.check.SysCheckConditionModel;
 import com.sinosoft.ops.cimp.vo.to.sys.check.SysCheckStatisticsData;
-import com.sinosoft.ops.cimp.vo.to.sys.check.SysCheckStatisticsDataItem;
 import com.sinosoft.ops.cimp.vo.to.sys.check.SysCheckTypeModel;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,19 +35,18 @@ import java.util.stream.StreamSupport;
 public class SysCheckServiceImpl implements SysCheckService {
 
     private final SysCheckConditionRepository sysCheckConditionRepository;
-
-    private final SysCheckItemRepository sysCheckItemRepository;
     private final SysCheckTypeRepository sysCheckTypeRepository;
     private final JdbcTemplate jdbcTemplate;
     private final JPAQueryFactory jpaQueryFactory;
+    private final SysCheckTypeAdapter[] typeAdapters;
 
     @Autowired
-    public SysCheckServiceImpl(SysCheckConditionRepository sysCheckConditionRepository, SysCheckItemRepository sysCheckItemRepository, SysCheckTypeRepository sysCheckTypeRepository, JdbcTemplate jdbcTemplate, JPAQueryFactory jpaQueryFactory) {
+    public SysCheckServiceImpl(SysCheckConditionRepository sysCheckConditionRepository, SysCheckTypeRepository sysCheckTypeRepository, JdbcTemplate jdbcTemplate, JPAQueryFactory jpaQueryFactory, SysCheckTypeAdapter[] typeAdapters) {
         this.sysCheckConditionRepository = sysCheckConditionRepository;
-        this.sysCheckItemRepository = sysCheckItemRepository;
         this.sysCheckTypeRepository = sysCheckTypeRepository;
         this.jdbcTemplate = jdbcTemplate;
         this.jpaQueryFactory = jpaQueryFactory;
+        this.typeAdapters = typeAdapters;
     }
 
     /**
@@ -83,7 +78,10 @@ public class SysCheckServiceImpl implements SysCheckService {
             builder.and(qCondition.typeId.eq(searchModel.getTypeId()));
         }
         if (StringUtils.isNotEmpty(searchModel.getName())) {
-            builder.and(qCondition.name.contains(searchModel.getName()));
+            builder.and(qCondition.name.contains(searchModel.getName().trim()));
+        }
+        if (StringUtils.isNotEmpty(searchModel.getWherePart())) {
+            builder.and(qCondition.wherePart.contains(searchModel.getWherePart().trim()));
         }
 
         List<SysCheckConditionModel> models = null;
@@ -159,48 +157,48 @@ public class SysCheckServiceImpl implements SysCheckService {
      */
     @Override
     public List<SysCheckStatisticsData> queryData(SysCheckQueryDataModel queryModel) {
-        QSysCheckItem qCheckItem = QSysCheckItem.sysCheckItem;
+//        QSysCheckItem qCheckItem = QSysCheckItem.sysCheckItem;
         List<SysCheckStatisticsData> resultList = new ArrayList<>();
 
-        List<SysCheckItem> sysCheckItems = sysCheckItemRepository.findBySysCheckConditionId(queryModel.getSysCheckConditionId());
-
-        //如果请求参数中单位id为空，根据当前用户的数据权限查询，否则，查询其下级单位
-        String depCodeSqlWhere = " select B001001_A from dep_b001 where ";
-        if (StringUtils.isNotEmpty(queryModel.getOrgId())) {
-            depCodeSqlWhere += "pptr in (select B001001_A from dep_b001 where dep_id ='" + queryModel.getOrgId() + "') ";
-        } else {
-            //当前用户的数据权限
-            String dataOrgId = SecurityUtils.getSubject().getCurrentUser().getDataOrganizationId();
-//            String dataOrgId = "DC5C7986DAEF50C1E02AB09B442EE34F";
-            depCodeSqlWhere += "DEP_ID ='" + dataOrgId + "'";
-        }
-
-        String type = null;
-        for (SysCheckItem sysCheckItem : sysCheckItems) {
-            type = sysCheckItem.getType();
-
-            SysCheckStatisticsData data = new SysCheckStatisticsData();
-            data.setTitle("下级各单位数据采集情况");
-            data.setType(type);
-
-            //只处理类型为A B 的
-            if (!"A".equalsIgnoreCase(type) && !"B".equalsIgnoreCase(type)) {
-                continue;
-            }
-
-            data.setItems(jdbcTemplate.queryForList(getQuerySqlAB(depCodeSqlWhere, sysCheckItem.getId(), type))
-                    .stream().map(map -> {
-                        SysCheckStatisticsDataItem item = new SysCheckStatisticsDataItem();
-                        item.setName(map.get("name").toString());
-                        item.setNum(map.get("num").toString());
-                        item.setOrgId(map.get("id").toString());
-                        item.setTotal(map.get("total").toString());
-                        item.setHasChildren(Integer.parseInt(map.get("childNum").toString()) > 0);
-
-                        return item;
-                    }).collect(Collectors.toList()));
-            resultList.add(data);
-        }
+//        List<SysCheckItem> sysCheckItems = sysCheckItemRepository.findBySysCheckConditionId(queryModel.getSysCheckConditionId());
+//
+//        //如果请求参数中单位id为空，根据当前用户的数据权限查询，否则，查询其下级单位
+//        String depCodeSqlWhere = " select B001001_A from dep_b001 where ";
+//        if (StringUtils.isNotEmpty(queryModel.getOrgId())) {
+//            depCodeSqlWhere += "pptr in (select B001001_A from dep_b001 where dep_id ='" + queryModel.getOrgId() + "') ";
+//        } else {
+//            //当前用户的数据权限
+//            String dataOrgId = SecurityUtils.getSubject().getCurrentUser().getDataOrganizationId();
+////            String dataOrgId = "DC5C7986DAEF50C1E02AB09B442EE34F";
+//            depCodeSqlWhere += "DEP_ID ='" + dataOrgId + "'";
+//        }
+//
+//        String type = null;
+//        for (SysCheckItem sysCheckItem : sysCheckItems) {
+//            type = sysCheckItem.getType();
+//
+//            SysCheckStatisticsData data = new SysCheckStatisticsData();
+//            data.setTitle("下级各单位数据采集情况");
+//            data.setType(type);
+//
+//            //只处理类型为A B 的
+//            if (!"A".equalsIgnoreCase(type) && !"B".equalsIgnoreCase(type)) {
+//                continue;
+//            }
+//
+//            data.setItems(jdbcTemplate.queryForList(getQuerySqlAB(depCodeSqlWhere, sysCheckItem.getId(), type))
+//                    .stream().map(map -> {
+//                        SysCheckStatisticsDataItem item = new SysCheckStatisticsDataItem();
+//                        item.setName(map.get("name").toString());
+//                        item.setNum(map.get("num").toString());
+//                        item.setOrgId(map.get("id").toString());
+//                        item.setTotal(map.get("total").toString());
+//                        item.setHasChildren(Integer.parseInt(map.get("childNum").toString()) > 0);
+//
+//                        return item;
+//                    }).collect(Collectors.toList()));
+//            resultList.add(data);
+//        }
 
         return resultList;
     }

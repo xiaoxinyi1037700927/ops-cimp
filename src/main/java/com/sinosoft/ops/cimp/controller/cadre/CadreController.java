@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
@@ -184,5 +185,15 @@ public class CadreController extends BaseController {
         }
     }
 
+
+    @ApiOperation(value = "上传干部图片")
+    @PostMapping(value = "/uploadPhoto")
+    public ResponseEntity uploadPhoto(@RequestParam("photo") MultipartFile photo, @RequestParam("empId") String empId) throws BusinessException {
+        if (photo.isEmpty()) {
+            return fail("上传图片不能为空！");
+        }
+
+        return cadreService.uploadPhoto(empId, photo) ? ok("上传成功!") : fail("上传失败！");
+    }
 
 }

@@ -1,4 +1,4 @@
-package com.sinosoft.ops.cimp.schedule.beans;
+package com.sinosoft.ops.cimp.schedule.syscheck;
 
 /**
  * 查错统计结果表，用2套是为了保证在定时任务生成统计数据时的可用性

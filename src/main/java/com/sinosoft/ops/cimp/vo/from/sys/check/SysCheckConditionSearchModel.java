@@ -18,6 +18,11 @@ public class SysCheckConditionSearchModel extends RePagination {
      */
     @ApiModelProperty(value = "条件名称")
     private String name;
+    /**
+     * 查询条件部分
+     */
+    @ApiModelProperty(value = "查询条件部分")
+    private String wherePart;
 
     public String getTypeId() {
         return typeId;
@@ -33,5 +38,13 @@ public class SysCheckConditionSearchModel extends RePagination {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getWherePart() {
+        return wherePart;
+    }
+
+    public void setWherePart(String wherePart) {
+        this.wherePart = wherePart;
     }
 }
