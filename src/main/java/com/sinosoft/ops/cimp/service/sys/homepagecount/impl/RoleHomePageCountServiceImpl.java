@@ -19,6 +19,7 @@ import org.springframework.util.StringUtils;
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,6 +50,7 @@ public class RoleHomePageCountServiceImpl implements RoleHomePageCountService {
         RoleHomePageCount po = new RoleHomePageCount();
         if (StringUtils.isEmpty(model.getId())) {
             BeanUtils.copyProperties(model, po);
+            po.setCreateTime(new Date());
         } else {
             Optional<RoleHomePageCount> one = roleHomePageCountRepository.findById(model.getId());
             if (one.isPresent()) {
@@ -90,6 +92,7 @@ public class RoleHomePageCountServiceImpl implements RoleHomePageCountService {
                 .from(qRoleHomePageCount)
                 .leftJoin(qRole).on(qRole.id.eq(qRoleHomePageCount.roleId))
                 .where(builder)
+                .orderBy(qRoleHomePageCount.createTime.asc())
                 .fetch();
 
 

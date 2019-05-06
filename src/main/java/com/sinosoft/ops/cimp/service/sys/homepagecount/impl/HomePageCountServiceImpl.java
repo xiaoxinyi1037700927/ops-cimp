@@ -75,7 +75,7 @@ public class HomePageCountServiceImpl implements HomePageCountService {
         QRoleHomePageCount qRoleHomePageCount = QRoleHomePageCount.roleHomePageCount;
 
         //查询角色对应的统计信息
-        Iterable<RoleHomePageCount> roleHomePageCounts = roleHomePageCountRepository.findAll(qRoleHomePageCount.roleId.in(roleIdList));
+        Iterable<RoleHomePageCount> roleHomePageCounts = roleHomePageCountRepository.findAll(qRoleHomePageCount.roleId.in(roleIdList), qRoleHomePageCount.createTime.asc());
         List<RoleHomePageCount> roleHomePageCountList = Lists.newArrayList(roleHomePageCounts);
 
         return roleHomePageCountList;
