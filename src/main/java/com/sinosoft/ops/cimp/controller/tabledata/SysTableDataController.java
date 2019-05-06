@@ -27,6 +27,7 @@ import com.sinosoft.ops.cimp.service.user.RolePermissionPageSqlService;
 import com.sinosoft.ops.cimp.service.user.RolePermissionTableService;
 import com.sinosoft.ops.cimp.service.user.UserCollectionTableService;
 import com.sinosoft.ops.cimp.util.JsonUtil;
+import com.sinosoft.ops.cimp.util.OrganizationUtil;
 import com.sinosoft.ops.cimp.util.SecurityUtils;
 import com.sinosoft.ops.cimp.vo.from.user.rolePermissionPageSql.RPPageSqlSearchModel;
 import com.sinosoft.ops.cimp.vo.to.organization.OrganizationSearchViewModel;
@@ -68,6 +69,7 @@ public class SysTableDataController extends BaseController {
     private final OrganizationService organizationService;
     private final RolePermissionPageSqlService rolePermissionPageSqlService;
     private final JdbcTemplate jdbcTemplate;
+    private final OrganizationUtil organizationUtil;
     private ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
 
     @Autowired
@@ -75,7 +77,7 @@ public class SysTableDataController extends BaseController {
                                   SysTableInfoDao sysTableInfoDao,
                                   SysTableTypeService sysTableTypeService,
                                   RolePermissionTableService rolePermissionTableService,
-                                  UserCollectionTableService userCollectionTableService, SysAppTableAccessService tableAccessService, SysAppFieldAccessService fieldAccessService, OrganizationService organizationService, RolePermissionPageSqlService rolePermissionPageSqlService, JdbcTemplate jdbcTemplate) {
+                                  UserCollectionTableService userCollectionTableService, SysAppTableAccessService tableAccessService, SysAppFieldAccessService fieldAccessService, OrganizationService organizationService, RolePermissionPageSqlService rolePermissionPageSqlService, JdbcTemplate jdbcTemplate, OrganizationUtil organizationUtil) {
         this.sysTableModelInfoService = sysTableModelInfoService;
         this.sysTableInfoDao = sysTableInfoDao;
         this.sysTableTypeService = sysTableTypeService;
@@ -86,6 +88,7 @@ public class SysTableDataController extends BaseController {
         this.organizationService = organizationService;
         this.rolePermissionPageSqlService = rolePermissionPageSqlService;
         this.jdbcTemplate = jdbcTemplate;
+        this.organizationUtil = organizationUtil;
     }
 
     @RequestMapping(value = "/getSysTableTypes", method = RequestMethod.GET)
@@ -324,6 +327,14 @@ public class SysTableDataController extends BaseController {
             }
             formMap = saveFormData;
         }
+
+        //保存单位
+        if (StringUtils.equalsIgnoreCase(tableName, "DepB001")) {
+            String code = formMap.get("PPTR").toString() + "." + formMap.get("treeLevelCode").toString();
+            formMap.put("treeLevelCode", code);
+            formMap.put("ORDINAL",jdbcTemplate.queryForMap("select nvl(max(nvl(ORDINAL,0)),0)+1 as ordinal from DEP_B001").get("ordinal"));
+        }
+
         QueryDataParamBuilder queryDataParam = new QueryDataParamBuilder();
 
         queryDataParam.setPrjCode(appCode)
@@ -360,6 +371,11 @@ public class SysTableDataController extends BaseController {
             }
         }
 
+        if (StringUtils.equalsIgnoreCase(tableName, "DepB001")) {
+            //新增单位时，同步到organization表
+            String tableNameEnPKValue = dataParamBuilder.getTableNameEnPKValue().toString();
+            executorService.submit(() -> organizationUtil.execute(tableNameEnPKValue));
+        }
 
         return ok("保存成功");
     }

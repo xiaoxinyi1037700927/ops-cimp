@@ -1,8 +1,9 @@
 package com.sinosoft.ops.cimp.entity.oraganization;
 
-import org.hibernate.annotations.GenericGenerator;
-
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.util.Date;
 
 /**
@@ -110,8 +111,6 @@ public class Organization {
     }
 
     @Id
-    @GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid", strategy = "uuid")
     @Column(length = 50)
     public String getId() {
         return id;

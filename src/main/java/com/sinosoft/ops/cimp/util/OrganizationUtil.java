@@ -94,7 +94,7 @@ public class OrganizationUtil {
      */
     public void execute(String id) {
         Optional<DepB001> depB001 = depB001Dao.findById(id);
-        String code = depB001.get().getCode();
+        String code = depB001.get().getTreeLevelCode();
         String parentId = null;
         if (code.length() > 3) {
             String parentCode = code.substring(0, code.length() - 4);
