@@ -92,7 +92,11 @@
             <engineName>ehcache</engineName>
             <cacheDesc>所有单位包含中管干部缓存</cacheDesc>
         </CacheItem>
-
+        <CacheItem>
+            <cacheName>SYS_CODE_SET_CACHE</cacheName>
+            <engineName>hashCache</engineName>
+            <cacheDesc>系统码表项和码表值缓存</cacheDesc>
+        </CacheItem>
         <!--控制层脚本缓存-->
         <CacheItem>
             <cacheName>SCRIPT_CONTROL_CACHE</cacheName>
