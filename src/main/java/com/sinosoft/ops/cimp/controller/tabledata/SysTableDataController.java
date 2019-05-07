@@ -278,106 +278,27 @@ public class SysTableDataController extends BaseController {
             @RequestParam("tableNameFKValue") String tableNameFKValue,
             @RequestParam("form") String form) throws BusinessException {
 
-        if (StringUtils.isEmpty(tableTypeName)) {
-            return fail("保存信息集数据必须指定表名类型");
-        }
-        if (StringUtils.isEmpty(tableName)) {
-            return fail("保存信息集必须指定表名");
-        }
-        if (StringUtils.isEmpty(tableNamePK)) {
-            return fail("保存信息集必须指定信息集主键字段");
-        }
+        return this.saveSysData(appCode, tableTypeName, tableName, tableNamePK, tableNameFK, tableNameFKValue, form);
+    }
 
-        SysTableModelInfo tableInfo = sysTableInfoDao.getTableInfo(tableTypeName);
-        if (tableInfo == null) {
-            return fail("请确认实体名称和项目编号存在");
-        }
+    @RequestMapping(value = "batchSaveSysTableData", method = RequestMethod.POST)
+    public ResponseEntity batchSaveSysTableData(
+            @RequestParam("appCode") String appCode,
+            @RequestParam("tableTypeName") String tableTypeName,
+            @RequestParam("tableName") String tableName,
+            @RequestParam("tableNamePK") String tableNamePK,
+            @RequestParam("tableNameFK") String tableNameFK,
+            @RequestParam("tableNameFKValue") String tableNameFKValue,
+            @RequestParam("form") String form) throws BusinessException {
 
-        String primaryKey = tableInfo.getPrimaryKey();
-        if (!StringUtils.equals(primaryKey, tableNamePK)) {
-            if (StringUtils.isEmpty(tableNameFK)) {
-                return fail("当前保存的信息项非主集则必须传递tableNameFK属性");
+        if (StringUtils.isNotEmpty(tableNameFKValue)) {
+            String[] tableNameFKValues = tableNameFKValue.split(",");
+
+            for (String table_name_FK_value : tableNameFKValues) {
+                this.saveSysData(appCode, tableTypeName, tableName, tableNamePK, tableNameFK, table_name_FK_value, form);
             }
         }
-
-        //权限判断
-        Map<String, SysAppTableAccessModel> tableAccessMap = tableAccessService.getTableAccess(appCode);
-        Map<String, SysTableInfo> tableNameEnMap = tableInfo.getTables().stream().collect(Collectors.toMap(SysTableInfo::getNameEn, (v) -> v, (s1, s2) -> s1));
-        SysTableInfo sysTableInfo = tableNameEnMap.get(tableName);
-        if (sysTableInfo == null) {
-            return fail("操作的信息集未配置");
-        }
-        SysAppTableAccessModel sysAppTableAccessModel = tableAccessMap.get(sysTableInfo.getId());
-        if (sysAppTableAccessModel == null) {
-            return fail("没有操作信息集的权限");
-        }
-        Map formMap;
-        if (sysAppTableAccessModel.getCanWriteAll()) {
-            formMap = JsonUtil.parseStringToObject(form, HashMap.class);
-        } else {
-            HashMap<String, Object> saveFormData = JsonUtil.parseStringToObject(form, HashMap.class);
-            Map<String, SysAppFieldAccessModel> fieldAccessMap = fieldAccessService.getFieldAccess(appCode, sysTableInfo.getId());
-            List<String> nameEnList = fieldAccessMap.values().stream().map(SysAppFieldAccessModel::getNameEn).collect(Collectors.toList());
-
-            ArrayList formDataKeys = Lists.newArrayList(saveFormData.keySet());
-            for (Object formDataKey : formDataKeys) {
-                if (!nameEnList.contains(formDataKey)) {
-                    saveFormData.entrySet().removeIf(e -> StringUtils.equals(e.getKey(), String.valueOf(formDataKey)));
-                }
-            }
-            formMap = saveFormData;
-        }
-
-        //保存单位
-        if (StringUtils.equalsIgnoreCase(tableName, "DepB001")) {
-            String code = formMap.get("PPTR").toString() + "." + formMap.get("treeLevelCode").toString();
-            formMap.put("treeLevelCode", code);
-            formMap.put("ORDINAL",jdbcTemplate.queryForMap("select nvl(max(nvl(ORDINAL,0)),0)+1 as ordinal from DEP_B001").get("ordinal"));
-        }
-
-        QueryDataParamBuilder queryDataParam = new QueryDataParamBuilder();
-
-        queryDataParam.setPrjCode(appCode)
-                .setTableTypeNameEn(tableTypeName)
-                .setTableNameEn(tableName)
-                .setTableNameEnPK(tableNamePK)
-                .setTableNameEnFK(tableNameFK)
-                .setTableNameEnFKValue(tableNameFKValue)
-                .setSaveOrUpdateFormData(formMap);
-
-        QueryDataParamBuilder dataParamBuilder = sysTableModelInfoService.saveData(queryDataParam);
-
-        if (StringUtils.equalsIgnoreCase(tableTypeName, "CadreInfo")) {
-            //如果primaryKey和tableNamePK不一致则表明保存的是子集
-            if (!StringUtils.equals(primaryKey, tableNamePK)) {
-                if (StringUtils.isNotEmpty(tableNameFKValue)) {
-                    executorService.submit(() -> {
-                        try {
-                            ExportManager.generate(new ExportGbrmbHtmlBiJie(tableNameFKValue));
-                        } catch (Exception e) {
-                            LOGGER.error("异步生成干部任免表html失败", e);
-                        }
-                    });
-                }
-            } else {
-                Object tableNameEnPKValue = dataParamBuilder.getTableNameEnPKValue();
-                executorService.submit(() -> {
-                    try {
-                        ExportManager.generate(new ExportGbrmbHtmlBiJie(String.valueOf(tableNameEnPKValue)));
-                    } catch (Exception e) {
-                        LOGGER.error("异步生成干部任免表html失败", e);
-                    }
-                });
-            }
-        }
-
-        if (StringUtils.equalsIgnoreCase(tableName, "DepB001")) {
-            //新增单位时，同步到organization表
-            String tableNameEnPKValue = dataParamBuilder.getTableNameEnPKValue().toString();
-            executorService.submit(() -> organizationUtil.execute(tableNameEnPKValue));
-        }
-
-        return ok("保存成功");
+        return ok("批量新增成功");
     }
 
     @RequestMapping(value = "updateSysTableData", method = RequestMethod.POST)
@@ -604,5 +525,109 @@ public class SysTableDataController extends BaseController {
             }
         }
         return ok(resultMap);
+    }
+
+
+    private ResponseEntity saveSysData(String appCode, String tableTypeName, String tableName, String
+            tableNamePK, String tableNameFK, String tableNameFKValue, String form) throws BusinessException {
+        if (StringUtils.isEmpty(tableTypeName)) {
+            return fail("保存信息集数据必须指定表名类型");
+        }
+        if (StringUtils.isEmpty(tableName)) {
+            return fail("保存信息集必须指定表名");
+        }
+        if (StringUtils.isEmpty(tableNamePK)) {
+            return fail("保存信息集必须指定信息集主键字段");
+        }
+
+        SysTableModelInfo tableInfo = sysTableInfoDao.getTableInfo(tableTypeName);
+        if (tableInfo == null) {
+            return fail("请确认实体名称和项目编号存在");
+        }
+
+        String primaryKey = tableInfo.getPrimaryKey();
+        if (!StringUtils.equals(primaryKey, tableNamePK)) {
+            if (StringUtils.isEmpty(tableNameFK)) {
+                return fail("当前保存的信息项非主集则必须传递tableNameFK属性");
+            }
+        }
+
+        //权限判断
+        Map<String, SysAppTableAccessModel> tableAccessMap = tableAccessService.getTableAccess(appCode);
+        Map<String, SysTableInfo> tableNameEnMap = tableInfo.getTables().stream().collect(Collectors.toMap(SysTableInfo::getNameEn, (v) -> v, (s1, s2) -> s1));
+        SysTableInfo sysTableInfo = tableNameEnMap.get(tableName);
+        if (sysTableInfo == null) {
+            return fail("操作的信息集未配置");
+        }
+        SysAppTableAccessModel sysAppTableAccessModel = tableAccessMap.get(sysTableInfo.getId());
+        if (sysAppTableAccessModel == null) {
+            return fail("没有操作信息集的权限");
+        }
+        Map formMap;
+        if (sysAppTableAccessModel.getCanWriteAll()) {
+            formMap = JsonUtil.parseStringToObject(form, HashMap.class);
+        } else {
+            HashMap<String, Object> saveFormData = JsonUtil.parseStringToObject(form, HashMap.class);
+            Map<String, SysAppFieldAccessModel> fieldAccessMap = fieldAccessService.getFieldAccess(appCode, sysTableInfo.getId());
+            List<String> nameEnList = fieldAccessMap.values().stream().map(SysAppFieldAccessModel::getNameEn).collect(Collectors.toList());
+
+            ArrayList formDataKeys = Lists.newArrayList(saveFormData.keySet());
+            for (Object formDataKey : formDataKeys) {
+                if (!nameEnList.contains(formDataKey)) {
+                    saveFormData.entrySet().removeIf(e -> StringUtils.equals(e.getKey(), String.valueOf(formDataKey)));
+                }
+            }
+            formMap = saveFormData;
+        }
+
+        //保存单位
+        if (StringUtils.equalsIgnoreCase(tableName, "DepB001")) {
+            String code = formMap.get("PPTR").toString() + "." + formMap.get("treeLevelCode").toString();
+            formMap.put("treeLevelCode", code);
+            formMap.put("ORDINAL", jdbcTemplate.queryForMap("select nvl(max(nvl(ORDINAL,0)),0)+1 as ordinal from DEP_B001").get("ordinal"));
+        }
+
+        QueryDataParamBuilder queryDataParam = new QueryDataParamBuilder();
+
+        queryDataParam.setPrjCode(appCode)
+                .setTableTypeNameEn(tableTypeName)
+                .setTableNameEn(tableName)
+                .setTableNameEnPK(tableNamePK)
+                .setTableNameEnFK(tableNameFK)
+                .setTableNameEnFKValue(tableNameFKValue)
+                .setSaveOrUpdateFormData(formMap);
+
+        QueryDataParamBuilder dataParamBuilder = sysTableModelInfoService.saveData(queryDataParam);
+
+        if (StringUtils.equalsIgnoreCase(tableTypeName, "CadreInfo")) {
+            //如果primaryKey和tableNamePK不一致则表明保存的是子集
+            if (!StringUtils.equals(primaryKey, tableNamePK)) {
+                if (StringUtils.isNotEmpty(tableNameFKValue)) {
+                    executorService.submit(() -> {
+                        try {
+                            ExportManager.generate(new ExportGbrmbHtmlBiJie(tableNameFKValue));
+                        } catch (Exception e) {
+                            LOGGER.error("异步生成干部任免表html失败", e);
+                        }
+                    });
+                }
+            } else {
+                Object tableNameEnPKValue = dataParamBuilder.getTableNameEnPKValue();
+                executorService.submit(() -> {
+                    try {
+                        ExportManager.generate(new ExportGbrmbHtmlBiJie(String.valueOf(tableNameEnPKValue)));
+                    } catch (Exception e) {
+                        LOGGER.error("异步生成干部任免表html失败", e);
+                    }
+                });
+            }
+        }
+
+        if (StringUtils.equalsIgnoreCase(tableName, "DepB001")) {
+            //新增单位时，同步到organization表
+            String tableNameEnPKValue = dataParamBuilder.getTableNameEnPKValue().toString();
+            executorService.submit(() -> organizationUtil.execute(tableNameEnPKValue));
+        }
+        return ok("保存成功");
     }
 }
