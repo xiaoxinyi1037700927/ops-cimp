@@ -1,0 +1,105 @@
+/* html, body {
+	width: 100%;
+	height: 100%;
+}
+
+.ifie-layout-container {
+	width: 100%;
+	height: 100%;
+	background: url("/static/ifIE/img/access_loginbg.jpg");
+	background-size: cover;
+	background-position: center;
+}
+
+.ifie-layout-container .main {
+	width: 100%;
+	font-size: 0;
+}
+
+.ifie-layout-container .main .sologan-wrapper {
+	display: inline-block;
+	width: 50%;
+	height: 100%;
+	text-align: center;
+	position: absolute;
+	top: 0;
+}
+
+.ifie-header-wrapper {
+	width: 100%;
+	height: 65px;
+	border-bottom: 1px solid #fff;
+}
+
+.ifie-header-wrapper .logo span {
+	display: inline-block;
+	margin: 0 10px;
+	width: 260px;
+	height: 50px;
+	background: url("/static/ifIE/img/title_00000.png");
+}
+
+.ifie-sologon-wrapper {
+	display: inline-block;
+	width: 50%;
+	height: 100%;
+	text-align: center;
+	position: absolute;
+	top: 0;
+}
+
+.ifie-sologon-wrapper:before {
+	content: '';
+	display: inline-block;
+	width: 1px;
+	height: 100%;
+	vertical-align: middle;
+}
+
+.ifie-hint-container {
+	display: inline-block;
+	width: 100%;
+	height: 100%;
+	text-align: center;
+	position: absolute;
+	top: 0;
+}
+
+.ifie-hint-container:before {
+	content: '';
+	display: inline-block;
+	width: 1px;
+	height: 100%;
+	vertical-align: middle;
+}
+
+.ifie-hint-wrapper {
+	display: inline-block;
+	margin: 100px 0 0 0;
+	padding: 30px;
+	width: 360px;
+	background: #fff;
+	vertical-align: middle;
+}
+
+.ifie-hint-wrapper .welcome {
+	display: block;
+	font-size: 20px;
+}
+.ifie-hint-wrapper .title {
+	display: none;
+	font-size: 20px;
+}
+
+.ifie-hint-wrapper .title span {
+	display: inline-block;
+	width: 100%;
+	height: 30px;
+	background: url("/static/ifIE/img/access_logintitle.png");
+	background-repeat: no-repeat;
+	background-position: left;
+}
+
+.ifie-hint-wrapper a:hover {
+	color: #0e77ca;
+} */
