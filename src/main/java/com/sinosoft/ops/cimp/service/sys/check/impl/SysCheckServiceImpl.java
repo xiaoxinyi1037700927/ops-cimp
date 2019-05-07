@@ -166,7 +166,6 @@ public class SysCheckServiceImpl implements SysCheckService {
     public SysCheckResultModel listSysCheckResult(SysCheckSearchModel searchModel) {
         //当前用户数据权限
         String dataOrgId = SecurityUtils.getSubject().getCurrentUser().getDataOrganizationId();
-//        String dataOrgId = "DC5C7986DAEF50C1E02AB09B442EE34F";
         String code = organizationRepository.findById(dataOrgId).get().getCode();
 
         //获取结果集的表名
@@ -231,7 +230,6 @@ public class SysCheckServiceImpl implements SysCheckService {
         } else {
             //当前用户的数据权限
             String dataOrgId = SecurityUtils.getSubject().getCurrentUser().getDataOrganizationId();
-//            String dataOrgId = "DC5C7986DAEF50C1E02AB09B442EE34F";
             depCodeSqlWhere += "DEP_ID ='" + dataOrgId + "'";
         }
 
@@ -255,9 +253,10 @@ public class SysCheckServiceImpl implements SysCheckService {
         int startIndex = (pageIndex - 1) * pageSize;
         int endIndex = pageIndex * pageSize;
 
-        //当前用户的数据权限
-//        String dataOrgId = SecurityUtils.getSubject().getCurrentUser().getDataOrganizationId();
-        String dataOrgId = "DC5C7986DAEF50C1E02AB09B442EE34F";
+        String wherePart = condition.getWherePart();
+        if (StringUtils.isNotBlank(searchModel.getKeywords())) {
+            wherePart += " and t1.A01001 || b001.B01001 like '%" + searchModel.getKeywords().trim() + "%'";
+        }
 
         String sql = "select EMP_ID as \"empId\"," +
                 "       A01001 as \"name\"," +
@@ -277,10 +276,11 @@ public class SysCheckServiceImpl implements SysCheckService {
                 "                                          inner join ORGANIZATION org on a02.A02001_B = org.ID" +
                 "                                 where a02.STATUS = '0'" +
                 "                                   and a02.A02055 = '2'" +
-                "                                   and org.CODE like (select code || '%' from ORGANIZATION where ID = '" + dataOrgId + "')" +
+                "                                   and org.CODE like (select code || '%' from ORGANIZATION where ID = '" + searchModel.getOrgId() + "')" +
                 "                                 group by a02.EMP_ID) tmp on t1.EMP_ID = tmp.EMP_ID" +
-                "              and t1.STATUS = '0' and " +
-                condition.getWherePart() +
+                "            left join DEP_B001 b001 on b001.DEP_ID = t1.A001004_A  " +
+                "              where t1.STATUS = '0' and " +
+                wherePart +
                 "            order by tmp.codeLen, tmp.code, tmp.sortNum, t1.ORDINAL) t" +
                 "      where ROWNUM <= '" + endIndex + "') t" +
                 " where rn > '" + startIndex + "'";
@@ -292,10 +292,11 @@ public class SysCheckServiceImpl implements SysCheckService {
                 "                                          inner join ORGANIZATION org on a02.A02001_B = org.ID" +
                 "                                 where a02.STATUS = '0'" +
                 "                                   and a02.A02055 = '2'" +
-                "                                   and org.CODE like (select code || '%' from ORGANIZATION where ID = '" + dataOrgId + "')" +
+                "                                   and org.CODE like (select code || '%' from ORGANIZATION where ID = '" + searchModel.getOrgId() + "')" +
                 "                                 group by a02.EMP_ID) tmp on t1.EMP_ID = tmp.EMP_ID" +
-                "              and t1.STATUS = '0' and " +
-                condition.getWherePart();
+                "            left join DEP_B001 b001 on b001.DEP_ID = t1.A001004_A  " +
+                "              where t1.STATUS = '0' and " +
+                wherePart;
 
         List<SysCheckEmpModel> models = jdbcTemplate.queryForList(sql).stream().map(map -> {
             SysCheckEmpModel model = new SysCheckEmpModel();
