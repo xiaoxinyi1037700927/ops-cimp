@@ -46,8 +46,8 @@
 
         <dependency>
             <groupId>com.oracle</groupId>
-            <artifactId>ojdbc6</artifactId>
-            <version>11</version>
+            <artifactId>ojdbc8</artifactId>
+            <version>12.2.0.1</version>
         </dependency>
         <!-- Swagger2 Dependency Begin-->
         <dependency>
@@ -212,7 +212,6 @@
             <artifactId>poi-ooxml-schemas</artifactId>
             <version>3.9</version>
         </dependency>
-
 
 
     </dependencies>
