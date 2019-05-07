@@ -10,6 +10,7 @@ import com.sinosoft.ops.cimp.mapper.user.RolePermissionTableMapper;
 import com.sinosoft.ops.cimp.repository.user.RolePermissionTableRepository;
 import com.sinosoft.ops.cimp.service.user.RolePermissionTableService;
 import com.sinosoft.ops.cimp.util.SecurityUtils;
+import com.sinosoft.ops.cimp.vo.from.user.rolePermissionTable.RPTableAddListModel;
 import com.sinosoft.ops.cimp.vo.from.user.rolePermissionTable.RPTableAddModel;
 import com.sinosoft.ops.cimp.vo.from.user.rolePermissionTable.RPTableSearchModel;
 import com.sinosoft.ops.cimp.vo.to.user.rolePermissionTable.RPTableModifyModel;
@@ -104,16 +105,18 @@ public class RolePermissionTableServiceImpl implements RolePermissionTableServic
     }
 
     @Override
-    public Boolean saveRPTable(RPTableAddModel addModel) {
-        RolePermissionTable rolePermissionTable = RolePermissionTableMapper.INSTANCE.addModelToRPTableAddModel(addModel);
-        Integer sortNumber = rolePermissionTableRepository.getSortNumberByRoleId(addModel.getRoleId());
-        if (sortNumber != null) {
-            sortNumber++;
-        } else {
-            sortNumber = 0;
+    public Boolean saveRPTable(RPTableAddListModel addModel) {
+        for (RPTableAddModel rpTableAddModel: addModel.getRpTableAddModels()) {
+            RolePermissionTable rolePermissionTable = RolePermissionTableMapper.INSTANCE.addModelToRPTableAddModel(rpTableAddModel);
+            Integer sortNumber = rolePermissionTableRepository.getSortNumberByRoleId(rpTableAddModel.getRoleId());
+            if (sortNumber != null) {
+                sortNumber++;
+            } else {
+                sortNumber = 0;
+            }
+            rolePermissionTable.setSortNumber(sortNumber);
+            rolePermissionTableRepository.save(rolePermissionTable);
         }
-        rolePermissionTable.setSortNumber(sortNumber);
-        rolePermissionTableRepository.save(rolePermissionTable);
         return true;
     }
 

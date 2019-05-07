@@ -7,6 +7,7 @@ import com.sinosoft.ops.cimp.dto.PaginationViewModel;
 import com.sinosoft.ops.cimp.entity.user.RolePermissionTable;
 import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.service.user.RolePermissionTableService;
+import com.sinosoft.ops.cimp.vo.from.user.rolePermissionTable.RPTableAddListModel;
 import com.sinosoft.ops.cimp.vo.from.user.rolePermissionTable.RPTableAddModel;
 import com.sinosoft.ops.cimp.vo.from.user.rolePermissionTable.RPTableDeleteModel;
 import com.sinosoft.ops.cimp.vo.from.user.rolePermissionTable.RPTableSearchModel;
@@ -55,7 +56,7 @@ public class RolePermissionTableController extends BaseController {
     @ApiOperation(value = "新增角色关联table")
     @PostMapping("/saveRPTable")
     @RequiresAuthentication
-    public ResponseEntity<Boolean> saveRPTable(@RequestBody RPTableAddModel addModel) throws BusinessException {
+    public ResponseEntity<Boolean> saveRPTable(@RequestBody RPTableAddListModel addModel) throws BusinessException {
         Boolean result = rolePermissionTableService.saveRPTable(addModel);
         if (result) {
             return ok(result);

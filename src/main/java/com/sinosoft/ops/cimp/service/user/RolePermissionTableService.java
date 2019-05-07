@@ -1,6 +1,7 @@
 package com.sinosoft.ops.cimp.service.user;
 
 import com.sinosoft.ops.cimp.dto.PaginationViewModel;
+import com.sinosoft.ops.cimp.vo.from.user.rolePermissionTable.RPTableAddListModel;
 import com.sinosoft.ops.cimp.vo.from.user.rolePermissionTable.RPTableAddModel;
 import com.sinosoft.ops.cimp.vo.from.user.rolePermissionTable.RPTableSearchModel;
 import com.sinosoft.ops.cimp.vo.to.user.rolePermissionTable.RPTableModifyModel;
@@ -43,7 +44,7 @@ public interface RolePermissionTableService {
      * @param addModel
      * @return
      */
-    Boolean saveRPTable(RPTableAddModel addModel);
+    Boolean saveRPTable(RPTableAddListModel addModel);
 
     /**
      * 修改 角色关联table
