@@ -21,6 +21,19 @@ public interface SysCheckTypeAdapter {
     void statisticsTotalWrongNum(JdbcTemplate jdbcTemplate, SysCheckCondition condition, String tableName);
 
     /**
+     * 获取总数
+     */
+    Integer getTotalNum(JdbcTemplate jdbcTemplate, String tableName, String treeLevelCode);
+
+    /**
+     * 获取错误数
+     */
+    Integer getWrongNum(JdbcTemplate jdbcTemplate, String tableName, String treeLevelCode, String conditionId);
+
+
+
+
+    /**
      * 适配器是否支持该查错类型
      */
     boolean support(String typeId);

@@ -83,10 +83,21 @@ public class SysCheckController extends BaseController {
      * 获取指定查错条件的分组统计数据
      */
     @ApiOperation(value = "获取指定查错条件的分组统计数据")
-    @PostMapping("/query")
-    public ResponseEntity queryData(@RequestBody SysCheckQueryDataModel queryModel) throws BusinessException {
-        return ok(sysCheckService.queryData(queryModel));
+    @PostMapping("/result/list")
+    public ResponseEntity listSysCheckResult(@RequestBody SysCheckSearchModel searchModel) throws BusinessException {
+        return ok(sysCheckService.listSysCheckResult(searchModel));
     }
+
+    /**
+     * 单位树
+     */
+    @ApiOperation(value = "单位树")
+    @PostMapping("/orgTree")
+    public ResponseEntity getOrgTree(@RequestBody SysCheckSearchModel searchModel) throws BusinessException {
+        return ok(sysCheckService.listSysCheckResult(searchModel));
+    }
+
+
 
     /**
      * 重新统计数据
@@ -96,5 +107,9 @@ public class SysCheckController extends BaseController {
     public ResponseEntity refresh() throws BusinessException {
         return ok(task.exec() ? "执行成功" : "执行失败");
     }
+
+
+
+
 
 }

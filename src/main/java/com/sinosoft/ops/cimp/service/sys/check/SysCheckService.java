@@ -1,10 +1,7 @@
 package com.sinosoft.ops.cimp.service.sys.check;
 
 import com.sinosoft.ops.cimp.dto.PaginationViewModel;
-import com.sinosoft.ops.cimp.vo.from.sys.check.SysCheckConditionAddModel;
-import com.sinosoft.ops.cimp.vo.from.sys.check.SysCheckConditionModifyModel;
-import com.sinosoft.ops.cimp.vo.from.sys.check.SysCheckConditionSearchModel;
-import com.sinosoft.ops.cimp.vo.from.sys.check.SysCheckQueryDataModel;
+import com.sinosoft.ops.cimp.vo.from.sys.check.*;
 import com.sinosoft.ops.cimp.vo.to.sys.check.SysCheckConditionModel;
 import com.sinosoft.ops.cimp.vo.to.sys.check.SysCheckStatisticsData;
 import com.sinosoft.ops.cimp.vo.to.sys.check.SysCheckTypeModel;
@@ -42,5 +39,10 @@ public interface SysCheckService {
     /**
      * 获取指定查错条件的分组统计数据
      */
-    List<SysCheckStatisticsData> queryData(SysCheckQueryDataModel queryModel);
+    List<SysCheckStatisticsData> queryData(SysCheckSearchModel queryModel);
+
+    /**
+     * 查错结果
+     */
+    SysCheckResultModel listSysCheckResult(SysCheckSearchModel searchModel);
 }

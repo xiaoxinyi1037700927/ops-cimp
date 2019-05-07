@@ -1,34 +1,22 @@
 package com.sinosoft.ops.cimp.vo.from.sys.check;
 
 import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
 @ApiModel(description = "系统查错查询模型")
-public class SysCheckQueryDataModel {
+public class SysCheckSearchModel {
 
     /**
-     * 查错条件id
+     * true:错误，false：全部
      */
-    private String sysCheckConditionId;
+    @ApiModelProperty(value = "是否仅显示含错误项")
+    private boolean wrongOnly;
 
-    /**
-     * 单位id
-     */
-    private String orgId;
-
-
-    public String getSysCheckConditionId() {
-        return sysCheckConditionId;
+    public boolean isWrongOnly() {
+        return wrongOnly;
     }
 
-    public void setSysCheckConditionId(String sysCheckConditionId) {
-        this.sysCheckConditionId = sysCheckConditionId;
-    }
-
-    public String getOrgId() {
-        return orgId;
-    }
-
-    public void setOrgId(String orgId) {
-        this.orgId = orgId;
+    public void setWrongOnly(boolean wrongOnly) {
+        this.wrongOnly = wrongOnly;
     }
 }

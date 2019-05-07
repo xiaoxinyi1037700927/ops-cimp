@@ -1,20 +1,19 @@
 package com.sinosoft.ops.cimp.service.sys.check.impl;
 
+import com.google.common.collect.Lists;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sinosoft.ops.cimp.dto.PaginationViewModel;
 import com.sinosoft.ops.cimp.entity.sys.check.QSysCheckCondition;
 import com.sinosoft.ops.cimp.entity.sys.check.SysCheckCondition;
 import com.sinosoft.ops.cimp.mapper.sys.check.SysCheckConditionMapper;
+import com.sinosoft.ops.cimp.repository.oraganization.OrganizationRepository;
 import com.sinosoft.ops.cimp.repository.sys.check.SysCheckConditionRepository;
 import com.sinosoft.ops.cimp.repository.sys.check.SysCheckTypeRepository;
 import com.sinosoft.ops.cimp.schedule.syscheck.SysCheckResultTables;
 import com.sinosoft.ops.cimp.schedule.syscheck.SysCheckTypeAdapter;
 import com.sinosoft.ops.cimp.service.sys.check.SysCheckService;
-import com.sinosoft.ops.cimp.vo.from.sys.check.SysCheckConditionAddModel;
-import com.sinosoft.ops.cimp.vo.from.sys.check.SysCheckConditionModifyModel;
-import com.sinosoft.ops.cimp.vo.from.sys.check.SysCheckConditionSearchModel;
-import com.sinosoft.ops.cimp.vo.from.sys.check.SysCheckQueryDataModel;
+import com.sinosoft.ops.cimp.vo.from.sys.check.*;
 import com.sinosoft.ops.cimp.vo.to.sys.check.SysCheckConditionModel;
 import com.sinosoft.ops.cimp.vo.to.sys.check.SysCheckStatisticsData;
 import com.sinosoft.ops.cimp.vo.to.sys.check.SysCheckTypeModel;
@@ -25,6 +24,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -39,14 +39,16 @@ public class SysCheckServiceImpl implements SysCheckService {
     private final JdbcTemplate jdbcTemplate;
     private final JPAQueryFactory jpaQueryFactory;
     private final SysCheckTypeAdapter[] typeAdapters;
+    private final OrganizationRepository organizationRepository;
 
     @Autowired
-    public SysCheckServiceImpl(SysCheckConditionRepository sysCheckConditionRepository, SysCheckTypeRepository sysCheckTypeRepository, JdbcTemplate jdbcTemplate, JPAQueryFactory jpaQueryFactory, SysCheckTypeAdapter[] typeAdapters) {
+    public SysCheckServiceImpl(SysCheckConditionRepository sysCheckConditionRepository, SysCheckTypeRepository sysCheckTypeRepository, JdbcTemplate jdbcTemplate, JPAQueryFactory jpaQueryFactory, SysCheckTypeAdapter[] typeAdapters, OrganizationRepository organizationRepository) {
         this.sysCheckConditionRepository = sysCheckConditionRepository;
         this.sysCheckTypeRepository = sysCheckTypeRepository;
         this.jdbcTemplate = jdbcTemplate;
         this.jpaQueryFactory = jpaQueryFactory;
         this.typeAdapters = typeAdapters;
+        this.organizationRepository = organizationRepository;
     }
 
     /**
@@ -156,7 +158,7 @@ public class SysCheckServiceImpl implements SysCheckService {
      * 获取指定查错条件的分组统计数据
      */
     @Override
-    public List<SysCheckStatisticsData> queryData(SysCheckQueryDataModel queryModel) {
+    public List<SysCheckStatisticsData> queryData(SysCheckSearchModel queryModel) {
 //        QSysCheckItem qCheckItem = QSysCheckItem.sysCheckItem;
         List<SysCheckStatisticsData> resultList = new ArrayList<>();
 
@@ -169,7 +171,7 @@ public class SysCheckServiceImpl implements SysCheckService {
 //        } else {
 //            //当前用户的数据权限
 //            String dataOrgId = SecurityUtils.getSubject().getCurrentUser().getDataOrganizationId();
-////            String dataOrgId = "DC5C7986DAEF50C1E02AB09B442EE34F";
+//////            String dataOrgId = "DC5C7986DAEF50C1E02AB09B442EE34F";
 //            depCodeSqlWhere += "DEP_ID ='" + dataOrgId + "'";
 //        }
 //
@@ -202,6 +204,74 @@ public class SysCheckServiceImpl implements SysCheckService {
 
         return resultList;
     }
+
+    /**
+     * 查错结果
+     */
+    @Override
+    public SysCheckResultModel listSysCheckResult(SysCheckSearchModel searchModel) {
+        //当前用户数据权限
+//        String dataOrgId = SecurityUtils.getSubject().getCurrentUser().getDataOrganizationId();
+        String dataOrgId = "DC5C7986DAEF50C1E02AB09B442EE34F";
+        String code = organizationRepository.findById(dataOrgId).get().getCode();
+
+        //获取结果集的表名
+        String id = jdbcTemplate.queryForMap("SELECT RESULT_TABLES FROM SYS_CHECK_RESULT_TABLES WHERE ROWNUM = 1").get("RESULT_TABLES").toString();
+        SysCheckResultTables resultTables = SysCheckResultTables.getAnotherTables(id);
+
+        //查错项
+        QSysCheckCondition qCondition = QSysCheckCondition.sysCheckCondition;
+        Iterable<SysCheckCondition> iterable = sysCheckConditionRepository.findAll(qCondition.sort.asc());
+        List<SysCheckCondition> conditions = Lists.newArrayList(iterable);
+
+        //获取每个查错项的总数和错误数
+        int totalWrongNum = 0;
+        List<SysCheckResultItemModel> items = new ArrayList<>();
+        try {
+            for (SysCheckCondition condition : conditions) {
+                SysCheckResultItemModel item = new SysCheckResultItemModel();
+                item.setConditionId(condition.getId());
+                item.setConditionName(condition.getName());
+
+                SysCheckTypeAdapter typeAdapter = getTypeAdapter(condition.getTypeId());
+                int total = typeAdapter.getTotalNum(jdbcTemplate, resultTables.getResultsName(), code);
+                int wrongNum = typeAdapter.getWrongNum(jdbcTemplate, resultTables.getResultsTempName(), code, condition.getId());
+
+                totalWrongNum += wrongNum;
+                item.setWrongNum(wrongNum);
+                item.setCompleteSchedule(new BigDecimal((total - wrongNum) / (double) total * 100).setScale(0, BigDecimal.ROUND_HALF_UP).intValue());
+
+                if (searchModel.isWrongOnly() && wrongNum == 0) {
+                    continue;
+                }
+
+                items.add(item);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        SysCheckResultModel result = new SysCheckResultModel();
+        result.setConditionNum(conditions.size());
+        result.setWrongNum(totalWrongNum);
+        result.setItems(items);
+
+        return result;
+    }
+
+
+    /**
+     * 根据查错类型获取适配器
+     */
+    private SysCheckTypeAdapter getTypeAdapter(String typeId) throws Exception {
+        for (SysCheckTypeAdapter typeAdapter : typeAdapters) {
+            if (typeAdapter.support(typeId)) {
+                return typeAdapter;
+            }
+        }
+        throw new Exception("no adapter for type " + typeId);
+    }
+
 
     private String getQuerySqlAB(String depCodeSqlWhere, String checkConditionId, String type) {
         //获取结果集的表名

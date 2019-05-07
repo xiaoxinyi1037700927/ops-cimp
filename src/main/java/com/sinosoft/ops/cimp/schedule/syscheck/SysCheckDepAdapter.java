@@ -2,13 +2,16 @@ package com.sinosoft.ops.cimp.schedule.syscheck;
 
 import com.sinosoft.ops.cimp.entity.sys.check.SysCheckCondition;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Component;
 
 /**
  * 查错类型：单位
  */
-@Component
+@Deprecated
+//@Component
 public class SysCheckDepAdapter implements SysCheckTypeAdapter {
+
+    private static final String TYPE_ID = "1";
+
     /**
      * 统计总数
      */
@@ -55,10 +58,26 @@ public class SysCheckDepAdapter implements SysCheckTypeAdapter {
     }
 
     /**
+     * 获取总数
+     */
+    @Override
+    public Integer getTotalNum(JdbcTemplate jdbcTemplate, String tableName, String treeLevelCode) {
+        return 0;
+    }
+
+    /**
+     * 获取错误数
+     */
+    @Override
+    public Integer getWrongNum(JdbcTemplate jdbcTemplate, String tableName, String treeLevelCode, String conditionId) {
+        return 0;
+    }
+
+    /**
      * 适配器是否支持该查错类型
      */
     @Override
     public boolean support(String typeId) {
-        return "1".equals(typeId);
+        return TYPE_ID.equals(typeId);
     }
 }

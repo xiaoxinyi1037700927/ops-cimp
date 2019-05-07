@@ -1,8 +1,8 @@
 package com.sinosoft.ops.cimp.service.oraganization;
 
 
-
 import com.sinosoft.ops.cimp.entity.oraganization.Organization;
+import com.sinosoft.ops.cimp.vo.to.organization.EmpSortInDepModel;
 import com.sinosoft.ops.cimp.vo.to.organization.OrganizationSearchViewModel;
 import com.sinosoft.ops.cimp.vo.to.organization.OrganizationViewModel;
 
@@ -58,4 +58,9 @@ public interface OrganizationService {
      * @return
      */
     List<OrganizationViewModel> findOrganizationByName(String name, String permission);
+
+    /**
+     * 干部在单位内排序
+     */
+    List<EmpSortInDepModel> getEmpSortInDep(String orgId);
 }

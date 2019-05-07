@@ -3,20 +3,49 @@ package com.sinosoft.ops.cimp.vo.from.sys.check;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-@ApiModel(description = "系统查错查询模型")
-public class SysCheckSearchModel {
+import java.util.List;
+
+@ApiModel(description = "系统查错结果模型")
+public class SysCheckResultModel {
+    /**
+     * 治理项总数
+     */
+    @ApiModelProperty(value = "治理项总数")
+    private int conditionNum;
 
     /**
-     * true:错误，false：全部
+     * 存在问题数
      */
-    @ApiModelProperty(value = "是否仅显示含错误项")
-    private boolean wrongOnly;
+    @ApiModelProperty(value = "存在问题数")
+    private int wrongNum;
 
-    public boolean isWrongOnly() {
-        return wrongOnly;
+    /**
+     * 治理项
+     */
+    @ApiModelProperty(value = "治理项")
+    private List<SysCheckResultItemModel> items;
+
+    public int getConditionNum() {
+        return conditionNum;
     }
 
-    public void setWrongOnly(boolean wrongOnly) {
-        this.wrongOnly = wrongOnly;
+    public void setConditionNum(int conditionNum) {
+        this.conditionNum = conditionNum;
+    }
+
+    public int getWrongNum() {
+        return wrongNum;
+    }
+
+    public void setWrongNum(int wrongNum) {
+        this.wrongNum = wrongNum;
+    }
+
+    public List<SysCheckResultItemModel> getItems() {
+        return items;
+    }
+
+    public void setItems(List<SysCheckResultItemModel> items) {
+        this.items = items;
     }
 }

@@ -7,6 +7,7 @@ import com.sinosoft.ops.cimp.repository.oraganization.OrganizationRepository;
 import com.sinosoft.ops.cimp.service.oraganization.OrganizationService;
 import com.sinosoft.ops.cimp.util.CachePackage.OrganizationCacheManager;
 import com.sinosoft.ops.cimp.util.SecurityUtils;
+import com.sinosoft.ops.cimp.vo.to.organization.EmpSortInDepModel;
 import com.sinosoft.ops.cimp.vo.to.organization.OrganizationSearchViewModel;
 import com.sinosoft.ops.cimp.vo.to.organization.OrganizationViewModel;
 import org.apache.commons.lang3.StringUtils;
@@ -209,5 +210,15 @@ public class OrganizationServiceImpl implements OrganizationService {
             List<OrganizationViewModel> collect = allOrgList.stream().filter(x -> x.getName().contains(name)).map(y -> OrganizationViewMapper.INSTANCE.organizationToViewModel(y)).collect(Collectors.toList());
             return collect;
         }
+    }
+
+    /**
+     * 干部在单位内排序
+     */
+    @Override
+    public List<EmpSortInDepModel> getEmpSortInDep(String orgId) {
+
+
+        return null;
     }
 }

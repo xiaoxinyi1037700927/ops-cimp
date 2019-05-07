@@ -7,7 +7,7 @@ import io.swagger.annotations.ApiModelProperty;
  * 统计数据项
  */
 @ApiModel(description = "统计数据项")
-public class SysCheckStatisticsDataItem {
+public class SysCheckTreeNode {
     /**
      * 单位id
      */
@@ -19,15 +19,10 @@ public class SysCheckStatisticsDataItem {
     @ApiModelProperty(value = "是否含有下级")
     private boolean hasChildren;
     /**
-     * 总数
-     */
-    @ApiModelProperty(value = "总数")
-    private String total;
-    /**
      * 查错数
      */
     @ApiModelProperty(value = "查错数")
-    private String num;
+    private String wrongName;
     /**
      * 单位名
      */
@@ -50,20 +45,12 @@ public class SysCheckStatisticsDataItem {
         this.hasChildren = hasChildren;
     }
 
-    public String getTotal() {
-        return total;
+    public String getWrongName() {
+        return wrongName;
     }
 
-    public void setTotal(String total) {
-        this.total = total;
-    }
-
-    public String getNum() {
-        return num;
-    }
-
-    public void setNum(String num) {
-        this.num = num;
+    public void setWrongName(String wrongName) {
+        this.wrongName = wrongName;
     }
 
     public String getName() {

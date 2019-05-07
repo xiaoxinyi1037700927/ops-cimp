@@ -173,4 +173,11 @@ public class OrganizationController extends BaseController {
         }
     }
 
+    @ApiOperation(value = "获取干部单位内排序")
+    @PostMapping("/emp/sort")
+    @RequiresAuthentication
+    public ResponseEntity getEmpSortInDep(@RequestParam String orgId) throws BusinessException {
+        return ok(organizationService.getEmpSortInDep(orgId));
+    }
+
 }
