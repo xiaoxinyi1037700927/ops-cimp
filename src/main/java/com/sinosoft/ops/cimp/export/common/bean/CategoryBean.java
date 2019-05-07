@@ -22,32 +22,17 @@ public class CategoryBean implements Serializable {
     // WHERE s.ID IN (SELECT gr.info_set_id FROM SYS_INFO_SET_GROUP gr WHERE gr.NAME IN (
     // SELECT G.NAME FROM SYS_INFO_SET_GROUP G WHERE G.ID='113')
     // );
-    private int parentId;
-    private int currentId;
+//    private int parentId;
+//    private int currentId;
+    private String sysTableNameEn;
     private List<AttributeBean> attributeBeans;
 
-    public CategoryBean(int parentId, int currentId, List<AttributeBean> attributeBeans) {
+    public CategoryBean(String sysTableNameEn, List<AttributeBean> attributeBeans) {
         super();
-        this.parentId = parentId;
-        this.currentId = currentId;
+        this.sysTableNameEn = sysTableNameEn;
         this.attributeBeans = attributeBeans;
     }
 
-    public int getParentId() {
-        return parentId;
-    }
-
-    public void setParentId(int parentId) {
-        this.parentId = parentId;
-    }
-
-    public int getCurrentId() {
-        return currentId;
-    }
-
-    public void setCurrentId(int currentId) {
-        this.currentId = currentId;
-    }
 
     public List<AttributeBean> getAttributeBeans() {
         return attributeBeans;
@@ -57,10 +42,19 @@ public class CategoryBean implements Serializable {
         this.attributeBeans = attributeBeans;
     }
 
-    @Override
-    public String toString() {
-        return "CategoryBean [parentId=" + parentId + ", currentId=" + currentId + ", attributeBeans=" + attributeBeans
-                + "]";
+    public String getSysTableNameEn() {
+        return sysTableNameEn;
     }
 
+    public void setSysTableNameEn(String sysTableNameEn) {
+        this.sysTableNameEn = sysTableNameEn;
+    }
+
+    @Override
+    public String toString() {
+        return "CategoryBean{" +
+                "sysTableNameEn='" + sysTableNameEn + '\'' +
+                ", attributeBeans=" + attributeBeans +
+                '}';
+    }
 }

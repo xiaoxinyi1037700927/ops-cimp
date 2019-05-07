@@ -121,7 +121,7 @@ public class HomePageCountServiceImpl implements HomePageCountService {
         countSql = countSql.replace("${deptId}", dataOrganizationId);
 
 
-        countSql = "SELECT count(DISTINCT EMP_ID) from(" + countSql + ")";
+        countSql = "SELECT count(DISTINCT id) from(" + countSql + ")";
 
         long count = jdbc.queryForObject(countSql, Long.class);
         return count;

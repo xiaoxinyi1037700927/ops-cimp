@@ -58,42 +58,42 @@ public class CategoryData {
         attributeBeans11314.add(new AttributeBean("出生地", "_BirthplaceId", leftLogicExpression, null, "94", null, processTypeA));
         attributeBeans11314.add(new AttributeBean("健康状况", "_HealthConditionId", leftLogicExpression, null, "94", null, processTypeA));
         attributeBeans11314.add(new AttributeBean("熟悉专业有何专长", "_SpecialtyId", leftLogicExpression, null, "180", null, processTypeA));
-        categoryBeansPf1.add(new CategoryBean(113, 14, attributeBeans11314));
+        categoryBeansPf1.add(new CategoryBean("EmpA001", attributeBeans11314));
 
         // 113(基本情况) && 53(政治面貌)
         List<AttributeBean> attributeBeans11353 = new ArrayList<>();
         attributeBeans11353.add(new AttributeBean("入党时间", "_JoinedPartyTimeId", leftLogicExpression, null, "104", null, processTypeA));
-        categoryBeansPf1.add(new CategoryBean(113, 53, attributeBeans11353));
+        categoryBeansPf1.add(new CategoryBean("EmpA58", attributeBeans11353));
 
         // 120(学习教育) && 8(学历)
         List<AttributeBean> attributeBeans1208 = new ArrayList<>();
         attributeBeans1208.add(new AttributeBean("学历学位", "_CollegeUniversityId", leftLogicExpression, null, null, null, "C"));
         attributeBeans1208.add(new AttributeBean("全日制教育", "_FullTimeEducationId", leftLogicExpression, null, "160", null, processTypeA));
         attributeBeans1208.add(new AttributeBean("毕业院校系及专业", "_UniversityDepartmentAndMajorFromFTEId", leftLogicExpression, null, "210", null, processTypeA));
-        categoryBeansPf1.add(new CategoryBean(120, 8, attributeBeans1208));
+        categoryBeansPf1.add(new CategoryBean("EmpA08", attributeBeans1208));
 
         // 120(学习教育) && 95(学位)
         List<AttributeBean> attributeBeans12095 = new ArrayList<>();
         attributeBeans12095.add(new AttributeBean("在职教育", "_InServiceEducationId", leftLogicExpression, null, "160", null, processTypeA));
         attributeBeans12095.add(new AttributeBean("毕业院校系及专业", "_UniversityDepartmentAndMajorFromISEId", leftLogicExpression, null, "210", null, processTypeA));
-        categoryBeansPf1.add(new CategoryBean(120, 95, attributeBeans12095));
+        categoryBeansPf1.add(new CategoryBean("EmpA09", attributeBeans12095));
 
         // 114(任职情况) && 2(职务信息)
         List<AttributeBean> attributeBeans1142 = new ArrayList<>();
         attributeBeans1142.add(new AttributeBean("现任职务", "_PresentOccupationId", leftLogicExpression, null, "460", null, processTypeA));
         attributeBeans1142.add(new AttributeBean("简历", "_ResumeId", leftLogicExpression, null, "556", null, processTypeA));
-        categoryBeansPf1.add(new CategoryBean(114, 2, attributeBeans1142));
+        categoryBeansPf1.add(new CategoryBean("EmpA02", attributeBeans1142));
 
         // 118(专业技术) && 6(专业技术任职资格)
         List<AttributeBean> attributeBeans1186 = new ArrayList<>();
         attributeBeans1186.add(new AttributeBean("专业技术职务", "_TitleOfTechnicalPostId", leftLogicExpression, null, "180", null, processTypeA));
-        categoryBeansPf1.add(new CategoryBean(118, 6, attributeBeans1186));
+        categoryBeansPf1.add(new CategoryBean("EmpA06", attributeBeans1186));
 
         // 139(岗位变动) && 48(拟任拟免职务)
         List<AttributeBean> attributeBeans13948 = new ArrayList<>();
         attributeBeans13948.add(new AttributeBean("拟任职务", "_DesignatedPositionId", leftLogicExpression, null, "460", null, processTypeA));
         attributeBeans13948.add(new AttributeBean("拟免职务", "_ToFreePostId", leftLogicExpression, null, "460", null, processTypeA));
-        categoryBeansPf1.add(new CategoryBean(139, 48, attributeBeans13948));
+        categoryBeansPf1.add(new CategoryBean("EmpA53", attributeBeans13948));
 
 
         // ++++++++++++++ pf2 ++++++++++++++
@@ -102,7 +102,7 @@ public class CategoryData {
         // 126(奖惩考核) && 94(奖惩情况)
         List<AttributeBean> attributeBeans12694 = new ArrayList<>();
         attributeBeans12694.add(new AttributeBean("奖惩情况", "_RewardAndPunishmentId", leftLogicExpression, null, "555", null, processTypeA));
-        categoryBeansPf2.add(new CategoryBean(126, 94, attributeBeans12694));
+        categoryBeansPf2.add(new CategoryBean("EmpA14", attributeBeans12694));
 
         // 不处理
 //		attributeBeansTemp2.add(new AttributeBean("任免理由", "_ToAppointOrRemoveReasonId", leftLogicExpression, null, "555", null, processTypeA));
@@ -116,13 +116,13 @@ public class CategoryData {
 //		attributeBeans11334.add(new AttributeBean("年龄", "_RelationAgeId", null, "#{bottom}-#{height}", null, null, processTypeB));
 //		attributeBeans11334.add(new AttributeBean("政治面貌", "_RelationPoliticsStatusId", leftLogicExpression, null, null, null, processTypeB));
 //		attributeBeans11334.add(new AttributeBean("工作单位及职务", "_RelationOcupertinoId", leftLogicExpression, null, null, null, processTypeB));
-        categoryBeansPf2.add(new CategoryBean(145, 34, attributeBeans11334));
+        categoryBeansPf2.add(new CategoryBean("EmpA39", attributeBeans11334));
 
 
         // 126(奖惩考核) && 15(考核情况)
         List<AttributeBean> attributeBeans12615 = new ArrayList<>();
         attributeBeans12615.add(new AttributeBean("年度考核结果", "_AnnualAssessmentResultsId", leftLogicExpression, "555", null, null, processTypeA));
-        categoryBeansPf2.add(new CategoryBean(126, 15, attributeBeans12615));
+        categoryBeansPf2.add(new CategoryBean("EmpA15", attributeBeans12615));
     }
 
 
