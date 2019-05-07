@@ -22,7 +22,7 @@ public class SysCheckTreeNode {
      * 查错数
      */
     @ApiModelProperty(value = "查错数")
-    private String wrongName;
+    private String wrongNum;
     /**
      * 单位名
      */
@@ -45,12 +45,12 @@ public class SysCheckTreeNode {
         this.hasChildren = hasChildren;
     }
 
-    public String getWrongName() {
-        return wrongName;
+    public String getWrongNum() {
+        return wrongNum;
     }
 
-    public void setWrongName(String wrongName) {
-        this.wrongName = wrongName;
+    public void setWrongNum(String wrongNum) {
+        this.wrongNum = wrongNum;
     }
 
     public String getName() {

@@ -214,7 +214,7 @@ public class ExportServiceImpl implements ExportService {
                 }
                 if (attributeBean.getValueIndex() == -1) {
                     if ("A".equals(attributeBean.getProcessType())) {
-                        buildDiv.append("<div id=\"" + attributeBean.getDivId() + "\" onclick=\"titleClickFn(" + categoryBean.getSysTableNameEn() + ")\" onmouseover=\"this.style.backgroundColor='#5eb9f0'\" onmouseout=\"this.style.backgroundColor=''\" style=\"cursor:pointer\"></div>");
+                        buildDiv.append("<div id=\"" + attributeBean.getDivId() + "\" onclick=\"titleClickFn('" + categoryBean.getSysTableNameEn() + "')\" onmouseover=\"this.style.backgroundColor='#5eb9f0'\" onmouseout=\"this.style.backgroundColor=''\" style=\"cursor:pointer\"></div>");
                         divEventAttributeBeans.add(attributeBean);
                         continue;
                     } else if ("B".equals(attributeBean.getProcessType())) {
@@ -226,7 +226,7 @@ public class ExportServiceImpl implements ExportService {
                     valueElement = pfChildrenElements.get(attributeBean.getValueIndex());
                 }
                 if (valueElement != null) {
-                    valueElement.attr("onclick", "titleClickFn(" + categoryBean.getSysTableNameEn() + ")");
+                    valueElement.attr("onclick", "titleClickFn('" + categoryBean.getSysTableNameEn() + "')");
 //					valueElement.attr("onclick", "alert('" + categoryBean.getParentId() + " - " + categoryBean.getCurrentId() + "')");
                     valueElement.attr("onmouseover", "this.style.backgroundColor='#5eb9f0'");//#F4F9FD, #FFA500, #5eb9f0
                     valueElement.attr("onmouseout", "this.style.backgroundColor=''");

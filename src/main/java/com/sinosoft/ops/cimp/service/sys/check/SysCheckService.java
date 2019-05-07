@@ -2,9 +2,7 @@ package com.sinosoft.ops.cimp.service.sys.check;
 
 import com.sinosoft.ops.cimp.dto.PaginationViewModel;
 import com.sinosoft.ops.cimp.vo.from.sys.check.*;
-import com.sinosoft.ops.cimp.vo.to.sys.check.SysCheckConditionModel;
-import com.sinosoft.ops.cimp.vo.to.sys.check.SysCheckStatisticsData;
-import com.sinosoft.ops.cimp.vo.to.sys.check.SysCheckTypeModel;
+import com.sinosoft.ops.cimp.vo.to.sys.check.*;
 
 import java.util.List;
 
@@ -35,14 +33,18 @@ public interface SysCheckService {
      */
     void deleteSysCheckCondition(List<String> ids);
 
-
-    /**
-     * 获取指定查错条件的分组统计数据
-     */
-    List<SysCheckStatisticsData> queryData(SysCheckSearchModel queryModel);
-
     /**
      * 查错结果
      */
     SysCheckResultModel listSysCheckResult(SysCheckSearchModel searchModel);
+
+    /**
+     * 查错机构树
+     */
+    List<SysCheckTreeNode> getOrgTree(SysCheckOrgTreeSearchModel searchModel);
+
+    /**
+     * 查错干部列表
+     */
+    PaginationViewModel<SysCheckEmpModel> getEmpList(SysCheckEmpSearchModel searchModel);
 }
