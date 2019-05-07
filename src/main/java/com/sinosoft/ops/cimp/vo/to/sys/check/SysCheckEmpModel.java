@@ -7,7 +7,7 @@ import io.swagger.annotations.ApiModelProperty;
  * 系统查错条件模型
  */
 @ApiModel(description = "系统查错条件模型")
-public class SysCheckConditionModel {
+public class SysCheckEmpModel {
     /**
      * id
      */

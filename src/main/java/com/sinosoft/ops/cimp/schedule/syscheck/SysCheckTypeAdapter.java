@@ -1,7 +1,10 @@
 package com.sinosoft.ops.cimp.schedule.syscheck;
 
 import com.sinosoft.ops.cimp.entity.sys.check.SysCheckCondition;
+import com.sinosoft.ops.cimp.vo.to.sys.check.SysCheckTreeNode;
 import org.springframework.jdbc.core.JdbcTemplate;
+
+import java.util.List;
 
 public interface SysCheckTypeAdapter {
 
@@ -30,8 +33,10 @@ public interface SysCheckTypeAdapter {
      */
     Integer getWrongNum(JdbcTemplate jdbcTemplate, String tableName, String treeLevelCode, String conditionId);
 
-
-
+    /**
+     * 获取查错单位树
+     */
+    List<SysCheckTreeNode> getTreeNodes(JdbcTemplate jdbcTemplate, String tableName, String conditionId, String sqlWhere);
 
     /**
      * 适配器是否支持该查错类型

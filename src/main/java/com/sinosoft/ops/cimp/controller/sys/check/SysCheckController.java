@@ -10,10 +10,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @SystemApiGroup
 @Api(description = "系统查错")
@@ -80,9 +77,9 @@ public class SysCheckController extends BaseController {
 
 
     /**
-     * 获取指定查错条件的分组统计数据
+     * 查错结果
      */
-    @ApiOperation(value = "获取指定查错条件的分组统计数据")
+    @ApiOperation(value = "查错结果")
     @PostMapping("/result/list")
     public ResponseEntity listSysCheckResult(@RequestBody SysCheckSearchModel searchModel) throws BusinessException {
         return ok(sysCheckService.listSysCheckResult(searchModel));
@@ -92,11 +89,19 @@ public class SysCheckController extends BaseController {
      * 单位树
      */
     @ApiOperation(value = "单位树")
-    @PostMapping("/orgTree")
-    public ResponseEntity getOrgTree(@RequestBody SysCheckSearchModel searchModel) throws BusinessException {
-        return ok(sysCheckService.listSysCheckResult(searchModel));
+    @PostMapping("/org/tree")
+    public ResponseEntity getOrgTree(@RequestParam("conditionId") String conditionId, @RequestParam("orgId") String orgId) throws BusinessException {
+        return ok(sysCheckService.getOrgTree(conditionId, orgId));
     }
 
+    /**
+     * 干部列表
+     */
+    @ApiOperation(value = "干部列表")
+    @PostMapping("/emp/list")
+    public ResponseEntity getEmpList(@RequestBody SysCheckEmpSearchModel searchModel) throws BusinessException {
+        return ok(sysCheckService.getEmpList(searchModel));
+    }
 
 
     /**
@@ -107,9 +112,6 @@ public class SysCheckController extends BaseController {
     public ResponseEntity refresh() throws BusinessException {
         return ok(task.exec() ? "执行成功" : "执行失败");
     }
-
-
-
 
 
 }

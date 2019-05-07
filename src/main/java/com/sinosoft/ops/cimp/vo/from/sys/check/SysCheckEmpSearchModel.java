@@ -4,47 +4,46 @@ import com.sinosoft.ops.cimp.dto.RePagination;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-@ApiModel(description = "系统查错条件查询模型")
-public class SysCheckConditionSearchModel extends RePagination {
+@ApiModel(description = "系统查错干部列表查询模型")
+public class SysCheckEmpSearchModel extends RePagination {
 
     /**
-     * 查错类型id
+     * 查错条件id
      */
-    @ApiModelProperty(value = "查错类型id")
-    private String typeId;
-
+    @ApiModelProperty(value = "查错条件id")
+    private String conditionId;
     /**
-     * 条件名称
+     * 单位id
      */
-    @ApiModelProperty(value = "条件名称")
-    private String name;
+    @ApiModelProperty(value = "单位id")
+    private String orgId;
     /**
-     * 查询条件部分
+     * 搜索关键字
      */
-    @ApiModelProperty(value = "查询条件部分")
-    private String wherePart;
+    @ApiModelProperty(value = "搜索关键字")
+    private String keywords;
 
-    public String getTypeId() {
-        return typeId;
+    public String getConditionId() {
+        return conditionId;
     }
 
-    public void setTypeId(String typeId) {
-        this.typeId = typeId;
+    public void setConditionId(String conditionId) {
+        this.conditionId = conditionId;
     }
 
-    public String getName() {
-        return name;
+    public String getOrgId() {
+        return orgId;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setOrgId(String orgId) {
+        this.orgId = orgId;
     }
 
-    public String getWherePart() {
-        return wherePart;
+    public String getKeywords() {
+        return keywords;
     }
 
-    public void setWherePart(String wherePart) {
-        this.wherePart = wherePart;
+    public void setKeywords(String keywords) {
+        this.keywords = keywords;
     }
 }
