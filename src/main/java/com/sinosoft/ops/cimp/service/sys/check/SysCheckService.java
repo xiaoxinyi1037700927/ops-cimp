@@ -41,7 +41,7 @@ public interface SysCheckService {
     /**
      * 查错机构树
      */
-    List<SysCheckTreeNode> getOrgTree(String conditionId, String orgId);
+    List<SysCheckTreeNode> getOrgTree(SysCheckOrgTreeSearchModel searchModel);
 
     /**
      * 查错干部列表

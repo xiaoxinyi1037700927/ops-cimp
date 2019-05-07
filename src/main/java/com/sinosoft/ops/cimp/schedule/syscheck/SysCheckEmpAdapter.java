@@ -7,7 +7,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -73,7 +75,8 @@ public class SysCheckEmpAdapter implements SysCheckTypeAdapter {
                 " where type = '" + TYPE_ID +
                 "' and tree_level_code = '" + treeLevelCode + "'";
 
-        return jdbcTemplate.queryForObject(sql, Integer.class);
+        List<Map<String, Object>> map = jdbcTemplate.queryForList(sql);
+        return map.size() > 0 ? ((BigDecimal) map.get(0).get("total")).intValue() : 0;
     }
 
     /**
@@ -86,8 +89,8 @@ public class SysCheckEmpAdapter implements SysCheckTypeAdapter {
                 + "' and tree_level_code = '" + treeLevelCode +
                 "' and check_condition_id = '" + conditionId + "'";
 
-        Object num = jdbcTemplate.queryForMap(sql).get("num");
-        return num != null ? (Integer) num : 0;
+        List<Map<String, Object>> map = jdbcTemplate.queryForList(sql);
+        return map.size() > 0 ? ((BigDecimal) map.get(0).get("num")).intValue() : 0;
     }
 
     /**

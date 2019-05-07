@@ -13,6 +13,7 @@ import com.sinosoft.ops.cimp.repository.sys.check.SysCheckTypeRepository;
 import com.sinosoft.ops.cimp.schedule.syscheck.SysCheckResultTables;
 import com.sinosoft.ops.cimp.schedule.syscheck.SysCheckTypeAdapter;
 import com.sinosoft.ops.cimp.service.sys.check.SysCheckService;
+import com.sinosoft.ops.cimp.util.SecurityUtils;
 import com.sinosoft.ops.cimp.vo.from.sys.check.*;
 import com.sinosoft.ops.cimp.vo.to.sys.check.SysCheckConditionModel;
 import com.sinosoft.ops.cimp.vo.to.sys.check.SysCheckEmpModel;
@@ -213,8 +214,8 @@ public class SysCheckServiceImpl implements SysCheckService {
      * 获取查错机构树
      */
     @Override
-    public List<SysCheckTreeNode> getOrgTree(String conditionId, String orgId) {
-        SysCheckCondition condition = sysCheckConditionRepository.findById(conditionId).get();
+    public List<SysCheckTreeNode> getOrgTree(SysCheckOrgTreeSearchModel searchModel) {
+        SysCheckCondition condition = sysCheckConditionRepository.findById(searchModel.getConditionId()).get();
 
         //获取结果集的表名
         String id = jdbcTemplate.queryForMap("SELECT RESULT_TABLES FROM SYS_CHECK_RESULT_TABLES WHERE ROWNUM = 1").get("RESULT_TABLES").toString();
@@ -222,8 +223,8 @@ public class SysCheckServiceImpl implements SysCheckService {
 
         //如果请求参数中单位id为空，根据当前用户的数据权限查询，否则，查询其下级单位
         String depCodeSqlWhere = " select B001001_A from dep_b001 where ";
-        if (StringUtils.isNotEmpty(orgId)) {
-            depCodeSqlWhere += "pptr in (select B001001_A from dep_b001 where dep_id ='" + orgId + "') ";
+        if (StringUtils.isNotEmpty(searchModel.getOrgId())) {
+            depCodeSqlWhere += "pptr in (select B001001_A from dep_b001 where dep_id ='" + searchModel.getOrgId() + "') ";
         } else {
             //当前用户的数据权限
 //            String dataOrgId = SecurityUtils.getSubject().getCurrentUser().getDataOrganizationId();
@@ -235,7 +236,7 @@ public class SysCheckServiceImpl implements SysCheckService {
             SysCheckTypeAdapter typeAdapter = getTypeAdapter(condition.getTypeId());
 
 
-            return typeAdapter.getTreeNodes(jdbcTemplate, resultTables.getResultsTempName(), conditionId, depCodeSqlWhere);
+            return typeAdapter.getTreeNodes(jdbcTemplate, resultTables.getResultsTempName(), searchModel.getConditionId(), depCodeSqlWhere);
         } catch (Exception e) {
             e.printStackTrace();
         }

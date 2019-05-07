@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.Null;
+
 @SystemApiGroup
 @Api(description = "系统查错")
 @RestController
@@ -90,8 +92,8 @@ public class SysCheckController extends BaseController {
      */
     @ApiOperation(value = "单位树")
     @PostMapping("/org/tree")
-    public ResponseEntity getOrgTree(@RequestParam("conditionId") String conditionId, @RequestParam("orgId") String orgId) throws BusinessException {
-        return ok(sysCheckService.getOrgTree(conditionId, orgId));
+    public ResponseEntity getOrgTree(@RequestBody SysCheckOrgTreeSearchModel searchModel) throws BusinessException {
+        return ok(sysCheckService.getOrgTree(searchModel));
     }
 
     /**
