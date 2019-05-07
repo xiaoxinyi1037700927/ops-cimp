@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @SystemApiGroup
 @Api(description = "系统表操纵")
@@ -70,6 +71,13 @@ public class SysTableController extends BaseController {
             @RequestBody SysTableSearchModel sysTableSearchModel) throws BusinessException {
         PaginationViewModel<SysTableModifyModel> sysEntityDefs = sysTableService.getSysTableByPage(sysTableSearchModel);
         return ok(sysEntityDefs);
+    }
+
+    @ApiOperation("显示所有系统表数据")
+    @RequestMapping(value = "/findSysTables", method = RequestMethod.POST)
+    public ResponseEntity<List<SysTableModifyModel>> findSysEntityDefList() throws BusinessException {
+        String tableTypeNameEn = "CadreInfo";
+        return ok(sysTableService.getSysTableByTableTypeNameEn(tableTypeNameEn));
     }
 
     @ApiOperation("数据库表操作")

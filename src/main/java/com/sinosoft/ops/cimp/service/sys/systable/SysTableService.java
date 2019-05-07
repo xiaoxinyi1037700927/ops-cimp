@@ -3,8 +3,8 @@ package com.sinosoft.ops.cimp.service.sys.systable;
 
 import com.sinosoft.ops.cimp.dto.PaginationViewModel;
 import com.sinosoft.ops.cimp.vo.from.sys.systable.SysTableAddModel;
-import com.sinosoft.ops.cimp.vo.from.sys.systable.SysTableSearchModel;
 import com.sinosoft.ops.cimp.vo.from.sys.systable.SysTableModifyModel;
+import com.sinosoft.ops.cimp.vo.from.sys.systable.SysTableSearchModel;
 
 import java.util.List;
 
@@ -26,6 +26,6 @@ public interface SysTableService {
 
     PaginationViewModel<SysTableModifyModel> getSysTableByPage(SysTableSearchModel sysTableSearchModel);
 
-
+    List<SysTableModifyModel> getSysTableByTableTypeNameEn(String tableTypeNameEn);
 
 }

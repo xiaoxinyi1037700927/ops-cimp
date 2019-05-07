@@ -1,12 +1,12 @@
 package com.sinosoft.ops.cimp.service.sys.systable.impl;
 
+import com.google.common.collect.Lists;
 import com.querydsl.core.BooleanBuilder;
 import com.sinosoft.ops.cimp.dto.PaginationViewModel;
-import com.sinosoft.ops.cimp.entity.sys.systable.QSysTable;
-import com.sinosoft.ops.cimp.entity.sys.systable.SysTable;
-import com.sinosoft.ops.cimp.entity.sys.systable.SysTableField;
+import com.sinosoft.ops.cimp.entity.sys.systable.*;
 import com.sinosoft.ops.cimp.mapper.sys.systable.SysTableModelMapper;
 import com.sinosoft.ops.cimp.repository.sys.systable.SysTableRepository;
+import com.sinosoft.ops.cimp.repository.sys.systable.SysTableTypeRepository;
 import com.sinosoft.ops.cimp.service.sys.systable.SysTableFieldService;
 import com.sinosoft.ops.cimp.service.sys.systable.SysTableService;
 import com.sinosoft.ops.cimp.util.DDLUtil;
@@ -40,6 +40,9 @@ public class SysTableServiceImpl implements SysTableService {
 
     @Autowired
     private SysTableFieldService sysTableFieldService;
+
+    @Autowired
+    private SysTableTypeRepository sysTableTypeRepository;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SysTableServiceImpl.class);
 
@@ -138,4 +141,19 @@ public class SysTableServiceImpl implements SysTableService {
         return page;
     }
 
+    @Override
+    public List<SysTableModifyModel> getSysTableByTableTypeNameEn(String tableTypeNameEn) {
+
+        if (StringUtils.isNotEmpty(tableTypeNameEn)) {
+            Optional<SysTableType> sysTableType = sysTableTypeRepository.findOne(QSysTableType.sysTableType.nameEn.eq(tableTypeNameEn));
+            if (sysTableType.isPresent()) {
+                SysTableType sysTableType1 = sysTableType.get();
+                String sysTableTypeId = sysTableType1.getId();
+
+                List<SysTable> sysTables = Lists.newArrayList(sysTableDao.findAll(QSysTable.sysTable.sysTableTypeId.eq(sysTableTypeId), QSysTable.sysTable.sort.asc()));
+                return sysTables.stream().map(SysTableModelMapper.INSTANCE::toModifyModel).collect(Collectors.toList());
+            }
+        }
+        return Lists.newArrayList();
+    }
 }
