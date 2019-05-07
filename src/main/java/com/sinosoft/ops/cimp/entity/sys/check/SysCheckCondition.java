@@ -37,6 +37,11 @@ public class SysCheckCondition implements java.io.Serializable {
     @Column(name = "WHERE_PART", length = 4000)
     private String wherePart;
     /**
+     * 系统表英文名
+     */
+    @Column(name = "SYS_TABLE_NAME_EN", length = 200)
+    private String sysTableNameEn;
+    /**
      * 排序
      */
     @Column(name = "SORT", length = 10)
@@ -134,5 +139,13 @@ public class SysCheckCondition implements java.io.Serializable {
 
     public void setWherePart(String wherePart) {
         this.wherePart = wherePart;
+    }
+
+    public String getSysTableNameEn() {
+        return sysTableNameEn;
+    }
+
+    public void setSysTableNameEn(String sysTableNameEn) {
+        this.sysTableNameEn = sysTableNameEn;
     }
 }

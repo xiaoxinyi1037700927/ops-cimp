@@ -23,6 +23,11 @@ public class SysCheckConditionModifyModel {
     @ApiModelProperty(value = "查询条件部分")
     private String wherePart;
     /**
+     * 系统表英文名
+     */
+    @ApiModelProperty(value = "系统表英文名")
+    private String sysTableNameEn;
+    /**
      * 修改人
      */
     @ApiModelProperty(value = "修改人")
@@ -71,5 +76,13 @@ public class SysCheckConditionModifyModel {
 
     public void setModifyTime(Date modifyTime) {
         this.modifyTime = modifyTime;
+    }
+
+    public String getSysTableNameEn() {
+        return sysTableNameEn;
+    }
+
+    public void setSysTableNameEn(String sysTableNameEn) {
+        this.sysTableNameEn = sysTableNameEn;
     }
 }

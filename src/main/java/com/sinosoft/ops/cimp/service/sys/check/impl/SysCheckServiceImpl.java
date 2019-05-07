@@ -87,6 +87,9 @@ public class SysCheckServiceImpl implements SysCheckService {
         if (StringUtils.isNotEmpty(searchModel.getWherePart())) {
             builder.and(qCondition.wherePart.contains(searchModel.getWherePart().trim()));
         }
+        if (StringUtils.isNotEmpty(searchModel.getSysTableNameEn())) {
+            builder.and(qCondition.sysTableNameEn.contains(searchModel.getSysTableNameEn()));
+        }
 
         List<SysCheckConditionModel> models = null;
         long total = 0;
@@ -162,8 +165,8 @@ public class SysCheckServiceImpl implements SysCheckService {
     @Override
     public SysCheckResultModel listSysCheckResult(SysCheckSearchModel searchModel) {
         //当前用户数据权限
-//        String dataOrgId = SecurityUtils.getSubject().getCurrentUser().getDataOrganizationId();
-        String dataOrgId = "DC5C7986DAEF50C1E02AB09B442EE34F";
+        String dataOrgId = SecurityUtils.getSubject().getCurrentUser().getDataOrganizationId();
+//        String dataOrgId = "DC5C7986DAEF50C1E02AB09B442EE34F";
         String code = organizationRepository.findById(dataOrgId).get().getCode();
 
         //获取结果集的表名
@@ -227,8 +230,8 @@ public class SysCheckServiceImpl implements SysCheckService {
             depCodeSqlWhere += "pptr in (select B001001_A from dep_b001 where dep_id ='" + searchModel.getOrgId() + "') ";
         } else {
             //当前用户的数据权限
-//            String dataOrgId = SecurityUtils.getSubject().getCurrentUser().getDataOrganizationId();
-            String dataOrgId = "DC5C7986DAEF50C1E02AB09B442EE34F";
+            String dataOrgId = SecurityUtils.getSubject().getCurrentUser().getDataOrganizationId();
+//            String dataOrgId = "DC5C7986DAEF50C1E02AB09B442EE34F";
             depCodeSqlWhere += "DEP_ID ='" + dataOrgId + "'";
         }
 
@@ -245,7 +248,76 @@ public class SysCheckServiceImpl implements SysCheckService {
 
     @Override
     public PaginationViewModel<SysCheckEmpModel> getEmpList(SysCheckEmpSearchModel searchModel) {
-        return null;
+        SysCheckCondition condition = sysCheckConditionRepository.findById(searchModel.getConditionId()).get();
+
+        int pageIndex = searchModel.getPageIndex() > 0 ? searchModel.getPageIndex() : 1;
+        int pageSize = searchModel.getPageSize() > 0 ? searchModel.getPageSize() : 10;
+        int startIndex = (pageIndex - 1) * pageSize;
+        int endIndex = pageIndex * pageSize;
+
+        //当前用户的数据权限
+//        String dataOrgId = SecurityUtils.getSubject().getCurrentUser().getDataOrganizationId();
+        String dataOrgId = "DC5C7986DAEF50C1E02AB09B442EE34F";
+
+        String sql = "select EMP_ID as \"empId\"," +
+                "       A01001 as \"name\"," +
+                "       (select name from SYS_CODE_ITEM where CODE_SET_ID = 18 and code = A01004) as \"gender\"," +
+                "       to_char(A01007, 'yyyy-mm-dd') as \"birthday\"," +
+                "       (select B01001 from DEP_B001 where DEP_ID = A001004_A) as \"organization\"," +
+                "       (select LISTAGG(A02016_A, '，') within group ( order by ID) from EMP_A02 where EMP_ID = t.EMP_ID and A02001_B = t.A001004_A group by t.EMP_ID) as \"position\"," +
+                "       (select LISTAGG(A05002_A, '，') within group ( order by ID) from EMP_A05 where EMP_ID = t.EMP_ID group by t.EMP_ID) as \"positionLevel\"" +
+                " from (select ROWNUM as rn, t.*" +
+                "      from (select t1.*, tmp.codeLen, tmp.code, tmp.sortNum" +
+                "            from EMP_A001 t1" +
+                "                     inner join (select a02.EMP_ID," +
+                "                                        min(length(nvl(org.code, '99999')))         as codeLen," +
+                "                                        nvl(min(nvl(org.code, '99999')), '99999')   as code," +
+                "                                        nvl(min(nvl(a02.A02023, '99999')), '99999') as sortNum" +
+                "                                 from EMP_A02 a02" +
+                "                                          inner join ORGANIZATION org on a02.A02001_B = org.ID" +
+                "                                 where a02.STATUS = '0'" +
+                "                                   and a02.A02055 = '2'" +
+                "                                   and org.CODE like (select code || '%' from ORGANIZATION where ID = '" + dataOrgId + "')" +
+                "                                 group by a02.EMP_ID) tmp on t1.EMP_ID = tmp.EMP_ID" +
+                "              and t1.STATUS = '0' and " +
+                condition.getWherePart() +
+                "            order by tmp.codeLen, tmp.code, tmp.sortNum, t1.ORDINAL) t" +
+                "      where ROWNUM <= '" + endIndex + "') t" +
+                " where rn > '" + startIndex + "'";
+
+        String countSql = "select count(*) as total " +
+                "            from EMP_A001 t1" +
+                "                     inner join (select a02.EMP_ID" +
+                "                                 from EMP_A02 a02" +
+                "                                          inner join ORGANIZATION org on a02.A02001_B = org.ID" +
+                "                                 where a02.STATUS = '0'" +
+                "                                   and a02.A02055 = '2'" +
+                "                                   and org.CODE like (select code || '%' from ORGANIZATION where ID = '" + dataOrgId + "')" +
+                "                                 group by a02.EMP_ID) tmp on t1.EMP_ID = tmp.EMP_ID" +
+                "              and t1.STATUS = '0' and " +
+                condition.getWherePart();
+
+        List<SysCheckEmpModel> models = jdbcTemplate.queryForList(sql).stream().map(map -> {
+            SysCheckEmpModel model = new SysCheckEmpModel();
+            model.setEmpId(map.get("empId").toString());
+            model.setName(map.get("name") != null ? map.get("name").toString() : "");
+            model.setBirthday(map.get("birthday") != null ? map.get("birthday").toString() : "");
+            model.setGender(map.get("gender") != null ? map.get("gender").toString() : "");
+            model.setPosition(map.get("position") != null ? map.get("position").toString() : "");
+            model.setOrganization(map.get("organization") != null ? map.get("organization").toString() : "");
+            model.setPositionLevel(map.get("positionLevel") != null ? map.get("positionLevel").toString() : "");
+            model.setSysTableNameEn(condition.getSysTableNameEn());
+            return model;
+        }).collect(Collectors.toList());
+
+        Long total = ((BigDecimal) jdbcTemplate.queryForMap(countSql).get("total")).longValue();
+
+        return new PaginationViewModel.Builder<SysCheckEmpModel>()
+                .pageIndex(pageIndex)
+                .pageSize(pageSize)
+                .totalCount(total)
+                .data(models)
+                .build();
     }
 
 

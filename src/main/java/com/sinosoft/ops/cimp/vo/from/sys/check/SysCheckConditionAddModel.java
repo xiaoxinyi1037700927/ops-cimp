@@ -24,6 +24,11 @@ public class SysCheckConditionAddModel {
     @ApiModelProperty(value = "查询条件部分")
     private String wherePart;
     /**
+     * 系统表英文名
+     */
+    @ApiModelProperty(value = "系统表英文名")
+    private String sysTableNameEn;
+    /**
      * 创建人
      */
     @ApiModelProperty(value = "创建人")
@@ -72,5 +77,13 @@ public class SysCheckConditionAddModel {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public String getSysTableNameEn() {
+        return sysTableNameEn;
+    }
+
+    public void setSysTableNameEn(String sysTableNameEn) {
+        this.sysTableNameEn = sysTableNameEn;
     }
 }
