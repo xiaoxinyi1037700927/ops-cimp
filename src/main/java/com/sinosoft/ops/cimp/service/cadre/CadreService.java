@@ -1,7 +1,9 @@
 package com.sinosoft.ops.cimp.service.cadre;
 
 import com.sinosoft.ops.cimp.exception.BusinessException;
-import com.sinosoft.ops.cimp.vo.from.cadre.EmpSortInDepModifyModel;
+import com.sinosoft.ops.cimp.vo.from.cadre.CadreOrgModifyModel;
+import com.sinosoft.ops.cimp.vo.from.cadre.CadreSortInDepModifyModel;
+import com.sinosoft.ops.cimp.vo.from.cadre.CadreStatusModifyModel;
 import com.sinosoft.ops.cimp.vo.to.cadre.CadreBasicInfoVO;
 import com.sinosoft.ops.cimp.vo.to.cadre.CadreSearchVO;
 import com.sinosoft.ops.cimp.vo.to.cadre.CadreSortInDepModel;
@@ -35,5 +37,15 @@ public interface CadreService {
     /**
      * 修改干部在单位内排序
      */
-    boolean modifySortInDep(List<EmpSortInDepModifyModel> modifyModels);
+    boolean modifySortInDep(List<CadreSortInDepModifyModel> modifyModels);
+
+    /**
+     * 修改干部状态
+     */
+    boolean modifyStatus(CadreStatusModifyModel modifyModel);
+
+    /**
+     * 修改干部所属单位
+     */
+    boolean modifyOrganization(CadreOrgModifyModel modifyModel);
 }

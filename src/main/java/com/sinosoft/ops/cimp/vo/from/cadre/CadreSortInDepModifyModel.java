@@ -4,7 +4,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 @ApiModel(description = "修改干部在单位内排序模型")
-public class EmpSortInDepModifyModel {
+public class CadreSortInDepModifyModel {
     /**
      * 单位id
      */

@@ -8,7 +8,9 @@ import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.repository.emp.EmpPhotoRepository;
 import com.sinosoft.ops.cimp.service.cadre.CadreService;
 import com.sinosoft.ops.cimp.util.IdUtil;
-import com.sinosoft.ops.cimp.vo.from.cadre.EmpSortInDepModifyModel;
+import com.sinosoft.ops.cimp.vo.from.cadre.CadreOrgModifyModel;
+import com.sinosoft.ops.cimp.vo.from.cadre.CadreSortInDepModifyModel;
+import com.sinosoft.ops.cimp.vo.from.cadre.CadreStatusModifyModel;
 import com.sinosoft.ops.cimp.vo.to.cadre.CadreBasicInfoVO;
 import com.sinosoft.ops.cimp.vo.to.cadre.CadreSearchVO;
 import com.sinosoft.ops.cimp.vo.to.cadre.CadreSortInDepModel;
@@ -325,12 +327,12 @@ public class CadreServiceImpl implements CadreService {
      */
     @Transactional
     @Override
-    public boolean modifySortInDep(List<EmpSortInDepModifyModel> modifyModels) {
+    public boolean modifySortInDep(List<CadreSortInDepModifyModel> modifyModels) {
         String sql = "UPDATE EMP_A02 SET A02025 = :sortNumber WHERE EMP_ID = :empId AND A02001_B = :orgId";
 
         try {
             List<Object[]> argsList = new ArrayList<>(modifyModels.size());
-            for (EmpSortInDepModifyModel modifyModel : modifyModels) {
+            for (CadreSortInDepModifyModel modifyModel : modifyModels) {
                 Object[] args = new Object[3];
                 args[0] = modifyModel.getSortNumber();
                 args[1] = modifyModel.getEmpId();
@@ -346,5 +348,50 @@ public class CadreServiceImpl implements CadreService {
         }
 
         return false;
+    }
+
+    /**
+     * 修改干部状态
+     */
+    @Override
+    public boolean modifyStatus(CadreStatusModifyModel modifyModel) {
+        List<String> empIds = modifyModel.getEmpIds();
+        String status = modifyModel.getStatus();
+
+        if (empIds == null || empIds.size() == 0 || StringUtils.isEmpty(status)) {
+            return false;
+        }
+
+        if ("QS".equals(status)) {
+            status = "4";
+        } else if ("QT".equals(status)) {
+            status = "9";
+        } else {
+            return false;
+        }
+
+        String sql = "UPDATE EMP_A001 SET A01063 = '" + status + "' WHERE EMP_ID in " + empIds.stream().collect(Collectors.joining("','", "('", "')"));
+
+        jdbcTemplate.update(sql);
+
+        return true;
+    }
+
+    /**
+     * 修改干部所属单位
+     */
+    @Override
+    public boolean modifyOrganization(CadreOrgModifyModel modifyModel) {
+        List<String> empIds = modifyModel.getEmpIds();
+        String orgId = modifyModel.getOrgId();
+        if (empIds == null || empIds.size() == 0 || StringUtils.isEmpty(orgId)) {
+            return false;
+        }
+
+        String sql = "UPDATE EMP_A001 SET A001004_A = '" + orgId + "' WHERE EMP_ID in " + empIds.stream().collect(Collectors.joining("','", "('", "')"));
+
+        jdbcTemplate.update(sql);
+
+        return true;
     }
 }
