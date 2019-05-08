@@ -3,6 +3,8 @@ package com.sinosoft.ops.cimp.controller.tabledata;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.sinosoft.ops.cimp.annotation.SystemApiGroup;
+import com.sinosoft.ops.cimp.cache.CacheManager;
+import com.sinosoft.ops.cimp.constant.Constants;
 import com.sinosoft.ops.cimp.constant.RolePermissionPageSqlEnum;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.dao.SysTableInfoDao;
@@ -222,7 +224,13 @@ public class SysTableDataController extends BaseController {
         SysTableModelInfoDTO tableInfo = sysTableInfoDao.getTableInfo(tableTypeName, prjCode);
 
         //权限判断
-        Map<String, SysAppTableAccessModel> tableAccessMap = tableAccessService.getTableAccess(prjCode);
+        Map<String, SysAppTableAccessModel> tableAccessMap;
+        Object o = CacheManager.getInstance().get(Constants.SYS_TABLE_ACCESS_CACHE, prjCode);
+        if (o != null) {
+            tableAccessMap = (Map<String, SysAppTableAccessModel>) o;
+        } else {
+            tableAccessMap = tableAccessService.getTableAccess(prjCode);
+        }
         for (Iterator<SysTableInfoDTO> itTable = tableInfo.getTables().iterator(); itTable.hasNext(); ) {
             SysTableInfoDTO table = itTable.next();
             //没有该表的访问权限,过滤掉

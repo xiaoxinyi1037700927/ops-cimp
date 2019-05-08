@@ -14,4 +14,8 @@ public interface Constants {
      * 系统码表缓存key
      */
     String SYS_CODE_SET_CACHE = "SYS_CODE_SET_CACHE";
+    /**
+     * 系统表访问控制缓存
+     */
+    String SYS_TABLE_ACCESS_CACHE = "SYS_TABLE_ACCESS_CACHE";
 }
