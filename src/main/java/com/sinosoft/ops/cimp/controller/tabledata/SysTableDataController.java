@@ -243,7 +243,7 @@ public class SysTableDataController extends BaseController {
             boolean canWriteAll = tableAccessMap.get(table.getId()).getCanWriteAll();
             if (!canWriteAll) {
                 String cacheKey = prjCode + "_" + table.getId();
-                Object fieldCache = CacheManager.getInstance().get(Constants.SYS_TABLE_ACCESS_CACHE, prjCode);
+                Object fieldCache = CacheManager.getInstance().get(Constants.SYS_TABLE_ACCESS_CACHE, cacheKey);
                 Map<String, SysAppFieldAccessModel> fieldAccessMap;
                 if (fieldCache != null) {
                     fieldAccessMap = (Map<String, SysAppFieldAccessModel>) fieldCache;
