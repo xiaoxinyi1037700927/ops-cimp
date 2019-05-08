@@ -242,7 +242,16 @@ public class SysTableDataController extends BaseController {
 
             boolean canWriteAll = tableAccessMap.get(table.getId()).getCanWriteAll();
             if (!canWriteAll) {
-                Map<String, SysAppFieldAccessModel> fieldAccessMap = fieldAccessService.getFieldAccess(prjCode, table.getId());
+                String cacheKey = prjCode + "_" + table.getId();
+                Object fieldCache = CacheManager.getInstance().get(Constants.SYS_TABLE_ACCESS_CACHE, prjCode);
+                Map<String, SysAppFieldAccessModel> fieldAccessMap;
+                if (fieldCache != null) {
+                    fieldAccessMap = (Map<String, SysAppFieldAccessModel>) fieldCache;
+                } else {
+                    fieldAccessMap = fieldAccessService.getFieldAccess(prjCode, table.getId());
+                    CacheManager.getInstance().put(Constants.SYS_TABLE_ACCESS_CACHE, cacheKey, fieldAccessMap);
+                }
+
                 for (Iterator<SysTableFieldInfoDTO> itField = table.getFields().iterator(); itField.hasNext(); ) {
                     SysTableFieldInfoDTO field = itField.next();
                     //没有该字段的访问权限,过滤掉
