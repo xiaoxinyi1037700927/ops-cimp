@@ -230,6 +230,7 @@ public class SysTableDataController extends BaseController {
             tableAccessMap = (Map<String, SysAppTableAccessModel>) o;
         } else {
             tableAccessMap = tableAccessService.getTableAccess(prjCode);
+            CacheManager.getInstance().put(Constants.SYS_TABLE_ACCESS_CACHE, prjCode, tableAccessMap);
         }
         for (Iterator<SysTableInfoDTO> itTable = tableInfo.getTables().iterator(); itTable.hasNext(); ) {
             SysTableInfoDTO table = itTable.next();
