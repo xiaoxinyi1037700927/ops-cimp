@@ -14,7 +14,9 @@ import com.sinosoft.ops.cimp.service.cadre.CadreService;
 import com.sinosoft.ops.cimp.service.user.RolePermissionPageSqlService;
 import com.sinosoft.ops.cimp.util.JsonUtil;
 import com.sinosoft.ops.cimp.util.SecurityUtils;
-import com.sinosoft.ops.cimp.vo.from.cadre.EmpSortInDepModifyModel;
+import com.sinosoft.ops.cimp.vo.from.cadre.CadreOrgModifyModel;
+import com.sinosoft.ops.cimp.vo.from.cadre.CadreSortInDepModifyModel;
+import com.sinosoft.ops.cimp.vo.from.cadre.CadreStatusModifyModel;
 import com.sinosoft.ops.cimp.vo.from.user.rolePermissionPageSql.RPPageSqlSearchModel;
 import com.sinosoft.ops.cimp.vo.to.cadre.CadreDataVO;
 import com.sinosoft.ops.cimp.vo.to.cadre.CadreFieldVO;
@@ -282,7 +284,21 @@ public class CadreController extends BaseController {
     @ApiOperation(value = "修改干部单位内排序")
     @PostMapping("/sortInDep/modify")
     @RequiresAuthentication
-    public ResponseEntity modifySortInDep(@RequestBody List<EmpSortInDepModifyModel> modifyModels) throws BusinessException {
+    public ResponseEntity modifySortInDep(@RequestBody List<CadreSortInDepModifyModel> modifyModels) throws BusinessException {
         return cadreService.modifySortInDep(modifyModels) ? ok("修改成功!") : fail("修改失败！");
+    }
+
+    @ApiOperation(value = "修改干部状态")
+    @PostMapping("/status/modify")
+    @RequiresAuthentication
+    public ResponseEntity modifyStatus(@RequestBody CadreStatusModifyModel modifyModel) throws BusinessException {
+        return cadreService.modifyStatus(modifyModel) ? ok("修改成功!") : fail("修改失败！");
+    }
+
+    @ApiOperation(value = "修改干部所属单位")
+    @PostMapping("/org/modify")
+    @RequiresAuthentication
+    public ResponseEntity modifyOrganization(@RequestBody CadreOrgModifyModel modifyModel) throws BusinessException {
+        return cadreService.modifyOrganization(modifyModel) ? ok("修改成功!") : fail("修改失败！");
     }
 }
