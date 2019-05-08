@@ -20,6 +20,7 @@ import com.sinosoft.ops.cimp.entity.user.UserRole;
 import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.export.ExportManager;
 import com.sinosoft.ops.cimp.export.handlers.impl.ExportGbrmbHtmlBiJie;
+import com.sinosoft.ops.cimp.export.handlers.impl.ExportGbrmbWordBiJie;
 import com.sinosoft.ops.cimp.service.oraganization.OrganizationService;
 import com.sinosoft.ops.cimp.service.sys.sysapp.acess.SysAppFieldAccessService;
 import com.sinosoft.ops.cimp.service.sys.sysapp.acess.SysAppTableAccessService;
@@ -602,7 +603,7 @@ public class SysTableDataController extends BaseController {
         if (StringUtils.equalsIgnoreCase(tableName, "DepB001")) {
             String code = formMap.get("PPTR").toString() + "." + formMap.get("treeLevelCode").toString();
             formMap.put("treeLevelCode", code);
-            formMap.put("ORDINAL", jdbcTemplate.queryForMap("select nvl(max(nvl(ORDINAL,0)),0)+1 as ordinal from DEP_B001").get("ordinal"));
+            formMap.put("ORDINAL", jdbcTemplate.queryForMap("SELECT nvl(max(nvl(ORDINAL,0)),0)+1 AS ordinal FROM DEP_B001").get("ordinal"));
         }
 
         QueryDataParamBuilder queryDataParam = new QueryDataParamBuilder();
@@ -624,6 +625,7 @@ public class SysTableDataController extends BaseController {
                     executorService.submit(() -> {
                         try {
                             ExportManager.generate(new ExportGbrmbHtmlBiJie(tableNameFKValue));
+                            ExportManager.generate(new ExportGbrmbWordBiJie(tableNameFKValue));
                         } catch (Exception e) {
                             LOGGER.error("异步生成干部任免表html失败", e);
                         }
@@ -634,6 +636,7 @@ public class SysTableDataController extends BaseController {
                 executorService.submit(() -> {
                     try {
                         ExportManager.generate(new ExportGbrmbHtmlBiJie(String.valueOf(tableNameEnPKValue)));
+                        ExportManager.generate(new ExportGbrmbWordBiJie(String.valueOf(tableNameEnPKValue)));
                     } catch (Exception e) {
                         LOGGER.error("异步生成干部任免表html失败", e);
                     }

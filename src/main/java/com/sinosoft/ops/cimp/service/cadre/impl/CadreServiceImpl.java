@@ -5,6 +5,9 @@ import com.sinosoft.ops.cimp.dao.SysTableInfoDao;
 import com.sinosoft.ops.cimp.dao.domain.sys.table.SysTableModelInfo;
 import com.sinosoft.ops.cimp.entity.emp.EmpPhoto;
 import com.sinosoft.ops.cimp.exception.BusinessException;
+import com.sinosoft.ops.cimp.export.ExportManager;
+import com.sinosoft.ops.cimp.export.handlers.impl.ExportGbrmbHtmlBiJie;
+import com.sinosoft.ops.cimp.export.handlers.impl.ExportGbrmbWordBiJie;
 import com.sinosoft.ops.cimp.repository.emp.EmpPhotoRepository;
 import com.sinosoft.ops.cimp.service.cadre.CadreService;
 import com.sinosoft.ops.cimp.util.IdUtil;
@@ -27,6 +30,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,6 +40,8 @@ public class CadreServiceImpl implements CadreService {
     private final JdbcTemplate jdbcTemplate;
     private final EmpPhotoRepository empPhotoRepository;
     private final SysTableInfoDao sysTableInfoDao;
+    private ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
+
 
     public CadreServiceImpl(JdbcTemplate jdbcTemplate, EmpPhotoRepository empPhotoRepository, SysTableInfoDao sysTableInfoDao) {
         this.jdbcTemplate = jdbcTemplate;
@@ -288,6 +295,16 @@ public class CadreServiceImpl implements CadreService {
             }
             empPhoto.setPhotoFile(photo.getBytes());
             empPhotoRepository.save(empPhoto);
+
+            //修改照片异步生成干部的任免表文件
+            executorService.submit(() -> {
+                try {
+                    ExportManager.generate(new ExportGbrmbHtmlBiJie(empId));
+                    ExportManager.generate(new ExportGbrmbWordBiJie(empId));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
 
             return true;
         } catch (Exception e) {
