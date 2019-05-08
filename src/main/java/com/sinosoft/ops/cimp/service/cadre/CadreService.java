@@ -1,10 +1,13 @@
 package com.sinosoft.ops.cimp.service.cadre;
 
 import com.sinosoft.ops.cimp.exception.BusinessException;
+import com.sinosoft.ops.cimp.vo.from.cadre.EmpSortInDepModifyModel;
 import com.sinosoft.ops.cimp.vo.to.cadre.CadreBasicInfoVO;
 import com.sinosoft.ops.cimp.vo.to.cadre.CadreSearchVO;
+import com.sinosoft.ops.cimp.vo.to.cadre.CadreSortInDepModel;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Map;
 
 public interface CadreService {
@@ -23,4 +26,14 @@ public interface CadreService {
      * 上传干部照片
      */
     boolean uploadPhoto(String empId, MultipartFile photo);
+
+    /**
+     * 获取干部单位内排序
+     */
+    List<CadreSortInDepModel> getSortInDep(String orgId);
+
+    /**
+     * 修改干部在单位内排序
+     */
+    boolean modifySortInDep(List<EmpSortInDepModifyModel> modifyModels);
 }

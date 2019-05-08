@@ -8,16 +8,20 @@ import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.repository.emp.EmpPhotoRepository;
 import com.sinosoft.ops.cimp.service.cadre.CadreService;
 import com.sinosoft.ops.cimp.util.IdUtil;
+import com.sinosoft.ops.cimp.vo.from.cadre.EmpSortInDepModifyModel;
 import com.sinosoft.ops.cimp.vo.to.cadre.CadreBasicInfoVO;
 import com.sinosoft.ops.cimp.vo.to.cadre.CadreSearchVO;
+import com.sinosoft.ops.cimp.vo.to.cadre.CadreSortInDepModel;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.transaction.Transactional;
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -287,6 +291,60 @@ public class CadreServiceImpl implements CadreService {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return false;
+    }
+
+    /**
+     * 获取干部单位内排序
+     */
+    @Override
+    public List<CadreSortInDepModel> getSortInDep(String orgId) {
+        String sql = "select a001.EMP_ID as empId, " +
+                "       max(a001.A01001) as name, " +
+                "       LISTAGG( A02016_A, '，') within group ( order by A02016_A) as position, " +
+                "       min(nvl(a02.A02025,999)) as sortNumber " +
+                " from EMP_A001 a001 inner join EMP_A02 a02 on a001.EMP_ID = a02.EMP_ID " +
+                " where a001.STATUS = '0' and a02.STATUS = '0' and a02.A02055 = '2' " +
+                " and a02.A02001_B = '" + orgId + "' " +
+                " group by a001.EMP_ID " +
+                " order by sortNumber";
+
+        return jdbcTemplate.queryForList(sql).stream().map(map -> {
+            CadreSortInDepModel model = new CadreSortInDepModel();
+            model.setOrgId(orgId);
+            model.setEmpId(map.get("empId").toString());
+            model.setName(map.get("name").toString());
+            model.setPositionName(map.get("position").toString());
+            model.setSortNumber(map.get("sortNumber").toString());
+            return model;
+        }).collect(Collectors.toList());
+    }
+
+    /**
+     * 修改干部在单位内排序
+     */
+    @Transactional
+    @Override
+    public boolean modifySortInDep(List<EmpSortInDepModifyModel> modifyModels) {
+        String sql = "UPDATE EMP_A02 SET A02025 = :sortNumber WHERE EMP_ID = :empId AND A02001_B = :orgId";
+
+        try {
+            List<Object[]> argsList = new ArrayList<>(modifyModels.size());
+            for (EmpSortInDepModifyModel modifyModel : modifyModels) {
+                Object[] args = new Object[3];
+                args[0] = modifyModel.getSortNumber();
+                args[1] = modifyModel.getEmpId();
+                args[2] = modifyModel.getOrgId();
+                argsList.add(args);
+
+            }
+            jdbcTemplate.batchUpdate(sql, argsList);
+
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         return false;
     }
 }

@@ -14,6 +14,7 @@ import com.sinosoft.ops.cimp.service.cadre.CadreService;
 import com.sinosoft.ops.cimp.service.user.RolePermissionPageSqlService;
 import com.sinosoft.ops.cimp.util.JsonUtil;
 import com.sinosoft.ops.cimp.util.SecurityUtils;
+import com.sinosoft.ops.cimp.vo.from.cadre.EmpSortInDepModifyModel;
 import com.sinosoft.ops.cimp.vo.from.user.rolePermissionPageSql.RPPageSqlSearchModel;
 import com.sinosoft.ops.cimp.vo.to.cadre.CadreDataVO;
 import com.sinosoft.ops.cimp.vo.to.cadre.CadreFieldVO;
@@ -270,4 +271,18 @@ public class CadreController extends BaseController {
         return cadreService.uploadPhoto(empId, photo) ? ok("上传成功!") : fail("上传失败！");
     }
 
+
+    @ApiOperation(value = "获取干部单位内排序")
+    @PostMapping("/sortInDep")
+    @RequiresAuthentication
+    public ResponseEntity getSortInDep(@RequestParam String orgId) throws BusinessException {
+        return ok(cadreService.getSortInDep(orgId));
+    }
+
+    @ApiOperation(value = "修改干部单位内排序")
+    @PostMapping("/sortInDep/modify")
+    @RequiresAuthentication
+    public ResponseEntity modifySortInDep(@RequestBody List<EmpSortInDepModifyModel> modifyModels) throws BusinessException {
+        return cadreService.modifySortInDep(modifyModels) ? ok("修改成功!") : fail("修改失败！");
+    }
 }
