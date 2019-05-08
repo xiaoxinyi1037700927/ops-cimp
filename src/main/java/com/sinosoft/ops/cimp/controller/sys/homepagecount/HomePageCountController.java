@@ -33,65 +33,6 @@ public class HomePageCountController extends BaseController {
     private RoleHomePageCountService roleHomePageCountService;
 
 
-//    @ApiOperation(value = "查询统计基础项")
-//    @PostMapping("/findAllHomePageCountList")
-//    @RequiresAuthentication
-//    public Result<List<HomePageCountVO>> findAllHomePageCountList() {
-//
-//        List<HomePageCountVO> allHomePageCountVOList = homePageCountService.findAllHomePageCountVOList();
-//
-//        return JsonSuccess(allHomePageCountVOList);
-//    }
-
-
-//    @ApiOperation(value = "新增/修改角色统计中间配置项")
-//    @PostMapping("/addRoleCount")
-//    @RequiresAuthentication
-//    public Result<Boolean> addRoleCount(@RequestBody RoleHomePageCountModel model) {
-//
-//        List<RoleHomePageCount> roleHomePageCountList = roleHomePageCountService.addRoleCount(model);
-//
-//        return JsonSuccess(true);
-//    }
-//
-//    @ApiOperation(value = "删除角色统计中间配置项")
-//    @PostMapping("/deleteRoleCountByRoleCountIdList")
-//    @RequiresAuthentication
-//    public Result<Boolean> deleteRoleCountByRoleCountIdList(@RequestBody List<String> roleCountIdList) {
-//
-//        boolean b = roleHomePageCountService.deleteRoleCountByRoleCountIdList(roleCountIdList);
-//
-//        return JsonSuccess(b);
-//    }
-//
-//    @ApiOperation(value = "查询角色配置项")
-//    @PostMapping("/findRoleCountByRoleId")
-//    @RequiresAuthentication
-//    public Result<List<RoleHomePageCountVO>> findRoleCountByRoleId(@RequestParam String roleId) {
-//        if (StringUtils.isEmpty(roleId)) {
-//            return JsonError("roleId不能为空！");
-//        }
-//
-//        List<RoleHomePageCountVO> roleHomePageCountVOList = roleHomePageCountService.findRoleCountByRoleId(roleId);
-//
-//        return JsonSuccess(roleHomePageCountVOList);
-//    }
-//
-//
-//    @ApiOperation(value = "查询角色对应的统计项统计信息")
-//    @PostMapping("/findRoleCountQueryByRoleIdList")
-//    @RequiresAuthentication
-//    public Result<List<HomePageCountQueryVO>> findRoleCountQueryByRoleIdList(@RequestBody List<String> roleIdList) {
-//        if (roleIdList != null && roleIdList.size() == 0) {
-//            return JsonError("roleIdList不能为空！");
-//        }
-//
-//        List<HomePageCountQueryVO> homePageCountQueryVOList = homePageCountService.findRoleHomePageCountQueryByRoleIdList(roleIdList);
-//
-//        return JsonSuccess(homePageCountQueryVOList);
-//    }
-
-
     @ApiOperation(value = "新增/修改角色统计信息")
     @PostMapping("/addOrUpdateRoleCount")
     @RequiresAuthentication
