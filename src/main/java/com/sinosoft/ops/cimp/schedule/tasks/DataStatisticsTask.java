@@ -138,9 +138,9 @@ public class DataStatisticsTask implements Task {
         deleteTableData("DEP_LEVEL");
 
         String sql = "INSERT INTO DEP_LEVEL(dep_id, description, tree_level_code,pptr,LEVEL_NUM, root) " +
-                " SELECT dep_id, description, B001001_A,pptr,LEVEL, CONNECT_BY_ROOT(B001001_A) root FROM dep_b001 " +
-                " START WITH B001001_A IN (SELECT B001001_A FROM dep_b001) " +
-                " CONNECT BY NOCYCLE PRIOR B001001_A = PPTR AND status = 0 ";
+                " SELECT dep_id, description, TREE_LEVEL_CODE,pptr,LEVEL, CONNECT_BY_ROOT(TREE_LEVEL_CODE) root FROM dep_b001 " +
+                " START WITH TREE_LEVEL_CODE IN (SELECT TREE_LEVEL_CODE FROM dep_b001 WHERE ) " +
+                " CONNECT BY NOCYCLE PRIOR TREE_LEVEL_CODE = PPTR AND status = 0 ";
         int count = jdbcTemplate.update(sql);
         logger.info("insert " + count + "rows into DEP_LEVEL table ");
         logger.info("statisticsDepLevel success");
