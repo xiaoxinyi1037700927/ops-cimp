@@ -21,6 +21,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.FileInputStream;
@@ -43,13 +44,13 @@ public class ExportGbrmbBiJieController extends BaseController {
     @ApiOperation(value = "生成干部任免表html文件(毕节)")
     @ApiImplicitParam(name = "empId", value = "empId", required = true)
     @PostMapping("/html/generate")
-    public ResponseEntity generateAndExportGbrmbHTML(String empId) throws BusinessException {
+    public ResponseEntity generateAndExportGbrmbHTML(String empId, @RequestParam(defaultValue = "false") boolean forceGenerate) throws BusinessException {
         if (StringUtils.isEmpty(empId)) {
             return fail("empId不能为空！");
         }
 
         try {
-            String outFile = ExportManager.generate(new ExportGbrmbHtmlBiJie(empId));
+            String outFile = ExportManager.generate(new ExportGbrmbHtmlBiJie(empId), forceGenerate);
             if (outFile == null) {
                 return fail("文件正在生成中，请稍后再试");
             }
@@ -76,7 +77,7 @@ public class ExportGbrmbBiJieController extends BaseController {
             //生成干部任免表
             ArrayList<String> outFiles = new ArrayList<>(empIds.length);
             for (String empId : empIds) {
-                String outFile = ExportManager.generate(new ExportGbrmbWordBiJie(empId));
+                String outFile = ExportManager.generate(new ExportGbrmbWordBiJie(empId), false);
                 if (outFile == null) {
                     writeJson(response, "文件正在生成中，请稍后再试！");
                     return;
@@ -114,7 +115,7 @@ public class ExportGbrmbBiJieController extends BaseController {
             //生成干部任免表lrmx文件
             ArrayList<String> outFiles = new ArrayList<>(empIds.length);
             for (String empId : empIds) {
-                String outFile = ExportManager.generate(new ExportGbrmbLrmx(empId));
+                String outFile = ExportManager.generate(new ExportGbrmbLrmx(empId), false);
                 if (outFile == null) {
                     writeJson(response, "文件正在生成中，请稍后再试！");
                     return;

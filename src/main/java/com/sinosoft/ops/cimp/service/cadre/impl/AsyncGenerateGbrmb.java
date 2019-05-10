@@ -18,8 +18,8 @@ public class AsyncGenerateGbrmb {
             for (String empId : empIds) {
                 executorService.submit(() -> {
                     try {
-                        ExportManager.generate(new ExportGbrmbHtmlBiJie(String.valueOf(empId)));
-                        ExportManager.generate(new ExportGbrmbWordBiJie(String.valueOf(empId)));
+                        ExportManager.generate(new ExportGbrmbHtmlBiJie(String.valueOf(empId)), true);
+                        ExportManager.generate(new ExportGbrmbWordBiJie(String.valueOf(empId)), true);
                     } catch (Exception e) {
                         LOGGER.error("异步生成干部任免表html失败", e);
                     }

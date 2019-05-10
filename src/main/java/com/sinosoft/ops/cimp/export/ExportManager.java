@@ -9,7 +9,13 @@ import java.util.Map;
 public class ExportManager {
     private static Map<String, Long> map = new HashMap<>();
 
-    public static String generate(ExportHandler handler) throws Exception {
+    /**
+     * @param handler
+     * @param forceGenerate 强制生成文件
+     * @return
+     * @throws Exception
+     */
+    public static String generate(ExportHandler handler, boolean forceGenerate) throws Exception {
         String filePath = handler.getFilePath();
 
         //如果目标文件正在生成，直接返回，否则存入map中
@@ -19,7 +25,7 @@ public class ExportManager {
 
         try {
             //如果目标文件不存在,生成目标文件
-            if (!handler.isReuse() || !FileUtils.fileExists(filePath)) {
+            if (forceGenerate || !handler.isReuse() || !FileUtils.fileExists(filePath)) {
                 if (!handler.generate()) {
                     return null;
                 }

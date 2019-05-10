@@ -299,8 +299,8 @@ public class CadreServiceImpl implements CadreService {
             //修改照片异步生成干部的任免表文件
             executorService.submit(() -> {
                 try {
-                    ExportManager.generate(new ExportGbrmbHtmlBiJie(empId));
-                    ExportManager.generate(new ExportGbrmbWordBiJie(empId));
+                    ExportManager.generate(new ExportGbrmbHtmlBiJie(empId), true);
+                    ExportManager.generate(new ExportGbrmbWordBiJie(empId), true);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

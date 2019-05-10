@@ -43,6 +43,7 @@ public class CategoryData {
     static {
         String leftLogicExpression = "#{left}+#{width}";
         String processTypeA = "A";
+        String processTypeB = "B";
 
         // ++++++++++++++ pf1 ++++++++++++++
         categoryBeansPf1 = new ArrayList<>();
@@ -110,18 +111,18 @@ public class CategoryData {
         // 113(基本情况) && 34(家庭成员及社会关系) 家庭主要成员及重要社会关系
         // 20180417--145(基本情况) && 34(家庭成员及社会关系) 家庭主要成员及重要社会关系
         List<AttributeBean> attributeBeans11334 = new ArrayList<>();
-        attributeBeans11334.add(new AttributeBean("家庭主要成员及重要社会关系", "_RelationId", leftLogicExpression, null, null, null, "B"));
-//		attributeBeans11334.add(new AttributeBean("称谓", "_RelationTitleId", leftLogicExpression, null, null, null, processTypeB));
-//		attributeBeans11334.add(new AttributeBean("姓名", "_RelationNameId", leftLogicExpression, null, null, null, processTypeB));
-//		attributeBeans11334.add(new AttributeBean("年龄", "_RelationAgeId", null, "#{bottom}-#{height}", null, null, processTypeB));
-//		attributeBeans11334.add(new AttributeBean("政治面貌", "_RelationPoliticsStatusId", leftLogicExpression, null, null, null, processTypeB));
-//		attributeBeans11334.add(new AttributeBean("工作单位及职务", "_RelationOcupertinoId", leftLogicExpression, null, null, null, processTypeB));
-        categoryBeansPf2.add(new CategoryBean("EmpA39", attributeBeans11334));
+//        attributeBeans11334.add(new AttributeBean("家庭主要成员及重要社会关系", "_RelationId", leftLogicExpression, null, null, null, "B"));
+		attributeBeans11334.add(new AttributeBean("称谓", "_RelationTitleId", leftLogicExpression, null, null, null, processTypeB));
+		attributeBeans11334.add(new AttributeBean("姓名", "_RelationNameId", leftLogicExpression, null, null, null, processTypeB));
+		attributeBeans11334.add(new AttributeBean("年龄", "_RelationAgeId", null, "#{bottom}-#{height}", null, null, processTypeB));
+		attributeBeans11334.add(new AttributeBean("政治面貌", "_RelationPoliticsStatusId", leftLogicExpression, null, null, null, processTypeB));
+		attributeBeans11334.add(new AttributeBean("工作单位及职务", "_RelationOcupertinoId", leftLogicExpression, null, null, null, processTypeB));
+        categoryBeansPf2.add(new CategoryBean("EmpA36", attributeBeans11334));
 
 
         // 126(奖惩考核) && 15(考核情况)
         List<AttributeBean> attributeBeans12615 = new ArrayList<>();
-        attributeBeans12615.add(new AttributeBean("年度考核结果", "_AnnualAssessmentResultsId", leftLogicExpression, "555", null, null, processTypeA));
+        attributeBeans12615.add(new AttributeBean("年度考核结果", "_AnnualAssessmentResultsId", leftLogicExpression, "555", null, null, processTypeB));
         categoryBeansPf2.add(new CategoryBean("EmpA15", attributeBeans12615));
     }
 

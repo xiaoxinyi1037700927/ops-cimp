@@ -5,6 +5,7 @@ import com.sinosoft.ops.cimp.export.common.bean.AttributeBean;
 import com.sinosoft.ops.cimp.export.common.bean.CategoryBean;
 import com.sinosoft.ops.cimp.export.common.bean.CategoryData;
 import com.sinosoft.ops.cimp.service.export.ExportService;
+import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -185,11 +186,18 @@ public class ExportServiceImpl implements ExportService {
             if ("".equals(divText)) {
                 continue;
             }
+
+            //处理生成html时，"年度考核结果"顺序错乱的问题
+            if(divText.length() == 6 && StringUtils.containsAny(divText,"年","度","考","核","结","果")){
+                divText = "年度考核结果";
+            }
+
             if (isContainsDivText(categoryBeansPf, divText, divElement.elementSiblingIndex())) {
                 nameIndexs.add(divElement.elementSiblingIndex());
             }
         }
     }
+
 
     private void setValueIndex(List<CategoryBean> categoryBeansPf, Elements pfChildrenElements, List<Integer> nameIndexs) {
         int pfChildrenElementsSize = pfChildrenElements.size();

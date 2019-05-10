@@ -26,7 +26,7 @@ public class ExportGbhmcController extends BaseController {
     @GetMapping("generateAndExport")
     public void generateAndExportGbhmc(ExportGbhmcModel model, HttpServletResponse response) {
         try {
-            String outFile = ExportManager.generate(new ExportGbHmc(model));
+            String outFile = ExportManager.generate(new ExportGbHmc(model),false);
             writeFileToResponse(response, outFile);
             return;
         } catch (Exception e) {

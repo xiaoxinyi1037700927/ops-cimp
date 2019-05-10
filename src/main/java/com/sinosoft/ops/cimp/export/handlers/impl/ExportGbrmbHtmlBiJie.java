@@ -5,7 +5,6 @@ import com.aspose.words.PdfSaveOptions;
 import com.sinosoft.ops.cimp.export.common.ExportConstant;
 import com.sinosoft.ops.cimp.export.common.Pdf2htmlUtil;
 import com.sinosoft.ops.cimp.export.handlers.AbstractExportGbrmbBiJie;
-import com.sinosoft.ops.cimp.util.FileUtils;
 
 /**
  * 生成毕节市干部任免表html文件
@@ -48,7 +47,7 @@ public class ExportGbrmbHtmlBiJie extends AbstractExportGbrmbBiJie {
             }
         } finally {
             //删除生成的pdf临时文件
-            FileUtils.deleteFile(fileDir + pdfFileName);
+//            FileUtils.deleteFile(fileDir + pdfFileName);
         }
     }
 }
