@@ -15,6 +15,7 @@ import com.sinosoft.ops.cimp.dto.QueryDataParamBuilder;
 import com.sinosoft.ops.cimp.dto.sys.table.SysTableFieldInfoDTO;
 import com.sinosoft.ops.cimp.dto.sys.table.SysTableInfoDTO;
 import com.sinosoft.ops.cimp.dto.sys.table.SysTableModelInfoDTO;
+import com.sinosoft.ops.cimp.entity.oraganization.Organization;
 import com.sinosoft.ops.cimp.entity.user.User;
 import com.sinosoft.ops.cimp.entity.user.UserRole;
 import com.sinosoft.ops.cimp.exception.BusinessException;
@@ -31,8 +32,6 @@ import com.sinosoft.ops.cimp.util.JsonUtil;
 import com.sinosoft.ops.cimp.util.OrganizationUtil;
 import com.sinosoft.ops.cimp.util.SecurityUtils;
 import com.sinosoft.ops.cimp.vo.from.user.rolePermissionPageSql.RPPageSqlSearchModel;
-import com.sinosoft.ops.cimp.vo.to.organization.OrganizationSearchViewModel;
-import com.sinosoft.ops.cimp.vo.to.organization.OrganizationViewModel;
 import com.sinosoft.ops.cimp.vo.to.sys.sysapp.access.SysAppFieldAccessModel;
 import com.sinosoft.ops.cimp.vo.to.sys.sysapp.access.SysAppTableAccessModel;
 import com.sinosoft.ops.cimp.vo.to.sys.systable.SysTableTypeModel;
@@ -607,11 +606,20 @@ public class SysTableDataController extends BaseController {
         List<UserRole> currentUserRole = SecurityUtils.getSubject().getCurrentUserRole();
         List<String> roleIds = currentUserRole.stream().map(UserRole::getRoleId).collect(Collectors.toList());
 
-        OrganizationSearchViewModel searchViewModel = new OrganizationSearchViewModel();
-        searchViewModel.setOrganizationId(dataOrganizationId);
-        OrganizationViewModel organizationViewModel = organizationService.lstTreeNode(searchViewModel);
+        int organizationCount = 0;
+        String[] deptIds = dataOrganizationId.split(",");
+        for (String deptId : deptIds) {
+            Organization organization = organizationService.findOrganizationById(deptId);
+            String code = organization.getCode();
+            String sql = "SELECT COUNT(ID) AS \"deptCount\" FROM ORGANIZATION WHERE CODE LIKE '%s\\%' ";
+            String execSql = String.format(sql, code);
+            Map<String, Object> map = jdbcTemplate.queryForMap(execSql);
+            Object deptCount = map.get("deptCount");
+            if (deptCount != null) {
+                organizationCount += Integer.parseInt(String.valueOf(deptCount));
+            }
+        }
 
-        int organizationCount = organizationViewModel.getSubTreeNode().size();
         resultMap.put("organizationCount", organizationCount);
 
         RPPageSqlSearchModel searchModel = new RPPageSqlSearchModel();
