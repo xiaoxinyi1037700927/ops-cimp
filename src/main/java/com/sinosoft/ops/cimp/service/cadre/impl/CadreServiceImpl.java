@@ -80,8 +80,8 @@ public class CadreServiceImpl implements CadreService {
     }
 
     @Override
-    public byte[] getPhoto(String photoId) {
-        Map<String, Object> data = jdbcTemplate.queryForMap(String.format("select PHOTO_FILE from EMP_PHOTO where SUB_ID = '%s'", photoId));
+    public byte[] getPhoto(String empId) {
+        Map<String, Object> data = jdbcTemplate.queryForMap(String.format("select PHOTO_FILE from EMP_PHOTO where ROWNUM = 1 AND EMP_ID = '%s'", empId));
         if (data.size() > 0) {
             return (byte[]) data.get("PHOTO_FILE");
         } else {

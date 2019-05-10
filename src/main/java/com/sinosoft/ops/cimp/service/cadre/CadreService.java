@@ -16,7 +16,7 @@ public interface CadreService {
 
     CadreBasicInfoVO getCadreBasicInfo(String empId);
 
-    byte[] getPhoto(String photoId);
+    byte[] getPhoto(String empId);
 
     /**
      * 查询干部，根据干部标签和信息项选择进行查询

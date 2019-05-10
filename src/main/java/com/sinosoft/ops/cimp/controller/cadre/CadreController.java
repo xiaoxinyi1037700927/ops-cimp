@@ -233,11 +233,11 @@ public class CadreController extends BaseController {
 
     @ApiOperation(value = "获取干部图片")
     @GetMapping(value = "/photo")
-    public void getPhoto(@RequestParam("photoId") String photoId, HttpServletResponse response) {
+    public void getPhoto(@RequestParam("empId") String empId, HttpServletResponse response) {
         try {
-            byte[] photo = cadreService.getPhoto(photoId);
+            byte[] photo = cadreService.getPhoto(empId);
 
-            String fileName = photoId;
+            String fileName = "照片";
             fileName = new String(fileName.getBytes("utf-8"), "utf-8");
             fileName = URLEncoder.encode(fileName, "UTF-8");
 
