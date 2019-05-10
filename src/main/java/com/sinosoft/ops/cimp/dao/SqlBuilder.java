@@ -51,7 +51,7 @@ public interface SqlBuilder {
     }
 
     default Object convertValue(Object data, String attrSaveType) throws BusinessException {
-        if (attrSaveType.startsWith("VARCHAR") || attrSaveType.startsWith("VARCHAR2")) {
+        if (attrSaveType.toUpperCase().startsWith("VARCHAR") || attrSaveType.toUpperCase().startsWith("VARCHAR2")) {
             if (data != null) {
                 return String.valueOf(data);
             }
@@ -73,7 +73,7 @@ public interface SqlBuilder {
                 throw new BusinessException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE, "格式化日期错误");
             }
         }
-        if (attrSaveType.startsWith("NUMBER")) {
+        if (attrSaveType.toUpperCase().startsWith("NUMBER")) {
             if (attrSaveType.contains(",")) {
                 if (data == null) {
                     return null;
@@ -92,7 +92,7 @@ public interface SqlBuilder {
                 return NumberUtil.toIntObject((String) data);
             }
         }
-        if (attrSaveType.startsWith("BLOB")) {
+        if (attrSaveType.toUpperCase().startsWith("BLOB")) {
             return ((String) data).toCharArray();
         }
         return "";

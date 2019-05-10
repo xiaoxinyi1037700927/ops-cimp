@@ -148,11 +148,20 @@ public class SysTableModelInfoServiceImpl implements SysTableModelInfoService {
         boolean masterTable = sysTableInfoDTO.isMasterTable();
         if (masterTable) {
             daoParam.addEqualCondition(tableNameEnPK, tableNameEnPKValue);
-            execParamList.add(new ExecParam(tableNameEnPK, ""));
+            ExecParam paramPk = new ExecParam(tableNameEnPK, "");
+            if (!contains(execParamList, paramPk)) {
+                execParamList.add(paramPk);
+            }
         } else {
             daoParam.addEqualCondition(tableNameEnFK, tableNameEnFKValue);
-            execParamList.add(new ExecParam(tableNameEnPK, ""));
-            execParamList.add(new ExecParam(tableNameEnFK, ""));
+            ExecParam paramPk = new ExecParam(tableNameEnPK, "");
+            ExecParam paramFk = new ExecParam(tableNameEnPK, "");
+            if (!contains(execParamList, paramPk)) {
+                execParamList.add(paramPk);
+            }
+            if (!contains(execParamList, paramFk)) {
+                execParamList.add(paramFk);
+            }
         }
         List<String> resultField = execParamList.stream().map(ExecParam::getFieldName).collect(Collectors.toList());
         queryDataParam.setResultFields(resultField);
@@ -206,6 +215,15 @@ public class SysTableModelInfoServiceImpl implements SysTableModelInfoService {
             queryDataParam.setResultMultiData(resultList);
         }
         return queryDataParam;
+    }
+
+    private boolean contains(List<ExecParam> execParamList, ExecParam paramPk) {
+        for (ExecParam execParam : execParamList) {
+            if (execParam.getFieldName().equalsIgnoreCase(paramPk.getFieldName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

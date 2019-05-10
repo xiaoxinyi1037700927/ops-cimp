@@ -78,11 +78,11 @@ public class FamilyRelAttrValue implements AttrValue {
                     }
                 }
             }
-            // shixianggui-20180312, 称昵修改: 父 --> 丈夫; 妻 --> 妻子; 独生子 --> 儿子; 独生女 --> 女儿;
+            // shixianggui-20180312, 称昵修改: 夫 --> 丈夫; 妻 --> 妻子; 独生子 --> 儿子; 独生女 --> 女儿;
             for (int i = 0; i < a36TableList.size(); i++) {
                 map = (Map) a36TableList.get(i);
                 A36005_B = StringUtil.obj2Str(map.get("A36005_B"));
-                // 父 --> 丈夫
+                // 夫 --> 丈夫
                 if ("11".equals(A36005_B)) {
                     familyRel = "丈夫";
                 }
