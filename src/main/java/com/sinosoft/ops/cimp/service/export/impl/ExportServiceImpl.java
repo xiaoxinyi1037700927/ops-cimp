@@ -153,7 +153,7 @@ public class ExportServiceImpl implements ExportService {
         Element firstElement = pfChildrenElements.first();
         if (firstElement != null) {
             // onclick="alert('Hi')" onmouseover="this.style.backgroundColor='#5eb9f0'" onmouseout="this.style.backgroundColor=''" style="cursor:pointer"
-            firstElement.attr("onclick", "titleClickFn(113,14)");
+            firstElement.attr("onclick", "titleClickFn('EmpA001')");
 //			firstElement.attr("onmouseover", "this.style.backgroundColor='#5eb9f0'");//#F4F9FD, #FFA500, #5eb9f0
 //			firstElement.attr("onmouseout", "this.style.backgroundColor=''");
             firstElement.attr("style", "cursor:pointer");
