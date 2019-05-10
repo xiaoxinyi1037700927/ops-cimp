@@ -1,6 +1,7 @@
 package com.sinosoft.ops.cimp.service.user.impl;
 
 import com.google.common.collect.Lists;
+import com.querydsl.core.BooleanBuilder;
 import com.sinosoft.ops.cimp.dto.PaginationViewModel;
 import com.sinosoft.ops.cimp.entity.user.QRolePermissionPageSql;
 import com.sinosoft.ops.cimp.entity.user.RolePermissionPageSql;
@@ -34,11 +35,15 @@ public class RolePermissionPageSqlServiceImpl implements RolePermissionPageSqlSe
         int pageSize = searchModel.getPageSize();
         if (pageIndex <= 0) pageIndex = 1;
         if (pageSize <= 0) pageSize = 10;
-
+        List<String> roleIds = searchModel.getRoleIds();
         QRolePermissionPageSql qRolePermissionPageSql = QRolePermissionPageSql.rolePermissionPageSql;
 //        PageRequest pageRequest = PageRequest.of(pageIndex - 1, pageSize, new Sort(Sort.Direction.ASC, qSysTableField.sort.getMetadata().getName()));
         PageRequest pageRequest = PageRequest.of(pageIndex - 1, pageSize);
-        Page<RolePermissionPageSql> all = rolePermissionPageSqlRepository.findAll(pageRequest);
+        BooleanBuilder builder = new BooleanBuilder();
+        if (roleIds != null && roleIds.size() > 0) {
+            builder = builder.and(qRolePermissionPageSql.roleId.in(roleIds));
+        }
+        Page<RolePermissionPageSql> all = rolePermissionPageSqlRepository.findAll(builder,pageRequest);
         List<RPPageSqlViewModel> collect = all.getContent().stream().map(rolePermissionPageSql -> RolePermissionPageSqlMapper.INSTANCE.rPPageSqlToViewModel(rolePermissionPageSql)).collect(Collectors.toList());
 
         PaginationViewModel<RPPageSqlViewModel> page = new PaginationViewModel<RPPageSqlViewModel>();
@@ -81,10 +86,10 @@ public class RolePermissionPageSqlServiceImpl implements RolePermissionPageSqlSe
     public Boolean modifyRPPageSql(RPPageSqlViewModel modifyModel) {
         Optional<RolePermissionPageSql> rolePermissionPageSqlOptional = rolePermissionPageSqlRepository.findById(modifyModel.getId());
         if (!rolePermissionPageSqlOptional.isPresent()) {
-            return  false;
+            return false;
         }
         RolePermissionPageSql rolePermissionPageSql = rolePermissionPageSqlOptional.get();
-        RolePermissionPageSqlMapper.INSTANCE.modifyToRolePermissionPageSql(modifyModel,rolePermissionPageSql);
+        RolePermissionPageSqlMapper.INSTANCE.modifyToRolePermissionPageSql(modifyModel, rolePermissionPageSql);
         rolePermissionPageSqlRepository.save(rolePermissionPageSql);
         return true;
     }
