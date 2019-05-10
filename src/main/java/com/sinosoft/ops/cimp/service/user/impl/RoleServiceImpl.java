@@ -58,6 +58,7 @@ public class RoleServiceImpl implements RoleService {
                         qRole.code,
                         qRole.parentId,
                         qRole.description,
+                        qRole.pageType,
                         qrmGroupCount.tableCount.as("menuCount"),
                         qrhpCountCount.tableCount.as("homePageCountNumber"),
                         qrpTableCount.tableCount.as("rPTableCount"),

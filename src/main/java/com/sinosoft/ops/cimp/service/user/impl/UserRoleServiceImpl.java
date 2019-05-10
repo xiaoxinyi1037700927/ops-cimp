@@ -213,12 +213,8 @@ public class UserRoleServiceImpl implements UserRoleService {
 
     @Override
     public boolean deleteRoleGroupById(String id) {
-        long count = rolePermissionRepository.count(QRolePermission.rolePermission.roleMenuGroupId.eq(id));
-        if (count > 0) {
-            return false;
-        } else {
-            roleGroupRepository.deleteById(id);
-        }
+        rolePermissionRepository.deleteRolePermissionByRoleMenuGroupId(id);
+        roleGroupRepository.deleteById(id);
         return true;
     }
 

@@ -7,4 +7,10 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 
 public interface RolePermissionRepository extends JpaRepository<RolePermission,String>
         , QuerydslPredicateExecutor<RolePermission> {
+
+    /**
+     * 根据roleMenuGroupId 删除
+     * @param roleMenuGroupId
+     */
+    void deleteRolePermissionByRoleMenuGroupId(String roleMenuGroupId);
 }
