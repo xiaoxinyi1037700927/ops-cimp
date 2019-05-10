@@ -5,9 +5,6 @@ import com.sinosoft.ops.cimp.dao.SysTableInfoDao;
 import com.sinosoft.ops.cimp.dao.domain.sys.table.SysTableModelInfo;
 import com.sinosoft.ops.cimp.entity.emp.EmpPhoto;
 import com.sinosoft.ops.cimp.exception.BusinessException;
-import com.sinosoft.ops.cimp.export.ExportManager;
-import com.sinosoft.ops.cimp.export.handlers.impl.ExportGbrmbHtmlBiJie;
-import com.sinosoft.ops.cimp.export.handlers.impl.ExportGbrmbWordBiJie;
 import com.sinosoft.ops.cimp.repository.emp.EmpPhotoRepository;
 import com.sinosoft.ops.cimp.service.cadre.CadreService;
 import com.sinosoft.ops.cimp.util.IdUtil;
@@ -297,14 +294,7 @@ public class CadreServiceImpl implements CadreService {
             empPhotoRepository.save(empPhoto);
 
             //修改照片异步生成干部的任免表文件
-            executorService.submit(() -> {
-                try {
-                    ExportManager.generate(new ExportGbrmbHtmlBiJie(empId), true);
-                    ExportManager.generate(new ExportGbrmbWordBiJie(empId), true);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            });
+            AsyncGenerateGbrmb.execute(empId);
 
             return true;
         } catch (Exception e) {
