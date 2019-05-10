@@ -18,9 +18,7 @@ import com.sinosoft.ops.cimp.dto.sys.table.SysTableModelInfoDTO;
 import com.sinosoft.ops.cimp.entity.user.User;
 import com.sinosoft.ops.cimp.entity.user.UserRole;
 import com.sinosoft.ops.cimp.exception.BusinessException;
-import com.sinosoft.ops.cimp.export.ExportManager;
-import com.sinosoft.ops.cimp.export.handlers.impl.ExportGbrmbHtmlBiJie;
-import com.sinosoft.ops.cimp.export.handlers.impl.ExportGbrmbWordBiJie;
+import com.sinosoft.ops.cimp.service.cadre.impl.AsyncGenerateGbrmb;
 import com.sinosoft.ops.cimp.service.oraganization.OrganizationService;
 import com.sinosoft.ops.cimp.service.sys.sysapp.acess.SysAppFieldAccessService;
 import com.sinosoft.ops.cimp.service.sys.sysapp.acess.SysAppTableAccessService;
@@ -359,7 +357,99 @@ public class SysTableDataController extends BaseController {
                 .setSaveOrUpdateFormData(formMap);
 
         sysTableModelInfoService.updateData(queryDataParam);
+        //如果修改的是主集信息则直接使用值进行修改，如果不是则需要确定主集的EmpId
+        if (StringUtils.equalsIgnoreCase(tableName, "EmpA001")) {
+            AsyncGenerateGbrmb.execute(String.valueOf(tableNamePKValue));
+        } else {
+            SysTableModelInfo tableInfo = sysTableInfoDao.getTableInfo(tableTypeName);
+            String tableSaveName = tableInfo.getTableNameEnAndSaveTableMap().get(tableName);
+            Optional<SysTableFieldInfo> tableNamePKOptional = tableInfo.getTableFields().stream().filter(e -> StringUtils.equalsIgnoreCase(e.getNameEn(), tableNamePK)).findFirst();
+            if (tableNamePKOptional.isPresent()) {
+                SysTableFieldInfo sysTableFieldInfo = tableNamePKOptional.get();
+                String dbFieldName = sysTableFieldInfo.getDbFieldName();
+
+                final String sql = "SELECT EMP_ID AS \"empId\" FROM %s WHERE %s = '%s'";
+                String execSql = String.format(sql, tableSaveName, dbFieldName, tableNamePKValue);
+                Map<String, Object> map = jdbcTemplate.queryForMap(execSql);
+                Object empId = map.get("empId");
+                if (empId != null) {
+                    AsyncGenerateGbrmb.execute(String.valueOf(empId));
+                }
+            }
+        }
         return ok("修改成功");
+    }
+
+    @RequestMapping(value = "batchUpdateSysTableData", method = RequestMethod.POST)
+    public ResponseEntity batchUpdateSysTableData(
+            @RequestParam("appCode") String appCode,
+            @RequestParam("tableTypeName") String tableTypeName,
+            @RequestParam("tableName") String tableName,
+            @RequestParam("tableNamePK") String tableNamePK,
+            @RequestParam("tableNamePKValues") String tableNamePKValues,
+            @RequestParam("form") String form) throws BusinessException {
+
+        if (StringUtils.isEmpty(tableTypeName)) {
+            return fail("修改信息集必须指定表类型");
+        }
+        if (StringUtils.isEmpty(appCode)) {
+            return fail("修改信息集必须指定项目编号");
+        }
+        //主集允许批量编辑否则不允许
+        if (StringUtils.isEmpty(tableName) && !StringUtils.equalsIgnoreCase(tableName, "EmpA001")) {
+            return fail("修改信息集必须指定表名");
+        }
+        if (StringUtils.isEmpty(tableNamePK)) {
+            return fail("修改信息集必须指定信息集主键字段");
+        }
+        if (StringUtils.isEmpty(tableNamePKValues)) {
+            return fail("修改信息集必须指定信息集主键字段的值");
+        }
+
+        Map formMap = JsonUtil.parseStringToObject(form, HashMap.class);
+        if (formMap == null || formMap.size() == 0) {
+            return ok("修改成功");
+        }
+        QueryDataParamBuilder queryDataParam = new QueryDataParamBuilder();
+
+        String[] table_name_PK_values = tableNamePKValues.split(",");
+        for (String table_name_pk_value : table_name_PK_values) {
+            queryDataParam.setPrjCode(appCode)
+                    .setTableTypeNameEn(tableTypeName)
+                    .setTableNameEn(tableName)
+                    .setTableNameEnPK(tableNamePK)
+                    .setTableNameEnPKValue(table_name_pk_value)
+                    .setSaveOrUpdateFormData(formMap);
+            sysTableModelInfoService.updateData(queryDataParam);
+        }
+        if (StringUtils.equalsIgnoreCase(tableName, "EmpA001")) {
+            if (StringUtils.isNotEmpty(tableNamePKValues)) {
+                String[] tableName_pk_values = tableNamePKValues.split(",");
+                for (String tableName_pk_value : tableName_pk_values) {
+                    AsyncGenerateGbrmb.execute(tableName_pk_value);
+                }
+            }
+        } else {
+            SysTableModelInfo tableInfo = sysTableInfoDao.getTableInfo(tableTypeName);
+            String tableSaveName = tableInfo.getTableNameEnAndSaveTableMap().get(tableName);
+            Optional<SysTableFieldInfo> tableNamePKOptional = tableInfo.getTableFields().stream().filter(e -> StringUtils.equalsIgnoreCase(e.getNameEn(), tableNamePK)).findFirst();
+            if (tableNamePKOptional.isPresent()) {
+                SysTableFieldInfo sysTableFieldInfo = tableNamePKOptional.get();
+                String dbFieldName = sysTableFieldInfo.getDbFieldName();
+
+                String[] tableName_pk_values = tableNamePKValues.split(",");
+                for (String tableName_pk_value : tableName_pk_values) {
+                    final String sql = "SELECT EMP_ID AS \"empId\" FROM %s WHERE %s = '%s'";
+                    String execSql = String.format(sql, tableSaveName, dbFieldName, tableName_pk_value);
+                    Map<String, Object> map = jdbcTemplate.queryForMap(execSql);
+                    Object empId = map.get("empId");
+                    if (empId != null) {
+                        AsyncGenerateGbrmb.execute(String.valueOf(empId));
+                    }
+                }
+            }
+        }
+        return ok("批量修改成功");
     }
 
     @RequestMapping(value = "getSysTableData")
@@ -622,25 +712,11 @@ public class SysTableDataController extends BaseController {
             //如果primaryKey和tableNamePK不一致则表明保存的是子集
             if (!StringUtils.equals(primaryKey, tableNamePK)) {
                 if (StringUtils.isNotEmpty(tableNameFKValue)) {
-                    executorService.submit(() -> {
-                        try {
-                            ExportManager.generate(new ExportGbrmbHtmlBiJie(tableNameFKValue));
-                            ExportManager.generate(new ExportGbrmbWordBiJie(tableNameFKValue));
-                        } catch (Exception e) {
-                            LOGGER.error("异步生成干部任免表html失败", e);
-                        }
-                    });
+                    AsyncGenerateGbrmb.execute(String.valueOf(tableNameFKValue));
                 }
             } else {
                 Object tableNameEnPKValue = dataParamBuilder.getTableNameEnPKValue();
-                executorService.submit(() -> {
-                    try {
-                        ExportManager.generate(new ExportGbrmbHtmlBiJie(String.valueOf(tableNameEnPKValue)));
-                        ExportManager.generate(new ExportGbrmbWordBiJie(String.valueOf(tableNameEnPKValue)));
-                    } catch (Exception e) {
-                        LOGGER.error("异步生成干部任免表html失败", e);
-                    }
-                });
+                AsyncGenerateGbrmb.execute(String.valueOf(tableNameEnPKValue));
             }
         }
 
