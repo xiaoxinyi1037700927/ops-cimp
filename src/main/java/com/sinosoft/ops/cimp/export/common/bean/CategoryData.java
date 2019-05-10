@@ -122,7 +122,7 @@ public class CategoryData {
 
         // 126(奖惩考核) && 15(考核情况)
         List<AttributeBean> attributeBeans12615 = new ArrayList<>();
-        attributeBeans12615.add(new AttributeBean("年度考核结果", "_AnnualAssessmentResultsId", leftLogicExpression, "555", null, null, processTypeB));
+        attributeBeans12615.add(new AttributeBean("年度考核结果", "_AnnualAssessmentResultsId", leftLogicExpression, "555", null, null, processTypeA));
         categoryBeansPf2.add(new CategoryBean("EmpA15", attributeBeans12615));
     }
 
