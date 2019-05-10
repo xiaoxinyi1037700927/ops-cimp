@@ -35,6 +35,12 @@ public class RoleViewModel {
     @ApiModelProperty(value = "统计项数量")
     private long homePageCountNumber;
 
+    @ApiModelProperty(value = "常规信息集数量")
+    private long rPTableCount;
+
+    @ApiModelProperty(value = "角色sql数量")
+    private long roleSqlCount;
+
     @ApiModelProperty(value = "首页类型：1.默认首页，2.无待办首页，3.带统计首页")
     private String pageType;
 
@@ -120,5 +126,21 @@ public class RoleViewModel {
 
     public void setHomePageCountNumber(long homePageCountNumber) {
         this.homePageCountNumber = homePageCountNumber;
+    }
+
+    public long getrPTableCount() {
+        return rPTableCount;
+    }
+
+    public void setrPTableCount(long rPTableCount) {
+        this.rPTableCount = rPTableCount;
+    }
+
+    public long getRoleSqlCount() {
+        return roleSqlCount;
+    }
+
+    public void setRoleSqlCount(long roleSqlCount) {
+        this.roleSqlCount = roleSqlCount;
     }
 }

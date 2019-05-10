@@ -34,13 +34,8 @@ public class RoleController extends BaseController {
     @PostMapping("/findData")
     @RequiresAuthentication
     public ResponseEntity<List<RoleViewModel>> findData() throws BusinessException {
-        Iterable<Role> roleLst = roleService.findData();
-        List<RoleViewModel> roleViewModelLst = new ArrayList<>();
-        roleLst.iterator().forEachRemaining(role->{
-            roleViewModelLst.add(RoleViewModelMapper.INSTANCE.roleToRoleViewModel(role));
-        });
-        return ok(roleViewModelLst);
-
+        List<RoleViewModel> data = roleService.findData();
+        return ok(data);
     }
 
 

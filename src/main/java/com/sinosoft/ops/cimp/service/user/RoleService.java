@@ -2,12 +2,15 @@ package com.sinosoft.ops.cimp.service.user;
 
 import com.sinosoft.ops.cimp.entity.user.Role;
 import com.sinosoft.ops.cimp.vo.from.sys.role.RoleModel;
+import com.sinosoft.ops.cimp.vo.to.sys.role.RoleViewModel;
+
+import java.util.List;
 
 
 public interface RoleService {
 
    // Iterable<Role> findData(RoleModel roleModel);
-    Iterable<Role> findData();
+    List<RoleViewModel> findData();
 
     Role getById(String roleId);
 
