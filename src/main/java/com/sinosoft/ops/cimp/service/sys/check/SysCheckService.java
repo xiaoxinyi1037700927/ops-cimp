@@ -47,4 +47,9 @@ public interface SysCheckService {
      * 查错干部列表
      */
     PaginationViewModel<SysCheckEmpModel> getEmpList(SysCheckEmpSearchModel searchModel);
+
+    /**
+     * 获取待处理的错误总数
+     */
+    int getTotalWrongNum();
 }

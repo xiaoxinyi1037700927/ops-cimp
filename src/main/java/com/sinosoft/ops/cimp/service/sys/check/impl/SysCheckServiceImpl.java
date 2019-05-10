@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -58,6 +59,8 @@ public class SysCheckServiceImpl implements SysCheckService {
      */
     @Override
     public List<SysCheckTypeModel> listSysCheckType() {
+        System.out.println(getTotalWrongNum());
+
         return sysCheckTypeRepository.findAll().stream().map(type -> {
             SysCheckTypeModel model = new SysCheckTypeModel();
             model.setId(type.getId());
@@ -177,7 +180,7 @@ public class SysCheckServiceImpl implements SysCheckService {
         Iterable<SysCheckCondition> iterable = sysCheckConditionRepository.findAll(qCondition.sort.asc());
         List<SysCheckCondition> conditions = Lists.newArrayList(iterable);
 
-        //获取每个查错项的总数和错误数
+        //获取每个查错项的总数、存在问题的数量
         int totalWrongNum = 0;
         List<SysCheckResultItemModel> items = new ArrayList<>();
         try {
@@ -190,9 +193,12 @@ public class SysCheckServiceImpl implements SysCheckService {
                 Integer total = typeAdapter.getTotalNum(jdbcTemplate, resultTables.getResultsName(), code);
                 Integer wrongNum = typeAdapter.getWrongNum(jdbcTemplate, resultTables.getResultsTempName(), code, condition.getId());
 
-                totalWrongNum += wrongNum;
                 item.setWrongNum(wrongNum);
                 item.setCompleteSchedule(new BigDecimal((total - wrongNum) / (double) total * 100).intValue());
+
+                if (wrongNum == 0) {
+                    totalWrongNum++;
+                }
 
                 if (searchModel.isWrongOnly() && wrongNum == 0) {
                     continue;
@@ -235,7 +241,6 @@ public class SysCheckServiceImpl implements SysCheckService {
 
         try {
             SysCheckTypeAdapter typeAdapter = getTypeAdapter(condition.getTypeId());
-
 
             return typeAdapter.getTreeNodes(jdbcTemplate, resultTables.getResultsTempName(), searchModel.getConditionId(), depCodeSqlWhere);
         } catch (Exception e) {
@@ -345,6 +350,23 @@ public class SysCheckServiceImpl implements SysCheckService {
                 .totalCount(total)
                 .data(models)
                 .build();
+    }
+
+    @Override
+    public int getTotalWrongNum() {
+        //当前用户数据权限
+        String dataOrgId = SecurityUtils.getSubject().getCurrentUser().getDataOrganizationId();
+        String code = organizationRepository.findById(dataOrgId).get().getCode();
+
+        //获取结果集的表名
+        String id = jdbcTemplate.queryForMap("SELECT RESULT_TABLES FROM SYS_CHECK_RESULT_TABLES WHERE ROWNUM = 1").get("RESULT_TABLES").toString();
+        SysCheckResultTables resultTables = SysCheckResultTables.getTables(id);
+
+        String sql = "select sum(nvl(num,0)) as total from " + resultTables.getResultsTempName() +
+                " where tree_level_code = '" + code + "'";
+
+        List<Map<String, Object>> map = jdbcTemplate.queryForList(sql);
+        return map.size() > 0 ? ((BigDecimal) map.get(0).get("total")).intValue() : 0;
     }
 
 
