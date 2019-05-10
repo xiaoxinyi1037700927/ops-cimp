@@ -1,5 +1,6 @@
 package com.sinosoft.ops.cimp.service.export.impl;
 
+import com.google.common.collect.Lists;
 import com.sinosoft.ops.cimp.dao.ExportDao;
 import com.sinosoft.ops.cimp.export.common.bean.AttributeBean;
 import com.sinosoft.ops.cimp.export.common.bean.CategoryBean;
@@ -19,8 +20,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -29,6 +32,8 @@ public class ExportServiceImpl implements ExportService {
     private final Logger logger = LoggerFactory.getLogger(ExportServiceImpl.class);
 
     private final ExportDao exportWordDao;
+
+    private static final List<String> RELATIONSHIP_NAMES = Arrays.asList("本人", "户主", "配偶", "夫", "丈夫", "妻", "妻子", "独生子", "儿子", "长子", "次子", "三子", "四子", "五子", "养子或继子", "女婿", "其他儿子", "独生女", "女儿", "长女", "次女", "三女", "四女", "五女", "养女或继女", "儿媳", "其他女儿", "孙子、孙女或外孙子、外孙女", "孙子", "孙女", "外孙子", "外孙女", "孙媳妇或外孙媳妇", "孙女婿或外孙女婿", "曾孙子或外曾孙子", "曾孙女或外曾孙女", "其他孙子、孙女或外孙子、外孙女", "父母", "父亲", "母亲", "公公", "婆婆", "岳父", "岳母", "继父或养父", "继母或养母", "其他父母关系", "祖父母或外祖父母", "祖父", "祖母", "外祖父", "外祖母", "配偶的祖父母或外祖父母", "曾祖父", "曾祖母", "配偶的曾祖父母或外曾祖父母", "其他祖父母或外祖父母关系", "兄弟姐妹", "兄", "嫂", "弟", "弟媳", "姐姐", "姐夫", "妹妹", "妹夫", "其他兄弟姐妹", "其他", "伯父", "伯母", "叔父", "婶母", "舅父", "舅母", "姨父", "姨母", "姑父", "姑母", "堂兄弟、堂姐妹", "表兄弟、表姐妹", "侄子", "侄女", "外甥", "外甥女", "其他亲属", "保姆", "非亲属");
 
     @Autowired
     public ExportServiceImpl(ExportDao exportWordDao) {
@@ -188,7 +193,7 @@ public class ExportServiceImpl implements ExportService {
             }
 
             //处理生成html时，"年度考核结果"顺序错乱的问题
-            if(divText.length() == 6 && StringUtils.containsAny(divText,"年","度","考","核","结","果")){
+            if (divText.length() == 6 && StringUtils.containsAny(divText, "年", "度", "考", "核", "结", "果")) {
                 divText = "年度考核结果";
             }
 
@@ -216,6 +221,36 @@ public class ExportServiceImpl implements ExportService {
     private void setDivEvent(List<CategoryBean> categoryBeansPf, Elements pfChildrenElements, StringBuffer buildDiv, List<AttributeBean> divEventAttributeBeans) {
         Element valueElement = null;
         for (CategoryBean categoryBean : categoryBeansPf) {
+            String sysTableNameEn = categoryBean.getSysTableNameEn();
+            if (StringUtils.equals(sysTableNameEn, "EmpA36")) {
+                List<Element> addATagElements = Lists.newArrayList();
+
+                List<Element> x18Element = pfChildrenElements.stream().filter(e -> RELATIONSHIP_NAMES.contains(e.text())).collect(Collectors.toList());
+                addATagElements.addAll(x18Element);
+
+                String[] className = new String[4];
+                if (x18Element.size() > 0) {
+                    for (int i = 0; i < x18Element.size(); i++) {
+                        Element element = x18Element.get(i);
+                        //获取第三个className的值，因为它表示纵坐标
+                        className[i] = (String) element.classNames().toArray()[2];
+                    }
+                }
+
+                for (String s : className) {
+                    List<Element> yElements = pfChildrenElements.stream().filter(e -> e.classNames().contains(s)).collect(Collectors.toList());
+                    addATagElements.addAll(yElements);
+                }
+                for (Element element : addATagElements) {
+
+                    element.attr("onclick", "titleClickFn('EmpA36')");
+//					element.attr("onclick", "alert('" + categoryBean.getParentId() + " - " + categoryBean.getCurrentId() + "')");
+                    element.attr("onmouseover", "this.style.backgroundColor='#5eb9f0'");//#F4F9FD, #FFA500, #5eb9f0
+                    element.attr("onmouseout", "this.style.backgroundColor=''");
+                    element.attr("style", "cursor:pointer");
+                }
+                continue;
+            }
             for (AttributeBean attributeBean : categoryBean.getAttributeBeans()) {
                 if (attributeBean.getNameIndex() == -1) {
                     continue;
