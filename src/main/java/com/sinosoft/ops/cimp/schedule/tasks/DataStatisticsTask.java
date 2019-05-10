@@ -12,7 +12,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 数据统计
@@ -137,12 +139,30 @@ public class DataStatisticsTask implements Task {
         //清空单位权限表的数据
         deleteTableData("DEP_LEVEL");
 
-        String sql = "INSERT INTO DEP_LEVEL(dep_id, description, tree_level_code,pptr,LEVEL_NUM, root) " +
-                " SELECT dep_id, description, TREE_LEVEL_CODE,pptr,LEVEL, CONNECT_BY_ROOT(TREE_LEVEL_CODE) root FROM dep_b001 " +
-                " START WITH TREE_LEVEL_CODE IN (SELECT TREE_LEVEL_CODE FROM dep_b001 WHERE ) " +
-                " CONNECT BY NOCYCLE PRIOR TREE_LEVEL_CODE = PPTR AND status = 0 ";
-        int count = jdbcTemplate.update(sql);
-        logger.info("insert " + count + "rows into DEP_LEVEL table ");
+        List<Map<String, Object>> list = jdbcTemplate.queryForList("SELECT TREE_LEVEL_CODE AS root FROM DEP_B001 WHERE STATUS = '0' ");
+
+        String sql = "INSERT INTO DEP_LEVEL(dep_id, description, tree_level_code, root)\n" +
+                "SELECT DEP_ID,DESCRIPTION,TREE_LEVEL_CODE,:root\n" +
+                "FROM DEP_B001\n" +
+                "WHERE STATUS = '0' AND TREE_LEVEL_CODE LIKE :code ";
+        int batchSize = 5000;
+        List<Object[]> argsList = new ArrayList<>(batchSize);
+        for (Map<String, Object> map : list) {
+            String root = map.get("root").toString();
+            Object[] args = new Object[2];
+            args[0] = root;
+            args[1] = root + "%";
+
+            argsList.add(args);
+            if (argsList.size() == batchSize) {
+                jdbcTemplate.batchUpdate(sql, argsList);
+                argsList.clear();
+            }
+        }
+        if (argsList.size() > 0) {
+            jdbcTemplate.batchUpdate(sql, argsList);
+        }
+
         logger.info("statisticsDepLevel success");
     }
 
@@ -166,7 +186,7 @@ public class DataStatisticsTask implements Task {
      */
     private void deleteTableData(String tableName) {
         int count = jdbcTemplate.update("delete from " + tableName);
-        logger.info("delete " + count + "rows from " + tableName + " table ");
+        logger.info("delete " + count + " rows from " + tableName + " table ");
     }
 
 
