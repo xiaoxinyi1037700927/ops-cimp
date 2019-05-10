@@ -262,6 +262,40 @@ public class CadreController extends BaseController {
         }
     }
 
+    @ApiOperation(value = "获取干部图片")
+    @GetMapping(value = "/photo/download")
+    public void downloadPhoto(@RequestParam("empId") String empId, HttpServletResponse response) {
+        try {
+            byte[] photo = cadreService.getPhoto(empId);
+
+            Map<String, Object> map = jdbcTemplate.queryForMap("select A01001 as \"name\" from EMP_A001 where EMP_ID = '" + empId + "'");
+
+            String name = map.get("name").toString();
+
+            String fileName = "照片";
+            fileName = new String(fileName.getBytes("utf-8"), "utf-8");
+            fileName = URLEncoder.encode(fileName, "UTF-8");
+
+            //设置向浏览器端传送的文件格式
+            response.setContentType("application/octet-stream");
+            response.addHeader("Content-Disposition", "attachment;filename=" + fileName);
+
+            //写入流
+            if (photo != null) {
+                try (InputStream in = new ByteArrayInputStream(photo);
+                     OutputStream os = response.getOutputStream()) {
+                    byte[] b = new byte[1024 * 10];
+                    int i = 0;
+                    while ((i = in.read(b)) > 0) {
+                        os.write(b, 0, i);
+                    }
+                    os.flush();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     @ApiOperation(value = "上传干部图片")
     @PostMapping(value = "/uploadPhoto")

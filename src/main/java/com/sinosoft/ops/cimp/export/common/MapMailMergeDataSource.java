@@ -1,6 +1,7 @@
 package com.sinosoft.ops.cimp.export.common;
 
 import com.aspose.words.IMailMergeDataSource;
+import com.aspose.words.ref.Ref;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,18 +67,18 @@ public class MapMailMergeDataSource implements IMailMergeDataSource {
      *
      * @return ***返回false则不绑定数据***
      */
-    @Override
-    public boolean getValue(String key, Object[] args) {
-        if (index < 0 || index >= this.getCount()) {
-            return false;
-        }
-        if (args != null && args.length > 0) {
-            args[0] = this.dataList.get(index).get(key);
-            return true;
-        } else {
-            return false;
-        }
-    }
+//    @Override
+//    public boolean getValue(String key, Object[] args) {
+//        if (index < 0 || index >= this.getCount()) {
+//            return false;
+//        }
+//        if (args != null && args.length > 0) {
+//            args[0] = this.dataList.get(index).get(key);
+//            return true;
+//        } else {
+//            return false;
+//        }
+//    }
 
     /**
      * 实现接口 判断是否还有下一条记录
@@ -89,6 +90,19 @@ public class MapMailMergeDataSource implements IMailMergeDataSource {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public boolean getValue(String s, Ref<Object> ref) throws Exception {
+        if (index < 0 || index >= this.getCount()) {
+            return false;
+        }
+        if (ref != null) {
+            ref.set(this.dataList.get(index).get(s));
+            return true;
+        }
+        return false;
+
     }
 
 }
