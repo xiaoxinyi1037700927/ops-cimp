@@ -196,7 +196,7 @@ public class SysCheckServiceImpl implements SysCheckService {
                 item.setWrongNum(wrongNum);
                 item.setCompleteSchedule(new BigDecimal((total - wrongNum) / (double) total * 100).intValue());
 
-                if (wrongNum == 0) {
+                if (wrongNum > 0) {
                     totalWrongNum++;
                 }
 
