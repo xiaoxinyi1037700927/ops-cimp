@@ -356,23 +356,26 @@ public class SysTableDataController extends BaseController {
                 .setSaveOrUpdateFormData(formMap);
 
         sysTableModelInfoService.updateData(queryDataParam);
-        //如果修改的是主集信息则直接使用值进行修改，如果不是则需要确定主集的EmpId
-        if (StringUtils.equalsIgnoreCase(tableName, "EmpA001")) {
-            AsyncGenerateGbrmb.execute(String.valueOf(tableNamePKValue));
-        } else {
-            SysTableModelInfo tableInfo = sysTableInfoDao.getTableInfo(tableTypeName);
-            String tableSaveName = tableInfo.getTableNameEnAndSaveTableMap().get(tableName);
-            Optional<SysTableFieldInfo> tableNamePKOptional = tableInfo.getTableFields().stream().filter(e -> StringUtils.equalsIgnoreCase(e.getNameEn(), tableNamePK)).findFirst();
-            if (tableNamePKOptional.isPresent()) {
-                SysTableFieldInfo sysTableFieldInfo = tableNamePKOptional.get();
-                String dbFieldName = sysTableFieldInfo.getDbFieldName();
 
-                final String sql = "SELECT EMP_ID AS \"empId\" FROM %s WHERE %s = '%s'";
-                String execSql = String.format(sql, tableSaveName, dbFieldName, tableNamePKValue);
-                Map<String, Object> map = jdbcTemplate.queryForMap(execSql);
-                Object empId = map.get("empId");
-                if (empId != null) {
-                    AsyncGenerateGbrmb.execute(String.valueOf(empId));
+        if (StringUtils.equalsIgnoreCase(tableTypeName, "CadreInfo")) {
+            //如果修改的是主集信息则直接使用值进行修改，如果不是则需要确定主集的EmpId
+            if (StringUtils.equalsIgnoreCase(tableName, "EmpA001")) {
+                AsyncGenerateGbrmb.execute(String.valueOf(tableNamePKValue));
+            } else {
+                SysTableModelInfo tableInfo = sysTableInfoDao.getTableInfo(tableTypeName);
+                String tableSaveName = tableInfo.getTableNameEnAndSaveTableMap().get(tableName);
+                Optional<SysTableFieldInfo> tableNamePKOptional = tableInfo.getTableFields().stream().filter(e -> StringUtils.equalsIgnoreCase(e.getNameEn(), tableNamePK)).findFirst();
+                if (tableNamePKOptional.isPresent()) {
+                    SysTableFieldInfo sysTableFieldInfo = tableNamePKOptional.get();
+                    String dbFieldName = sysTableFieldInfo.getDbFieldName();
+
+                    final String sql = "SELECT EMP_ID AS \"empId\" FROM %s WHERE %s = '%s'";
+                    String execSql = String.format(sql, tableSaveName, dbFieldName, tableNamePKValue);
+                    Map<String, Object> map = jdbcTemplate.queryForMap(execSql);
+                    Object empId = map.get("empId");
+                    if (empId != null) {
+                        AsyncGenerateGbrmb.execute(String.valueOf(empId));
+                    }
                 }
             }
         }
@@ -421,29 +424,32 @@ public class SysTableDataController extends BaseController {
                     .setSaveOrUpdateFormData(formMap);
             sysTableModelInfoService.updateData(queryDataParam);
         }
-        if (StringUtils.equalsIgnoreCase(tableName, "EmpA001")) {
-            if (StringUtils.isNotEmpty(tableNamePKValues)) {
-                String[] tableName_pk_values = tableNamePKValues.split(",");
-                for (String tableName_pk_value : tableName_pk_values) {
-                    AsyncGenerateGbrmb.execute(tableName_pk_value);
-                }
-            }
-        } else {
-            SysTableModelInfo tableInfo = sysTableInfoDao.getTableInfo(tableTypeName);
-            String tableSaveName = tableInfo.getTableNameEnAndSaveTableMap().get(tableName);
-            Optional<SysTableFieldInfo> tableNamePKOptional = tableInfo.getTableFields().stream().filter(e -> StringUtils.equalsIgnoreCase(e.getNameEn(), tableNamePK)).findFirst();
-            if (tableNamePKOptional.isPresent()) {
-                SysTableFieldInfo sysTableFieldInfo = tableNamePKOptional.get();
-                String dbFieldName = sysTableFieldInfo.getDbFieldName();
 
-                String[] tableName_pk_values = tableNamePKValues.split(",");
-                for (String tableName_pk_value : tableName_pk_values) {
-                    final String sql = "SELECT EMP_ID AS \"empId\" FROM %s WHERE %s = '%s'";
-                    String execSql = String.format(sql, tableSaveName, dbFieldName, tableName_pk_value);
-                    Map<String, Object> map = jdbcTemplate.queryForMap(execSql);
-                    Object empId = map.get("empId");
-                    if (empId != null) {
-                        AsyncGenerateGbrmb.execute(String.valueOf(empId));
+        if (StringUtils.equalsIgnoreCase(tableTypeName, "CadreInfo")) {
+            if (StringUtils.equalsIgnoreCase(tableName, "EmpA001")) {
+                if (StringUtils.isNotEmpty(tableNamePKValues)) {
+                    String[] tableName_pk_values = tableNamePKValues.split(",");
+                    for (String tableName_pk_value : tableName_pk_values) {
+                        AsyncGenerateGbrmb.execute(tableName_pk_value);
+                    }
+                }
+            } else {
+                SysTableModelInfo tableInfo = sysTableInfoDao.getTableInfo(tableTypeName);
+                String tableSaveName = tableInfo.getTableNameEnAndSaveTableMap().get(tableName);
+                Optional<SysTableFieldInfo> tableNamePKOptional = tableInfo.getTableFields().stream().filter(e -> StringUtils.equalsIgnoreCase(e.getNameEn(), tableNamePK)).findFirst();
+                if (tableNamePKOptional.isPresent()) {
+                    SysTableFieldInfo sysTableFieldInfo = tableNamePKOptional.get();
+                    String dbFieldName = sysTableFieldInfo.getDbFieldName();
+
+                    String[] tableName_pk_values = tableNamePKValues.split(",");
+                    for (String tableName_pk_value : tableName_pk_values) {
+                        final String sql = "SELECT EMP_ID AS \"empId\" FROM %s WHERE %s = '%s'";
+                        String execSql = String.format(sql, tableSaveName, dbFieldName, tableName_pk_value);
+                        Map<String, Object> map = jdbcTemplate.queryForMap(execSql);
+                        Object empId = map.get("empId");
+                        if (empId != null) {
+                            AsyncGenerateGbrmb.execute(String.valueOf(empId));
+                        }
                     }
                 }
             }
