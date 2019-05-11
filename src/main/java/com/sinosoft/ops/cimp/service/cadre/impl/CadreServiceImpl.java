@@ -1,5 +1,6 @@
 package com.sinosoft.ops.cimp.service.cadre.impl;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.sinosoft.ops.cimp.dao.SysTableInfoDao;
 import com.sinosoft.ops.cimp.dao.domain.sys.table.SysTableModelInfo;
@@ -235,7 +236,16 @@ public class CadreServiceImpl implements CadreService {
             while (iterator.hasNext()) {
                 Map.Entry<String, Object> next = iterator.next();
                 String tableName = next.getKey();
-                List<Map> value = (List<Map>) next.getValue();
+
+                Object valueObject = next.getValue();
+
+                List<Map> value = Lists.newArrayList();
+                if (valueObject instanceof Map) {
+                    value.add((Map) valueObject);
+                }
+                if (valueObject instanceof List) {
+                    value = (List<Map>) valueObject;
+                }
                 SysTableModelInfo cadreInfo = sysTableInfoDao.getTableInfo("CadreInfo");
                 String saveTableName = cadreInfo.getTableNameEnAndSaveTableMap().get(tableName);
 
