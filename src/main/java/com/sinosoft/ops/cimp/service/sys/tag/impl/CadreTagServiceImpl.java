@@ -122,6 +122,15 @@ public class CadreTagServiceImpl implements CadreTagService {
         }
     }
 
+    @Override
+    public void deleteTag(String tagId) {
+        if (StringUtils.isNotEmpty(tagId)) {
+            String sql = "DELETE FROM CADRE_TAG WHERE TAG_ID = '%s'";
+            String execSql = String.format(sql, tagId);
+            jdbcTemplate.update(execSql);
+        }
+    }
+
     private String addPager(String sql, int startRow, int endRow) {
         if (StringUtils.isNotEmpty(sql)) {
             String pageSqlPrefix = "SELECT * FROM ( SELECT PAGE_DATA.*, ROWNUM RN FROM ( ";

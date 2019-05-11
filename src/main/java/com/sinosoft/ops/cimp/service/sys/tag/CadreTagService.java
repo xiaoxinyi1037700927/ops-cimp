@@ -16,4 +16,9 @@ public interface CadreTagService {
      * 并行对干部进行批量打多个标签
      */
     void parallelMarkingTag(List<SysTag> sysTagList);
+
+    /**
+     * 删除干部某项标签
+     */
+    void deleteTag(String tagId);
 }
