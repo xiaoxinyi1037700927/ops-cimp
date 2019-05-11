@@ -611,9 +611,8 @@ public class SysTableDataController extends BaseController {
         for (String deptId : deptIds) {
             Organization organization = organizationService.findOrganizationById(deptId);
             String code = organization.getCode();
-            String sql = "SELECT COUNT(ID) AS \"deptCount\" FROM ORGANIZATION WHERE CODE LIKE '%s\\%' ";
-            String execSql = String.format(sql, code);
-            Map<String, Object> map = jdbcTemplate.queryForMap(execSql);
+            String sql = "SELECT COUNT(ID) AS \"deptCount\" FROM ORGANIZATION WHERE CODE LIKE '" + code + "%' ";
+            Map<String, Object> map = jdbcTemplate.queryForMap(sql);
             Object deptCount = map.get("deptCount");
             if (deptCount != null) {
                 organizationCount += Integer.parseInt(String.valueOf(deptCount));
