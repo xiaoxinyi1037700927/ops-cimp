@@ -86,4 +86,8 @@ public interface OpsErrorMessage {
      * 100207=实体[{0}]配置错误，必须存在主键字段
      */
     String ERROR_MESSAGE_100207 = "100207";
+    /**
+     * 100208=实体[{0}]配置，删除信息集信息[{1}]未配置逻辑删除列
+     */
+    String ERROR_MESSAGE_100208 = "100208";
 }

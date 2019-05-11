@@ -163,6 +163,9 @@ public class SysTableModelInfoServiceImpl implements SysTableModelInfoService {
                 execParamList.add(paramFk);
             }
         }
+        //非逻辑删除条件
+        daoParam.addCondition("STATUS", Conditions.ConditionsEnum.EQUAL, "0");
+
         List<String> resultField = execParamList.stream().map(ExecParam::getFieldName).collect(Collectors.toList());
         queryDataParam.setResultFields(resultField);
 
@@ -313,7 +316,7 @@ public class SysTableModelInfoServiceImpl implements SysTableModelInfoService {
             SysTableField sysTableField = logicalDeleteFlagField.get();
             deleteFlagFieldEnName = sysTableField.getDbFieldName();
         } else {
-            throw new SystemException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE_100207, tableTypeNameEn);
+            throw new SystemException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE_100208, tableTypeNameEn);
         }
 
 
