@@ -220,7 +220,7 @@ public class CadreServiceImpl implements CadreService {
         }
 
         if (searchVO.getTableConditions().size() > 0) {
-            int insertIndex = 0;
+            int insertIndex;
             int i = searchCadreSql.indexOf("CADRE_TAG.EMP_ID = tmp.EMP_ID   ");
             //若没有添加标签项
             if (i == -1) {
@@ -235,25 +235,46 @@ public class CadreServiceImpl implements CadreService {
             while (iterator.hasNext()) {
                 Map.Entry<String, Object> next = iterator.next();
                 String tableName = next.getKey();
-                Map value = (Map) next.getValue();
-                Object fieldName = value.get("fieldName");
-                Object condition = value.get("condition");
-                Object conditionValue = value.get("conditionValue");
-                //查询为干部模型
+                List<Map> value = (List<Map>) next.getValue();
                 SysTableModelInfo cadreInfo = sysTableInfoDao.getTableInfo("CadreInfo");
                 String saveTableName = cadreInfo.getTableNameEnAndSaveTableMap().get(tableName);
-                List<List<String>> tableFields = cadreInfo.getTableNameEnAndFieldMap().get(String.valueOf(tableName));
-                Map<String, List<List<String>>> fieldMap = tableFields.stream().collect(Collectors.groupingBy(e -> e.get(0)));
-                List<List<String>> fieldDbSaveType = fieldMap.get(String.valueOf(fieldName));
-                List<String> list = fieldDbSaveType.get(0);
-                String dbSaveName = null;
-                if (list != null) {
-                    dbSaveName = list.get(1);
+
+                Map<String, StringBuilder> conditionSqlBuilderMap = Maps.newHashMap();
+                for (Map map : value) {
+                    Object fieldName = map.get("fieldName");
+                    Object condition = map.get("condition");
+                    Object conditionValue = map.get("conditionValue");
+                    //查询为干部模型
+
+                    List<List<String>> tableFields = cadreInfo.getTableNameEnAndFieldMap().get(String.valueOf(tableName));
+                    Map<String, List<List<String>>> fieldMap = tableFields.stream().collect(Collectors.groupingBy(e -> e.get(0)));
+                    List<List<String>> fieldDbSaveType = fieldMap.get(String.valueOf(fieldName));
+                    List<String> list = fieldDbSaveType.get(0);
+                    String dbSaveName = null;
+                    if (list != null) {
+                        dbSaveName = list.get(1);
+                    }
+                    if (StringUtils.equalsIgnoreCase(condition.toString(), "like")) {
+                        conditionValue = "%" + conditionValue + "%";
+                    }
+                    StringBuilder stringBuilder = conditionSqlBuilderMap.get(saveTableName);
+                    if (stringBuilder != null) {
+                        stringBuilder.append(" AND ")
+                                .append(dbSaveName).append(" ").append(condition).append(" ").append("'").append(conditionValue).append("'");
+                    } else {
+                        stringBuilder = new StringBuilder();
+                        stringBuilder.append(" WHERE 1=1 ").append(" AND ")
+                                .append(dbSaveName).append(" ").append(condition).append(" ").append("'").append(conditionValue).append("'");
+                    }
+                    conditionSqlBuilderMap.put(saveTableName, stringBuilder);
                 }
-                if (StringUtils.equalsIgnoreCase(condition.toString(), "like")) {
-                    conditionValue = "%" + conditionValue + "%";
+
+                for (Map.Entry<String, StringBuilder> entry : conditionSqlBuilderMap.entrySet()) {
+                    String dbTableName = entry.getKey();
+                    String whereSql = entry.getValue().toString();
+                    tableInnerJoinBuild.append(" INNER JOIN (SELECT DISTINCT EMP_ID FROM ").append(dbTableName).append(whereSql).append(") ").append(tableName.toUpperCase()).append(" ON ").append(tableName.toUpperCase()).append(" .EMP_ID = tmp.EMP_ID ");
                 }
-                tableInnerJoinBuild.append(" INNER JOIN (SELECT DISTINCT EMP_ID FROM ").append(saveTableName).append(" ").append(tableName).append(" WHERE ").append(tableName).append(".").append(dbSaveName).append(" ").append(condition).append(" ").append("'").append(conditionValue).append("') ").append(tableName.toUpperCase()).append(" ON ").append(tableName.toUpperCase()).append(" .EMP_ID = tmp.EMP_ID ");
+
             }
             //插入位置应该最后一个条件的末尾
             searchCadreSql = new StringBuilder(searchCadreSql).insert(insertIndex + 32, tableInnerJoinBuild.toString()).toString();
