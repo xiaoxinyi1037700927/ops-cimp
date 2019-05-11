@@ -66,6 +66,7 @@ public abstract class AbstractExportGbrmbBiJie extends AbstractExportWithAsposeW
         attrValueProcessorMap.put(ResumeAttrValue.KEY, new ResumeAttrValueProcessor());
         attrValueProcessorMap.put(HornorAttrValue.KEY, new HornorAttrValueProcessor());
         attrValueProcessorMap.put(EvaluationAttrValue.KEY, new EvaluationAttrValueProcessor());
+        attrValueProcessorMap.put(FamilyPartyAttrValue.KEY, new FamilyPartyValueProcessor());
         attrValueProcessorMap.put(FamilyOrgAndJobAttrValue.KEY, new FamilyOrgAndJobAttrValueProcessor());
         attrValueProcessorMap.put("default", new DefaultAttrValueProcessor());
     }

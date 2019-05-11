@@ -228,12 +228,12 @@ public class ExportServiceImpl implements ExportService {
                 List<Element> x18Element = pfChildrenElements.stream().filter(e -> RELATIONSHIP_NAMES.contains(e.text())).collect(Collectors.toList());
                 addATagElements.addAll(x18Element);
 
-                String[] className = new String[4];
+                List<String> className = new ArrayList<>();
                 if (x18Element.size() > 0) {
                     for (int i = 0; i < x18Element.size(); i++) {
                         Element element = x18Element.get(i);
                         //获取第三个className的值，因为它表示纵坐标
-                        className[i] = (String) element.classNames().toArray()[2];
+                        className.add((String) element.classNames().toArray()[2]);
                     }
                 }
 
