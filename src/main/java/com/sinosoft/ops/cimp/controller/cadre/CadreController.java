@@ -237,7 +237,9 @@ public class CadreController extends BaseController {
         try {
             byte[] photo = cadreService.getPhoto(empId);
 
-            String fileName = "照片";
+            Map<String, Object> map = jdbcTemplate.queryForMap("select A01001 as \"name\" from EMP_A001 where EMP_ID = '" + empId + "'");
+            String name = map.get("name").toString();
+            String fileName = name + ".png";
             fileName = new String(fileName.getBytes("utf-8"), "utf-8");
             fileName = URLEncoder.encode(fileName, "UTF-8");
 
@@ -269,10 +271,9 @@ public class CadreController extends BaseController {
             byte[] photo = cadreService.getPhoto(empId);
 
             Map<String, Object> map = jdbcTemplate.queryForMap("select A01001 as \"name\" from EMP_A001 where EMP_ID = '" + empId + "'");
-
             String name = map.get("name").toString();
 
-            String fileName = "照片";
+            String fileName = name + ".png";
             fileName = new String(fileName.getBytes("utf-8"), "utf-8");
             fileName = URLEncoder.encode(fileName, "UTF-8");
 
