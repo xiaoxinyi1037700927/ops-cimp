@@ -130,6 +130,7 @@ public class CadreController extends BaseController {
                 cadreVOS.add(cadreVO);
             }
             cadreDataVO.setCadres(cadreVOS);
+            cadreDataVO.setTableFields(selectFields);
             return ok(cadreDataVO);
         } else {
             throw new BusinessException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE, "请检查角色配置的干部信息数据权限");

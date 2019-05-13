@@ -167,6 +167,7 @@ public class OrganizationController extends BaseController {
                 depVOS.add(depVO);
             }
             depDataVO.setDeps(depVOS);
+            depDataVO.setTableFields(selectFields);
             return ok(depDataVO);
         } else {
             throw new BusinessException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE, "请检查角色配置的权限");

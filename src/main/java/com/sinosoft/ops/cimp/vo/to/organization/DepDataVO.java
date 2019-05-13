@@ -1,10 +1,12 @@
 package com.sinosoft.ops.cimp.vo.to.organization;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import io.swagger.annotations.ApiModel;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 @ApiModel(value = "DepDataVO", description = "单位列表数据模型")
 public class DepDataVO implements Serializable {
@@ -18,6 +20,8 @@ public class DepDataVO implements Serializable {
     private long dataCount;
     //干部记录
     private List<DepVO> deps = Lists.newArrayList();
+    //单位列表表头
+    private Map tableFields = Maps.newHashMap();
 
     public int getPageIndex() {
         return pageIndex;
@@ -49,5 +53,13 @@ public class DepDataVO implements Serializable {
 
     public void setDeps(List<DepVO> deps) {
         this.deps = deps;
+    }
+
+    public Map getTableFields() {
+        return tableFields;
+    }
+
+    public void setTableFields(Map tableFields) {
+        this.tableFields = tableFields;
     }
 }

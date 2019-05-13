@@ -1,10 +1,12 @@
 package com.sinosoft.ops.cimp.vo.to.cadre;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import io.swagger.annotations.ApiModel;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 @ApiModel(value = "CadreDataVO", description = "干部列表数据模型")
 public class CadreDataVO implements Serializable {
@@ -18,6 +20,8 @@ public class CadreDataVO implements Serializable {
     private long dataCount;
     //干部记录
     private List<CadreVO> cadres = Lists.newArrayList();
+    //干部列表表头
+    private Map tableFields = Maps.newHashMap();
 
     public int getPageIndex() {
         return pageIndex;
@@ -49,5 +53,13 @@ public class CadreDataVO implements Serializable {
 
     public void setCadres(List<CadreVO> cadres) {
         this.cadres = cadres;
+    }
+
+    public Map getTableFields() {
+        return tableFields;
+    }
+
+    public void setTableFields(Map tableFields) {
+        this.tableFields = tableFields;
     }
 }
