@@ -1,8 +1,6 @@
 package com.sinosoft.ops.cimp.service.sys.tag.impl;
 
 import com.google.common.collect.Lists;
-import com.sinosoft.ops.cimp.entity.sys.tag.CadreTag;
-import com.sinosoft.ops.cimp.entity.sys.tag.QCadreTag;
 import com.sinosoft.ops.cimp.entity.sys.tag.QSysTag;
 import com.sinosoft.ops.cimp.entity.sys.tag.SysTag;
 import com.sinosoft.ops.cimp.repository.sys.tag.CadreTagRepository;
@@ -67,10 +65,9 @@ public class SysTagServiceImpl implements SysTagService {
     public void delete(String sysTagId) {
         if (StringUtils.isNotEmpty(sysTagId)) {
             sysTagRepository.deleteById(sysTagId);
-            Iterable<CadreTag> tagIterable = cadreTagRepository.findAll(QCadreTag.cadreTag.tagId.eq(sysTagId));
-            cadreTagRepository.deleteInBatch(tagIterable);
+            String sql = "DELETE FROM CADRE_TAG WHERE TAG_ID = '%s'";
+            String execSql = String.format(sql, sysTagId);
+            jdbcTemplate.update(execSql);
         }
     }
-
-
 }
