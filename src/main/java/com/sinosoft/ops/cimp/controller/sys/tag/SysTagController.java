@@ -11,10 +11,12 @@ import com.sinosoft.ops.cimp.service.sys.tag.SysTagService;
 import com.sinosoft.ops.cimp.vo.to.sys.tag.SysTagModel;
 import com.sinosoft.ops.cimp.vo.to.sys.tag.SysTagVO;
 import io.swagger.annotations.Api;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -35,6 +37,25 @@ public class SysTagController extends BaseController {
     public SysTagController(SysTagCategoryService sysTagCategoryService, SysTagService sysTagService) {
         this.sysTagCategoryService = sysTagCategoryService;
         this.sysTagService = sysTagService;
+    }
+
+    @RequestMapping(value = "/getSysTagCategory")
+    public ResponseEntity<List<SysTagCategory>> getSysTagCategory() throws BusinessException {
+        String cadreTagCategory = "CadreInfo";
+
+        List<SysTagCategory> tagCategories = sysTagCategoryService.findAllByModelName(cadreTagCategory);
+        return ok(tagCategories);
+    }
+
+    @RequestMapping(value = "/getSysTag")
+    public ResponseEntity<List<SysTag>> getSysTag(@RequestParam("sysTagCategoryId") String sysTagCategoryId) throws BusinessException {
+        if (StringUtils.isNotEmpty(sysTagCategoryId)) {
+            List<String> tagCategoryIds = Lists.newArrayList();
+            tagCategoryIds.add(sysTagCategoryId);
+            List<SysTag> sysTags = sysTagService.findAll(tagCategoryIds);
+            ok(sysTags);
+        }
+        return ok(Lists.newArrayList());
     }
 
     /**
