@@ -75,7 +75,7 @@ public class SysTagController extends BaseController {
         return ok(null);
     }
 
-    @RequestMapping(value = "/updateSysTagCategory", method = RequestMethod.POST)
+    @RequestMapping(value = "/deleteSysTagCategory", method = RequestMethod.POST)
     public ResponseEntity deleteSysTagCategory(@RequestParam("sysTagCategoryId") String sysTagCategoryId) throws BusinessException {
         if (StringUtils.isNotEmpty(sysTagCategoryId)) {
             sysTagCategoryService.delete(sysTagCategoryId);
