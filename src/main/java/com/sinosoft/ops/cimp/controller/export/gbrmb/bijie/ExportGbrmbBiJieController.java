@@ -52,7 +52,7 @@ public class ExportGbrmbBiJieController extends BaseController {
         try {
             String outFile = ExportManager.generate(new ExportGbrmbHtmlBiJie(empId), forceGenerate);
             if (outFile == null) {
-                return fail("文件正在生成中，请稍后再试");
+                return ok("任免表正在生成中，请稍后刷新再试");
             }
 
             return ok(exportService.analysisHtml(outFile));

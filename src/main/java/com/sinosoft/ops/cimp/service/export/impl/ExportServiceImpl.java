@@ -1,7 +1,6 @@
 package com.sinosoft.ops.cimp.service.export.impl;
 
 import com.google.common.collect.Lists;
-import com.sinosoft.ops.cimp.dao.ExportDao;
 import com.sinosoft.ops.cimp.export.common.bean.AttributeBean;
 import com.sinosoft.ops.cimp.export.common.bean.CategoryBean;
 import com.sinosoft.ops.cimp.export.common.bean.CategoryData;
@@ -14,8 +13,8 @@ import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,20 +30,19 @@ public class ExportServiceImpl implements ExportService {
 
     private final Logger logger = LoggerFactory.getLogger(ExportServiceImpl.class);
 
-    private final ExportDao exportWordDao;
+    private final JdbcTemplate jdbcTemplate;
 
     private static final List<String> RELATIONSHIP_NAMES = Arrays.asList("本人", "户主", "配偶", "夫", "丈夫", "妻", "妻子", "独生子", "儿子", "长子", "次子", "三子", "四子", "五子", "养子或继子", "女婿", "其他儿子", "独生女", "女儿", "长女", "次女", "三女", "四女", "五女", "养女或继女", "儿媳", "其他女儿", "孙子、孙女或外孙子、外孙女", "孙子", "孙女", "外孙子", "外孙女", "孙媳妇或外孙媳妇", "孙女婿或外孙女婿", "曾孙子或外曾孙子", "曾孙女或外曾孙女", "其他孙子、孙女或外孙子、外孙女", "父母", "父亲", "母亲", "公公", "婆婆", "岳父", "岳母", "继父或养父", "继母或养母", "其他父母关系", "祖父母或外祖父母", "祖父", "祖母", "外祖父", "外祖母", "配偶的祖父母或外祖父母", "曾祖父", "曾祖母", "配偶的曾祖父母或外曾祖父母", "其他祖父母或外祖父母关系", "兄弟姐妹", "兄", "嫂", "弟", "弟媳", "姐姐", "姐夫", "妹妹", "妹夫", "其他兄弟姐妹", "其他", "伯父", "伯母", "叔父", "婶母", "舅父", "舅母", "姨父", "姨母", "姑父", "姑母", "堂兄弟、堂姐妹", "表兄弟、表姐妹", "侄子", "侄女", "外甥", "外甥女", "其他亲属", "保姆", "非亲属");
 
     @Autowired
-    public ExportServiceImpl(ExportDao exportWordDao) {
-        this.exportWordDao = exportWordDao;
+    public ExportServiceImpl(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
-    @Transactional
     public List<Map<String, Object>> findBySQL(String sql) {
         try {
-            return exportWordDao.findBySQL(sql);
+            return jdbcTemplate.queryForList(sql);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -54,7 +52,7 @@ public class ExportServiceImpl implements ExportService {
     @Override
     public List<Map<String, Object>> findBySQL(String sql, Object... args) {
         try {
-            return exportWordDao.findBySQL(sql, args);
+            return jdbcTemplate.queryForList(sql, args);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
