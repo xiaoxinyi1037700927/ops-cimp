@@ -11,20 +11,24 @@ import com.sinosoft.ops.cimp.repository.sys.tag.SysTagRepository;
 import com.sinosoft.ops.cimp.service.sys.tag.SysTagCategoryService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class SysTagCategoryServiceImpl implements SysTagCategoryService {
 
     private final SysTagCategoryRepository sysTagCategoryRepository;
     private final SysTagRepository sysTagRepository;
+    private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public SysTagCategoryServiceImpl(SysTagCategoryRepository sysTagCategoryRepository, SysTagRepository sysTagRepository) {
+    public SysTagCategoryServiceImpl(SysTagCategoryRepository sysTagCategoryRepository, SysTagRepository sysTagRepository, JdbcTemplate jdbcTemplate) {
         this.sysTagCategoryRepository = sysTagCategoryRepository;
         this.sysTagRepository = sysTagRepository;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
@@ -35,6 +39,12 @@ public class SysTagCategoryServiceImpl implements SysTagCategoryService {
     @Override
     public SysTagCategory save(SysTagCategory sysTagCategory) {
         if (sysTagCategory != null) {
+            Map<String, Object> map = jdbcTemplate.queryForMap("SELECT MAX(TAG_CATEGORY_SORT) AS \"tagCategorySort\" FROM SYS_TAG_CATEGORY ");
+            Object tagCategorySort = map.get("tagCategorySort");
+            if (tagCategorySort != null) {
+                Integer nextSort = Integer.parseInt(String.valueOf(tagCategorySort)) + 1;
+                sysTagCategory.setTagCategorySort(nextSort);
+            }
             return sysTagCategoryRepository.save(sysTagCategory);
         }
         return null;

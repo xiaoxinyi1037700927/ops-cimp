@@ -10,20 +10,24 @@ import com.sinosoft.ops.cimp.repository.sys.tag.SysTagRepository;
 import com.sinosoft.ops.cimp.service.sys.tag.SysTagService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
 public class SysTagServiceImpl implements SysTagService {
     private final SysTagRepository sysTagRepository;
     private final CadreTagRepository cadreTagRepository;
+    private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public SysTagServiceImpl(SysTagRepository sysTagRepository, CadreTagRepository cadreTagRepository) {
+    public SysTagServiceImpl(SysTagRepository sysTagRepository, CadreTagRepository cadreTagRepository, JdbcTemplate jdbcTemplate) {
         this.sysTagRepository = sysTagRepository;
         this.cadreTagRepository = cadreTagRepository;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
@@ -42,7 +46,16 @@ public class SysTagServiceImpl implements SysTagService {
 
     @Override
     public SysTag save(SysTag sysTag) {
-        return sysTagRepository.save(sysTag);
+        if (sysTag != null) {
+            Map<String, Object> map = jdbcTemplate.queryForMap("SELECT MAX(TAG_SORT) AS \"tagSort\" FROM SYS_TAG ");
+            Object tagSort = map.get("tagSort");
+            if (tagSort != null) {
+                Integer nextSort = Integer.parseInt(String.valueOf(tagSort)) + 1;
+                sysTag.setTagSort(nextSort);
+            }
+            return sysTagRepository.save(sysTag);
+        }
+        return null;
     }
 
     @Override
