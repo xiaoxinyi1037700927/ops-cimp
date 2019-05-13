@@ -6,6 +6,7 @@ import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.entity.sys.tag.SysTag;
 import com.sinosoft.ops.cimp.entity.sys.tag.SysTagCategory;
 import com.sinosoft.ops.cimp.exception.BusinessException;
+import com.sinosoft.ops.cimp.service.sys.tag.CadreTagService;
 import com.sinosoft.ops.cimp.service.sys.tag.SysTagCategoryService;
 import com.sinosoft.ops.cimp.service.sys.tag.SysTagService;
 import com.sinosoft.ops.cimp.vo.to.sys.tag.SysTagModel;
@@ -14,13 +15,11 @@ import io.swagger.annotations.Api;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @SystemApiGroup
@@ -32,14 +31,16 @@ public class SysTagController extends BaseController {
 
     private final SysTagCategoryService sysTagCategoryService;
     private final SysTagService sysTagService;
+    private final CadreTagService cadreTagService;
 
     @Autowired
-    public SysTagController(SysTagCategoryService sysTagCategoryService, SysTagService sysTagService) {
+    public SysTagController(SysTagCategoryService sysTagCategoryService, SysTagService sysTagService, CadreTagService cadreTagService) {
         this.sysTagCategoryService = sysTagCategoryService;
         this.sysTagService = sysTagService;
+        this.cadreTagService = cadreTagService;
     }
 
-    @RequestMapping(value = "/getSysTagCategory")
+    @RequestMapping(value = "/getSysTagCategory", method = RequestMethod.GET)
     public ResponseEntity<List<SysTagCategory>> getSysTagCategory() throws BusinessException {
         String cadreTagCategory = "CadreInfo";
 
@@ -47,7 +48,7 @@ public class SysTagController extends BaseController {
         return ok(tagCategories);
     }
 
-    @RequestMapping(value = "/getSysTag")
+    @RequestMapping(value = "/getSysTag", method = RequestMethod.GET)
     public ResponseEntity<List<SysTag>> getSysTag(@RequestParam("sysTagCategoryId") String sysTagCategoryId) throws BusinessException {
         if (StringUtils.isNotEmpty(sysTagCategoryId)) {
             List<String> tagCategoryIds = Lists.newArrayList();
@@ -56,6 +57,78 @@ public class SysTagController extends BaseController {
             ok(sysTags);
         }
         return ok(Lists.newArrayList());
+    }
+
+    @RequestMapping(value = "/saveSysTagCategory", method = RequestMethod.POST)
+    public ResponseEntity<SysTagCategory> saveSysTagCategory(@RequestBody SysTagCategory sysTagCategory) throws BusinessException {
+        if (sysTagCategory != null) {
+            return ok(sysTagCategoryService.save(sysTagCategory));
+        }
+        return ok(null);
+    }
+
+    @RequestMapping(value = "/updateSysTagCategory", method = RequestMethod.POST)
+    public ResponseEntity<SysTagCategory> updateSysTagCategory(@RequestBody SysTagCategory sysTagCategory) throws BusinessException {
+        if (sysTagCategory != null && sysTagCategory.getId() != null) {
+            return ok(sysTagCategoryService.update(sysTagCategory));
+        }
+        return ok(null);
+    }
+
+    @RequestMapping(value = "/updateSysTagCategory", method = RequestMethod.POST)
+    public ResponseEntity deleteSysTagCategory(@RequestParam("sysTagCategoryId") String sysTagCategoryId) throws BusinessException {
+        if (StringUtils.isNotEmpty(sysTagCategoryId)) {
+            sysTagCategoryService.delete(sysTagCategoryId);
+        }
+        return ok(null);
+    }
+
+    @RequestMapping(value = "/saveSysTag", method = RequestMethod.POST)
+    public ResponseEntity saveSysTag(@RequestBody SysTag sysTag) throws BusinessException {
+        if (sysTag != null) {
+            ok(sysTagService.save(sysTag));
+        }
+        return ok(null);
+    }
+
+    @RequestMapping(value = "/updateSysTag", method = RequestMethod.POST)
+    public ResponseEntity updateSysTag(@RequestBody SysTag sysTag) throws BusinessException {
+        if (sysTag != null && sysTag.getId() != null) {
+            ok(sysTagService.update(sysTag));
+        }
+        return ok(null);
+    }
+
+    @RequestMapping(value = "/deleteSysTag", method = RequestMethod.POST)
+    public ResponseEntity deleteSysTag(@RequestParam("sysTagId") String sysTagId) throws BusinessException {
+        if (StringUtils.isNotEmpty(sysTagId)) {
+            sysTagService.delete(sysTagId);
+        }
+        return ok(null);
+    }
+
+    @RequestMapping(value = "/markTag", method = RequestMethod.POST)
+    public ResponseEntity markTag(@RequestParam("sysTagId") String sysTagId) throws BusinessException {
+        Optional<SysTag> sysTag = sysTagService.findSysTag(sysTagId);
+        if (sysTag.isPresent()) {
+            SysTag sys_tag = sysTag.get();
+            List<SysTag> sysTagList = Lists.newArrayListWithCapacity(1);
+            sysTagList.add(sys_tag);
+            cadreTagService.parallelMarkingTag(sysTagList);
+        }
+        return ok("计算标签中");
+    }
+
+    @RequestMapping(value = "/markTags", method = RequestMethod.POST)
+    public ResponseEntity markTags(@RequestParam("sysTagCategoryId") String sysTagCategoryId) throws BusinessException {
+        if (StringUtils.isNotEmpty(sysTagCategoryId)) {
+            List<String> sysTagCategoryIdList = Lists.newArrayList();
+            sysTagCategoryIdList.add(sysTagCategoryId);
+
+            List<SysTag> sysTagList = sysTagService.findAll(sysTagCategoryIdList);
+            cadreTagService.parallelMarkingTag(sysTagList);
+        }
+        return ok("计算标签中");
     }
 
     /**
