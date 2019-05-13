@@ -116,13 +116,13 @@ public class CadreTagServiceImpl implements CadreTagService {
             for (SysTag sysTag : sysTagList) {
                 completionService.submit(() -> markingTag(sysTag), 0L);
             }
-            int finishJobCount = 0;
-            while (finishJobCount < jobCount) { // 判断提交线程数和完成线程数是否相等
-                if (completionService.poll() != null) {
-                    finishJobCount++;
-                }
-            }
-            executorService.shutdown();
+//            int finishJobCount = 0;
+//            while (finishJobCount < jobCount) { // 判断提交线程数和完成线程数是否相等
+//                if (completionService.poll() != null) {
+//                    finishJobCount++;
+//                }
+//            }
+//            executorService.shutdown();
         }
     }
 
