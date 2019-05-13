@@ -45,6 +45,10 @@ public class CadreTagServiceImpl implements CadreTagService {
         String tagCountSql = sysTag.getTagCountSql();
         String tagTargetName = sysTag.getTagTargetName();
 
+        //执行该tag之前先把原来的删掉
+        String sql = "DELETE FROM CADRE_TAG WHERE TAG_ID = '%s'";
+        String execSql = String.format(sql, tagId);
+        jdbcTemplate.update(execSql);
         int tagCountNumber = 0;
         if (StringUtils.isNotEmpty(tagCountSql)) {
             Map<String, Object> countMap = jdbcTemplate.queryForMap(tagCountSql);
