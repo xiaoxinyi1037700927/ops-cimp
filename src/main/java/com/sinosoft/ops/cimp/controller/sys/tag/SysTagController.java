@@ -54,7 +54,7 @@ public class SysTagController extends BaseController {
             List<String> tagCategoryIds = Lists.newArrayList();
             tagCategoryIds.add(sysTagCategoryId);
             List<SysTag> sysTags = sysTagService.findAll(tagCategoryIds);
-            ok(sysTags);
+            return ok(sysTags);
         }
         return ok(Lists.newArrayList());
     }
