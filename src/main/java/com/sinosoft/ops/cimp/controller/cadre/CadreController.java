@@ -188,16 +188,24 @@ public class CadreController extends BaseController {
         cadreDataVO.setPageSize(Integer.parseInt(pageSize));
         cadreDataVO.setPageIndex(Integer.parseInt(pageIndex));
 
+        List<UserRole> currentUserRole = SecurityUtils.getSubject().getCurrentUserRole();
+        List<String> roleIds = currentUserRole.stream().map(UserRole::getRoleId).collect(Collectors.toList());
+
+        RPPageSqlSearchModel rpPageSqlSearchModel = new RPPageSqlSearchModel();
+        rpPageSqlSearchModel.setRoleIds(roleIds);
+
+        List<RPPageSqlViewModel> pageSqlByRoleList = rolePermissionPageSqlService.findRPPageSqlListByRoleIds(rpPageSqlSearchModel);
+        Optional<RPPageSqlViewModel> sqlViewModel = pageSqlByRoleList.stream().filter(s -> StringUtils.equals(s.getSqlNameEn(), RolePermissionPageSqlEnum.NAME_EN.干部集合.value)).filter(s -> StringUtils.equals(s.getIncludeSubNode(), "1")).findFirst();
+
+        if (sqlViewModel.isPresent()) {
+            RPPageSqlViewModel viewModel = sqlViewModel.get();
+            String selectListFieldsEn = viewModel.getSelectListFieldsEn();
+            Map selectFields = JsonUtil.parseStringToObject(selectListFieldsEn, LinkedHashMap.class);
+            cadreDataVO.setTableFields(selectFields);
+        }
         if (cadreList != null) {
             ArrayList cadreList1 = (ArrayList) cadreList;
-            List<UserRole> currentUserRole = SecurityUtils.getSubject().getCurrentUserRole();
-            List<String> roleIds = currentUserRole.stream().map(UserRole::getRoleId).collect(Collectors.toList());
 
-            RPPageSqlSearchModel rpPageSqlSearchModel = new RPPageSqlSearchModel();
-            rpPageSqlSearchModel.setRoleIds(roleIds);
-
-            List<RPPageSqlViewModel> pageSqlByRoleList = rolePermissionPageSqlService.findRPPageSqlListByRoleIds(rpPageSqlSearchModel);
-            Optional<RPPageSqlViewModel> sqlViewModel = pageSqlByRoleList.stream().filter(s -> StringUtils.equals(s.getSqlNameEn(), RolePermissionPageSqlEnum.NAME_EN.干部集合.value)).filter(s -> StringUtils.equals(s.getIncludeSubNode(), "1")).findFirst();
             if (sqlViewModel.isPresent()) {
                 RPPageSqlViewModel viewModel = sqlViewModel.get();
                 String selectListFieldsEn = viewModel.getSelectListFieldsEn();
