@@ -102,6 +102,13 @@ public interface SqlBuilder {
         if (StringUtils.equalsIgnoreCase("DATE", fieldType)) {
             if (paramValue != null) {
                 int length = String.valueOf(paramValue).length();
+                if (length <= 7) {
+                    try {
+                        return DateFormatUtil.parseDate("yyyy-MM", String.valueOf(paramValue));
+                    } catch (ParseException e) {
+                        return null;
+                    }
+                }
                 if (length <= 10) {//yyyy-MM-dd格式
                     try {
                         return DateFormatUtil.parseDate(DateFormatUtil.PATTERN_ISO_ON_DATE, String.valueOf(paramValue));
