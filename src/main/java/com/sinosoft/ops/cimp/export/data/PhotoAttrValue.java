@@ -32,6 +32,9 @@ public class PhotoAttrValue implements AttrValue {
                 attrValueContext.put("photo", map);
                 //获取图片并返回
                 Object file = map.get("PHOTO_FILE");
+                if (file instanceof byte[]) {
+                    return file;
+                }
                 return StringUtil.blobToBytes((Blob) file);
             }
             return new byte[0];
