@@ -1,25 +1,28 @@
 package com.sinosoft.ops.cimp.util.combinedQuery.processors.nodes;
 
+import com.sinosoft.ops.cimp.util.combinedQuery.beans.CombinedQueryParseException;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.LogicalOperatorNode;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.Node;
 import com.sinosoft.ops.cimp.util.combinedQuery.enums.LogicalOperator;
 import org.springframework.stereotype.Component;
+
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * 逻辑操作符节点(and/or)处理器
  */
 @Component
 public class LogicalOperatorNodeProcessor implements NodeProcessor {
+    private static Map<LogicalOperator, Pattern> logicalOperators = new HashMap<>();
 
-    /**
-     * 将表达式解析为节点
-     *
-     * @param expr
-     * @return
-     */
-    @Override
-    public Node parse(String expr) {
-        return new LogicalOperatorNode(expr);
+    public LogicalOperatorNodeProcessor() {
+        //预编译逻辑操作符的正则表达式
+        for (LogicalOperator logicalOperator : LogicalOperator.values()) {
+            logicalOperators.put(logicalOperator, Pattern.compile(logicalOperator.getRegex()));
+        }
     }
 
     /**
@@ -30,11 +33,61 @@ public class LogicalOperatorNodeProcessor implements NodeProcessor {
      */
     @Override
     public boolean support(String expr) {
-        for (LogicalOperator logicalOperator : LogicalOperator.values()) {
-            if (logicalOperator.getName().equalsIgnoreCase(expr)) {
-                return true;
+        return getLogicalOperator(expr) != null;
+    }
+
+    /**
+     * 节点是否匹配
+     *
+     * @param node
+     * @return
+     */
+    @Override
+    public boolean support(Node node) {
+        return node instanceof LogicalOperatorNode;
+    }
+
+    /**
+     * 将表达式解析为节点
+     *
+     * @param expr
+     * @return
+     */
+    @Override
+    public Node parse(String expr) {
+        return new LogicalOperatorNode(expr, getLogicalOperator(expr));
+    }
+
+    private LogicalOperator getLogicalOperator(String expr) {
+        for (Map.Entry<LogicalOperator, Pattern> logicalOperator : logicalOperators.entrySet()) {
+            if (logicalOperator.getValue().matcher(expr).matches()) {
+                return logicalOperator.getKey();
             }
         }
-        return false;
+        return null;
     }
+
+    /**
+     * 将节点push进堆栈中
+     *
+     * @param stack
+     * @param node
+     * @return
+     * @throws CombinedQueryParseException
+     */
+    @Override
+    public Node pushNode(Deque<Node> stack, Node node) throws CombinedQueryParseException {
+        //栈首必须是逻辑表达式节点支持的子节点类型
+        if (stack.size() > 0 && (stack.peek().getCode() & LogicalOperatorNode.SUPPORT_NODES) != 0) {
+            Node first = stack.pop();
+            first.setParent(node);
+            node.addSubNode(first);
+            stack.push(node);
+        } else {
+            throw new CombinedQueryParseException("缺失的表达式!");
+        }
+
+        return null;
+    }
+
 }
