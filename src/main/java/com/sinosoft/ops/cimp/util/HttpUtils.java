@@ -3,6 +3,9 @@ package com.sinosoft.ops.cimp.util;
 import com.sinosoft.ops.cimp.context.ExecuteContext;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -42,5 +45,30 @@ public class HttpUtils {
             ipAddress = "";
         }
         return ipAddress;
+    }
+
+    public static String getMACAddress(String ip) {
+        String str;
+        String macAddress = "";
+        try {
+            Process p = Runtime.getRuntime().exec("nbtstat -A " + ip);
+            InputStreamReader ir = new InputStreamReader(p.getInputStream());
+            LineNumberReader input = new LineNumberReader(ir);
+            for (int i = 1; i < 100; i++) {
+                str = input.readLine();
+                if (str != null) {
+                    if (str.indexOf("MAC Address") > 1) {
+                        macAddress = str.substring(str.indexOf("MAC Address") + 14, str.length());
+                        break;
+                    }
+                    if (str.contains("MAC")) {
+                        macAddress = str.substring(14);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace(System.out);
+        }
+        return macAddress;
     }
 }
