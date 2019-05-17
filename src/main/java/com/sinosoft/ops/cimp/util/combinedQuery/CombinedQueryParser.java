@@ -4,6 +4,7 @@ import com.sinosoft.ops.cimp.util.combinedQuery.beans.CombinedQueryParseExceptio
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.ExprStream;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.Node;
 import com.sinosoft.ops.cimp.util.combinedQuery.processors.nodes.NodeProcessor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Deque;
@@ -14,58 +15,68 @@ public class CombinedQueryParser {
 
     private final NodeProcessor[] nodeProcessors;
 
+    @Autowired
     public CombinedQueryParser(NodeProcessor[] nodeProcessors) {
         this.nodeProcessors = nodeProcessors;
     }
 
 
-    private String sql = "基本情况.姓名 等于 '周建琨' and " +
-            " 基本信息.性别 等于 [男] and 基本信息.出生日期 等于 '2000-01-01' " +
-            " 基本信息.出生日期 等于 系统日期() " +
-            " (求商(月份差(基本情况.出生日期,系统日期()),12) 小于等于 '30' ) " +
-            " and ((学历.学历代码 等于 [本科] or 学历.学历代码 等于 [硕士]) and 学历.教育类别 等于 [全日制教育]) " +
-            "  ";
-
     /**
      * 将表达式解析为sql
      */
     public String parse(String expression) throws CombinedQueryParseException {
-        return parseGramTree(expression).getSql();
+        Node root = parseGramTree(expression, null);
+        return root != null ? root.getSql() : null;
     }
 
     /**
-     * 将表达式解析为语法树
+     * @param expression
+     * @param parent     parent为null是根节点
+     * @return
+     * @throws CombinedQueryParseException
      */
-    private Node parseGramTree(String expression) throws CombinedQueryParseException {
+    private Node parseGramTree(String expression, Node parent) throws CombinedQueryParseException {
         Deque<Node> stack = new LinkedList<>();
         ExprStream stream = new ExprStream(expression);
 
         String expr;
         Node node;
+        NodeProcessor processor;
         while (stream.hasNext()) {
             expr = getExpr(stream);
             if (expr == null) {
                 break;
             }
-            System.out.println(expr);
 
             //获取节点处理器
-            NodeProcessor nodeProcessor = getNodeProcessor(expr);
+            processor = getNodeProcessor(expr);
             //将表达式解析为节点
-            node = nodeProcessor.parse(expr);
-            //处理子节点
-            if (node.getSubExprStr() != null) {
-                String[] subExpr = node.getSubExprStr();
-                Node[] subNodes = node.getSubNodes();
-                for (int i = 0; i < node.getSubExprStr().length; ++i) {
-                    subNodes[i] = parseGramTree(subExpr[i]);
-                }
-            }
+            node = processor.parse(expr);
 
-            nodeProcessor.pushNode(stack, node);
+            //节点入栈
+            Node next = node;
+            do {
+                next = processor.pushNode(stack, next);
+                processor = getNodeProcessor(next);
+            } while (next != null);
+
+            //处理子节点
+            for (String exprStr : node.getSubNodeExpr()) {
+                node.addSubNode(parseGramTree(exprStr, node));
+            }
         }
 
-        return stack.pop();
+        if (stack.size() > 1) {
+            //如果处理结束后堆栈中的节点数大于1，说明解析出错
+            throw new CombinedQueryParseException("解析失败：" + expression);
+        } else if (stack.size() == 0) {
+            return null;
+        }
+        //设置父节点，根节点的parent为null
+        Node result = stack.pop();
+        result.setParent(parent);
+
+        return result;
     }
 
     /**
@@ -77,13 +88,28 @@ public class CombinedQueryParser {
                 return nodeProcessor;
             }
         }
-        throw new CombinedQueryParseException("未定义的表达式：" + expr);
+        throw new CombinedQueryParseException("no nodeProcessor for expression: " + expr);
     }
 
     /**
-     * 获取节点对应的表达式(函数节点只取函数名,剩余部分后续处理)
+     * 获取节点处理器
      */
-    private String getExpr(ExprStream stream) {
+    private NodeProcessor getNodeProcessor(Node node) throws CombinedQueryParseException {
+        if (node == null) {
+            return null;
+        }
+        for (NodeProcessor nodeProcessor : nodeProcessors) {
+            if (nodeProcessor.support(node)) {
+                return nodeProcessor;
+            }
+        }
+        throw new CombinedQueryParseException("no nodeProcessor for node: " + node.getClass());
+    }
+
+    /**
+     * 获取节点对应的表达式
+     */
+    private String getExpr(ExprStream stream) throws CombinedQueryParseException {
         //获取第一个非空格字符
         char first = stream.next();
         while (first == ' ') {
@@ -101,16 +127,8 @@ public class CombinedQueryParser {
             case '(':
             case ')':
                 break;
-            case '[':
-                while (stream.hasNext()) {
-                    char c = stream.next();
-                    sb.append(c);
-                    if (c == ']') {
-                        break;
-                    }
-                }
-                break;
             case '\'':
+                //value
                 while (stream.hasNext()) {
                     char c = stream.next();
                     sb.append(c);
@@ -122,11 +140,22 @@ public class CombinedQueryParser {
             default:
                 while (stream.hasNext()) {
                     char c = stream.next();
-                    if (c == ' ' || c == '(') {
-                        stream.back();
+                    if (c == ' ') {
+                        //默认取到空格为止
                         break;
                     }
                     sb.append(c);
+
+                    if (c == '[') {
+                        //处理运算符在[...]之中，取到与之对应的右括号为止
+                        sb.append(stream.getUtilRightBrackets('[', ']'));
+                    }
+
+                    if (c == '(') {
+                        //函数格式，取到与之对应的右括号为止
+                        sb.append(stream.getUtilRightBrackets('(', ')'));
+                        break;
+                    }
                 }
         }
 

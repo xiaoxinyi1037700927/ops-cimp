@@ -1,22 +1,22 @@
 package com.sinosoft.ops.cimp.util.combinedQuery.enums;
 
 public enum LogicalOperator {
-    AND("and", " %s AND %s "),
-    OR("or", " %s OR %s ");
+    AND("^and|并且$", " %s AND %s "),
+    OR("^or|或者$", " %s OR %s ");
 
-    private String name;
+    private String regex;
     private String sql;
 
-    public String getName() {
-        return name;
+    public String getRegex() {
+        return regex;
     }
 
     public String getSql() {
         return sql;
     }
 
-    LogicalOperator(String name, String sql) {
-        this.name = name;
+    LogicalOperator(String regex, String sql) {
+        this.regex = regex;
         this.sql = sql;
     }
 

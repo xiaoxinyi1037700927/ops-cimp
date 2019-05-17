@@ -1,15 +1,12 @@
-package com.sinosoft.ops.cimp.util.combinedQuery.beans;
-
-import com.sinosoft.ops.cimp.util.combinedQuery.beans.expressions.EqExpr;
-import com.sinosoft.ops.cimp.util.combinedQuery.beans.expressions.NqExpr;
+package com.sinosoft.ops.cimp.util.combinedQuery.enums;
 
 public enum FieldType {
     STRING("string",
-            EqExpr.CODE & NqExpr.CODE),
+            Operator.EQ.getCode() & Operator.NQ.getCode()),
     NUMBER("number",
-            EqExpr.CODE & NqExpr.CODE),
+            Operator.EQ.getCode() & Operator.NQ.getCode()),
     DATE("date",
-            EqExpr.CODE & NqExpr.CODE),
+            Operator.EQ.getCode() & Operator.NQ.getCode()),
     BLOB("blob", 0);
 
     private String code;

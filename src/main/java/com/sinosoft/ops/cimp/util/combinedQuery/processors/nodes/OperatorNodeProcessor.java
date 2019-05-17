@@ -1,24 +1,25 @@
+
 package com.sinosoft.ops.cimp.util.combinedQuery.processors.nodes;
 
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.CombinedQueryParseException;
-import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.FunctionNode;
+import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.LogicalOperatorNode;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.Node;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.OperatorNode;
-import com.sinosoft.ops.cimp.util.combinedQuery.processors.functions.FunctionProcessor;
+import com.sinosoft.ops.cimp.util.combinedQuery.processors.operators.OperatorProcessor;
 import org.springframework.stereotype.Component;
 
 import java.util.Deque;
 
 /**
- * 函数节点处理器
+ * 运算符节点处理器
  */
 @Component
-public class FunctionNodeProcessor implements NodeProcessor {
+public class OperatorNodeProcessor implements NodeProcessor {
 
-    private final FunctionProcessor[] functionProcessors;
+    private final OperatorProcessor[] OperatorProcessors;
 
-    public FunctionNodeProcessor(FunctionProcessor[] functionProcessors) {
-        this.functionProcessors = functionProcessors;
+    public OperatorNodeProcessor(OperatorProcessor[] operatorProcessors) {
+        OperatorProcessors = operatorProcessors;
     }
 
     /**
@@ -40,7 +41,7 @@ public class FunctionNodeProcessor implements NodeProcessor {
      */
     @Override
     public boolean support(Node node) {
-        return node instanceof FunctionNode;
+        return node instanceof OperatorNode;
     }
 
     /**
@@ -52,15 +53,21 @@ public class FunctionNodeProcessor implements NodeProcessor {
      */
     @Override
     public Node parse(String expr) throws CombinedQueryParseException {
-        FunctionProcessor processor = getProcessor(expr);
-        Node node = new FunctionNode(expr, processor);
+        OperatorProcessor processor = getProcessor(expr);
+        Node node = new OperatorNode(expr, processor);
         processor.parse(node, expr);
 
         return node;
     }
 
-    private FunctionProcessor getProcessor(String expr) {
-        for (FunctionProcessor processor : functionProcessors) {
+    /**
+     * 获取表达式对应的运算符处理器
+     *
+     * @param expr
+     * @return
+     */
+    private OperatorProcessor getProcessor(String expr) {
+        for (OperatorProcessor processor : OperatorProcessors) {
             if (processor.support(expr)) {
                 return processor;
             }
@@ -79,16 +86,23 @@ public class FunctionNodeProcessor implements NodeProcessor {
      */
     @Override
     public Node pushNode(Deque<Node> stack, Node node) throws CombinedQueryParseException {
-        if (stack.size() > 0 && stack.peek().getCode() == OperatorNode.CODE) {
+        if (node.isComplete()) {
+            if (stack.size() > 0 && stack.peek().getCode() == LogicalOperatorNode.CODE) {
+                stack.peek().addSubNode(node);
+            } else {
+                stack.push(node);
+            }
+        } else if (stack.size() > 0 && (stack.peek().getCode() & OperatorNode.SUPPORT_NODES) != 0) {
             Node first = stack.pop();
-            first.addSubNode(node);
-            return first;
-        } else {
+            first.setParent(node);
+            node.addSubNode(first);
+
             stack.push(node);
+        } else {
+            throw new CombinedQueryParseException("缺失的表达式!");
         }
 
         return null;
     }
-
 
 }

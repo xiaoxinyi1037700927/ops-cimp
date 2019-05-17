@@ -6,13 +6,16 @@ package com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes;
  */
 public class ValueNode extends Node {
     public static final int CODE = 1 << 5;
-    /**
-     * 子节点支持的节点类型
-     */
-    public static final int supportNodes = Node.NONE;
+    public static final int SUPPORT_NODES = Node.NONE;
+    private static final String SQL = " %s ";
 
-    public ValueNode(String expr) {
-        super(expr);
+    private String value;
+    private boolean isCode;
+
+    public ValueNode(String expr, String value, boolean isCode) {
+        super(expr, !isCode, 0, SUPPORT_NODES, CODE);
+        this.value = value;
+        this.isCode = isCode;
     }
 
     /**
@@ -20,11 +23,7 @@ public class ValueNode extends Node {
      */
     @Override
     public String getSql() {
-        return null;
+        return String.format(SQL, value);
     }
 
-    @Override
-    public int getCode() {
-        return CODE;
-    }
 }
