@@ -113,7 +113,7 @@ public class QuerySqlBuilder implements SqlBuilder {
             }
         }
 
-        if (sortColumn.length() > 0) {
+        if (sortColumn.length() > 10) {
             querySqlBuilder.append(sortColumn);
         }
 
