@@ -28,8 +28,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,8 +36,6 @@ public class CadreServiceImpl implements CadreService {
     private final JdbcTemplate jdbcTemplate;
     private final EmpPhotoRepository empPhotoRepository;
     private final SysTableInfoDao sysTableInfoDao;
-    private ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
-
 
     public CadreServiceImpl(JdbcTemplate jdbcTemplate, EmpPhotoRepository empPhotoRepository, SysTableInfoDao sysTableInfoDao) {
         this.jdbcTemplate = jdbcTemplate;
@@ -435,5 +431,22 @@ public class CadreServiceImpl implements CadreService {
         jdbcTemplate.update(sql);
 
         return true;
+    }
+
+    @Override
+    public boolean cadreCardIdExist(String cardId) {
+        if (StringUtils.isNotEmpty(cardId)) {
+            String sql = "SELECT COUNT(*) AS \"cardCount\" FROM EMP_A001 WHERE A001003 = %s";
+            String execSql = String.format(sql, cardId);
+
+            Map<String, Object> resultMap = jdbcTemplate.queryForMap(execSql);
+            Object cardCount = resultMap.get("cardCount");
+            if (cardCount != null) {
+                int cardCountInt = Integer.parseInt(String.valueOf(cardCount));
+                return cardCountInt > 0;
+            }
+            return false;
+        }
+        return false;
     }
 }
