@@ -12,14 +12,14 @@ import java.util.List;
 @Repository
 public interface ArchiveMaterialFileRepository extends JpaRepository<ArchiveMaterialFile,String>, QuerydslPredicateExecutor<ArchiveMaterialFile> {
 
-    @Query("select ArchiveMaterialFile from ArchiveMaterialFile  where archiveMaterialId=?1 order by archiveMaterialId,id,pageNumber")
-    public List<ArchiveMaterialFile> getArchiveMaterialFilebyAchiveMaterialID(String IDofAchiveMaterial);
+    @Query("select a from ArchiveMaterialFile a where a.archiveMaterialId=?1 order by a.archiveMaterialId,a.id,a.pageNumber")
+    public List<ArchiveMaterialFile> findByArchiveMaterialIdOrderByaAndArchiveMaterialIdAndIdAndPageNumber(String IDofAchiveMaterial);
 
-    @Query("select ArchiveMaterialFile from ArchiveMaterialFile  where archiveMaterialId=?1 and pageNumber=?2 and fileType=?3")
-    public ArchiveMaterialFile findbyPageNo(String archiveMaterialId,String pageNumber,String type);
+    @Query("select a from ArchiveMaterialFile a where a.archiveMaterialId=?1 and a.pageNumber=?2 and a.fileType=?3")
+    public ArchiveMaterialFile findAllByArchiveMaterialIdAndPageNumberAndAndFileType(String archiveMaterialId,String pageNumber,String type);
 
-    @Query("select ArchiveMaterialFile from ArchiveMaterialFile  where archiveMaterialId in (?1) order by archiveMaterialId,id,pageNumber")
-    public List<ArchiveMaterialFile> getFilebyAchiveMaterialIDs(List<String> idList);
+    @Query("select a from ArchiveMaterialFile a where a.archiveMaterialId in (?1) order by a.archiveMaterialId,a.id,a.pageNumber")
+    public List<ArchiveMaterialFile> findAllByArchiveMaterialIdOrderByArchiveMaterialIdAndIdAndPageNumber(List<String> idList);
 
 
 

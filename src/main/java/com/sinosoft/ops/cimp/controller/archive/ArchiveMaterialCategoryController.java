@@ -1,7 +1,6 @@
 package com.sinosoft.ops.cimp.controller.archive;
 
 
-import com.sinosoft.ops.cimp.common.BaseResult;
 import com.sinosoft.ops.cimp.common.BaseResultHttpStatus;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.exception.BusinessException;
@@ -9,10 +8,11 @@ import com.sinosoft.ops.cimp.service.archive.ArchiveMaterialCategoryService;
 import com.sinosoft.ops.cimp.service.archive.ArchiveMaterialService;
 import com.sinosoft.ops.cimp.util.SecurityUtils;
 import com.sinosoft.ops.cimp.util.StringUtil;
-import io.swagger.annotations.Api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.annotation.Resource;
@@ -28,9 +28,9 @@ import java.util.List;
 @RequestMapping("/materialCategory")
 public class ArchiveMaterialCategoryController extends BaseController {
 	private static final Logger logger = LoggerFactory.getLogger(ArchiveMaterialCategoryController.class);
-	@Resource
+	@Autowired
 	private ArchiveMaterialCategoryService archiveMaterialCategoryService;
-	@Resource
+	@Autowired
 	private ArchiveMaterialService archiveMaterialService;
 	
 	/**

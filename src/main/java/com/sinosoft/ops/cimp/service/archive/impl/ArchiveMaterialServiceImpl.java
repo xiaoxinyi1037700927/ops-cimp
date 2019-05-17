@@ -29,16 +29,16 @@ public class ArchiveMaterialServiceImpl implements ArchiveMaterialService {
 	@Override
 	@Transactional
 	public List<ArchiveMaterial> getArchiveListByEmpId(String empId){
-		return archiveMaterialRepository.getArchiveMaterialListByEmpId(empId);
+		return archiveMaterialRepository.findAllByEmpIdOrderByCategoryIdSeqNum(empId);
 	}
 	
 	@Override
 	@Transactional
 	public List<ArchiveMaterial> getArchiveListByEmpIdAndCaterogyId(String empId,String categoryId){
-		return archiveMaterialRepository.getArchiveListByEmpIdAndCategoryId(empId,categoryId);
+		return archiveMaterialRepository.findAllByEmpIdAndCategoryIdOrderBySeqNum(empId,categoryId);
 	}
 	@Transactional
 	public List<String> getArchiveMaterialIDs(String empId,String categoryId){
-		return  archiveMaterialRepository.getArchiveMaterialIDs(empId, categoryId);
+		return  archiveMaterialRepository.findByEmpIdAndCategoryId(empId, categoryId);
 	}
 }

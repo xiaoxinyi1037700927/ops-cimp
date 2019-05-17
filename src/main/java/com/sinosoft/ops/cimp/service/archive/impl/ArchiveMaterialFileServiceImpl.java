@@ -28,7 +28,7 @@ public class ArchiveMaterialFileServiceImpl  implements ArchiveMaterialFileServi
 	@Override
 	@Transactional
 	public ArchiveMaterialFile findbypageNo(String archiveMaterialId, String pageNo, String type){
-		return archiveMaterialFileRepository.findbyPageNo(archiveMaterialId, pageNo,type);
+		return archiveMaterialFileRepository.findAllByArchiveMaterialIdAndPageNumberAndAndFileType(archiveMaterialId, pageNo,type);
 	}
 
 	@Override
@@ -39,13 +39,13 @@ public class ArchiveMaterialFileServiceImpl  implements ArchiveMaterialFileServi
 	@Override
 	@Transactional
 	public ArrayList<ArchiveMaterialFile> getArchiveMaterialFilebyAchiveMaterialID(String  archiveMaterialId){
-		return (ArrayList<ArchiveMaterialFile>) archiveMaterialFileRepository.getArchiveMaterialFilebyAchiveMaterialID(archiveMaterialId);
+		return (ArrayList<ArchiveMaterialFile>) archiveMaterialFileRepository.findByArchiveMaterialIdOrderByaAndArchiveMaterialIdAndIdAndPageNumber(archiveMaterialId);
 	};
 	
 	@Override
 	@Transactional
 	public List<ArchiveMaterialFile> getArchiveMaterialFilebyAchiveMaterialIDs(List<String> idList){
-		return (List<ArchiveMaterialFile>) archiveMaterialFileRepository.getFilebyAchiveMaterialIDs(idList);
+		return (List<ArchiveMaterialFile>) archiveMaterialFileRepository.findAllByArchiveMaterialIdOrderByArchiveMaterialIdAndIdAndPageNumber(idList);
 	}
 
 	@Override
@@ -54,7 +54,7 @@ public class ArchiveMaterialFileServiceImpl  implements ArchiveMaterialFileServi
 		Map<String, List<ArchiveMaterialFile>> map = new HashMap<String, List<ArchiveMaterialFile>>();
 		List<ArchiveMaterialFile> list = new ArrayList<ArchiveMaterialFile>();
 		for (String materialId : idList) {
-			list = ( List<ArchiveMaterialFile>) archiveMaterialFileRepository.getArchiveMaterialFilebyAchiveMaterialID(materialId);
+			list = ( List<ArchiveMaterialFile>) archiveMaterialFileRepository.findByArchiveMaterialIdOrderByaAndArchiveMaterialIdAndIdAndPageNumber(materialId);
 			map.put(materialId, list);
 		}
 		return map;

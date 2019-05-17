@@ -26,7 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @date:            2017年12月24日 
  */
 @Service("archiveMaterialCategoryService")
-public abstract class ArchiveMaterialCategoryServiceImpl implements ArchiveMaterialCategoryService {
+public class ArchiveMaterialCategoryServiceImpl implements ArchiveMaterialCategoryService {
 	/***MaterialCategory标识->MaterialCategory映射*/
 	private static Map<String, ArchiveMaterialCategory> id2IMaterial = new ConcurrentHashMap<String, ArchiveMaterialCategory>();
 
@@ -60,6 +60,15 @@ public abstract class ArchiveMaterialCategoryServiceImpl implements ArchiveMater
 	}
 
 
+	@Override
+	public void deleteById(Serializable id) {
+
+	}
+
+	@Override
+	public Map<String, ArchiveMaterialCategory> getAll() {
+		return null;
+	}
 
 	@Override
 	@Transactional
@@ -97,7 +106,7 @@ public abstract class ArchiveMaterialCategoryServiceImpl implements ArchiveMater
 		if (StringUtil.isEmptyOrNull(code)){
 			categoryList = archiveMaterialCategoryRepository.getCategorysByCode();
 		}else {
-			categoryList = archiveMaterialCategoryRepository.getCategorysByCode(code);
+			categoryList = archiveMaterialCategoryRepository.findByParentCodeOrderBySn(code);
 		}
 
 		// System.out.println("empid==="+empId+"code=="+code+"categoryId="+categoryId);
@@ -119,7 +128,7 @@ public abstract class ArchiveMaterialCategoryServiceImpl implements ArchiveMater
 
 				}
 
-				List<ArchiveMaterial> ds = archiveMaterialRepository.getArchiveListByEmpIdAndCategoryId(empId, categoryId);
+				List<ArchiveMaterial> ds = archiveMaterialRepository.findAllByEmpIdAndCategoryIdOrderBySeqNum(empId, categoryId);
 
 				System.out.println("dsds==" + ds.size());
 				if (ds != null && ds.size() > 0) {
@@ -178,14 +187,14 @@ private List<HashMap<String, Object>> buildArchiveMaterialCategory(List<ArchiveM
 @Transactional(readOnly=true)
 public List<String> getIdCardsByEmpid(String empId) {
 	
-	return archiveMaterialRepository.getIdCardsByEmpid(empId);
+	return archiveMaterialRepository.findByemp(empId);
 }
 
 @Override
 @Transactional(readOnly=true)
 public String getidcardforone(String empId) {
 	// TODO Auto-generated method stub
-	return archiveMaterialRepository.getidcardforone(empId);
+	return archiveMaterialRepository.findByemp001(empId);
 }
 
 @Override

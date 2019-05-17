@@ -12,9 +12,9 @@ import java.util.List;
 public interface ArchiveMaterialCategoryRepository extends JpaRepository<ArchiveMaterialCategory,String>, QuerydslPredicateExecutor<ArchiveMaterialCategory> {
 
 
-    @Query("select ArchiveMaterialCategory from ArchiveMaterialCategory where parentCode=?1 order by sn")
-    public List<ArchiveMaterialCategory> getCategorysByCode(String parentCode);
-    @Query("select ArchiveMaterialCategory from ArchiveMaterialCategory where parentCode='00' order by sn")
+    @Query("select a  from ArchiveMaterialCategory a where a.parentCode=?1 order by a.sn")
+    public List<ArchiveMaterialCategory> findByParentCodeOrderBySn(String parentCode);
+    @Query("select a  from ArchiveMaterialCategory a where a.parentCode='00' order by a.sn")
     public List<ArchiveMaterialCategory> getCategorysByCode();
 
     @Query(value = "select b.* from ARCHIVE_MATERIAL_CATEGORY b ,(select  a.code from  ARCHIVE_MATERIAL_CATEGORY  a where a.id=:categoryId) c where b.parent_code= c.code order by b.sn",nativeQuery=true)
