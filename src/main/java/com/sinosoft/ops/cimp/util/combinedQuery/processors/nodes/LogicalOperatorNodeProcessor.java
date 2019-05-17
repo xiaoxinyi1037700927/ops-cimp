@@ -78,9 +78,10 @@ public class LogicalOperatorNodeProcessor implements NodeProcessor {
     @Override
     public Node pushNode(Deque<Node> stack, Node node) throws CombinedQueryParseException {
         //栈首必须是逻辑表达式节点支持的子节点类型
-        if (stack.size() > 0 && (stack.peek().getCode() & LogicalOperatorNode.SUPPORT_NODES) != 0) {
+        if (node.isComplete()) {
+            stack.push(node);
+        } else if (stack.size() > 0 && (stack.peek().getReturnType() & node.getNextSubType()) != 0) {
             Node first = stack.pop();
-            first.setParent(node);
             node.addSubNode(first);
             stack.push(node);
         } else {

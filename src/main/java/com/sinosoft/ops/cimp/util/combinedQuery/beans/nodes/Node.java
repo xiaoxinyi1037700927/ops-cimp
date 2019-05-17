@@ -1,6 +1,7 @@
 package com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes;
 
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.CombinedQueryParseException;
+import com.sinosoft.ops.cimp.util.combinedQuery.enums.Type;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,14 +10,10 @@ import java.util.List;
  * 语法树节点
  */
 public abstract class Node {
-    public static final int NONE = 0;
-
-    public Node(String expr, boolean isComplete, int subNodesNum, int supportSubNodes, int code) {
+    public Node(String expr, boolean isComplete, int[] supportSubTypes) {
         this.expr = expr;
         this.isComplete = isComplete;
-        this.subNodesNum = subNodesNum;
-        this.supportSubNodes = supportSubNodes;
-        this.code = code;
+        this.supportSubTypes = supportSubTypes;
     }
 
     /**
@@ -26,27 +23,15 @@ public abstract class Node {
     /**
      * 当前节点对应的表达式
      */
-    private String expr;
-    /**
-     * 当前节点的code
-     */
-    private int code;
-    /**
-     * 当前节点需要的子节点数量
-     */
-    private int subNodesNum;
+    protected String expr;
     /**
      * 当前节点支持的子节点类型
      */
-    private int supportSubNodes;
+    private int[] supportSubTypes;
     /**
      * 子节点对应的表达式
      */
     private List<String> subNodeExpr = new ArrayList<>();
-    /**
-     * 父节点
-     */
-    protected Node parent;
     /**
      * 子节点
      */
@@ -60,28 +45,20 @@ public abstract class Node {
         return expr;
     }
 
-    public int getSubNodesNum() {
-        return subNodesNum;
+    public int[] getSupportSubTypes() {
+        return supportSubTypes;
     }
 
-    public int getSupportSubNodes() {
-        return supportSubNodes;
-    }
-
-    public int getCode() {
-        return code;
+    public int getNextSubType() {
+        if (supportSubTypes.length > subNodes.size()) {
+            return supportSubTypes[subNodes.size()];
+        } else {
+            return Type.NONE.getCode();
+        }
     }
 
     public List<String> getSubNodeExpr() {
         return subNodeExpr;
-    }
-
-    public Node getParent() {
-        return parent;
-    }
-
-    public void setParent(Node parent) {
-        this.parent = parent;
     }
 
     public List<Node> getSubNodes() {
@@ -114,14 +91,29 @@ public abstract class Node {
      */
     public void addSubNode(Node node) throws CombinedQueryParseException {
         if (isComplete) {
-            throw new CombinedQueryParseException("添加子节点失败！");
+            throw new CombinedQueryParseException("非法的表达式：" + node.expr);
         }
+
+        //判断下一个子节点是否支持添加的节点的返回类型
+        int subType = supportSubTypes[subNodes.size()];
+        if ((subType & node.getReturnType()) == 0) {
+            throw new CombinedQueryParseException("错误的子节点类型 : " + node.expr);
+        }
+
         subNodes.add(node);
 
-        if (subNodes.size() == subNodesNum) {
+        //判断节点是否完整
+        if (subNodes.size() == supportSubTypes.length) {
             isComplete = true;
         }
     }
+
+    /**
+     * 获取节点的返回类型
+     *
+     * @return
+     */
+    public abstract int getReturnType();
 
 
     /**

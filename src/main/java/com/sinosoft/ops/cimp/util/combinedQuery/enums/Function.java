@@ -1,31 +1,57 @@
 package com.sinosoft.ops.cimp.util.combinedQuery.enums;
 
 public enum Function {
-    LENGTH("求长度", "^求长度\\((.*?)\\)$", 1, 1, " length(%s) "),
-    SYSDATE("系统日期", "^系统日期\\((.*?)\\)$", 0, 1 << 1, " SYSDATE "),
-    MONTH_DIFFERENCE("月份差", "^月份差\\((.*?)\\)$", 2, 1 << 2, " MONTHS_BETWEEN(%s,%s) "),
-    TO_DATE("转日期", "^转日期\\((.*?)\\)$", 2, 1 << 3, " TO_DATE(%s,%s) "),
-    ABS("绝对值", "^绝对值\\((.*?)\\)$", 1, 1 << 4, " ABS(%s) "),
-    FLOOR("向下取整", "^向下取整\\((.*?)\\)$", 1, 1 << 5, " FLOOR(%s) "),
-    CEIL("向上取整", "^向上取整\\((.*?)\\)$", 1, 1 << 6, " CEIL(%s) "),
-    SUB_STRING("字符串截取", "^字符串截取\\((.*?)\\)$", 3, 1 << 7, " SUBSTR(%s,%s,%s) "),
-    DIVIDE("求商", "^求商\\((.*?)\\)$", 2, 1 << 8, " %s / %s "),
-    MULTIPLY("求积", "^求积\\((.*?)\\)$", 2, 1 << 9, " %s * %s "),
-    PLUS("求和", "^求和\\((.*?)\\)$", 2, 1 << 10, " %s + %s "),
-    MINUS("求差", "^求差\\((.*?)\\)$", 2, 1 << 11, " %s - %s ");
+    LENGTH("求长度", "^求长度\\((.*?)\\)$",
+            Type.NUMBER.getCode(), new int[]{Type.ALL.getCode()},
+            " length(%s) ", " 求长度(%s) "),
+    SYSDATE("系统日期", "^系统日期\\((.*?)\\)$",
+            Type.DATE.getCode(), new int[]{},
+            " SYSDATE ", " 系统日期() "),
+    MONTH_DIFFERENCE("月份差", "^月份差\\((.*?)\\)$",
+            Type.NUMBER.getCode(), new int[]{Type.DATE.getCode(), Type.DATE.getCode()},
+            " MONTHS_BETWEEN(%s,%s) ", " 月份差(%s,%s) "),
+    TO_DATE("转日期", "^转日期\\((.*?)\\)$",
+            Type.DATE.getCode(), new int[]{Type.STRING.getCode(), Type.STRING.getCode()},
+            " TO_DATE(%s,%s) ", " 转日期(%s,%s) "),
+    ABS("绝对值", "^绝对值\\((.*?)\\)$",
+            Type.NUMBER.getCode(), new int[]{Type.NUMBER.getCode()},
+            " ABS(%s) ", " 绝对值(%s) "),
+    FLOOR("向下取整", "^向下取整\\((.*?)\\)$",
+            Type.NUMBER.getCode(), new int[]{Type.NUMBER.getCode()},
+            " FLOOR(%s) ", " 向下取整(%s) "),
+    CEIL("向上取整", "^向上取整\\((.*?)\\)$",
+            Type.NUMBER.getCode(), new int[]{Type.NUMBER.getCode()},
+            " CEIL(%s) ", " 向上取整(%s) "),
+    SUB_STRING("字符串截取", "^字符串截取\\((.*?)\\)$",
+            Type.STRING.getCode(), new int[]{Type.STRING.getCode(), Type.NUMBER.getCode(), Type.NUMBER.getCode()},
+            " SUBSTR(%s,%s,%s) ", " 字符串截取(%s,%s,%s) "),
+    DIVIDE("求商", "^求商\\((.*?)\\)$",
+            Type.NUMBER.getCode(), new int[]{Type.NUMBER.getCode(), Type.NUMBER.getCode()},
+            " %s / %s ", " 求商(%s,%s) "),
+    MULTIPLY("求积", "^求积\\((.*?)\\)$",
+            Type.NUMBER.getCode(), new int[]{Type.NUMBER.getCode(), Type.NUMBER.getCode()},
+            " %s * %s ", " 求积(%s,%s) "),
+    PLUS("求和", "^求和\\((.*?)\\)$",
+            Type.NUMBER.getCode(), new int[]{Type.NUMBER.getCode(), Type.NUMBER.getCode()},
+            " %s + %s ", " 求和(%s,%s) "),
+    MINUS("求差", "^求差\\((.*?)\\)$",
+            Type.NUMBER.getCode(), new int[]{Type.NUMBER.getCode(), Type.NUMBER.getCode()},
+            " %s - %s ", " 求差(%s,%s) ");
 
     private String name;
     private String regex;
-    private int paramsNum;
-    private int code;
-    private String sql;
+    private int returnType;
+    private int[] paramsType;
+    private String sqlFormat;
+    private String exprFormat;
 
-    Function(String name, String regex, int paramsNum, int code, String sql) {
+    Function(String name, String regex, int returnType, int[] paramsType, String sqlFormat, String exprFormat) {
         this.name = name;
         this.regex = regex;
-        this.paramsNum = paramsNum;
-        this.code = code;
-        this.sql = sql;
+        this.returnType = returnType;
+        this.paramsType = paramsType;
+        this.sqlFormat = sqlFormat;
+        this.exprFormat = exprFormat;
     }
 
     public String getName() {
@@ -36,16 +62,24 @@ public enum Function {
         return regex;
     }
 
+    public int getReturnType() {
+        return returnType;
+    }
+
+    public int[] getParamsType() {
+        return paramsType;
+    }
+
     public int getParamsNum() {
-        return paramsNum;
+        return paramsType.length;
     }
 
-    public int getCode() {
-        return code;
+    public String getSqlFormat() {
+        return sqlFormat;
     }
 
-    public String getSql() {
-        return sql;
+    public String getExprFormat() {
+        return exprFormat;
     }
 }
 

@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 public class ValueNodeProcessor implements NodeProcessor {
 
     private static final Pattern PATTERN = Pattern.compile("^'(.*?)'$");
-    private static final Pattern PATTERN_CODE = Pattern.compile("^\\[(\\d+)\\].+?$");
+    private static final Pattern PATTERN_CODE = Pattern.compile("^\\[(\\d+)].+?$");
 
     /**
      * 表达式是否满足节点
@@ -136,7 +136,7 @@ public class ValueNodeProcessor implements NodeProcessor {
      */
     @Override
     public Node pushNode(Deque<Node> stack, Node node) throws CombinedQueryParseException {
-        if (stack.size() > 0 && (stack.peek().getSupportSubNodes() & ValueNode.CODE) != 0) {
+        if (stack.size() > 0 && (stack.peek().getNextSubType() & node.getReturnType()) != 0) {
             //如果栈首支持value的子节点，合并
             Node first = stack.pop();
             first.addSubNode(node);

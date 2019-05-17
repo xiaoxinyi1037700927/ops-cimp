@@ -6,14 +6,21 @@ import com.sinosoft.ops.cimp.util.combinedQuery.processors.functions.FunctionPro
  * 函数节点
  */
 public class FunctionNode extends Node {
-    public static final int CODE = 1 << 3;
-    public static final int SUPPORT_NODES = FieldNode.CODE | FunctionNode.CODE | ValueNode.CODE;
-
     private FunctionProcessor processor;
 
     public FunctionNode(String expr, FunctionProcessor processor) {
-        super(expr, processor.getFunction().getParamsNum() == 0, processor.getFunction().getParamsNum(), SUPPORT_NODES, CODE);
+        super(expr, processor.getFunction().getParamsNum() == 0, processor.getFunction().getParamsType());
         this.processor = processor;
+    }
+
+    /**
+     * 获取节点的返回类型
+     *
+     * @return
+     */
+    @Override
+    public int getReturnType() {
+        return processor.getFunction().getReturnType();
     }
 
     /**
@@ -24,4 +31,15 @@ public class FunctionNode extends Node {
         return processor.getSql(subNodes);
     }
 
+    /**
+     * 获取节点对应的表达式
+     */
+    @Override
+    public String getExpr() {
+        return processor.getExpr(subNodes);
+    }
+
+    public FunctionProcessor getProcessor() {
+        return processor;
+    }
 }

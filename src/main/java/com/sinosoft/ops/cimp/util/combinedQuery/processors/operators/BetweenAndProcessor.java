@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 
 @Component
 public class BetweenAndProcessor extends OperatorProcessor {
-    private static final Pattern pattern = Pattern.compile(Operator.BETWEEN_AND.getName());
+    private static final Pattern pattern = Pattern.compile(Operator.BETWEEN_AND.getRegex());
 
     public BetweenAndProcessor() {
         super(Operator.BETWEEN_AND);

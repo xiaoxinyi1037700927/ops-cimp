@@ -3,7 +3,7 @@ package com.sinosoft.ops.cimp.util.combinedQuery.processors.nodes;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.CombinedQueryParseException;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.FunctionNode;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.Node;
-import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.OperatorNode;
+import com.sinosoft.ops.cimp.util.combinedQuery.enums.Type;
 import com.sinosoft.ops.cimp.util.combinedQuery.processors.functions.FunctionProcessor;
 import org.springframework.stereotype.Component;
 
@@ -79,7 +79,7 @@ public class FunctionNodeProcessor implements NodeProcessor {
      */
     @Override
     public Node pushNode(Deque<Node> stack, Node node) throws CombinedQueryParseException {
-        if (stack.size() > 0 && stack.peek().getCode() == OperatorNode.CODE) {
+        if (stack.size() > 0 && stack.peek().getReturnType() == Type.OPERATOR.getCode()) {
             Node first = stack.pop();
             first.addSubNode(node);
             return first;

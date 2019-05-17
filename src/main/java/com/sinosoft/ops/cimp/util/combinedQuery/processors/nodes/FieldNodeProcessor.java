@@ -8,6 +8,8 @@ import com.sinosoft.ops.cimp.entity.sys.systable.SysTableField;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.CombinedQueryParseException;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.FieldNode;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.Node;
+import com.sinosoft.ops.cimp.util.combinedQuery.enums.Type;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.Deque;
@@ -78,8 +80,14 @@ public class FieldNodeProcessor implements NodeProcessor {
             throw new CombinedQueryParseException("未知的字段名：" + fieldName);
         }
 
-        return new FieldNode(expr, table.getDbTableName(), field.getDbFieldName(), field.getDbFieldDataType());
+        Type returnType = getReturnType(field.getDbFieldDataType());
+        if (returnType == null) {
+            throw new CombinedQueryParseException("未知的字段类型：" + tableName + "." + fieldName);
+        }
+
+        return new FieldNode(expr, table.getDbTableName(), table.getNameCn(), field.getDbFieldName(), field.getNameCn(), returnType);
     }
+
 
     /**
      * 获取系统表
@@ -110,6 +118,32 @@ public class FieldNodeProcessor implements NodeProcessor {
                                 .or(qSysTableField.nameEn.equalsIgnoreCase(fieldName))
                                 .or(qSysTableField.dbFieldName.equalsIgnoreCase(fieldName))
                 )).fetchOne();
+    }
+
+    /**
+     * 根据字段类型获取节点返回类型
+     *
+     * @param fieldType
+     * @return
+     */
+    private Type getReturnType(String fieldType) {
+        if (StringUtils.isEmpty(fieldType)) {
+            return null;
+        }
+        fieldType = fieldType.toLowerCase();
+
+        if (fieldType.contains("char")) {
+            return Type.STRING;
+        } else if (fieldType.contains("number") || fieldType.contains("numeric")) {
+            return Type.NUMBER;
+        } else if (fieldType.contains("date") || fieldType.contains("timestamp")) {
+            return Type.DATE;
+        } else if (fieldType.contains("blob") || fieldType.contains("clob")) {
+            return Type.LOB;
+        }
+
+        return null;
+
     }
 
     /**

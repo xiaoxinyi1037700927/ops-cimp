@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 @Component
 public class InProcessor extends OperatorProcessor {
     public static final String IDENTIFIER = "$IN_OPERATOR_VALUE";
-    private static final Pattern pattern = Pattern.compile(Operator.IN.getName());
+    private static final Pattern pattern = Pattern.compile(Operator.IN.getRegex());
 
 
     public InProcessor() {

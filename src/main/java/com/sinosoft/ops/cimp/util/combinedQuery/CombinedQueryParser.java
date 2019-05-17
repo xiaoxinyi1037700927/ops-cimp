@@ -2,13 +2,17 @@ package com.sinosoft.ops.cimp.util.combinedQuery;
 
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.CombinedQueryParseException;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.ExprStream;
-import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.Node;
+import com.sinosoft.ops.cimp.util.combinedQuery.beans.Expression;
+import com.sinosoft.ops.cimp.util.combinedQuery.beans.Param;
+import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.*;
 import com.sinosoft.ops.cimp.util.combinedQuery.processors.nodes.NodeProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.List;
 
 @Component
 public class CombinedQueryParser {
@@ -20,6 +24,65 @@ public class CombinedQueryParser {
         this.nodeProcessors = nodeProcessors;
     }
 
+
+    public List<Expression> parseExpressions(String expression) throws CombinedQueryParseException {
+        Node root = parseGramTree(expression, null);
+
+        List<Expression> expressions = new ArrayList<>();
+
+        nodeToExpressions(root, expressions, null);
+        return expressions;
+    }
+
+    private void nodeToExpressions(Node root, List<Expression> expressions, String logicalOperator) {
+        if (root instanceof LogicalOperatorNode) {
+            //逻辑表达式节点，递归处理子节点
+            List<Node> subNodes = root.getSubNodes();
+            nodeToExpressions(subNodes.get(0), expressions, logicalOperator);
+            nodeToExpressions(subNodes.get(1), expressions, ((LogicalOperatorNode) root).getLogicalOperator().getName());
+        } else if (root instanceof BracketsNode) {
+            //添加括号表达式
+            Expression expression = new Expression();
+            List<Expression> subExprs = new ArrayList<>();
+            expression.setBracketsNode(true);
+            expression.setSubExprs(subExprs);
+            expression.setLogicalOperator(logicalOperator);
+            expressions.add(expression);
+
+            //递归处理子节点
+            nodeToExpressions(root.getSubNodes().get(0), subExprs, null);
+        } else if (root instanceof OperatorNode) {
+            Expression expression = new Expression();
+            expression.setText(root.getExpr());
+
+            List<Node> subNodes = root.getSubNodes();
+            expression.setParam1(nodeToParam(subNodes.get(0)));
+            expression.setParam2(subNodes.size() > 1 ? nodeToParam(subNodes.get(1)) : null);
+            expression.setLogicalOperator(logicalOperator);
+            expression.setOperator(((OperatorNode) root).getProcessor().getOperator().getName());
+
+            expressions.add(expression);
+        }
+    }
+
+    private Param nodeToParam(Node node) {
+        Param param = new Param();
+        param.setText(node.getExpr());
+        param.setReturnType(node.getReturnType());
+
+        if (node instanceof FunctionNode) {
+            param.setIsFunction(1);
+            param.setFunctionName(((FunctionNode) node).getProcessor().getFunction().getName());
+
+            List<Param> params = new ArrayList<>();
+            for (Node subNode : node.getSubNodes()) {
+                params.add(nodeToParam(subNode));
+            }
+            param.setParams(params);
+        }
+
+        return param;
+    }
 
     /**
      * 将表达式解析为sql
@@ -72,11 +135,8 @@ public class CombinedQueryParser {
         } else if (stack.size() == 0) {
             return null;
         }
-        //设置父节点，根节点的parent为null
-        Node result = stack.pop();
-        result.setParent(parent);
 
-        return result;
+        return stack.pop();
     }
 
     /**
@@ -161,6 +221,5 @@ public class CombinedQueryParser {
 
         return sb.toString();
     }
-
 
 }

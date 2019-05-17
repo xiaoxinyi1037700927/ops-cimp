@@ -2,9 +2,9 @@
 package com.sinosoft.ops.cimp.util.combinedQuery.processors.nodes;
 
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.CombinedQueryParseException;
-import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.LogicalOperatorNode;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.Node;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.OperatorNode;
+import com.sinosoft.ops.cimp.util.combinedQuery.enums.Type;
 import com.sinosoft.ops.cimp.util.combinedQuery.processors.operators.OperatorProcessor;
 import org.springframework.stereotype.Component;
 
@@ -87,17 +87,23 @@ public class OperatorNodeProcessor implements NodeProcessor {
     @Override
     public Node pushNode(Deque<Node> stack, Node node) throws CombinedQueryParseException {
         if (node.isComplete()) {
-            if (stack.size() > 0 && stack.peek().getCode() == LogicalOperatorNode.CODE) {
-                stack.peek().addSubNode(node);
+            if (stack.size() > 0 && stack.peek().getReturnType() == Type.lOGICAL_OPERATOR.getCode()) {
+                Node first = stack.pop();
+                first.addSubNode(node);
+
+                return first;
             } else {
                 stack.push(node);
             }
-        } else if (stack.size() > 0 && (stack.peek().getCode() & OperatorNode.SUPPORT_NODES) != 0) {
+        } else if (stack.size() > 0 && (stack.peek().getReturnType() & node.getNextSubType()) != 0) {
             Node first = stack.pop();
-            first.setParent(node);
             node.addSubNode(first);
 
-            stack.push(node);
+            if (node.isComplete()) {
+                return node;
+            } else {
+                stack.push(node);
+            }
         } else {
             throw new CombinedQueryParseException("缺失的表达式!");
         }

@@ -1,19 +1,29 @@
 package com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes;
 
 import com.sinosoft.ops.cimp.util.combinedQuery.enums.LogicalOperator;
+import com.sinosoft.ops.cimp.util.combinedQuery.enums.Type;
 
 /**
  * 逻辑操作符节点(and/or)
  */
 public class LogicalOperatorNode extends Node {
-    public static final int CODE = 1 << 1;
-    public static final int SUPPORT_NODES = LogicalOperatorNode.CODE | OperatorNode.CODE | BracketsNode.CODE;
+    private static final int[] SUPPORT_SUB_TYPES = new int[]{Type.lOGICAL_OPERATOR.getCode() | Type.OPERATOR.getCode() | Type.BRACKETS.getCode(), Type.lOGICAL_OPERATOR.getCode() | Type.OPERATOR.getCode() | Type.BRACKETS.getCode()};
 
     private LogicalOperator logicalOperator;
 
     public LogicalOperatorNode(String expr, LogicalOperator logicalOperator) {
-        super(expr, false, 2, SUPPORT_NODES, CODE);
+        super(expr, false, SUPPORT_SUB_TYPES);
         this.logicalOperator = logicalOperator;
+    }
+
+    /**
+     * 获取节点的返回类型
+     *
+     * @return
+     */
+    @Override
+    public int getReturnType() {
+        return Type.lOGICAL_OPERATOR.getCode();
     }
 
     /**
@@ -26,4 +36,18 @@ public class LogicalOperatorNode extends Node {
         return String.format(logicalOperator.getSql(), subNodes.get(0).getSql(), subNodes.get(1).getSql());
     }
 
+    /**
+     * 获取节点对应的表达式
+     *
+     * @return
+     */
+    @Override
+    public String getExpr() {
+        return String.format(logicalOperator.getExprFormat(), subNodes.get(0).getExpr(), subNodes.get(1).getExpr());
+    }
+
+
+    public LogicalOperator getLogicalOperator() {
+        return logicalOperator;
+    }
 }

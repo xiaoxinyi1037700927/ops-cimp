@@ -2,8 +2,8 @@ package com.sinosoft.ops.cimp.util.combinedQuery.processors.operators;
 
 
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.CombinedQueryParseException;
-import com.sinosoft.ops.cimp.util.combinedQuery.enums.Operator;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.Node;
+import com.sinosoft.ops.cimp.util.combinedQuery.enums.Operator;
 
 import java.util.List;
 
@@ -44,11 +44,26 @@ public abstract class OperatorProcessor {
      * @return
      */
     public String getSql(List<Node> subNodes) {
-        Object[] subSql = new Object[operator.getSubNodeNum()];
+        Object[] subSql = new Object[operator.getParamsNum()];
         for (int i = 0; i < subNodes.size(); ++i) {
             subSql[i] = subNodes.get(i).getSql();
         }
         return String.format(operator.getSql(), subSql);
+    }
+
+
+    /**
+     * 获取表达式对应的表达式
+     *
+     * @param subNodes
+     * @return
+     */
+    public String getExpr(List<Node> subNodes) {
+        Object[] subExpr = new Object[operator.getParamsNum()];
+        for (int i = 0; i < subNodes.size(); ++i) {
+            subExpr[i] = subNodes.get(i).getExpr();
+        }
+        return String.format(operator.getExprFormat(), subExpr);
     }
 
     public Operator getOperator() {

@@ -1,10 +1,10 @@
 package com.sinosoft.ops.cimp.util.combinedQuery.processors.nodes;
 
-import com.sinosoft.ops.cimp.util.combinedQuery.enums.Brackets;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.CombinedQueryParseException;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.BracketsNode;
-import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.LogicalOperatorNode;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.Node;
+import com.sinosoft.ops.cimp.util.combinedQuery.enums.Brackets;
+import com.sinosoft.ops.cimp.util.combinedQuery.enums.Type;
 import org.springframework.stereotype.Component;
 
 import java.util.Deque;
@@ -71,7 +71,7 @@ public class BracketsNodeProcessor implements NodeProcessor {
 
         if (bracketsNode.isComplete()) {
             //完整的括号节点
-            if (stack.size() > 0 && stack.peek().getCode() == LogicalOperatorNode.CODE) {
+            if (stack.size() > 0 && stack.peek().getReturnType() == Type.lOGICAL_OPERATOR.getCode()) {
                 //前面是一个逻辑操作符节点
                 stack.peek().addSubNode(bracketsNode);
             } else {
@@ -85,18 +85,17 @@ public class BracketsNodeProcessor implements NodeProcessor {
             //此时，括号之间应该有且只有一个解析后的节点
             Node first = stack.pop();
 
-            if (first.getCode() == BracketsNode.CODE && !first.isComplete()) {
+            if (first.getReturnType() == Type.BRACKETS.getCode() && !first.isComplete()) {
                 //如果节点类型是括号且不完整，则说明这对括号之间没有表达式，直接忽略
                 return null;
             }
 
             Node second = stack.pop();
-            if (second.getCode() != BracketsNode.CODE) {
+            if (second.getReturnType() != Type.BRACKETS.getCode()) {
                 //如果堆栈中第二个节点不是括号节点，解析失败
                 throw new CombinedQueryParseException("解析失败!");
             }
 
-            first.setParent(second);
             second.addSubNode(first);
 
             pushNode(stack, second);

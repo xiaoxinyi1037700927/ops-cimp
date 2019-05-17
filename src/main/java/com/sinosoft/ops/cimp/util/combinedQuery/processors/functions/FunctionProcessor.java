@@ -58,7 +58,22 @@ public abstract class FunctionProcessor {
         for (int i = 0; i < subNodes.size(); ++i) {
             subSql[i] = subNodes.get(i).getSql();
         }
-        return String.format(function.getSql(), subSql);
+        return String.format(function.getSqlFormat(), subSql);
+    }
+
+
+    /**
+     * 获取表达式对应的表达式
+     *
+     * @param subNodes
+     * @return
+     */
+    public String getExpr(List<Node> subNodes) {
+        Object[] subExpr = new Object[function.getParamsNum()];
+        for (int i = 0; i < subNodes.size(); ++i) {
+            subExpr[i] = subNodes.get(i).getExpr();
+        }
+        return String.format(function.getExprFormat(), subExpr);
     }
 
     /**
