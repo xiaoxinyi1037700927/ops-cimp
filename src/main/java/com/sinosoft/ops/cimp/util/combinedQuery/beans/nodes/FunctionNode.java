@@ -1,17 +1,19 @@
 package com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes;
 
+import com.sinosoft.ops.cimp.util.combinedQuery.processors.functions.FunctionProcessor;
+
 /**
  * 函数节点
  */
 public class FunctionNode extends Node {
     public static final int CODE = 1 << 3;
-    /**
-     * 子节点支持的节点类型
-     */
-    public static final int supportNodes = FieldNode.CODE & FunctionNode.CODE & ValueNode.CODE;
+    public static final int SUPPORT_NODES = FieldNode.CODE | FunctionNode.CODE | ValueNode.CODE;
 
-    public FunctionNode(String expr) {
-        super(expr);
+    private FunctionProcessor processor;
+
+    public FunctionNode(String expr, FunctionProcessor processor) {
+        super(expr, processor.getFunction().getParamsNum() == 0, processor.getFunction().getParamsNum(), SUPPORT_NODES, CODE);
+        this.processor = processor;
     }
 
     /**
@@ -19,12 +21,7 @@ public class FunctionNode extends Node {
      */
     @Override
     public String getSql() {
-        return null;
+        return processor.getSql(subNodes);
     }
 
-
-    @Override
-    public int getCode() {
-        return CODE;
-    }
 }

@@ -48,4 +48,9 @@ public interface CadreService {
      * 修改干部所属单位
      */
     boolean modifyOrganization(CadreOrgModifyModel modifyModel);
+
+    /**
+     * 查询干部身份证号是否重复
+     */
+    boolean cadreCardIdExist(String cardId);
 }

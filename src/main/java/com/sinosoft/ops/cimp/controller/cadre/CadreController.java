@@ -345,4 +345,11 @@ public class CadreController extends BaseController {
     public ResponseEntity modifyOrganization(@RequestBody CadreOrgModifyModel modifyModel) throws BusinessException {
         return cadreService.modifyOrganization(modifyModel) ? ok("修改成功!") : fail("修改失败！");
     }
+
+    @ApiOperation(value = "查询干部身份证号是否重复")
+    @PostMapping("/cardId")
+    @RequiresAuthentication
+    public ResponseEntity cadreCardIdExist(@RequestParam("cardId") String cardId) throws BusinessException {
+        return ok(cadreService.cadreCardIdExist(cardId));
+    }
 }

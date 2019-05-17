@@ -1,18 +1,21 @@
 package com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes;
 
 
+import com.sinosoft.ops.cimp.util.combinedQuery.enums.Brackets;
+
 /**
  * 括号节点
  */
 public class BracketsNode extends Node {
     public static final int CODE = 1;
-    /**
-     * 子节点支持的节点类型
-     */
-    public static final int supportNodes = LogicalOperatorNode.CODE & ExpressionNode.CODE & BracketsNode.CODE;
+    public static final int SUPPORT_NODES = LogicalOperatorNode.CODE | OperatorNode.CODE | BracketsNode.CODE;
+    private static final String SQL = " (%s) ";
 
-    public BracketsNode(String expr) {
-        super(expr);
+    private Brackets brackets;
+
+    public BracketsNode(String expr, Brackets brackets) {
+        super(expr, false, 1, SUPPORT_NODES, CODE);
+        this.brackets = brackets;
     }
 
     /**
@@ -22,11 +25,11 @@ public class BracketsNode extends Node {
      */
     @Override
     public String getSql() {
-        return null;
+        return String.format(SQL, subNodes.get(0).getSql());
     }
 
-    @Override
-    public int getCode() {
-        return CODE;
+    public Brackets getBrackets() {
+        return brackets;
     }
+
 }

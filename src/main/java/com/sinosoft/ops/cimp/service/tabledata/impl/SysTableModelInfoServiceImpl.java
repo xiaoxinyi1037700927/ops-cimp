@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.sinosoft.ops.cimp.constant.DeleteTypeEnum;
 import com.sinosoft.ops.cimp.constant.OpsErrorMessage;
+import com.sinosoft.ops.cimp.constant.SysOpLogEnum;
 import com.sinosoft.ops.cimp.constant.TableFieldLogicalDeleteFlagEnum;
 import com.sinosoft.ops.cimp.dao.SysTableDao;
 import com.sinosoft.ops.cimp.dao.SysTableInfoDao;
@@ -11,27 +12,37 @@ import com.sinosoft.ops.cimp.dao.domain.Conditions;
 import com.sinosoft.ops.cimp.dao.domain.DaoParam;
 import com.sinosoft.ops.cimp.dao.domain.ExecParam;
 import com.sinosoft.ops.cimp.dao.domain.ResultParam;
+import com.sinosoft.ops.cimp.dao.domain.sys.table.SysTableModelInfo;
 import com.sinosoft.ops.cimp.dto.QueryDataParamBuilder;
 import com.sinosoft.ops.cimp.dto.TranslateField;
 import com.sinosoft.ops.cimp.dto.sys.table.SysTableFieldInfoDTO;
 import com.sinosoft.ops.cimp.dto.sys.table.SysTableInfoDTO;
 import com.sinosoft.ops.cimp.dto.sys.table.SysTableModelInfoDTO;
 import com.sinosoft.ops.cimp.entity.oraganization.Organization;
+import com.sinosoft.ops.cimp.entity.sys.oplog.SysOperationLog;
 import com.sinosoft.ops.cimp.entity.sys.systable.SysTableField;
+import com.sinosoft.ops.cimp.entity.user.User;
 import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.exception.SystemException;
+import com.sinosoft.ops.cimp.service.sys.oplog.SysOperationLogService;
 import com.sinosoft.ops.cimp.service.sys.systable.SysTableFieldService;
 import com.sinosoft.ops.cimp.service.tabledata.SysTableModelInfoService;
 import com.sinosoft.ops.cimp.util.CachePackage.OrganizationCacheManager;
+import com.sinosoft.ops.cimp.util.HttpUtils;
 import com.sinosoft.ops.cimp.util.IdUtil;
+import com.sinosoft.ops.cimp.util.JsonUtil;
+import com.sinosoft.ops.cimp.util.SecurityUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,12 +51,17 @@ public class SysTableModelInfoServiceImpl implements SysTableModelInfoService {
     private final SysTableInfoDao sysTableInfoDao;
     private final SysTableDao sysTableDao;
     private final com.sinosoft.ops.cimp.service.sys.systable.SysTableFieldService sysTableFieldService;
+    private final SysOperationLogService sysOperationLogService;
+    private final JdbcTemplate jdbcTemplate;
+    private ExecutorService executorService = Executors.newFixedThreadPool(2);
 
     @Autowired
-    public SysTableModelInfoServiceImpl(SysTableInfoDao sysTableInfoDao, SysTableDao sysTableDao, SysTableFieldService sysTableFieldService) {
+    public SysTableModelInfoServiceImpl(SysTableInfoDao sysTableInfoDao, SysTableDao sysTableDao, SysTableFieldService sysTableFieldService, SysOperationLogService sysOperationLogService, JdbcTemplate jdbcTemplate) {
         this.sysTableInfoDao = sysTableInfoDao;
         this.sysTableDao = sysTableDao;
         this.sysTableFieldService = sysTableFieldService;
+        this.sysOperationLogService = sysOperationLogService;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
@@ -66,14 +82,25 @@ public class SysTableModelInfoServiceImpl implements SysTableModelInfoService {
         if (tableInfo == null) {
             throw new BusinessException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE_100202, tableTypeNameEn);
         }
-        //TODO 获取app定义信息对属性进行过滤
+
         Map<String, List<SysTableInfoDTO>> sysTableInfoMap = tableInfo.getTables().stream().collect(Collectors.groupingBy(SysTableInfoDTO::getTableNameEn));
         List<SysTableInfoDTO> sysTableInfoDTOList = sysTableInfoMap.get(tableNameEn);
         if (sysTableInfoDTOList == null) {
             throw new BusinessException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE, "保存信息集必须在项目中存在");
         }
         List<String> sysTableFieldList = sysTableInfoDTOList.stream().map(SysTableInfoDTO::getFields).flatMap(List::stream).map(SysTableFieldInfoDTO::getFieldNameEn).collect(Collectors.toList());
-//        List<String> sysTableFieldList = tableInfo.getTableNameEnAndFieldNameListMap().get(tableNameEn);
+        Map<String, String> sysFieldNameEnCnMap = Maps.newHashMap();
+        String tableNameCn = "";
+        for (SysTableInfoDTO sysTableInfoDTO : sysTableInfoDTOList) {
+            tableNameCn = sysTableInfoDTO.getTableNameCn();
+            for (SysTableFieldInfoDTO field : sysTableInfoDTO.getFields()) {
+                String fieldNameEn = field.getFieldNameEn();
+                String fieldNameCn = field.getFieldNameCn();
+
+                sysFieldNameEnCnMap.put(fieldNameEn, fieldNameCn);
+            }
+        }
+//        sysTableInfoDTOList.stream().map(e -> e.getFields())
         List<String> execTableFieldList = Lists.newArrayList(saveOrUpdateFormData.keySet());
 
         boolean result = sysTableFieldList.containsAll(execTableFieldList);
@@ -104,6 +131,14 @@ public class SysTableModelInfoServiceImpl implements SysTableModelInfoService {
         daoParam.addTableTypeNameEn(tableTypeNameEn)
                 .addTableNameEn(tableNameEn)
                 .addExecParamList(execParamList);
+
+        //异步生成日志
+        if (StringUtils.equals(primaryKey, sysPrimaryKey)) {
+            this.asyncCadreOpLog(primaryKeyValue, null, null, SysOpLogEnum.CREATE, tableNameCn, saveOrUpdateFormData, sysFieldNameEnCnMap);
+        } else if (StringUtils.equals(tableNameEnFK, sysPrimaryKey)) {
+            this.asyncCadreOpLog(String.valueOf(tableNameEnFKValue), null, null, SysOpLogEnum.CREATE, tableNameCn, saveOrUpdateFormData, sysFieldNameEnCnMap);
+        }
+
         sysTableDao.insertData(daoParam);
         return queryDataParam;
     }
@@ -165,6 +200,7 @@ public class SysTableModelInfoServiceImpl implements SysTableModelInfoService {
         }
         //非逻辑删除条件
         daoParam.addCondition("STATUS", Conditions.ConditionsEnum.EQUAL, "0");
+        daoParam.addSort("ORDINAL", "ASC");
 
         List<String> resultField = execParamList.stream().map(ExecParam::getFieldName).collect(Collectors.toList());
         queryDataParam.setResultFields(resultField);
@@ -248,9 +284,23 @@ public class SysTableModelInfoServiceImpl implements SysTableModelInfoService {
         if (sysTableInfoDTOList == null) {
             throw new BusinessException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE, "保存信息集必须在项目中存在");
         }
+        String tableNameCn = "";
+        SysTableInfoDTO sysTableInfoDTO = sysTableInfoDTOList.get(0);
+        if (sysTableInfoDTO != null) {
+            tableNameCn = sysTableInfoDTO.getTableNameCn();
+        }
         List<String> sysTableFieldList = sysTableInfoDTOList.stream().map(SysTableInfoDTO::getFields).flatMap(List::stream).map(SysTableFieldInfoDTO::getFieldNameEn).collect(Collectors.toList());
         List<String> execTableFieldList = Lists.newArrayList(saveOrUpdateFormData.keySet());
 
+        Map<String, String> sysFieldNameEnCnMap = Maps.newHashMap();
+        for (SysTableInfoDTO tableInfoDTO : sysTableInfoDTOList) {
+            List<SysTableFieldInfoDTO> fields = tableInfoDTO.getFields();
+            for (SysTableFieldInfoDTO field : fields) {
+                String fieldNameEn = field.getFieldNameEn();
+                String fieldNameCn = field.getFieldNameCn();
+                sysFieldNameEnCnMap.put(fieldNameEn, fieldNameCn);
+            }
+        }
         boolean result = sysTableFieldList.containsAll(execTableFieldList);
         if (!result) {
             throw new BusinessException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE, "保存属性必须全部在配置中存在");
@@ -269,6 +319,12 @@ public class SysTableModelInfoServiceImpl implements SysTableModelInfoService {
                 .addExecParamList(execParamList)
                 .addEqualCondition(tableNameEnPK, tableNameEnPKValue);
 
+        String primaryField = tableInfo.getPrimaryField();
+        if (StringUtils.equals(primaryField, tableNameEnPK)) {
+            this.asyncCadreOpLog(tableNameEnPKValue, null, null, SysOpLogEnum.UPDATE, tableNameCn, saveOrUpdateFormData, sysFieldNameEnCnMap);
+        } else {
+            this.asyncCadreOpLog(null, tableNameEnPKValue, tableNameEn, SysOpLogEnum.UPDATE, tableNameCn, saveOrUpdateFormData, sysFieldNameEnCnMap);
+        }
         sysTableDao.updateData(daoParam);
         return queryDataParam;
     }
@@ -284,7 +340,7 @@ public class SysTableModelInfoServiceImpl implements SysTableModelInfoService {
         if (tableInfo == null) {
             throw new BusinessException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE_100202, tableTypeNameEn);
         }
-        //TODO 获取app定义信息对属性进行过滤
+
         Map<String, List<SysTableInfoDTO>> sysTableInfoMap = tableInfo.getTables().stream().collect(Collectors.groupingBy(SysTableInfoDTO::getTableNameEn));
         List<SysTableInfoDTO> sysTableInfoDTOList = sysTableInfoMap.get(tableNameEn);
         if (sysTableInfoDTOList == null) {
@@ -388,5 +444,135 @@ public class SysTableModelInfoServiceImpl implements SysTableModelInfoService {
             }
         }
         return translateField;
+    }
+
+    //异步生成操作日志
+    private void asyncCadreOpLog(String empId, String subId, String tableNameEn, SysOpLogEnum sysOpLogEnum, String tableNameCn, Map<String, Object> formMap, Map<String, String> sysFieldNameEnCnMap) {
+        executorService.submit(() -> {
+            String userId = "";
+            String loginName = "";
+            String userName = "";
+            User currentUser = SecurityUtils.getSubject().getCurrentUser();
+            if (currentUser != null) {
+                userId = currentUser.getId();
+                loginName = currentUser.getLoginName();
+                userName = currentUser.getName();
+            }
+            String cardId = "";
+            String cadreName = "";
+            if (StringUtils.isNotEmpty(empId) || StringUtils.isNotEmpty(subId)) {
+                String sql = "SELECT A001003 AS \"cardId\", A01001 AS \"cadreName\" FROM EMP_A001 WHERE EMP_ID = '%s'";
+                String execSql = "";
+                if (StringUtils.isNotEmpty(empId)) {
+                    execSql = String.format(sql, empId);
+                }
+                if (StringUtils.isEmpty(empId) && StringUtils.isNotEmpty(subId)) {
+                    execSql = String.format(sql, subId);
+                }
+
+                List<Map<String, Object>> listMap = jdbcTemplate.queryForList(execSql);
+                if (listMap.size() > 0) {
+                    Map<String, Object> map = listMap.get(0);
+                    Object card_id = map.get("cardId");
+                    if (card_id != null) {
+                        cardId = String.valueOf(card_id);
+                    }
+                    Object cadre_name = map.get("cadreName");
+                    if (cadre_name != null) {
+                        cadreName = String.valueOf(cadre_name);
+                    }
+                }
+            }
+
+            String ipAddr = HttpUtils.getIpAddr();
+            Integer opType = sysOpLogEnum.getOpType();
+            SysOperationLog sysOperationLog = new SysOperationLog();
+            sysOperationLog.setUserId(userId);
+            sysOperationLog.setLoginName(loginName);
+            sysOperationLog.setUserName(userName);
+            sysOperationLog.setOpFromIp(ipAddr);
+            sysOperationLog.setOpFromMac(HttpUtils.getMACAddress(ipAddr));
+            sysOperationLog.setExecMethod(opType);
+
+            if (formMap != null) {
+                sysOperationLog.setExecDetail(JsonUtil.getJsonString(formMap));
+            }
+            StringBuilder logDetailBuilder = new StringBuilder();
+            if (opType != null) {
+                if (SysOpLogEnum.CREATE.getOpType().equals(opType)) {
+                    logDetailBuilder.append("添加了").append("(").append(cardId).append(")")
+                            .append("[").append(tableNameCn).append("]").append("信息集");
+
+                    if (formMap != null) {
+                        for (Map.Entry<String, Object> entry : formMap.entrySet()) {
+                            String key = entry.getKey();
+                            Object value = entry.getValue();
+                            String attrNameCn = sysFieldNameEnCnMap.get(key);
+                            logDetailBuilder.append("新增").append("[").append(attrNameCn).append("]").append("属性值").append("【").append(value).append("】");
+                        }
+                    }
+                    sysOperationLog.setLogDetail(logDetailBuilder.toString());
+                }
+                if (SysOpLogEnum.UPDATE.getOpType().equals(opType)) {
+                    if (StringUtils.isNotEmpty(tableNameEn)) {
+                        try {
+                            SysTableModelInfo cadreInfo = sysTableInfoDao.getTableInfo("CadreInfo");
+                            String tableSaveName = cadreInfo.getTableNameEnAndSaveTableMap().get(tableNameEn);
+                            String sql = "SELECT EMP_ID as \"cadreId\", A01001 as \"cadreName\" FROM EMP_A001 WHERE EMP_ID = (SELECT EMP_ID FROM %s WHERE SUB_ID = '%s')";
+                            if (StringUtils.isNotEmpty(tableSaveName) && StringUtils.isNotEmpty(subId)) {
+                                String execSql = String.format(sql, tableSaveName, subId);
+                                List<Map<String, Object>> maps = jdbcTemplate.queryForList(execSql);
+                                if (maps.size() > 0) {
+                                    Map<String, Object> map = maps.get(0);
+                                    Object cadreId = map.get("cadreId");
+                                    Object cadreName1 = map.get("cadreName");
+                                    cardId = String.valueOf(cadreId);
+                                    cadreName = String.valueOf(cadreName1);
+                                }
+                            }
+                        } catch (BusinessException e) {
+                            //如果有异常则不执行获取cadreId和cadreName
+                        }
+                    }
+                    logDetailBuilder.append("修改了").append(cadreName).append("(").append(cardId).append(")")
+                            .append("[").append(tableNameCn).append("]").append("信息集");
+
+                    if (formMap != null) {
+                        for (Map.Entry<String, Object> entry : formMap.entrySet()) {
+                            String key = entry.getKey();
+                            Object value = entry.getValue();
+                            String attrNameCn = sysFieldNameEnCnMap.get(key);
+                            logDetailBuilder.append("将").append("[").append(attrNameCn).append("]").append("属性的值修改为").append("【").append(value).append("】");
+                        }
+                    }
+                    sysOperationLog.setLogDetail(logDetailBuilder.toString());
+                }
+                if (SysOpLogEnum.DELETE.getOpType().equals(opType)) {
+                    try {
+                        SysTableModelInfo cadreInfo = sysTableInfoDao.getTableInfo("CadreInfo");
+                        String tableSaveName = cadreInfo.getTableNameEnAndSaveTableMap().get(tableNameEn);
+                        String sql = "SELECT EMP_ID as \"cadreId\", A01001 as \"cadreName\" FROM EMP_A001 WHERE EMP_ID = (SELECT EMP_ID FROM %s WHERE SUB_ID = '%s')";
+                        if (StringUtils.isNotEmpty(tableSaveName) && StringUtils.isNotEmpty(subId)) {
+                            String execSql = String.format(sql, tableSaveName, subId);
+                            List<Map<String, Object>> maps = jdbcTemplate.queryForList(execSql);
+                            if (maps.size() > 0) {
+                                Map<String, Object> map = maps.get(0);
+                                Object cadreId = map.get("cadreId");
+                                Object cadreName1 = map.get("cadreName");
+                                cardId = String.valueOf(cadreId);
+                                cadreName = String.valueOf(cadreName1);
+                            }
+                        }
+                    } catch (BusinessException e) {
+                        //如果有异常则不执行获取cadreId和cadreName
+                    }
+                    logDetailBuilder.append("删除了").append(cadreName).append("(").append(cardId).append(")")
+                            .append("[").append(tableNameCn).append("]").append("信息集");
+                }
+                sysOperationLog.setLogDetail(logDetailBuilder.toString());
+            }
+
+            sysOperationLogService.saveLog(sysOperationLog);
+        });
     }
 }
