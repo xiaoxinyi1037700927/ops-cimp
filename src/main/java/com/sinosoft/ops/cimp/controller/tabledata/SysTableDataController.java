@@ -721,11 +721,13 @@ public class SysTableDataController extends BaseController {
 
         QueryDataParamBuilder dataParamBuilder = sysTableModelInfoService.saveData(queryDataParam);
 
+        //异步生成任免表和异步记录日志
         if (StringUtils.equalsIgnoreCase(tableTypeName, "CadreInfo")) {
             //如果primaryKey和tableNamePK不一致则表明保存的是子集
+            //异步生成任免表
             if (!StringUtils.equals(primaryKey, tableNamePK)) {
                 if (StringUtils.isNotEmpty(tableNameFKValue)) {
-                    AsyncGenerateGbrmb.execute(String.valueOf(tableNameFKValue));
+                    AsyncGenerateGbrmb.execute(tableNameFKValue);
                 }
             } else {
                 Object tableNameEnPKValue = dataParamBuilder.getTableNameEnPKValue();
