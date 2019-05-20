@@ -8,8 +8,8 @@ import com.sinosoft.ops.cimp.util.combinedQuery.processors.functions.FunctionPro
 public class FunctionNode extends Node {
     private FunctionProcessor processor;
 
-    public FunctionNode(String expr, FunctionProcessor processor) {
-        super(expr, processor.getFunction().getParamsNum() == 0, processor.getFunction().getParamsType());
+    public FunctionNode(FunctionProcessor processor) {
+        super(processor.getFunction().getParamsNum() == 0, processor.getFunction().getParamsType());
         this.processor = processor;
     }
 

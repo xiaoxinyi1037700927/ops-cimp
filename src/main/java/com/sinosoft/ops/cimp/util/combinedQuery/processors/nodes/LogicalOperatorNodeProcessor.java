@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
  * 逻辑操作符节点(and/or)处理器
  */
 @Component
-public class LogicalOperatorNodeProcessor implements NodeProcessor {
+public class LogicalOperatorNodeProcessor extends NodeProcessor {
     private static Map<LogicalOperator, Pattern> logicalOperators = new HashMap<>();
 
     public LogicalOperatorNodeProcessor() {
@@ -55,7 +55,7 @@ public class LogicalOperatorNodeProcessor implements NodeProcessor {
      */
     @Override
     public Node parse(String expr) {
-        return new LogicalOperatorNode(expr, getLogicalOperator(expr));
+        return new LogicalOperatorNode(getLogicalOperator(expr));
     }
 
     private LogicalOperator getLogicalOperator(String expr) {
@@ -77,7 +77,6 @@ public class LogicalOperatorNodeProcessor implements NodeProcessor {
      */
     @Override
     public Node pushNode(Deque<Node> stack, Node node) throws CombinedQueryParseException {
-        //栈首必须是逻辑表达式节点支持的子节点类型
         if (node.isComplete()) {
             stack.push(node);
         } else if (stack.size() > 0 && (stack.peek().getReturnType() & node.getNextSubType()) != 0) {
@@ -85,7 +84,7 @@ public class LogicalOperatorNodeProcessor implements NodeProcessor {
             node.addSubNode(first);
             stack.push(node);
         } else {
-            throw new CombinedQueryParseException("缺失的表达式!");
+            throw new CombinedQueryParseException("非法表达式!");
         }
 
         return null;

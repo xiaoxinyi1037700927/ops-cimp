@@ -7,12 +7,12 @@ import com.sinosoft.ops.cimp.util.combinedQuery.enums.Type;
  * 逻辑操作符节点(and/or)
  */
 public class LogicalOperatorNode extends Node {
-    private static final int[] SUPPORT_SUB_TYPES = new int[]{Type.lOGICAL_OPERATOR.getCode() | Type.OPERATOR.getCode() | Type.BRACKETS.getCode(), Type.lOGICAL_OPERATOR.getCode() | Type.OPERATOR.getCode() | Type.BRACKETS.getCode()};
+    private static final int[] SUPPORT_SUB_TYPES = new int[]{Type.LOGICAL_OPERATOR.getCode() | Type.OPERATOR.getCode() | Type.BRACKETS.getCode(), Type.LOGICAL_OPERATOR.getCode() | Type.OPERATOR.getCode() | Type.BRACKETS.getCode()};
 
     private LogicalOperator logicalOperator;
 
-    public LogicalOperatorNode(String expr, LogicalOperator logicalOperator) {
-        super(expr, false, SUPPORT_SUB_TYPES);
+    public LogicalOperatorNode(LogicalOperator logicalOperator) {
+        super(false, SUPPORT_SUB_TYPES);
         this.logicalOperator = logicalOperator;
     }
 
@@ -23,7 +23,7 @@ public class LogicalOperatorNode extends Node {
      */
     @Override
     public int getReturnType() {
-        return Type.lOGICAL_OPERATOR.getCode();
+        return Type.LOGICAL_OPERATOR.getCode();
     }
 
     /**
@@ -33,7 +33,7 @@ public class LogicalOperatorNode extends Node {
      */
     @Override
     public String getSql() {
-        return String.format(logicalOperator.getSql(), subNodes.get(0).getSql(), subNodes.get(1).getSql());
+        return String.format(logicalOperator.getSqlFormat(), subNodes.get(0).getSql(), subNodes.get(1).getSql());
     }
 
     /**

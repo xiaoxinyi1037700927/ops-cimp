@@ -1,28 +1,27 @@
 package com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes;
 
 
-import com.sinosoft.ops.cimp.util.combinedQuery.enums.Type;
-
 /**
  * 字段节点
  */
 public class FieldNode extends Node {
-    public static final int[] SUPPORT_SUB_TYPES = new int[]{};
-    private static final String FORMAT = " %s.%s ";
+    private static final String FORMAT = "%s.%s";
 
     private String tableName;
     private String tableNameCn;
     private String fieldName;
     private String fieldNameCn;
-    private Type returnType;
+    private String codeSetName;
+    private int returnType;
 
-    public FieldNode(String expr, String tableName, String tableNameCn, String fieldName, String fieldNameCn, Type returnType) {
-        super(expr, true, SUPPORT_SUB_TYPES);
+    public FieldNode(String tableName, String tableNameCn, String fieldName, String fieldNameCn, int returnType, String codeSetName) {
+        super(true, new int[]{});
         this.tableName = tableName;
         this.tableNameCn = tableNameCn;
         this.fieldName = fieldName;
         this.fieldNameCn = fieldNameCn;
         this.returnType = returnType;
+        this.codeSetName = codeSetName;
     }
 
     /**
@@ -32,7 +31,7 @@ public class FieldNode extends Node {
      */
     @Override
     public int getReturnType() {
-        return returnType.getCode();
+        return returnType;
     }
 
     /**
@@ -55,5 +54,9 @@ public class FieldNode extends Node {
         return String.format(FORMAT, tableNameCn, fieldNameCn);
     }
 
+
+    public String getCodeSetName() {
+        return codeSetName;
+    }
 }
 

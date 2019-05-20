@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
  * 字段节点处理器
  */
 @Component
-public class FieldNodeProcessor implements NodeProcessor {
+public class FieldNodeProcessor extends NodeProcessor {
     private static final Pattern pattern = Pattern.compile("^([\\u4e00-\\u9fa5_a-zA-Z0-9\\-]+)\\.([\\u4e00-\\u9fa5_a-zA-Z0-9\\-]+)$");
 
     private final JPAQueryFactory jpaQueryFactory;
@@ -64,7 +64,7 @@ public class FieldNodeProcessor implements NodeProcessor {
     public Node parse(String expr) throws CombinedQueryParseException {
         Matcher matcher = pattern.matcher(expr);
         if (!matcher.matches()) {
-            throw new CombinedQueryParseException("解析失败：" + expr);
+            throw new CombinedQueryParseException("非法表达式：" + expr);
         }
 
         String tableName = matcher.group(1);
@@ -80,12 +80,12 @@ public class FieldNodeProcessor implements NodeProcessor {
             throw new CombinedQueryParseException("未知的字段名：" + fieldName);
         }
 
-        Type returnType = getReturnType(field.getDbFieldDataType());
+        Type returnType = getReturnType(field);
         if (returnType == null) {
-            throw new CombinedQueryParseException("未知的字段类型：" + tableName + "." + fieldName);
+            throw new CombinedQueryParseException("未定义的字段类型：" + tableName + "." + fieldName);
         }
 
-        return new FieldNode(expr, table.getDbTableName(), table.getNameCn(), field.getDbFieldName(), field.getNameCn(), returnType);
+        return new FieldNode(table.getDbTableName(), table.getNameCn(), field.getDbFieldName(), field.getNameCn(), returnType.getCode(), field.getSysCodeSetName());
     }
 
 
@@ -123,16 +123,19 @@ public class FieldNodeProcessor implements NodeProcessor {
     /**
      * 根据字段类型获取节点返回类型
      *
-     * @param fieldType
+     * @param field
      * @return
      */
-    private Type getReturnType(String fieldType) {
+    private Type getReturnType(SysTableField field) {
+        String fieldType = field.getDbFieldDataType();
         if (StringUtils.isEmpty(fieldType)) {
             return null;
         }
         fieldType = fieldType.toLowerCase();
 
-        if (fieldType.contains("char")) {
+        if (StringUtils.isNotEmpty(field.getSysCodeSetName())) {
+            return Type.CODE;
+        } else if (fieldType.contains("char")) {
             return Type.STRING;
         } else if (fieldType.contains("number") || fieldType.contains("numeric")) {
             return Type.NUMBER;
@@ -141,9 +144,7 @@ public class FieldNodeProcessor implements NodeProcessor {
         } else if (fieldType.contains("blob") || fieldType.contains("clob")) {
             return Type.LOB;
         }
-
         return null;
-
     }
 
     /**
@@ -157,4 +158,5 @@ public class FieldNodeProcessor implements NodeProcessor {
         stack.push(node);
         return null;
     }
+
 }

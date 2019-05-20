@@ -1,7 +1,7 @@
 package com.sinosoft.ops.cimp.util.combinedQuery.processors.operators;
 
-import com.sinosoft.ops.cimp.util.combinedQuery.enums.Operator;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.Node;
+import com.sinosoft.ops.cimp.util.combinedQuery.enums.Operator;
 import org.springframework.stereotype.Component;
 
 import java.util.regex.Matcher;
@@ -30,4 +30,5 @@ public class BetweenAndProcessor extends OperatorProcessor {
             node.addSubNodeExpr(matcher.group(2));
         }
     }
+
 }

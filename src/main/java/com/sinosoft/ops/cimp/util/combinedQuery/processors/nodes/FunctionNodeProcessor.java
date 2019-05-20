@@ -13,7 +13,7 @@ import java.util.Deque;
  * 函数节点处理器
  */
 @Component
-public class FunctionNodeProcessor implements NodeProcessor {
+public class FunctionNodeProcessor extends NodeProcessor {
 
     private final FunctionProcessor[] functionProcessors;
 
@@ -53,7 +53,7 @@ public class FunctionNodeProcessor implements NodeProcessor {
     @Override
     public Node parse(String expr) throws CombinedQueryParseException {
         FunctionProcessor processor = getProcessor(expr);
-        Node node = new FunctionNode(expr, processor);
+        Node node = new FunctionNode(processor);
         processor.parse(node, expr);
 
         return node;

@@ -3,7 +3,10 @@ package com.sinosoft.ops.cimp.util.combinedQuery.processors.operators;
 
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.CombinedQueryParseException;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.Node;
+import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.OperatorNode;
+import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.ValueNode;
 import com.sinosoft.ops.cimp.util.combinedQuery.enums.Operator;
+import com.sinosoft.ops.cimp.util.combinedQuery.enums.Type;
 
 import java.util.List;
 
@@ -48,7 +51,7 @@ public abstract class OperatorProcessor {
         for (int i = 0; i < subNodes.size(); ++i) {
             subSql[i] = subNodes.get(i).getSql();
         }
-        return String.format(operator.getSql(), subSql);
+        return String.format(operator.getSqlFormat(), subSql);
     }
 
 
@@ -64,6 +67,36 @@ public abstract class OperatorProcessor {
             subExpr[i] = subNodes.get(i).getExpr();
         }
         return String.format(operator.getExprFormat(), subExpr);
+    }
+
+    /**
+     * 校验表达式参数类型
+     *
+     * @param node
+     * @throws CombinedQueryParseException
+     */
+    public void checkType(OperatorNode node) throws CombinedQueryParseException {
+        List<Node> subNodes = node.getSubNodes();
+        if (subNodes.size() == 1) {
+            //无需校验只有一个参数的运算符
+            return;
+        }
+
+        Node first = subNodes.get(0);
+
+        //判断参数的类型是否匹配
+        for (int i = 1; i < subNodes.size(); i++) {
+            Node next = subNodes.get(i);
+            if (first.getReturnType() == Type.STRING.getCode() && next instanceof ValueNode && next.getReturnType() == Type.NUMBER.getCode()) {
+                //处理string类型和number类型的值节点的情况
+                ((ValueNode) next).setReturnType(Type.STRING.getCode());
+            }
+
+            if (first.getReturnType() != next.getReturnType()) {
+                throw new CombinedQueryParseException("类型不匹配！");
+            }
+        }
+
     }
 
     public Operator getOperator() {

@@ -34,13 +34,13 @@ public abstract class FunctionProcessor {
     public void parse(Node node, String expr) throws CombinedQueryParseException {
         Matcher matcher = pattern.matcher(expr);
         if (!matcher.matches()) {
-            throw new CombinedQueryParseException("无法解析的函数表达式：" + expr);
+            throw new CombinedQueryParseException("非法的函数表达式：" + expr);
         }
 
         List<String> params = getParams(matcher.group(1));
 
         if (function.getParamsNum() != params.size()) {
-            throw new CombinedQueryParseException("错误的参数数量！");
+            throw new CombinedQueryParseException("参数数量不匹配：" + expr);
         }
 
         node.addSubNodeExpr(params);
@@ -97,7 +97,8 @@ public abstract class FunctionProcessor {
             if (c == ',') {
                 String param = sb.toString().trim();
                 if (StringUtils.isEmpty(param)) {
-                    throw new CombinedQueryParseException("缺失的表达式 ：" + expr);
+                    //逗号前没有参数
+                    throw new CombinedQueryParseException("非法的函数表达式 ：" + expr);
                 }
                 params.add(param);
                 sb.delete(0, sb.length());
@@ -113,7 +114,7 @@ public abstract class FunctionProcessor {
                 while (true) {
                     if (!stream.hasNext()) {
                         //如果没找到下一个单引号，抛出异常
-                        throw new CombinedQueryParseException("缺失的 ' ：" + sb.toString());
+                        throw new CombinedQueryParseException("非法的函数表达式 ：" + expr);
                     }
 
                     c = stream.next();
@@ -127,19 +128,13 @@ public abstract class FunctionProcessor {
 
         String param = sb.toString().trim();
         if (StringUtils.isEmpty(param) && params.size() > 0) {
-            throw new CombinedQueryParseException("缺失的表达式 ：" + expr);
+            //参数以逗号结尾
+            throw new CombinedQueryParseException("非法的函数表达式 ：" + expr);
         } else if (StringUtils.isNotEmpty(param)) {
             params.add(param);
         }
 
         return params;
-    }
-
-    private void addParam(List<String> params, StringBuilder sb) throws CombinedQueryParseException {
-        String param = sb.toString();
-        if (StringUtils.isEmpty(param.trim())) {
-            throw new CombinedQueryParseException("缺失的表达式 ：");
-        }
     }
 
     public Function getFunction() {
