@@ -436,7 +436,7 @@ public class CadreServiceImpl implements CadreService {
     @Override
     public boolean cadreCardIdExist(String cardId) {
         if (StringUtils.isNotEmpty(cardId)) {
-            String sql = "SELECT COUNT(*) AS \"cardCount\" FROM EMP_A001 WHERE A001003 = %s";
+            String sql = "SELECT COUNT(*) AS \"cardCount\" FROM EMP_A001 WHERE A001003 = '%s'";
             String execSql = String.format(sql, cardId);
 
             Map<String, Object> resultMap = jdbcTemplate.queryForMap(execSql);
