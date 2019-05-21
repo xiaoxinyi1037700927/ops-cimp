@@ -6,6 +6,7 @@ import com.sinosoft.ops.cimp.util.combinedQuery.beans.Expression;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.Param;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.*;
 import com.sinosoft.ops.cimp.util.combinedQuery.processors.nodes.NodeProcessor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -30,7 +31,10 @@ public class CombinedQueryParser {
 
         List<Expression> expressions = new ArrayList<>();
 
-        nodeToExpressions(root, expressions, null);
+        if (root != null) {
+            nodeToExpressions(root, expressions, null);
+        }
+
         return expressions;
     }
 
@@ -89,16 +93,44 @@ public class CombinedQueryParser {
      */
     public String parse(String expression) throws CombinedQueryParseException {
         Node root = parseGramTree(expression, null);
-        return root != null ? root.getSql() : null;
+
+        if (root == null) {
+            return null;
+        }
+
+
+        //调用后置处理器
+        invokeNodePostProcessors(root);
+
+        return root.getSql();
     }
+
+
+    /**
+     * 调用后置处理器
+     *
+     * @param root
+     */
+    private void invokeNodePostProcessors(Node root) {
+
+
+        for (Node subNode : root.getSubNodes()) {
+            invokeNodePostProcessors(subNode);
+        }
+    }
+
 
     /**
      * @param expression
-     * @param parent     parent为null是根节点
+     * @param parent     父节点为null是根节点
      * @return
      * @throws CombinedQueryParseException
      */
     private Node parseGramTree(String expression, Node parent) throws CombinedQueryParseException {
+        if (StringUtils.isEmpty(expression)) {
+            return null;
+        }
+
         Deque<Node> stack = new LinkedList<>();
         ExprStream stream = new ExprStream(expression);
 
@@ -129,14 +161,41 @@ public class CombinedQueryParser {
             }
         }
 
-        if (stack.size() > 1) {
+        if (stack.size() != 1) {
             //如果处理结束后堆栈中的节点数大于1，说明解析出错
-            throw new CombinedQueryParseException("解析失败：" + expression);
-        } else if (stack.size() == 0) {
-            return null;
+            throw new CombinedQueryParseException("非法表达式!");
         }
 
-        return stack.pop();
+
+        node = stack.pop();
+        node.setParent(parent);
+        if (parent == null) {
+            if (!(node instanceof BracketsNode || node instanceof LogicalOperatorNode || node instanceof OperatorNode)) {
+                //根节点必须是括号节点、逻辑运算符节点、运算符节点之一
+                throw new CombinedQueryParseException("非法表达式!");
+            }
+
+            //语法树节点校验
+            checkNode(node);
+        }
+
+        return node;
+    }
+
+    /**
+     * 节点检验
+     *
+     * @param node
+     * @throws CombinedQueryParseException
+     */
+    private void checkNode(Node node) throws CombinedQueryParseException {
+        NodeProcessor processor = getNodeProcessor(node);
+        processor.checkNode(node);
+
+        //校验子节点
+        for (Node subNode : node.getSubNodes()) {
+            checkNode(subNode);
+        }
     }
 
     /**
@@ -197,6 +256,9 @@ public class CombinedQueryParser {
                     }
                 }
                 break;
+            case '[':
+                //数组格式的value
+                sb.append(stream.getUtilRightBrackets('[', ']'));
             default:
                 while (stream.hasNext()) {
                     char c = stream.next();

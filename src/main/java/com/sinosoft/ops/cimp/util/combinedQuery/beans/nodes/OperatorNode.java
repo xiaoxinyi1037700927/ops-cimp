@@ -11,8 +11,8 @@ import com.sinosoft.ops.cimp.util.combinedQuery.processors.operators.OperatorPro
 public class OperatorNode extends Node {
     private OperatorProcessor processor;
 
-    public OperatorNode(String expr, OperatorProcessor processor) {
-        super(expr, false, processor.getOperator().getParamsType());
+    public OperatorNode(OperatorProcessor processor) {
+        super(false, processor.getOperator().getParamsType());
         this.processor = processor;
     }
 

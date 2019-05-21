@@ -8,13 +8,13 @@ import com.sinosoft.ops.cimp.util.combinedQuery.enums.Type;
  * 括号节点
  */
 public class BracketsNode extends Node {
-    public static final int[] SUPPORT_SUB_TYPES = new int[]{Type.lOGICAL_OPERATOR.getCode() | Type.OPERATOR.getCode() | Type.BRACKETS.getCode()};
+    private static final int[] SUPPORT_SUB_TYPES = new int[]{Type.LOGICAL_OPERATOR.getCode() | Type.OPERATOR.getCode() | Type.BRACKETS.getCode()};
     private static final String FORMAT = "(%s)";
 
     private Brackets brackets;
 
-    public BracketsNode(String expr, Brackets brackets) {
-        super(expr, false, SUPPORT_SUB_TYPES);
+    public BracketsNode(Brackets brackets) {
+        super(false, SUPPORT_SUB_TYPES);
         this.brackets = brackets;
     }
 

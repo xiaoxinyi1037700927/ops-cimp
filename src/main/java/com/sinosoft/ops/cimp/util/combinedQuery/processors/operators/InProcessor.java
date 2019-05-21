@@ -9,7 +9,6 @@ import java.util.regex.Pattern;
 
 @Component
 public class InProcessor extends OperatorProcessor {
-    public static final String IDENTIFIER = "$IN_OPERATOR_VALUE";
     private static final Pattern pattern = Pattern.compile(Operator.IN.getRegex());
 
 
@@ -27,8 +26,7 @@ public class InProcessor extends OperatorProcessor {
     public void parse(Node node, String expr) {
         Matcher matcher = pattern.matcher(expr);
         if (matcher.matches()) {
-            //添加IN操作标识符,在valueNodeProcessor中处理
-            node.addSubNodeExpr("'" + IDENTIFIER + matcher.group(1).replaceAll("'", "\"") + "'");
+            node.addSubNodeExpr(matcher.group(1));
         }
     }
 }

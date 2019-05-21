@@ -10,20 +10,20 @@ import java.util.List;
  * 语法树节点
  */
 public abstract class Node {
-    public Node(String expr, boolean isComplete, int[] supportSubTypes) {
-        this.expr = expr;
+    public Node(boolean isComplete, int[] supportSubTypes) {
         this.isComplete = isComplete;
         this.supportSubTypes = supportSubTypes;
     }
 
+
+    /**
+     * 父节点
+     */
+    private Node parent;
     /**
      * 当前节点是否完整
      */
     private boolean isComplete;
-    /**
-     * 当前节点对应的表达式
-     */
-    protected String expr;
     /**
      * 当前节点支持的子节点类型
      */
@@ -37,16 +37,16 @@ public abstract class Node {
      */
     protected List<Node> subNodes = new ArrayList<>();
 
+    public Node getParent() {
+        return parent;
+    }
+
+    public void setParent(Node parent) {
+        this.parent = parent;
+    }
+
     public boolean isComplete() {
         return isComplete;
-    }
-
-    public String getExpr() {
-        return expr;
-    }
-
-    public int[] getSupportSubTypes() {
-        return supportSubTypes;
     }
 
     public int getNextSubType() {
@@ -91,16 +91,22 @@ public abstract class Node {
      */
     public void addSubNode(Node node) throws CombinedQueryParseException {
         if (isComplete) {
-            throw new CombinedQueryParseException("非法的表达式：" + node.expr);
+            throw new CombinedQueryParseException("非法表达式！");
         }
 
         //判断下一个子节点是否支持添加的节点的返回类型
         int subType = supportSubTypes[subNodes.size()];
+
+        if (subType == Type.STRING.getCode() && node instanceof ValueNode && node.getReturnType() == Type.NUMBER.getCode()) {
+            //处理需要string类型，而添加的是number类型的值节点的情况
+            ((ValueNode) node).setReturnType(Type.STRING.getCode());
+        }
         if ((subType & node.getReturnType()) == 0) {
-            throw new CombinedQueryParseException("错误的子节点类型 : " + node.expr);
+            throw new CombinedQueryParseException("错误的类型");
         }
 
         subNodes.add(node);
+        node.setParent(this);
 
         //判断节点是否完整
         if (subNodes.size() == supportSubTypes.length) {
@@ -121,5 +127,11 @@ public abstract class Node {
      */
     public abstract String getSql();
 
+    /**
+     * 获取节点对应的表达式
+     *
+     * @return
+     */
+    public abstract String getExpr();
 
 }

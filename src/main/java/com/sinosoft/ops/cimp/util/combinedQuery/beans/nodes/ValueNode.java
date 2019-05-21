@@ -3,20 +3,28 @@ package com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes;
 
 import com.sinosoft.ops.cimp.util.combinedQuery.enums.Type;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  * 值节点
  */
 public class ValueNode extends Node {
-    public static final int[] SUPPORT_SUB_TYPES = new int[]{};
-    private static final String SQL_FORMAT = " %s ";
 
-    private String value;
+    private List<String> values;
+    private List<String> codeNames;
     private boolean isCode;
+    private boolean isArray;
+    private int returnType;
 
-    public ValueNode(String expr, String value, boolean isCode) {
-        super(expr, !isCode, SUPPORT_SUB_TYPES);
-        this.value = value;
+    public ValueNode(List<String> values, List<String> codeNames, boolean isCode, boolean isArray, int returnType) {
+        super(true, new int[]{});
+        this.values = values;
+        this.codeNames = codeNames;
         this.isCode = isCode;
+        this.isArray = isArray;
+        this.returnType = returnType;
     }
 
     /**
@@ -26,7 +34,7 @@ public class ValueNode extends Node {
      */
     @Override
     public int getReturnType() {
-        return Type.STRING.getCode() | Type.NUMBER.getCode();
+        return returnType;
     }
 
     /**
@@ -34,7 +42,11 @@ public class ValueNode extends Node {
      */
     @Override
     public String getSql() {
-        return String.format(SQL_FORMAT, value);
+        if ((Type.NUMBER.getCode() & returnType) != 0) {
+            return values.stream().collect(Collectors.joining(","));
+        } else {
+            return values.stream().collect(Collectors.joining("','", "'", "'"));
+        }
     }
 
     /**
@@ -42,7 +54,34 @@ public class ValueNode extends Node {
      */
     @Override
     public String getExpr() {
-        return expr.replaceAll("\"", "'");
+        if (isCode) {
+            List<String> codeStr = new ArrayList<>();
+            for (int i = 0; i < values.size(); i++) {
+                codeStr.add("[" + values.get(i) + "]" + codeNames.get(i));
+            }
+            return codeStr.stream().collect(Collectors.joining("','", "'", "'"));
+        } else {
+            return values.stream().collect(Collectors.joining("','", "'", "'"));
+        }
     }
 
+    public void setReturnType(int returnType) {
+        this.returnType = returnType;
+    }
+
+    public boolean isCode() {
+        return isCode;
+    }
+
+    public List<String> getValues() {
+        return values;
+    }
+
+    public List<String> getCodeNames() {
+        return codeNames;
+    }
+
+    public boolean isArray() {
+        return isArray;
+    }
 }

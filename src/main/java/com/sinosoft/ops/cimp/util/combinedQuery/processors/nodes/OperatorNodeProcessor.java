@@ -14,9 +14,10 @@ import java.util.Deque;
  * 运算符节点处理器
  */
 @Component
-public class OperatorNodeProcessor implements NodeProcessor {
+public class OperatorNodeProcessor extends NodeProcessor {
 
     private final OperatorProcessor[] OperatorProcessors;
+
 
     public OperatorNodeProcessor(OperatorProcessor[] operatorProcessors) {
         OperatorProcessors = operatorProcessors;
@@ -54,7 +55,7 @@ public class OperatorNodeProcessor implements NodeProcessor {
     @Override
     public Node parse(String expr) throws CombinedQueryParseException {
         OperatorProcessor processor = getProcessor(expr);
-        Node node = new OperatorNode(expr, processor);
+        Node node = new OperatorNode(processor);
         processor.parse(node, expr);
 
         return node;
@@ -87,7 +88,7 @@ public class OperatorNodeProcessor implements NodeProcessor {
     @Override
     public Node pushNode(Deque<Node> stack, Node node) throws CombinedQueryParseException {
         if (node.isComplete()) {
-            if (stack.size() > 0 && stack.peek().getReturnType() == Type.lOGICAL_OPERATOR.getCode()) {
+            if (stack.size() > 0 && stack.peek().getReturnType() == Type.LOGICAL_OPERATOR.getCode()) {
                 Node first = stack.pop();
                 first.addSubNode(node);
 
@@ -105,10 +106,27 @@ public class OperatorNodeProcessor implements NodeProcessor {
                 stack.push(node);
             }
         } else {
-            throw new CombinedQueryParseException("缺失的表达式!");
+            throw new CombinedQueryParseException("非法表达式!");
         }
 
         return null;
     }
+
+
+    /**
+     * 校验节点
+     *
+     * @param node
+     * @throws CombinedQueryParseException
+     */
+    @Override
+    public void checkNode(Node node) throws CombinedQueryParseException {
+        super.checkNode(node);
+
+        //校验参数类型
+        ((OperatorNode) node).getProcessor().checkType((OperatorNode) node);
+
+    }
+
 
 }
