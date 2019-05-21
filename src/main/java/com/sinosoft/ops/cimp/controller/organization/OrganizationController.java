@@ -1,6 +1,7 @@
 package com.sinosoft.ops.cimp.controller.organization;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.sinosoft.ops.cimp.annotation.OrganizationApiGroup;
 import com.sinosoft.ops.cimp.annotation.RequiresAuthentication;
 import com.sinosoft.ops.cimp.constant.OpsErrorMessage;
@@ -174,5 +175,35 @@ public class OrganizationController extends BaseController {
         }
     }
 
+    @ApiOperation(value = "查询职务信息")
+    @GetMapping(value = "/getDutyInfo")
+    @RequiresAuthentication
+    public ResponseEntity getDutyInfo(@RequestParam("deptId") String deptId) throws BusinessException {
+        //B01027 任职机构级别
+        //B01017 任职机构所在行政区划
+        //B01031 任职机构性质类别
+        //B01044B 隶属单位代码
+        //B01044A 隶属单位名称
+        Map<String, String> result = Maps.newHashMap();
+        if (StringUtils.isNotEmpty(deptId)) {
+            String sql = "SELECT B01027,B01017,B01031,B01044_B,B01044_A FROM DEP_B001 WHERE DEP_ID = '%s'";
+            String execSql = String.format(sql, deptId);
 
+            List<Map<String, Object>> maps = jdbcTemplate.queryForList(execSql);
+            if (maps.size() > 0) {
+                Map<String, Object> map = maps.get(0);
+                Object B01027 = map.get("B01027");
+                Object B01017 = map.get("B01017");
+                Object B01031 = map.get("B01031");
+                Object B01044B = map.get("B01044_B");
+                Object B01044A = map.get("B01044_A");
+                result.put("B01027", String.valueOf(B01027));
+                result.put("B01017", String.valueOf(B01017));
+                result.put("B01031", String.valueOf(B01031));
+                result.put("B01044B", String.valueOf(B01044B));
+                result.put("B01044A", String.valueOf(B01044A));
+            }
+        }
+        return ok(result);
+    }
 }

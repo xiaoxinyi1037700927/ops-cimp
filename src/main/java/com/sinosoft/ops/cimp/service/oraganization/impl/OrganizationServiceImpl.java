@@ -1,5 +1,6 @@
 package com.sinosoft.ops.cimp.service.oraganization.impl;
 
+import com.google.common.collect.Lists;
 import com.sinosoft.ops.cimp.entity.oraganization.Organization;
 import com.sinosoft.ops.cimp.entity.user.User;
 import com.sinosoft.ops.cimp.mapper.oraganization.OrganizationViewMapper;
@@ -34,22 +35,25 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     @Override
     public OrganizationViewModel lstTreeNode(OrganizationSearchViewModel organizationSearchViewModel) {
+        List<Organization> loginDataOrgList = Lists.newArrayList();
+        boolean isMultiOrg = false;
         OrganizationViewModel viewModel = null;
         String organizationId = organizationSearchViewModel.getOrganizationId();
         if (StringUtils.isNotBlank(organizationId)) {
-            List<Organization> allOrgList = OrganizationCacheManager.getSubject().getAllList();
-            //说明传入了机构ID,是反显的
-            Organization organization = OrganizationCacheManager.getSubject().getOrganizationById(organizationId);
-            String parentCode = organization.getParentCode();
+            //如果传递的
             Organization root = this.getRoot();
             viewModel = OrganizationViewMapper.INSTANCE.organizationToViewModel(root);
-            List<Organization> childNodes = this.getParentNodesByCode(organization.getCode());
-            viewModel.setHasChildren("1");
-            List<String> relNodes = this.getRelNodes(parentCode);
-            childNodes.sort(Comparator.comparing(Organization::getSortNumber));
-            List<OrganizationViewModel> subTreeNodes = this.getSubTreeNodes(viewModel.getId(), childNodes, relNodes);
-            this.setChildrenFlag(subTreeNodes, allOrgList);
-            viewModel.setSubTreeNode(subTreeNodes);
+            List<Organization> allOrgList = OrganizationCacheManager.getSubject().getAllList();
+
+            if (StringUtils.containsIgnoreCase(organizationId, ",")) {
+                String[] orgIds = organizationId.split(",");
+                for (String orgId : orgIds) {
+                    getSubOrgViewModel(viewModel, allOrgList, orgId);
+                }
+            } else {
+                //说明传入了机构ID,是反显的
+                getSubOrgViewModel(viewModel, allOrgList, organizationId);
+            }
         } else {
             //说明是查询树
             Organization organization = null;
@@ -61,28 +65,82 @@ public class OrganizationServiceImpl implements OrganizationService {
                 } else {
                     loginDataOrganId = currentUser.getDataOrganizationId();
                 }
-                organization = OrganizationCacheManager.getSubject().getOrganizationById(loginDataOrganId);
+                //如果有权限的单位有多个
+                if (StringUtils.containsIgnoreCase(loginDataOrganId, ",")) {
+                    isMultiOrg = true;
+                    String[] loginDataOrgIds = loginDataOrganId.split(",");
+                    for (String loginDataOrgId : loginDataOrgIds) {
+                        Organization organization1 = OrganizationCacheManager.getSubject().getOrganizationById(loginDataOrgId);
+                        loginDataOrgList.add(organization1);
+                    }
+                } else {
+                    organization = OrganizationCacheManager.getSubject().getOrganizationById(loginDataOrganId);
+                }
             } else {
                 organization = this.findRoot("ROOT");
             }
             if (organization != null) {
                 viewModel = OrganizationViewMapper.INSTANCE.organizationToViewModel(organization);
-                List<Organization> childNodeList = organizationRepository.findByParentCode(organization.getCode());
-                childNodeList.sort(Comparator.comparing(Organization::getSortNumber));
-                List<String> codeList = childNodeList.stream().map(x -> x.getCode()).collect(Collectors.toList());
-                List<Organization> parentOrganList = organizationRepository.findByParentCodeIn(codeList);
-                List<OrganizationViewModel> viewModelList = new ArrayList<>();
-                childNodeList.forEach(childNode -> {
-                    OrganizationViewModel organizationViewModel = OrganizationViewMapper.INSTANCE.organizationToViewModel(childNode);
-                    long count = parentOrganList.stream().filter(x -> x.getParentCode().equals(childNode.getCode())).count();
-                    if (count > 0) organizationViewModel.setHasChildren("1");
-                    else organizationViewModel.setHasChildren("0");
-                    viewModelList.add(organizationViewModel);
-                });
-                viewModel.setSubTreeNode(viewModelList);
+                getOrgViewModel(viewModel, organization);
+            }
+            //如果是多个单位的数据权限,则先必须给出根节点
+            if (isMultiOrg) {
+                Organization root = this.findRoot("ROOT");
+                OrganizationViewModel rootViewModel = OrganizationViewMapper.INSTANCE.organizationToViewModel(root);
+                for (Organization organization1 : loginDataOrgList) {
+                    getOrgViewModel(rootViewModel, organization1);
+                }
             }
         }
         return viewModel;
+    }
+
+    private void getSubOrgViewModel(OrganizationViewModel viewModel, List<Organization> allOrgList, String orgId) {
+        Organization organization = OrganizationCacheManager.getSubject().getOrganizationById(orgId);
+        String parentCode = organization.getParentCode();
+
+        List<Organization> childNodes = this.getParentNodesByCode(organization.getCode());
+        viewModel.setHasChildren("1");
+        List<String> relNodes = this.getRelNodes(parentCode);
+        childNodes.sort(Comparator.comparing(Organization::getSortNumber));
+        List<OrganizationViewModel> subTreeNode = viewModel.getSubTreeNode();
+        List<OrganizationViewModel> subTreeNodes = this.getSubTreeNodes(viewModel.getId(), childNodes, relNodes);
+        //多个单位的时候应该合并下级单位
+        this.setChildrenFlag(subTreeNodes, allOrgList);
+        if (subTreeNode != null && subTreeNode.size() > 0) {
+            Map<String, OrganizationViewModel> viewModelMap = subTreeNode.stream().collect(Collectors.toMap(OrganizationViewModel::getId, k -> k, (k1, k2) -> k1));
+            for (OrganizationViewModel treeNode : subTreeNodes) {
+                String id = treeNode.getId();
+                OrganizationViewModel organizationViewModel = viewModelMap.get(id);
+                if (organizationViewModel != null) {
+                    List<OrganizationViewModel> subTreeNode1 = organizationViewModel.getSubTreeNode();
+                    if (subTreeNode1 != null && subTreeNode1.size() > 0) {
+                        List<OrganizationViewModel> subTreeNode2 = treeNode.getSubTreeNode();
+                        subTreeNode2.addAll(subTreeNode1);
+                        treeNode.setSubTreeNode(subTreeNode2);
+                    }
+                }
+            }
+            viewModel.setSubTreeNode(subTreeNodes);
+        } else {
+            viewModel.setSubTreeNode(subTreeNodes);
+        }
+    }
+
+    private void getOrgViewModel(OrganizationViewModel viewModel, Organization organization) {
+        List<Organization> childNodeList = organizationRepository.findByParentCode(organization.getCode());
+        childNodeList.sort(Comparator.comparing(Organization::getSortNumber));
+        List<String> codeList = childNodeList.stream().map(Organization::getCode).collect(Collectors.toList());
+        List<Organization> parentOrganList = organizationRepository.findByParentCodeIn(codeList);
+        List<OrganizationViewModel> viewModelList = new ArrayList<>();
+        childNodeList.forEach(childNode -> {
+            OrganizationViewModel organizationViewModel = OrganizationViewMapper.INSTANCE.organizationToViewModel(childNode);
+            long count = parentOrganList.stream().filter(x -> x.getParentCode().equals(childNode.getCode())).count();
+            if (count > 0) organizationViewModel.setHasChildren("1");
+            else organizationViewModel.setHasChildren("0");
+            viewModelList.add(organizationViewModel);
+        });
+        viewModel.setSubTreeNode(viewModelList);
     }
 
 
