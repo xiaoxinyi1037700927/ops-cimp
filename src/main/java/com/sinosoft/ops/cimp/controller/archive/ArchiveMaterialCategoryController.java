@@ -1,6 +1,7 @@
 package com.sinosoft.ops.cimp.controller.archive;
 
 
+import com.sinosoft.ops.cimp.annotation.ArchiveApiGroup;
 import com.sinosoft.ops.cimp.common.BaseResultHttpStatus;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.exception.BusinessException;
@@ -27,6 +28,7 @@ import java.util.List;
 /**
  * 档案分类控制器
  */
+@ArchiveApiGroup
 @Api("档案分类控制器")
 @Controller("archiveMaterialCategoryController")
 @RequestMapping("/materialCategory")
@@ -46,11 +48,11 @@ public class ArchiveMaterialCategoryController extends BaseController {
 	 */
 	@ApiOperation("档案分类 和 档案材料 树结构")
 	@ApiImplicitParams({
-			@ApiImplicitParam(name = "id", value = "id", dataType = "String", required = true, paramType = "query"),
-			@ApiImplicitParam(name = "empId", value = "empId", dataType = "String", required = true, paramType = "query"),
-			@ApiImplicitParam(name = "archiveMaterialCategoryId", value = "archiveMaterialCategoryId", dataType = "String", required = true, paramType = "query")
+			@ApiImplicitParam(name = "id", value = "档案分类的code", dataType = "String", required = true, paramType = "query"),
+			@ApiImplicitParam(name = "empId", value = "人员ID", dataType = "String", required = true, paramType = "query"),
+			@ApiImplicitParam(name = "archiveMaterialCategoryId", value = "档案分类ID", dataType = "String", required = true, paramType = "query")
 	})
-	@RequestMapping(value = "/getTree",method = RequestMethod.GET)
+	@RequestMapping(value = "/getTree",method = RequestMethod.POST)
 	public void getMaterialCategoryAndMaterial4Tree(HttpServletRequest request, HttpServletResponse response) throws BusinessException {
 		try {
 			String code=request.getParameter("id");//id档案分类的code
@@ -86,20 +88,16 @@ public class ArchiveMaterialCategoryController extends BaseController {
 						resultMap.put("children",materialCategoryAndMaterialList);
 						resultMap.put("root", resultMap);
 
-
 						writeJson(response, ok(resultMap));
-						System.out.println("1");
 
 					}else{
 						writeJson(response, ok(materialCategoryAndMaterialList));
-						System.out.println("2");
 					}
 				}
 			
 			
 		} catch (Exception e) {
             logger.error("查询失败！", e);
-            System.out.println("3");
 			writeJson(response, fail("查询失败", BaseResultHttpStatus.FAIL));
 		}
 	}
@@ -110,7 +108,7 @@ public class ArchiveMaterialCategoryController extends BaseController {
 			dataType = "String",
 			required = true,
 			paramType = "query")
-	@RequestMapping(value = "/testrelated",method = RequestMethod.GET)
+	@RequestMapping(value = "/testrelated",method = RequestMethod.POST)
 	public void testrelated(HttpServletRequest request, HttpServletResponse response) throws BusinessException {
 		String userid="";
 		String empId=request.getParameter("empId");

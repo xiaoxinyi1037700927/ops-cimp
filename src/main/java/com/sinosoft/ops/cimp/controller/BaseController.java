@@ -73,6 +73,7 @@ public abstract class BaseController {
     protected void writeJson(HttpServletResponse response, Object data) {
         try (PrintWriter writer = response.getWriter()) {
             String json = JSON.toJSONString(data, SerializerFeature.WriteDateUseDateFormat);
+            System.out.println("json="+json);
             // 设置信息类型、编码格式和禁用缓存
             response.setContentType("application/json;charset=utf-8");
             response.setHeader("cache-Control", "no-cache");

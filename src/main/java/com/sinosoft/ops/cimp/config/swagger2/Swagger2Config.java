@@ -37,6 +37,21 @@ public class Swagger2Config {
     }
 
     @Bean
+    public Docket createArchiveApiGroupRestApi() {
+        return new Docket(DocumentationType.SWAGGER_2)
+                .groupName("13.干部档案接口")
+                .apiInfo(apiInfo())
+                .select()
+                .apis(input -> {
+                    assert input != null;
+                    Class<?> declaringClass = input.declaringClass();
+                    return declaringClass.isAnnotationPresent(ArchiveApiGroup.class);
+                })
+                .paths(PathSelectors.any())
+                .build();
+    }
+
+    @Bean
     public Docket createSystemGroupRestApi() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .groupName("11.系统配置接口分组")

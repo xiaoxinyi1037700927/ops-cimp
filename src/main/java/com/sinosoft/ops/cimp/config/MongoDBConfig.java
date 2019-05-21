@@ -15,6 +15,7 @@ import org.springframework.data.convert.CustomConversions;
 import org.springframework.data.mapping.model.CamelCaseAbbreviatingFieldNamingStrategy;
 import org.springframework.data.mapping.model.FieldNamingStrategy;
 import org.springframework.data.mapping.model.PropertyNameFieldNamingStrategy;
+import org.springframework.data.mongodb.config.AbstractMongoConfiguration;
 import org.springframework.data.mongodb.config.MongoConfigurationSupport;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
@@ -24,6 +25,7 @@ import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
+import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
@@ -41,7 +43,6 @@ public class MongoDBConfig {
     private Integer mongoClientPort;
     @Value("${mongoDbName}")
     private String mongoDbName;
-
 
 
     @Bean
