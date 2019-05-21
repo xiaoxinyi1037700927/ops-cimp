@@ -1,10 +1,12 @@
 package com.sinosoft.ops.cimp.controller.user;
 
 
+import com.google.common.collect.Lists;
 import com.sinosoft.ops.cimp.annotation.RequiresAuthentication;
 import com.sinosoft.ops.cimp.annotation.SystemUserApiGroup;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.dto.PaginationViewModel;
+import com.sinosoft.ops.cimp.entity.oraganization.Organization;
 import com.sinosoft.ops.cimp.entity.user.Role;
 import com.sinosoft.ops.cimp.entity.user.User;
 import com.sinosoft.ops.cimp.exception.BusinessException;
@@ -12,6 +14,7 @@ import com.sinosoft.ops.cimp.mapper.user.RoleViewModelMapper;
 import com.sinosoft.ops.cimp.mapper.user.UserViewModelMapper;
 import com.sinosoft.ops.cimp.service.user.UserRoleService;
 import com.sinosoft.ops.cimp.service.user.UserService;
+import com.sinosoft.ops.cimp.util.CachePackage.OrganizationCacheManager;
 import com.sinosoft.ops.cimp.util.CachePackage.UserCacheManager;
 import com.sinosoft.ops.cimp.util.HttpUtils;
 import com.sinosoft.ops.cimp.util.PasswordEncoderHelper;
@@ -111,6 +114,17 @@ public class UserController extends BaseController {
             return fail("未找到该ID下的用户！");
         }
         UserViewModel model = UserViewModelMapper.INSTANCE.UserToUserViewModel(user);
+        String dataOrganizationId = model.getDataOrganizationId();
+        String[] orgIds = dataOrganizationId.split(",");
+        List<Organization> dataOrgList = Lists.newArrayList();
+        for (String orgId : orgIds) {
+            Organization organizationById = OrganizationCacheManager.getSubject().getOrganizationById(orgId);
+            if (organizationById != null) {
+                dataOrgList.add(organizationById);
+            }
+        }
+        String orgNames = dataOrgList.stream().map(Organization::getName).collect(Collectors.joining(","));
+        model.setDataOrganizationName(orgNames);
         List<Role> userRole = userService.findUserRole(userId);
         model.setRoleList(userRole);
         return ok(model);
@@ -229,11 +243,11 @@ public class UserController extends BaseController {
         return ok("登出成功！");
     }
 
-    @ApiOperation(value ="重置密码")
+    @ApiOperation(value = "重置密码")
     @PostMapping(value = "/resetPassword")
     @RequiresAuthentication
     public ResponseEntity<String> resetPassword(String userId,
-                                        String password) throws BusinessException {
+                                                String password) throws BusinessException {
         boolean flag = userService.resetPassword(userId, password);
         if (flag) return ok("重置密码成功!");
         return ok("重置密码异常！");
