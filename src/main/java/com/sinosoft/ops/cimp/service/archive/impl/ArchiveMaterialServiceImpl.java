@@ -12,14 +12,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @ClassName:  ArchiveMaterialServiceImpl
- * @author:        zhaizf
- * @date:            2017年12月24日 
  */
 @Service("archiveMaterialService")
 public class ArchiveMaterialServiceImpl implements ArchiveMaterialService {
 	@Autowired
 	private ArchiveMaterialRepository archiveMaterialRepository;
-
 
 	@Override
 	public ArchiveMaterial getById(String id) {
@@ -37,6 +34,8 @@ public class ArchiveMaterialServiceImpl implements ArchiveMaterialService {
 	public List<ArchiveMaterial> getArchiveListByEmpIdAndCaterogyId(String empId,String categoryId){
 		return archiveMaterialRepository.findAllByEmpIdAndCategoryIdOrderBySeqNum(empId,categoryId);
 	}
+
+	@Override
 	@Transactional
 	public List<String> getArchiveMaterialIDs(String empId,String categoryId){
 		return  archiveMaterialRepository.findByEmpIdAndCategoryId(empId, categoryId);

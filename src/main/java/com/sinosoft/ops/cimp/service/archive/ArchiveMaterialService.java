@@ -6,8 +6,6 @@ import com.sinosoft.ops.cimp.entity.archive.ArchiveMaterial;
 
 /**
  * @ClassName:  ArchiveMaterialService
- * @author:        zhaizf
- * @date:            2017年12月24日 
  */
 public interface ArchiveMaterialService {
 

@@ -42,6 +42,8 @@ public class MongoDBConfig {
     @Value("${mongoDbName}")
     private String mongoDbName;
 
+
+
     @Bean
     public MongoTemplate mongoTemplate() {
 

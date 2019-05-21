@@ -4,18 +4,25 @@ package com.sinosoft.ops.cimp.controller.archive;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.entity.archive.ArchiveMaterialFile;
 import com.sinosoft.ops.cimp.exception.BusinessException;
+import com.sinosoft.ops.cimp.repository.archive.impl.MongoDbDaoImpl;
 import com.sinosoft.ops.cimp.service.archive.ArchiveMaterialFileService;
 import com.sinosoft.ops.cimp.service.archive.ArchiveMaterialService;
 import com.sinosoft.ops.cimp.service.archive.MongoDbService;
 import com.sinosoft.ops.cimp.util.StringUtil;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -23,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Api("archiveMaterialFileController")
 @Controller("archiveMaterialFileController")
 @RequestMapping("/archiveMaterialFile")
 public class ArchiveMaterialFileController extends BaseController {
@@ -34,13 +42,18 @@ public class ArchiveMaterialFileController extends BaseController {
 	@Resource 
 	private ArchiveMaterialService archiveMaterialService;
 
-
+	@Resource
+	private MongoDbDaoImpl mongoDbDao;
+	@ApiOperation("添加图片")
+	@RequestMapping(value = "/save",method = RequestMethod.GET)
+	public void save() throws IOException {
+			mongoDbDao.save();
+	}
 
 	/**
 	 * 根据人员ID+档案分类ID 获取 ArchiveMaterialFile集合
 	 * @param request->empId 人员ID; 
 	 * @param request->categoryId 档案分类ID;
-	 * @author zhaizf
 	 * @return ArchiveMaterialFile  保存路径、文件名信息
 	 */
 //	@RequestMapping("/findbyArchiveIDs")
@@ -83,10 +96,15 @@ public class ArchiveMaterialFileController extends BaseController {
 	/**
 	 * 根据指定档案ID 和pageNo获取
 	 * @param request->archiveMaterialId: ArchiveMaterialFile archiveMaterialId;
-	 * @param request->pageNo: ArchiveMaterialFile pageNumber
-	 * @author zhaizf
+	 * @param request->pageNo: ArchiveMaterialFile pageNumbe
 	 */
-	@RequestMapping("/findbyArchiveMaterialIDAndPageNo")
+	@ApiOperation("根据指定档案ID 和pageNo获取")
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "pageNo", value = "pageNo", dataType = "String", required = true, paramType = "query"),
+			@ApiImplicitParam(name = "archiveMaterialId", value = "archiveMaterialId", dataType = "String", required = true, paramType = "query"),
+			@ApiImplicitParam(name = "type", value = "type", dataType = "String", required = true, paramType = "query")
+	})
+	@RequestMapping(value = "/findbyArchiveMaterialIDAndPageNo",method = RequestMethod.GET)
 	public void findbyArchiveMaterialIDAndPageNo(HttpServletRequest request, HttpServletResponse response) throws BusinessException {
 		try {
 			String archiveMaterialId =request.getParameter("archiveMaterialId");			
@@ -96,16 +114,18 @@ public class ArchiveMaterialFileController extends BaseController {
 			if(StringUtil.isEmptyOrNull(pageNo)){
 				pageNo="1";
 			}
-			ArchiveMaterialFile archiveMaterialFile = archiveMaterialFileService.findbypageNo(archiveMaterialId, pageNo,type);
+			Integer pageNumber=Integer.valueOf(pageNo);
+			ArchiveMaterialFile archiveMaterialFile = archiveMaterialFileService.findbypageNo(archiveMaterialId, pageNumber,type);
 			if(archiveMaterialFile!=null){
 				//保存路径
 				String relPath = request.getSession().getServletContext().getRealPath("resources/download/");
+				System.out.println(relPath);
 				//返回 保存路径 和 文件名列表
 				Map<String,Object> map = new HashMap<String,Object>() ;
 				String id = archiveMaterialFile.getFileStorageRef();
 				String fileName=id+".jpg";
 				Path path = Paths.get(relPath,fileName);
-				mongoDbService.downloadToFileDecryptWithAES(id, path);
+				mongoDbService.downloadToFileDecryptWithAES(fileName, path);
 				map.put("location", "resources/download/" + fileName);
 				writeJson(response, ok(map));
 			}else{
@@ -121,9 +141,14 @@ public class ArchiveMaterialFileController extends BaseController {
 	 * 根据指定 ArchiveMaterialFile ID 获取单个ArchiveMaterialFile
 	 * @param request->archiveMaterialId :ArchiveMaterialFile ID
 	 * @return ArchiveMaterialFile
-	 * @author zhaizf
 	 */
-	@RequestMapping("/getArchiveMaterialFileByID")
+	@ApiOperation("根据指定 ArchiveMaterialFile ID 获取单个ArchiveMaterialFile")
+	@ApiImplicitParam(name = "archiveMaterialId",
+			value = "archiveMaterialId",
+			dataType = "String",
+			required = true,
+			paramType = "query")
+	@RequestMapping(value = "/getArchiveMaterialFileByID", method = RequestMethod.GET)
 	public void getArchiveMaterialFileByID(HttpServletRequest request, HttpServletResponse response) throws BusinessException {
 		try {
 			String archiveMaterialId =request.getParameter("archiveMaterialId");
@@ -141,12 +166,17 @@ public class ArchiveMaterialFileController extends BaseController {
 
 	/**
 	 * 根据指定 Archive_Material_ID 获取 ArchiveMaterialFile集合 List<ArchiveMaterialFile>
-	 * 
+	 *
 	 * @param request->archiveMaterialId  Archive_Material_ID
 	 * @return ArchiveMaterialFile集合  List<ArchiveMaterialFile>
-	 * @author zhaizf
 	 */
-	@RequestMapping("/getAMFileListByAMID")
+	@ApiOperation("根据指定 Archive_Material_ID 获取 ArchiveMaterialFile集合 List<ArchiveMaterialFile>")
+	@ApiImplicitParam(name = "archiveMaterialId",
+			value = "archiveMaterialId",
+			dataType = "String",
+			required = true,
+			paramType = "query")
+	@RequestMapping(value = "/getAMFileListByAMID",method = RequestMethod.GET)
 	public void getArchiveMaterialFileByAchiveMaterialID(HttpServletRequest request, HttpServletResponse response) throws BusinessException {
 		try {
 			String archiveMaterialId =request.getParameter("archiveMaterialId");
@@ -180,11 +210,10 @@ public class ArchiveMaterialFileController extends BaseController {
 	}
 
 	/**
-	 * 根据多个Archive_Material_ID   获取ArchiveMaterialFile Map集合 
+	 * 根据多个Archive_Material_ID   获取ArchiveMaterialFile Map集合
 	 *
 	 * @param request  Archive_Material_ID集
 	 * @return ArchiveMaterialFile集合Map<String,  List<ArchiveMaterialFile>>
-	 * @author zhaizf
 	 */
 	//	@RequestMapping("/getMapByAchiveMaterialIDs")
 	public void getMapByAchiveMaterialIDs(HttpServletRequest request, HttpServletResponse response) throws BusinessException {

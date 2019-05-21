@@ -8,8 +8,6 @@ import com.sinosoft.ops.cimp.entity.archive.ArchiveMaterialFile;
 
 /**
  * @ClassName:  ArchiveMaterialFileService
- * @author:        zhaizf
- * @date:            2017年12月24日 
  */
 public interface ArchiveMaterialFileService{
 
@@ -27,7 +25,7 @@ public interface ArchiveMaterialFileService{
 	/**
 	 * 根据archiveMaterialId 和pageNo获取 ArchiveMaterialFile
 	 * */
-	public ArchiveMaterialFile findbypageNo(String archiveMaterialId, String pageNo, String type);
+	public ArchiveMaterialFile findbypageNo(String archiveMaterialId, Integer pageNo, String type);
 	
 	/**
 	 * 获取 多个Achive_Material_ID 对应的ArchiveMaterialFile Map <Material_ID,List<ArchiveMaterialFile>>

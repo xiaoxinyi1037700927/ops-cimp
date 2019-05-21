@@ -11,8 +11,6 @@ import org.springframework.stereotype.Service;
 
 /**
  * @ClassName:  ArchiveServiceImpl
- * @author:        zhaizf
- * @date:            2017年12月24日 
  */
 @Service("archiveService")
 public class ArchiveServiceImpl implements ArchiveService {

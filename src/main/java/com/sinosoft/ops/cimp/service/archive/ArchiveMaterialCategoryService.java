@@ -12,8 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * @ClassName:  ArchiveMaterialCategoryService
  * @description: 档案分类Service
- * @author:        zhaizf
- * @date:            2017年12月24日 
  */
 public interface ArchiveMaterialCategoryService{
 	
@@ -35,8 +33,11 @@ public interface ArchiveMaterialCategoryService{
 	void deleteById(String id);
 
 	public List<HashMap<String, Object>> getMaterialCategoryAndMaterial4Tree(String code, String empId, String categoryId);
+
 	public List<String> getIdCardsByEmpid(String empId);
+
 	public String getidcardforone(String empId);
+
 	public String findEmpidByUserID(String userid);
 
 	

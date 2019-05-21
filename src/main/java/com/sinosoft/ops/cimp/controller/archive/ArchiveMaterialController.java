@@ -6,10 +6,15 @@ import com.sinosoft.ops.cimp.entity.archive.ArchiveMaterial;
 import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.service.archive.ArchiveMaterialService;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -19,6 +24,7 @@ import java.util.List;
 /**
  * ArchiveMaterial控制器
  */
+@Api("ArchiveMaterial控制器")
 @Controller("archiveMaterialController")
 @RequestMapping("/archiveMaterial")
 public class ArchiveMaterialController extends BaseController {
@@ -27,14 +33,17 @@ public class ArchiveMaterialController extends BaseController {
 	private ArchiveMaterialService archiveMaterialService;
 
 	
-	
 	/**
 	 * 根据人员ID +档案分类ID  获取ArchiveMaterial集合
 	 * @param request->empId 人员ID;  categoryId分类ID
 	 * @return 指定人员 特定分类 ArchiveMaterial集合
-	 * @author zhaizf
 	 */
-	@RequestMapping("/getAMTLbyEmpIDAndCategoryId")
+	@ApiOperation("根据人员ID +档案分类ID  获取ArchiveMaterial集合")
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "empId", value = "empId", dataType = "String", required = true, paramType = "query"),
+			@ApiImplicitParam(name = "categoryId", value = "categoryId", dataType = "String", required = true, paramType = "query")
+	})
+	@RequestMapping(value = "/getAMTLbyEmpIDAndCategoryId",method = RequestMethod.GET)
 	public void getArchiveMaterialListByEmpIdAndCategoryId(HttpServletRequest request, HttpServletResponse response) throws BusinessException {
 		try {
 			String empId = request.getParameter("empId");
@@ -52,14 +61,18 @@ public class ArchiveMaterialController extends BaseController {
 	}
 
 	
-	
 	/**
 	 * 根据人员ID查询  获取ArchiveMaterial集合
 	 * @param request->empId 指定人员ID
 	 * @return 指定人员ID的 ArchiveMaterial 集合
-	 * 	@author zhaizf
 	 */
-	@RequestMapping("/getArchiveMateriaListbyEmpID")
+	@ApiOperation("根据人员ID查询  获取ArchiveMaterial集合")
+	@ApiImplicitParam(name = "empId",
+					value = "empId",
+					dataType = "String",
+					required = true,
+					paramType = "query")
+	@RequestMapping(value = "/getArchiveMateriaListbyEmpID",method = RequestMethod.GET)
 	public void getArchiveMaterialListByEmpId(HttpServletRequest request, HttpServletResponse response) throws BusinessException {
 		try {
 			String empId = request.getParameter("empId");
@@ -80,10 +93,15 @@ public class ArchiveMaterialController extends BaseController {
 	/**
 	 * 根据档案ID查询 获取ArchiveMaterial
 	 * @param  request->materialID   档案ID
-	 * @return 指定ID ArchiveMaterial 
-	 * 	@author zhaizf
+	 * @return 指定ID ArchiveMaterial
 	 */
-	@RequestMapping("/getArchiveMaterialByID")
+	@ApiOperation("根据档案ID查询 获取ArchiveMaterial")
+	@ApiImplicitParam(name = "materialID",
+			value = "materialID",
+			dataType = "String",
+			required = true,
+			paramType = "query")
+	@RequestMapping(value = "/getArchiveMaterialByID",method = RequestMethod.GET)
 	public void getArchiveMaterialByID(HttpServletRequest request, HttpServletResponse response) throws BusinessException {
 		try {
 			String archiveMaterialID = request.getParameter( "materialID");

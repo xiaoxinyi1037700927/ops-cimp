@@ -16,8 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @ClassName:  ArchiveMaterialFileServiceImpl
- * @author:        zhaizf
- * @date:            2017年12月24日 
  */
 @Service("archiveMaterialFileService")
 public class ArchiveMaterialFileServiceImpl  implements ArchiveMaterialFileService {
@@ -27,8 +25,8 @@ public class ArchiveMaterialFileServiceImpl  implements ArchiveMaterialFileServi
 	
 	@Override
 	@Transactional
-	public ArchiveMaterialFile findbypageNo(String archiveMaterialId, String pageNo, String type){
-		return archiveMaterialFileRepository.findAllByArchiveMaterialIdAndPageNumberAndAndFileType(archiveMaterialId, pageNo,type);
+	public ArchiveMaterialFile findbypageNo(String archiveMaterial, Integer pageNo, String type){
+		return archiveMaterialFileRepository.findAllByArchiveMaterialIdAndPageNumberAndAndFileType(archiveMaterial, pageNo,type);
 	}
 
 	@Override
@@ -59,7 +57,6 @@ public class ArchiveMaterialFileServiceImpl  implements ArchiveMaterialFileServi
 		}
 		return map;
 	}
-	
-	
+
 	
 }

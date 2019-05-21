@@ -8,14 +8,17 @@ import com.sinosoft.ops.cimp.service.archive.ArchiveMaterialCategoryService;
 import com.sinosoft.ops.cimp.service.archive.ArchiveMaterialService;
 import com.sinosoft.ops.cimp.util.SecurityUtils;
 import com.sinosoft.ops.cimp.util.StringUtil;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
@@ -24,6 +27,7 @@ import java.util.List;
 /**
  * 档案分类控制器
  */
+@Api("档案分类控制器")
 @Controller("archiveMaterialCategoryController")
 @RequestMapping("/materialCategory")
 public class ArchiveMaterialCategoryController extends BaseController {
@@ -39,10 +43,14 @@ public class ArchiveMaterialCategoryController extends BaseController {
 	 * @param request->id  档案分类的code
 	 * @param request->empId 人员ID
 	 * @param request->categoryId 档案分类ID
-	 * @author zhaizf
-	 * @date 2017年12月26日
 	 */
-	@RequestMapping("/getTree")
+	@ApiOperation("档案分类 和 档案材料 树结构")
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "id", value = "id", dataType = "String", required = true, paramType = "query"),
+			@ApiImplicitParam(name = "empId", value = "empId", dataType = "String", required = true, paramType = "query"),
+			@ApiImplicitParam(name = "archiveMaterialCategoryId", value = "archiveMaterialCategoryId", dataType = "String", required = true, paramType = "query")
+	})
+	@RequestMapping(value = "/getTree",method = RequestMethod.GET)
 	public void getMaterialCategoryAndMaterial4Tree(HttpServletRequest request, HttpServletResponse response) throws BusinessException {
 		try {
 			String code=request.getParameter("id");//id档案分类的code
@@ -80,22 +88,29 @@ public class ArchiveMaterialCategoryController extends BaseController {
 
 
 						writeJson(response, ok(resultMap));
+						System.out.println("1");
+
 					}else{
 						writeJson(response, ok(materialCategoryAndMaterialList));
+						System.out.println("2");
 					}
 				}
-			
-				
-				
-			//}
 			
 			
 		} catch (Exception e) {
             logger.error("查询失败！", e);
+            System.out.println("3");
 			writeJson(response, fail("查询失败", BaseResultHttpStatus.FAIL));
 		}
 	}
-	@RequestMapping("/testrelated")
+
+	@ApiOperation("testrelated")
+	@ApiImplicitParam(name = "empId",
+			value = "empId",
+			dataType = "String",
+			required = true,
+			paramType = "query")
+	@RequestMapping(value = "/testrelated",method = RequestMethod.GET)
 	public void testrelated(HttpServletRequest request, HttpServletResponse response) throws BusinessException {
 		String userid="";
 		String empId=request.getParameter("empId");
@@ -110,8 +125,9 @@ public class ArchiveMaterialCategoryController extends BaseController {
 		}else{
 			userid=SecurityUtils.getSubject().getCurrentUser().getId().toString();
 		}
-		
+		System.out.println(userid.toUpperCase());
 		String user_empid=archiveMaterialCategoryService.findEmpidByUserID(userid.toUpperCase());
+		System.out.println(user_empid);
 		List<String> idcards=null;
 		//获取登录人员家庭成员身份证
 		if(user_empid!=null){
@@ -140,6 +156,5 @@ public class ArchiveMaterialCategoryController extends BaseController {
 		}
 		writeJson(response, ok("查询成功"));
 	}
-
 
 }

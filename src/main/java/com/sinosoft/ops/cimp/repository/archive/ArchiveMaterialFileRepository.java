@@ -13,10 +13,10 @@ import java.util.List;
 public interface ArchiveMaterialFileRepository extends JpaRepository<ArchiveMaterialFile,String>, QuerydslPredicateExecutor<ArchiveMaterialFile> {
 
     @Query("select a from ArchiveMaterialFile a where a.archiveMaterialId=?1 order by a.archiveMaterialId,a.id,a.pageNumber")
-    public List<ArchiveMaterialFile> findByArchiveMaterialIdOrderByaAndArchiveMaterialIdAndIdAndPageNumber(String IDofAchiveMaterial);
+    public List<ArchiveMaterialFile> findByArchiveMaterialIdOrderByaAndArchiveMaterialIdAndIdAndPageNumber(String archiveMaterialId);
 
     @Query("select a from ArchiveMaterialFile a where a.archiveMaterialId=?1 and a.pageNumber=?2 and a.fileType=?3")
-    public ArchiveMaterialFile findAllByArchiveMaterialIdAndPageNumberAndAndFileType(String archiveMaterialId,String pageNumber,String type);
+    public ArchiveMaterialFile findAllByArchiveMaterialIdAndPageNumberAndAndFileType(String archiveMaterialId,Integer pageNumber,String type);
 
     @Query("select a from ArchiveMaterialFile a where a.archiveMaterialId in (?1) order by a.archiveMaterialId,a.id,a.pageNumber")
     public List<ArchiveMaterialFile> findAllByArchiveMaterialIdOrderByArchiveMaterialIdAndIdAndPageNumber(List<String> idList);
