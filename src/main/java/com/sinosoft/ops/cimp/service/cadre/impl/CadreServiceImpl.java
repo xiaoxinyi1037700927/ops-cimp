@@ -208,7 +208,7 @@ public class CadreServiceImpl implements CadreService {
                 "            WHERE a001.A01063 <> '2' AND a001.STATUS = '0'\n" +
                 "            ORDER BY tmp.codeLen, tmp.code, tmp.sortNum, a001.ORDINAL) t\n" +
                 "      WHERE ROWNUM <= '${endIndex}') t\n" +
-                "WHERE rn >= '${startIndex}'";
+                "WHERE rn > '${startIndex}'";
 
         if (searchVO.getCadreTagIds().size() > 0) {
             String tagIdInCondition = searchVO.getCadreTagIds().stream().collect(Collectors.joining("','", "('", "')"));
