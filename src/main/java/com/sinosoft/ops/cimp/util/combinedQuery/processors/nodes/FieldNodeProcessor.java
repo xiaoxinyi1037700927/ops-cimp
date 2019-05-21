@@ -1,6 +1,7 @@
 package com.sinosoft.ops.cimp.util.combinedQuery.processors.nodes;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.sinosoft.ops.cimp.entity.sys.syscode.QSysCodeSet;
 import com.sinosoft.ops.cimp.entity.sys.systable.QSysTable;
 import com.sinosoft.ops.cimp.entity.sys.systable.QSysTableField;
 import com.sinosoft.ops.cimp.entity.sys.systable.SysTable;
@@ -85,7 +86,17 @@ public class FieldNodeProcessor extends NodeProcessor {
             throw new CombinedQueryParseException("未定义的字段类型：" + tableName + "." + fieldName);
         }
 
-        return new FieldNode(table.getDbTableName(), table.getNameCn(), field.getDbFieldName(), field.getNameCn(), returnType.getCode(), field.getSysCodeSetName());
+        return new FieldNode(table.getDbTableName(), table.getNameCn(), field.getDbFieldName(), field.getNameCn(), returnType.getCode(), field.getSysCodeSetName(), getCodeSetId(field.getSysCodeSetName()));
+    }
+
+    private Integer getCodeSetId(String sysCodeSetName) {
+        if (sysCodeSetName == null) {
+            return null;
+        }
+
+        QSysCodeSet qSysCodeSet = QSysCodeSet.sysCodeSet;
+        return jpaQueryFactory.select(qSysCodeSet.id).from(qSysCodeSet)
+                .where(qSysCodeSet.name.eq(sysCodeSetName)).fetchOne();
     }
 
 

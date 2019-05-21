@@ -5,6 +5,7 @@ import com.sinosoft.ops.cimp.util.combinedQuery.beans.ExprStream;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.Expression;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.Param;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.*;
+import com.sinosoft.ops.cimp.util.combinedQuery.processors.code.CodeProcessor;
 import com.sinosoft.ops.cimp.util.combinedQuery.processors.nodes.NodeProcessor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +20,12 @@ import java.util.List;
 public class CombinedQueryParser {
 
     private final NodeProcessor[] nodeProcessors;
+    private final CodeProcessor codeProcessor;
 
     @Autowired
-    public CombinedQueryParser(NodeProcessor[] nodeProcessors) {
+    public CombinedQueryParser(NodeProcessor[] nodeProcessors, CodeProcessor codeProcessor) {
         this.nodeProcessors = nodeProcessors;
+        this.codeProcessor = codeProcessor;
     }
 
 
@@ -98,24 +101,26 @@ public class CombinedQueryParser {
             return null;
         }
 
-
-        //调用后置处理器
-        invokeNodePostProcessors(root);
+        //调用码值处理器
+        invokeCodeProcessors(root);
 
         return root.getSql();
     }
 
 
     /**
-     * 调用后置处理器
+     * 调用码值处理器,生成sql前调用
      *
      * @param root
      */
-    private void invokeNodePostProcessors(Node root) {
-
+    private void invokeCodeProcessors(Node root) {
+        if (root instanceof OperatorNode) {
+            codeProcessor.processCode((OperatorNode) root);
+            return;
+        }
 
         for (Node subNode : root.getSubNodes()) {
-            invokeNodePostProcessors(subNode);
+            invokeCodeProcessors(subNode);
         }
     }
 
