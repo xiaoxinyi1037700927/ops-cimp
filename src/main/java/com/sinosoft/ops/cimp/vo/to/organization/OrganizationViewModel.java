@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @ApiModel(value = "OrganizationViewModel", description="返回单位数")
 public class OrganizationViewModel {
@@ -161,5 +162,31 @@ public class OrganizationViewModel {
 
     public void setCount(int count) {
         this.count = count;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        OrganizationViewModel that = (OrganizationViewModel) o;
+        return count == that.count &&
+                Objects.equals(id, that.id) &&
+                Objects.equals(name, that.name) &&
+                Objects.equals(code, that.code) &&
+                Objects.equals(briefName, that.briefName) &&
+                Objects.equals(fullName, that.fullName) &&
+                Objects.equals(parentCode, that.parentCode) &&
+                Objects.equals(parentId, that.parentId) &&
+                Objects.equals(orgType, that.orgType) &&
+                Objects.equals(orgLevel, that.orgLevel) &&
+                Objects.equals(hasChildren, that.hasChildren) &&
+                Objects.equals(isCheck, that.isCheck) &&
+                Objects.equals(submit, that.submit) &&
+                Objects.equals(subTreeNode, that.subTreeNode);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, code, briefName, fullName, parentCode, parentId, orgType, orgLevel, hasChildren, isCheck, submit, count, subTreeNode);
     }
 }

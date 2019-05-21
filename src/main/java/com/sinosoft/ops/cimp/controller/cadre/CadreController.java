@@ -246,7 +246,11 @@ public class CadreController extends BaseController {
         try {
             byte[] photo = cadreService.getPhoto(empId);
 
-            Map<String, Object> map = jdbcTemplate.queryForMap("select A01001 as \"name\" from EMP_A001 where EMP_ID = '" + empId + "'");
+            List<Map<String, Object>> maps = jdbcTemplate.queryForList("select A01001 as \"name\" from EMP_A001 where EMP_ID = '" + empId + "'");
+            Map<String, Object> map = Maps.newHashMap();
+            if (maps.size() > 0) {
+                map = maps.get(0);
+            }
             String name = map.get("name").toString();
             String fileName = name + ".png";
             fileName = new String(fileName.getBytes("utf-8"), "utf-8");

@@ -1,6 +1,7 @@
 package com.sinosoft.ops.cimp.service.oraganization.impl;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.sinosoft.ops.cimp.entity.oraganization.Organization;
 import com.sinosoft.ops.cimp.entity.user.User;
 import com.sinosoft.ops.cimp.mapper.oraganization.OrganizationViewMapper;
@@ -88,8 +89,21 @@ public class OrganizationServiceImpl implements OrganizationService {
                 Organization root = this.findRoot("ROOT");
                 OrganizationViewModel rootViewModel = OrganizationViewMapper.INSTANCE.organizationToViewModel(root);
                 for (Organization organization1 : loginDataOrgList) {
-                    getOrgViewModel(rootViewModel, organization1);
+                    OrganizationViewModel organizationViewModel = OrganizationViewMapper.INSTANCE.organizationToViewModel(organization1);
+                    getOrgViewModel(organizationViewModel, organization1);
+                    List<OrganizationViewModel> subOrgList = new ArrayList<>(1);
+                    subOrgList.add(organizationViewModel);
+                    List<OrganizationViewModel> subTreeNode = rootViewModel.getSubTreeNode();
+                    if (subTreeNode != null && subTreeNode.size() > 0) {
+                        Set<OrganizationViewModel> orgSetViewModels = Sets.newLinkedHashSet();
+                        orgSetViewModels.addAll(subTreeNode);
+                        orgSetViewModels.addAll(subOrgList);
+                        rootViewModel.setSubTreeNode(new ArrayList<>(orgSetViewModels));
+                    } else {
+                        rootViewModel.setSubTreeNode(subOrgList);
+                    }
                 }
+                viewModel = rootViewModel;
             }
         }
         return viewModel;
@@ -116,7 +130,12 @@ public class OrganizationServiceImpl implements OrganizationService {
                     List<OrganizationViewModel> subTreeNode1 = organizationViewModel.getSubTreeNode();
                     if (subTreeNode1 != null && subTreeNode1.size() > 0) {
                         List<OrganizationViewModel> subTreeNode2 = treeNode.getSubTreeNode();
-                        subTreeNode2.addAll(subTreeNode1);
+                        Set<OrganizationViewModel> subTreeNodeSet = Sets.newLinkedHashSet();
+                        subTreeNodeSet.addAll(subTreeNode2);
+                        subTreeNodeSet.addAll(subTreeNode1);
+
+                        subTreeNode2 = new ArrayList<>(subTreeNodeSet);
+
                         treeNode.setSubTreeNode(subTreeNode2);
                     }
                 }

@@ -36,7 +36,7 @@ public class SysOperationLogController extends BaseController {
         int pageSizeInt = 0;
         if (StringUtils.isNotEmpty(pageIndex)) {
             try {
-                pageIndexInt = Integer.parseInt(pageIndex);
+                pageIndexInt = Integer.parseInt(pageIndex) - 1;
             } catch (Exception e) {
                 pageIndexInt = 0;
             }

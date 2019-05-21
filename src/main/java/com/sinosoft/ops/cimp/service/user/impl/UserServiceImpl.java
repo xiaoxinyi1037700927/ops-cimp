@@ -112,10 +112,19 @@ public class UserServiceImpl implements UserService {
                 userViewModel.setOrganizationName(organization.getName());
             }
             String dataOrganizationId = userViewModel.getDataOrganizationId();
-            Organization dataOrganization = OrganizationCacheManager.getSubject().getOrganizationById(dataOrganizationId);
-            if (dataOrganization != null) {
-                userViewModel.setDataOrganizationName(dataOrganization.getName());
+            List<Organization> dataOrgList = Lists.newArrayList();
+            if (dataOrganizationId.contains(",")) {
+                String[] orgIds = dataOrganizationId.split(",");
+                for (String orgId : orgIds) {
+                    Organization organizationById = OrganizationCacheManager.getSubject().getOrganizationById(orgId);
+                    dataOrgList.add(organizationById);
+                }
+            } else {
+                Organization organizationById = OrganizationCacheManager.getSubject().getOrganizationById(dataOrganizationId);
+                dataOrgList.add(organizationById);
             }
+            String orgNames = dataOrgList.stream().map(Organization::getName).collect(Collectors.joining(","));
+            userViewModel.setDataOrganizationName(orgNames);
 
             String ownerOrganizationId = userViewModel.getOwnerOrganizationId();
             Organization ownerOrganization = OrganizationCacheManager.getSubject().getOrganizationById(ownerOrganizationId);
@@ -309,7 +318,6 @@ public class UserServiceImpl implements UserService {
         }
         return false;
     }
-
 
 
     @Override
