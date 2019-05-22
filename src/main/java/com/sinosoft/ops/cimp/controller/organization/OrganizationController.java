@@ -6,6 +6,7 @@ import com.sinosoft.ops.cimp.annotation.OrganizationApiGroup;
 import com.sinosoft.ops.cimp.annotation.RequiresAuthentication;
 import com.sinosoft.ops.cimp.constant.OpsErrorMessage;
 import com.sinosoft.ops.cimp.constant.RolePermissionPageSqlEnum;
+import com.sinosoft.ops.cimp.context.ExecuteContext;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.entity.oraganization.Organization;
 import com.sinosoft.ops.cimp.entity.user.User;
@@ -55,8 +56,12 @@ public class OrganizationController extends BaseController {
     @ApiOperation(value = "查询机构树")
     @PostMapping("/lstTreeNode")
     @RequiresAuthentication
-    public ResponseEntity<OrganizationViewModel> lstTreeNode(@RequestBody OrganizationSearchViewModel searchViewModel) throws BusinessException {
+    public ResponseEntity lstTreeNode(@RequestBody OrganizationSearchViewModel searchViewModel) throws BusinessException {
         OrganizationViewModel viewModel = organizationService.lstTreeNode(searchViewModel);
+        Object organizationViewModelList = ExecuteContext.getVariable("organizationViewModelList");
+        if (organizationViewModelList != null) {
+            return ok(organizationViewModelList);
+        }
         return ok(viewModel);
     }
 

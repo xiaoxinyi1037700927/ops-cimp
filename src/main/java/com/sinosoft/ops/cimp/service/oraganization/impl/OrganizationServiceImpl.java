@@ -2,6 +2,7 @@ package com.sinosoft.ops.cimp.service.oraganization.impl;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.sinosoft.ops.cimp.context.ExecuteContext;
 import com.sinosoft.ops.cimp.entity.oraganization.Organization;
 import com.sinosoft.ops.cimp.entity.user.User;
 import com.sinosoft.ops.cimp.mapper.oraganization.OrganizationViewMapper;
@@ -86,24 +87,13 @@ public class OrganizationServiceImpl implements OrganizationService {
             }
             //如果是多个单位的数据权限,则先必须给出根节点
             if (isMultiOrg) {
-                Organization root = this.findRoot("ROOT");
-                OrganizationViewModel rootViewModel = OrganizationViewMapper.INSTANCE.organizationToViewModel(root);
+                Set<OrganizationViewModel> organizationViewModelList = Sets.newLinkedHashSet();
                 for (Organization organization1 : loginDataOrgList) {
                     OrganizationViewModel organizationViewModel = OrganizationViewMapper.INSTANCE.organizationToViewModel(organization1);
                     getOrgViewModel(organizationViewModel, organization1);
-                    List<OrganizationViewModel> subOrgList = new ArrayList<>(1);
-                    subOrgList.add(organizationViewModel);
-                    List<OrganizationViewModel> subTreeNode = rootViewModel.getSubTreeNode();
-                    if (subTreeNode != null && subTreeNode.size() > 0) {
-                        Set<OrganizationViewModel> orgSetViewModels = Sets.newLinkedHashSet();
-                        orgSetViewModels.addAll(subTreeNode);
-                        orgSetViewModels.addAll(subOrgList);
-                        rootViewModel.setSubTreeNode(new ArrayList<>(orgSetViewModels));
-                    } else {
-                        rootViewModel.setSubTreeNode(subOrgList);
-                    }
+                    organizationViewModelList.add(organizationViewModel);
                 }
-                viewModel = rootViewModel;
+                ExecuteContext.putVariable("organizationViewModelList", organizationViewModelList);
             }
         }
         return viewModel;
