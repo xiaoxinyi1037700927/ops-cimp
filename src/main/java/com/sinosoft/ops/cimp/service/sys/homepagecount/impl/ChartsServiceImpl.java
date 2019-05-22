@@ -10,10 +10,7 @@ import com.sinosoft.ops.cimp.vo.to.sys.homepagecount.ChartsDataModel;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -38,10 +35,12 @@ public class ChartsServiceImpl implements ChartsService {
     @Override
     public List<ChartsDataModel> getCadreStatisticsData() {
         QChartsStatisticsSql qChartsStatisticsSql = QChartsStatisticsSql.chartsStatisticsSql;
-        Iterable<ChartsStatisticsSql> iterable = chartsRepository.findAll(qChartsStatisticsSql.sortNumber.asc());
+        Iterable<ChartsStatisticsSql> iterable = chartsRepository.findAll(qChartsStatisticsSql.sortNumber.asc().nullsLast());
         List<ChartsStatisticsSql> charts = Lists.newArrayList(iterable);
 
         String dataOrganizationId = SecurityUtils.getSubject().getCurrentUser().getDataOrganizationId();
+
+        dataOrganizationId = Arrays.stream(dataOrganizationId.split(",")).collect(Collectors.joining("','", "('", "')"));
 
         List<ChartsDataModel> modelList = new ArrayList<>(charts.size());
         List<QueryTask> tasks = new ArrayList<>();
