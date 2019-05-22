@@ -118,10 +118,29 @@ public class HomePageCountServiceImpl implements HomePageCountService {
         if (!StringUtils.isEmpty(currentReserveCadreId)) {
             countSql = countSql.replace("{$我的账户干部编号}", currentReserveCadreId);
         }
-        countSql = countSql.replace("${deptId}", dataOrganizationId);
+        StringBuilder countSqlBuilder = new StringBuilder();
 
+        if (dataOrganizationId.contains(",")) {
+            String[] dataOrgIds = dataOrganizationId.split(",");
+            for (String dataOrgId : dataOrgIds) {
+                String empIdSql = countSql.replace("${deptId}", dataOrgId);
+                countSqlBuilder.append(empIdSql).append(" UNION( ");
+            }
+        } else {
+            countSql = countSql.replace("${deptId}", dataOrganizationId);
+            countSql = "SELECT count(DISTINCT id) from(" + countSql + ")";
+            long count = jdbc.queryForObject(countSql, Long.class);
+            return count;
+        }
+        if (countSqlBuilder.length() > 0) {
+            int length = dataOrganizationId.split(",").length;
+            countSqlBuilder = new StringBuilder(countSqlBuilder.substring(0, countSqlBuilder.lastIndexOf(" UNION( ")));
+            for (int i = 0; i < length; i++) {
+                countSqlBuilder.append(")");
+            }
+        }
 
-        countSql = "SELECT count(DISTINCT id) from(" + countSql + ")";
+        countSql = "SELECT count(DISTINCT id) from(" + countSqlBuilder;
 
         long count = jdbc.queryForObject(countSql, Long.class);
         return count;
