@@ -14,6 +14,8 @@ public class Expression {
 
     private Param param2;
 
+    private Param param3;
+
     private boolean isBracketsNode;
 
     private List<Expression> subExprs;
@@ -56,6 +58,14 @@ public class Expression {
 
     public void setParam2(Param param2) {
         this.param2 = param2;
+    }
+
+    public Param getParam3() {
+        return param3;
+    }
+
+    public void setParam3(Param param3) {
+        this.param3 = param3;
     }
 
     public boolean isBracketsNode() {

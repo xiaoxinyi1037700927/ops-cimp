@@ -1,6 +1,7 @@
 package com.sinosoft.ops.cimp.controller.archive;
 
 
+import com.sinosoft.ops.cimp.annotation.ArchiveApiGroup;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.entity.archive.ArchiveMaterialFile;
 import com.sinosoft.ops.cimp.exception.BusinessException;
@@ -29,8 +30,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-@Api("archiveMaterialFileController")
+@ArchiveApiGroup
+@Api("干部档案文件控制器")
 @Controller("archiveMaterialFileController")
 @RequestMapping("/archiveMaterialFile")
 public class ArchiveMaterialFileController extends BaseController {
@@ -42,13 +43,7 @@ public class ArchiveMaterialFileController extends BaseController {
 	@Resource 
 	private ArchiveMaterialService archiveMaterialService;
 
-	@Resource
-	private MongoDbDaoImpl mongoDbDao;
-	@ApiOperation("添加图片")
-	@RequestMapping(value = "/save",method = RequestMethod.GET)
-	public void save() throws IOException {
-			mongoDbDao.save();
-	}
+
 
 	/**
 	 * 根据人员ID+档案分类ID 获取 ArchiveMaterialFile集合
@@ -100,11 +95,11 @@ public class ArchiveMaterialFileController extends BaseController {
 	 */
 	@ApiOperation("根据指定档案ID 和pageNo获取")
 	@ApiImplicitParams({
-			@ApiImplicitParam(name = "pageNo", value = "pageNo", dataType = "String", required = true, paramType = "query"),
-			@ApiImplicitParam(name = "archiveMaterialId", value = "archiveMaterialId", dataType = "String", required = true, paramType = "query"),
-			@ApiImplicitParam(name = "type", value = "type", dataType = "String", required = true, paramType = "query")
+			@ApiImplicitParam(name = "pageNo", value = "页数", dataType = "String", required = true, paramType = "query"),
+			@ApiImplicitParam(name = "archiveMaterialId", value = "档案id", dataType = "String", required = true, paramType = "query"),
+			@ApiImplicitParam(name = "type", value = "文件类型", dataType = "String", required = true, paramType = "query")
 	})
-	@RequestMapping(value = "/findbyArchiveMaterialIDAndPageNo",method = RequestMethod.GET)
+	@RequestMapping(value = "/findbyArchiveMaterialIDAndPageNo",method = RequestMethod.POST)
 	public void findbyArchiveMaterialIDAndPageNo(HttpServletRequest request, HttpServletResponse response) throws BusinessException {
 		try {
 			String archiveMaterialId =request.getParameter("archiveMaterialId");			
@@ -118,13 +113,14 @@ public class ArchiveMaterialFileController extends BaseController {
 			ArchiveMaterialFile archiveMaterialFile = archiveMaterialFileService.findbypageNo(archiveMaterialId, pageNumber,type);
 			if(archiveMaterialFile!=null){
 				//保存路径
-				String relPath = request.getSession().getServletContext().getRealPath("resources/download/");
-				System.out.println(relPath);
+				String relPath = request.getSession().getServletContext().getRealPath("");
+
 				//返回 保存路径 和 文件名列表
 				Map<String,Object> map = new HashMap<String,Object>() ;
 				String id = archiveMaterialFile.getFileStorageRef();
 				String fileName=id+".jpg";
 				Path path = Paths.get(relPath,fileName);
+				System.out.println(path);
 				mongoDbService.downloadToFileDecryptWithAES(fileName, path);
 				map.put("location", "resources/download/" + fileName);
 				writeJson(response, ok(map));
@@ -142,13 +138,13 @@ public class ArchiveMaterialFileController extends BaseController {
 	 * @param request->archiveMaterialId :ArchiveMaterialFile ID
 	 * @return ArchiveMaterialFile
 	 */
-	@ApiOperation("根据指定 ArchiveMaterialFile ID 获取单个ArchiveMaterialFile")
+	@ApiOperation("根据指定 干部档案文件 ID 获取单个干部档案文件")
 	@ApiImplicitParam(name = "archiveMaterialId",
-			value = "archiveMaterialId",
+			value = "干部档案文件 ID",
 			dataType = "String",
 			required = true,
 			paramType = "query")
-	@RequestMapping(value = "/getArchiveMaterialFileByID", method = RequestMethod.GET)
+	@RequestMapping(value = "/getArchiveMaterialFileByID", method = RequestMethod.POST)
 	public void getArchiveMaterialFileByID(HttpServletRequest request, HttpServletResponse response) throws BusinessException {
 		try {
 			String archiveMaterialId =request.getParameter("archiveMaterialId");
@@ -170,13 +166,13 @@ public class ArchiveMaterialFileController extends BaseController {
 	 * @param request->archiveMaterialId  Archive_Material_ID
 	 * @return ArchiveMaterialFile集合  List<ArchiveMaterialFile>
 	 */
-	@ApiOperation("根据指定 Archive_Material_ID 获取 ArchiveMaterialFile集合 List<ArchiveMaterialFile>")
+	@ApiOperation("根据指定 Archive_Material_ID 获取 档案文件集合 List<ArchiveMaterialFile>")
 	@ApiImplicitParam(name = "archiveMaterialId",
-			value = "archiveMaterialId",
+			value = "档案id",
 			dataType = "String",
 			required = true,
 			paramType = "query")
-	@RequestMapping(value = "/getAMFileListByAMID",method = RequestMethod.GET)
+	@RequestMapping(value = "/getAMFileListByAMID",method = RequestMethod.POST)
 	public void getArchiveMaterialFileByAchiveMaterialID(HttpServletRequest request, HttpServletResponse response) throws BusinessException {
 		try {
 			String archiveMaterialId =request.getParameter("archiveMaterialId");

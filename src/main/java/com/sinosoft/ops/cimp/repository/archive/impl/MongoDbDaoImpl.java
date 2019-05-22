@@ -1,5 +1,6 @@
 package com.sinosoft.ops.cimp.repository.archive.impl;
 
+import com.mongodb.*;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.GridFSBuckets;
@@ -91,7 +92,7 @@ public class MongoDbDaoImpl implements MongoDbDao {
             // 获取文件头信息
             Query queryWhereId = new Query(Criteria.where("_id").is(id));
 
-            gfsf = mongoTemplate.findOne(queryWhereId, GridFSFile.class);
+            gfsf = mongoTemplate.findOne(queryWhereId,GridFSFile.class);
 //            gfsf = gridFsTemplate.findOne(queryWhereId);
             if (gfsf == null)
                 throw new CannotFindMongoDbResourceById(queryWhereId);
