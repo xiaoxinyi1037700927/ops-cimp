@@ -344,7 +344,7 @@ public class CadreController extends BaseController {
             baseResult.setData("移动的两个干部不属于同一个单位无法移动");
             baseResult.setMessage("移动的两个干部不属于同一个单位无法移动");
         }
-        return ok(baseResult);
+        return ResponseEntity.ok(baseResult);
     }
 
     @ApiOperation(value = "修改干部单位内排序")
