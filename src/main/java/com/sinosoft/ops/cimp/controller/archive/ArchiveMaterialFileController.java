@@ -127,7 +127,7 @@ public class ArchiveMaterialFileController extends BaseController {
 				map.put("location", "" + fileName);
 				writeJson(response, ok(map));
 			}else{
-				writeJson(response, ok("不存在Archive_Material_ID="+archiveMaterialId+"的记录"));
+				writeJson(response, fail("不存在Archive_Material_ID="+archiveMaterialId+"的记录"));
 			}
 		} catch (Exception e) {
 			logger.error("查询失败！", e);

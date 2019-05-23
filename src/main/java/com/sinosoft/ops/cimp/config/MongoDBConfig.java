@@ -49,7 +49,7 @@ public class MongoDBConfig {
     public MongoTemplate mongoTemplate() {
 
         ServerAddress serverAddress = new ServerAddress(mongoClientIp, mongoClientPort);
-        MongoClientOptions options = MongoClientOptions.builder().requiredReplicaSetName("192.168.0.143:27017").build();
+        MongoClientOptions options = MongoClientOptions.builder().build();
         MongoClient mongoClient = new MongoClient(serverAddress, options);
         mongoClient.getMongoClientOptions();
         SimpleMongoDbFactory simpleMongoDbFactory = new SimpleMongoDbFactory(mongoClient, mongoDbName);

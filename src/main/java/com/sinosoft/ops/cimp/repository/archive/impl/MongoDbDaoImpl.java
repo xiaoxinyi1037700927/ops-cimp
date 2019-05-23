@@ -16,6 +16,7 @@ import org.bson.BsonString;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -33,6 +34,12 @@ public class MongoDbDaoImpl implements MongoDbDao {
     @Autowired
     private MongoTemplate mongoTemplate;
 
+    @Value("${mongoClientIp}")
+    private String host;
+    @Value("${mongoClientPort}")
+    private Integer Port;
+    @Value("${mongoDbName}")
+    private String mongoDbName;
 
     @Override
     public String uploadFromFile(File file) throws IOException {
@@ -93,26 +100,33 @@ public class MongoDbDaoImpl implements MongoDbDao {
 
         try {
             //链接服务器
-            Mongo mongo = new Mongo("192.168.0.143", 27017);
+            Mongo mongo = new Mongo(host, Port);
             //连接数据库
-            DB db = mongo.getDB("iimp");
+            DB db = mongo.getDB(mongoDbName);
             GridFS gridFS = new GridFS(db);
 
+            BasicDBObject basicDBObject=new BasicDBObject();
+            basicDBObject.put("_id",id);
+            DBObject query=basicDBObject;
+            gridFSOne = gridFS.findOne(query);
+            System.out.println(gridFSOne);
 
-            gridFSOne = gridFS.findOne(id);
+            GridFSBucket gfsb = GridFSBuckets.create(mongoTemplate.getDb());
+            gfsb.downloadToStream(new BsonString(id), os);
         } finally {
             IOUtils.closeQuietly(os);
         }
-      /*   GridFSFile gridFSFile=null;
+        /* GridFSFile gfsf=null;
        try {
             // 获取文件头信息
-            Query queryWhereId = new Query(Criteria.where("_id").is(id));
-
-            gridFSFile = mongoTemplate.findOne(queryWhereId,GridFSFile.class);
+           BasicDBObject queryWhereId=new BasicDBObject();
+           queryWhereId.put("_id",id);
+           gfsf = mongoTemplate.findAll(GridFSFile.class).get(1);
+           System.out.println(gfsf);
 //            gfsf = gridFsTemplate.findOne(queryWhereId);
-            if (gridFSFile == null)
-                throw new CannotFindMongoDbResourceById(queryWhereId);
-//
+//            if (gfsf == null)
+//                throw new CannotFindMongoDbResourceById(queryWhereId);
+
             // 获取多块二进制数据,写入到输出流
             GridFSBucket gfsb = GridFSBuckets.create(mongoTemplate.getDb());
             gfsb.downloadToStream(new BsonString(id), os);
