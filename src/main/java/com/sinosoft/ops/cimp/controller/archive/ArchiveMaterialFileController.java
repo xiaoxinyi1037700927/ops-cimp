@@ -18,6 +18,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -102,7 +103,7 @@ public class ArchiveMaterialFileController extends BaseController {
 			@ApiImplicitParam(name = "type", value = "文件类型", dataType = "String", required = true, paramType = "query")
 	})
 	@RequestMapping(value = "/findbyArchiveMaterialIDAndPageNo",method = RequestMethod.POST)
-	public void findbyArchiveMaterialIDAndPageNo(HttpServletRequest request, HttpServletResponse response) throws BusinessException {
+	public ResponseEntity findbyArchiveMaterialIDAndPageNo(HttpServletRequest request, HttpServletResponse response) throws BusinessException {
 		try {
 			String archiveMaterialId =request.getParameter("archiveMaterialId");			
 			String pageNo =request.getParameter("pageNo");
@@ -115,7 +116,8 @@ public class ArchiveMaterialFileController extends BaseController {
 			ArchiveMaterialFile archiveMaterialFile = archiveMaterialFileService.findbypageNo(archiveMaterialId, pageNumber,type);
 			if(archiveMaterialFile!=null){
 				//保存路径
-				String relPath = request.getSession().getServletContext().getRealPath("");
+				String relPath = request.getSession().getServletContext().getRealPath("/");
+				System.out.println(relPath);
 
 				//返回 保存路径 和 文件名列表
 				Map<String,Object> map = new HashMap<String,Object>() ;
@@ -125,13 +127,15 @@ public class ArchiveMaterialFileController extends BaseController {
 				System.out.println(path);
 				mongoDbService.downloadToFileDecryptWithAES(fileName, path);
 				map.put("location", "" + fileName);
-				ok(map);
+				map.put("PageCount",archiveMaterialFile.getPageCount());
+				map.put("PageNumber",archiveMaterialFile.getPageNumber());
+				return ok(map);
 			}else{
-			fail("不存在Archive_Material_ID="+archiveMaterialId+"的记录");
+				return fail("不存在Archive_Material_ID="+archiveMaterialId+"的记录");
 			}
 		} catch (Exception e) {
 			logger.error("查询失败！", e);
-			fail("查询失败");
+			return fail("查询失败");
 		}
 	}
 
@@ -147,18 +151,18 @@ public class ArchiveMaterialFileController extends BaseController {
 			required = true,
 			paramType = "query")
 	@RequestMapping(value = "/getArchiveMaterialFileByID", method = RequestMethod.POST)
-	public void getArchiveMaterialFileByID(HttpServletRequest request, HttpServletResponse response) throws BusinessException {
+	public ResponseEntity getArchiveMaterialFileByID(HttpServletRequest request, HttpServletResponse response) throws BusinessException {
 		try {
 			String archiveMaterialId =request.getParameter("archiveMaterialId");
 			ArchiveMaterialFile archiveMaterialFile = archiveMaterialFileService.getById(archiveMaterialId);
 			if(archiveMaterialFile!=null){
-				ok(archiveMaterialFile);
+				return ok(archiveMaterialFile);
 			}else{
-				fail("不存在archiveMaterialId="+archiveMaterialId+"的记录");
+				return fail("不存在archiveMaterialId="+archiveMaterialId+"的记录");
 			}
 		} catch (Exception e) {
 			logger.error("查询失败！", e);
-			fail("查询失败");
+			return fail("查询失败");
 		}
 	}
 
@@ -175,13 +179,13 @@ public class ArchiveMaterialFileController extends BaseController {
 			required = true,
 			paramType = "query")
 	@RequestMapping(value = "/getAMFileListByAMID",method = RequestMethod.POST)
-	public void getArchiveMaterialFileByAchiveMaterialID(HttpServletRequest request, HttpServletResponse response) throws BusinessException {
+	public ResponseEntity getArchiveMaterialFileByAchiveMaterialID(HttpServletRequest request, HttpServletResponse response) throws BusinessException {
 		try {
 			String archiveMaterialId =request.getParameter("archiveMaterialId");
 			List<ArchiveMaterialFile> archiveMaterialFileList = (List<ArchiveMaterialFile>)archiveMaterialFileService.getArchiveMaterialFilebyAchiveMaterialID(archiveMaterialId);
 			if(archiveMaterialFileList!=null&&archiveMaterialFileList.size()!=0){
 				String relPath = request.getSession().getServletContext().getRealPath("resources/download/");
-				Map<String,Object> map = new HashMap<String,Object>() ;
+				Map<String,Object> map = new HashMap<String,Object>();
 				List<String> fileNameList = new ArrayList<String>();
 				String  id="";
 				Path path=null;
@@ -197,13 +201,13 @@ public class ArchiveMaterialFileController extends BaseController {
 				}
 				map.put("fileNameList",fileNameList);
 				map.put("location", "resources/download/");
-				ok(map);
+				return ok(map);
 			}else{
-				fail("不存在Archive_Material_ID="+archiveMaterialId+"的记录");
+				return fail("不存在Archive_Material_ID="+archiveMaterialId+"的记录");
 			}
 		} catch (Exception e) {
 			logger.error("查询失败！", e);
-			fail("查询失败");
+			return fail("查询失败");
 		}
 	}
 

@@ -19,6 +19,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -45,20 +46,22 @@ public class BusinessController extends BaseController {
 	@ApiOperation("根据depid查申请人信息和岗位")
 	@ApiImplicitParam(name = "depId",value = "depid", dataType = "String", required = true, paramType = "query")
 	@RequestMapping(value = "/getPersonAndPostByDepid",method = RequestMethod.POST)
-	public void getPersonAndPostByDepid(HttpServletRequest request, HttpServletResponse response) throws Exception{
+	public ResponseEntity getPersonAndPostByDepid(HttpServletRequest request, HttpServletResponse response) throws Exception{
+		Map<String,Object> map=new HashMap<String,Object>();
 		String Depid=request.getParameter("depId");
 		List<PersonAndPost>	personAndPost = businessService.getPersonAndPostByDepid(Depid);
-		ok(personAndPost);
+		System.out.println(personAndPost);
+		return ok(personAndPost);
 	}
 
-	@ApiOperation("")
+	/*@ApiOperation("")
 	@ApiImplicitParam(name = "empid",value = "所要查看人的id", dataType = "String", required = true, paramType = "query")
 	@RequestMapping(value = "/getA02ByDepid",method = RequestMethod.POST)
-	public void getA02ByDepid(HttpServletRequest request, HttpServletResponse response) throws Exception{
+	public ResponseEntity getA02ByDepid(HttpServletRequest request, HttpServletResponse response) throws Exception{
 		String Depid=request.getParameter("depId");
 		List<Map<String, Object>>	A02ByDep = businessService.getA02ByDepid(Depid);
-		ok(A02ByDep);
-	}
+		return ok(A02ByDep);
+	}*/
 	
 /*	@RequestMapping("/updateA02Data")
 	public void updateA02Data(HttpServletRequest request, HttpServletResponse response) throws BusinessException {
@@ -77,7 +80,7 @@ public class BusinessController extends BaseController {
 	@ApiOperation("树结构")
 	@ApiImplicitParam(name = "empid",value = "所要查看人的id", dataType = "String", required = true, paramType = "query")
 	@RequestMapping(value = "/getPersonMaterial",method = RequestMethod.POST)
-	public void getPersonMaterial(HttpServletRequest request, HttpServletResponse response) throws Exception{
+	public ResponseEntity getPersonMaterial(HttpServletRequest request, HttpServletResponse response) throws Exception{
 
 		String userid=SecurityUtils.getSubject().getCurrentUser().getId();
 		boolean flag=false;
@@ -89,20 +92,20 @@ public class BusinessController extends BaseController {
 		if(flag){
 			String empid=request.getParameter("empid");
 			List<HashMap<String, Object>> prsonMaterial = businessService.getPersonMaterial(empid);
-			ok(prsonMaterial);
+			return ok(prsonMaterial);
 		}else{
-			fail("抱歉您无查看档案权限！");
+			return fail("抱歉您无查看档案权限！");
 		}
 	
 	}
-	@ApiOperation("获取系统时间")
+	/*@ApiOperation("获取系统时间")
 	@RequestMapping(value = "/getSystemDate",method = RequestMethod.POST)
-	public void revoke(HttpServletRequest request, HttpServletResponse response) throws BusinessException {
+	public ResponseEntity revoke(HttpServletRequest request, HttpServletResponse response) throws BusinessException {
 		try {
-			ok(DateTime.now().toString("yyyy-MM-dd HH:mm:ss"));
+			return ok(DateTime.now().toString("yyyy-MM-dd HH:mm:ss"));
 		} catch (Exception e) {
 			logger.error("取得系统时间失败！", e);
-			fail("取得系统时间失败!");
+			return fail("取得系统时间失败!");
 		}
-	}
+	}*/
 }

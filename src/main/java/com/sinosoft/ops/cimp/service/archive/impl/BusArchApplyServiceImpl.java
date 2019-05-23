@@ -103,9 +103,11 @@ public class BusArchApplyServiceImpl implements BusArchApplyService {
 //			Collection<UserRole> listsysUserRole = busArchApplyRepository.getByUserId(UUID.fromString(userid));
 //			if (listsysUserRole.size()>0 && listsysUserRole.stream().filter(temp -> temp.getRoleId() == 400).count() > 0) {
 				listBus = busArchApplyRepository.findAllByVerifyType();
+				System.out.println(listBus.get(0).getId());
 				for(BusArchApply busArchApply:listBus)
 				{
 					List<BusArchApplyPerson> ListBusArchApplyPerson =busArchApplyPersonRepository.findAllByApplyId(busArchApply.getId());
+					System.out.println(ListBusArchApplyPerson);
 					String strPerson ="";
 					for(BusArchApplyPerson busArchApplyPerson : ListBusArchApplyPerson)
 					{
@@ -195,7 +197,7 @@ public class BusArchApplyServiceImpl implements BusArchApplyService {
 //		{
 //			listpm=getChildCate(listpm,bad.getArchiveMaterialId());
 //		}
-//		
+
 		return listpm;
 	}
 	

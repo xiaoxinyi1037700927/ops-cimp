@@ -21,6 +21,7 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -50,7 +51,7 @@ public class BusArchApplyController  extends BaseController {
 			@ApiImplicitParam(name = "data",value = "数据", dataType = "String", required = true, paramType = "query")
 	})
 	@RequestMapping(value = "/create",method = RequestMethod.POST)
-	public void create(HttpServletRequest request, HttpServletResponse response, BusArchApply entity) throws BusinessException {
+	public ResponseEntity create(HttpServletRequest request, HttpServletResponse response, BusArchApply entity) throws BusinessException {
 		try {
 			
 			String reason ="";
@@ -71,7 +72,7 @@ public class BusArchApplyController  extends BaseController {
 			{
 				BusArchApplyPerson bap = new BusArchApplyPerson();
 				JSONObject temp = JSONObject.parseObject(ob.toString());
-				bap.setApplyId(applyid.toString());
+				bap.setApplyId(applyid);
 				String personid = UUID.randomUUID().toString();
 				bap.setId(personid);
 				bap.setEmpid(temp.getString("empId"));
@@ -87,8 +88,8 @@ public class BusArchApplyController  extends BaseController {
 					JSONObject tempdetail = JSONObject.parseObject(obdetail.toString());
 					String detailid = UUID.randomUUID().toString();
 					bad.setId(detailid);
-					bad.setApplyid(applyid.toString());
-					bad.setPersonid(personid.toString());
+					bad.setApplyid(applyid);
+					bad.setPersonid(personid);
 					bad.setArchiveMaterialId(tempdetail.getString("archiveMaterialId"));
 					bad.setArchiveMaterialText(tempdetail.getString("archiveMaterialText"));
 					bad.setCategoryId(tempdetail.getString("categoryId"));
@@ -98,30 +99,30 @@ public class BusArchApplyController  extends BaseController {
 			}		
 
 			busArchApplyService.create(entity,baplist,badlist);
-			ok("保存成功！");
+			return  ok("保存成功！");
 		} catch (Exception e) {
 			logger.error("创建失败！", e);
-			fail("保存失败！");
+			return fail("保存失败！");
 		}
 	}
 
-	@ApiOperation("查看档案申请")
-	@ApiImplicitParam(name = "resouceId",value = "...", dataType = "String", required = true, paramType = "query")
+	@ApiOperation("查看档案申请和审批")
+	@ApiImplicitParam(name = "resouceId",value = "11为查看申请，其他为审批", dataType = "String", required = true, paramType = "query")
 	@RequestMapping(value = "/getApplyByUser",method = RequestMethod.POST)
-	public void getApplyByUser(HttpServletRequest request, HttpServletResponse response) throws BusinessException {
+	public ResponseEntity getApplyByUser(HttpServletRequest request, HttpServletResponse response) throws BusinessException {
 		String userid =SecurityUtils.getSubject().getCurrentUser().getId();
 		String resouceId = request.getParameter("resouceId");
 		List<BusArchApply> listba = busArchApplyService.getApplyByUser(userid,resouceId);
-		ok(listba);
+		return  ok(listba);
 	}
 
 	@ApiOperation("根据id 查询申请详情")
 	@ApiImplicitParam(name = "id",value = "id", dataType = "String", required = true, paramType = "query")
 	@RequestMapping(value = "/getPersonByApplyId",method = RequestMethod.POST)
-	public void getPersonByApplyId(HttpServletRequest request, HttpServletResponse response) throws BusinessException {
+	public ResponseEntity getPersonByApplyId(HttpServletRequest request, HttpServletResponse response) throws BusinessException {
 		String id = request.getParameter("id");
 		List<HashMap<String, Object>> listbap = busArchApplyService.getPersonByApplyId(id);
-		ok( listbap);
+		return  ok( listbap);
 	}
 
 	@ApiOperation("申请和审批档案树")
@@ -130,23 +131,29 @@ public class BusArchApplyController  extends BaseController {
 			@ApiImplicitParam(name = "applyid",value = "申请时为空", dataType = "String", required = true, paramType = "query")
 	})
 	@RequestMapping(value = "/getTreeByApplyId",method = RequestMethod.POST)
-	public void getTreeByApplyId(HttpServletRequest request, HttpServletResponse response) throws BusinessException {
+	public ResponseEntity getTreeByApplyId(HttpServletRequest request, HttpServletResponse response) throws BusinessException {
 		String id = request.getParameter("applyid");
 		String empid = request.getParameter("empid");
 		List<HashMap<String, Object>> listbap = busArchApplyService.getTreeByApplyId(id,empid);
-		ok( listbap);
+		return ok( listbap);
 	}
 
-	/*@RequestMapping("/getDetailByPersonId")
+	/*@RequestMapping(value = "/getDetailByPersonId",method = RequestMethod.POST)
 	public void getDetailByPersonId(HttpServletRequest request, HttpServletResponse response) throws BusinessException {
 		String id = request.getParameter("id");
 		String empid = request.getParameter("empid");
 		List<HashMap<String, Object>> listbad = busArchApplyService.getDetailByPersonId(id,empid);
 		writeJson(response,ok(listbad));
-	}
+	}*/
 
-	@RequestMapping("/update")
-	public void update(HttpServletRequest request, HttpServletResponse response, BusArchApply entity) throws BusinessException {
+	@ApiOperation("修改申请查看档案")
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "reason",value = "所要查看档案的理由", dataType = "String", required = true, paramType = "query"),
+			@ApiImplicitParam(name = "endTime",value = "结束时间", dataType = "String", required = true, paramType = "query"),
+			@ApiImplicitParam(name = "data",value = "数据和创建一样", dataType = "String", required = true, paramType = "query")
+	})
+	@RequestMapping(value = "/update",method = RequestMethod.POST)
+	public ResponseEntity update(HttpServletRequest request, HttpServletResponse response, BusArchApply entity) throws BusinessException {
 		try {
 
 			String reason ="";
@@ -224,39 +231,49 @@ public class BusArchApplyController  extends BaseController {
 			}
 			
 			busArchApplyService.update(entity,baplist,badlist,listDelPerson,listDelArch);
-			writeJson(response, ok("保存成功！"));
+			return ok("保存成功！");
 		} catch (Exception e) {
 			logger.error("保存失败！", e);
-			writeJson(response, fail("保存失败！"));
+			return fail("保存失败！");
 		}
 	}
 
-	@RequestMapping("/delete")
-	public void delete(HttpServletRequest request, HttpServletResponse response, BusArchApply entity) throws BusinessException {
+	@ApiOperation("删除申请查看档案")
+	@ApiImplicitParam(name = "applyid",value = "申请id", dataType = "String", required = true, paramType = "query")
+	@RequestMapping(value = "/delete",method = RequestMethod.POST)
+	public ResponseEntity delete(HttpServletRequest request, HttpServletResponse response, BusArchApply entity) throws BusinessException {
 		try {
 			String applyid = request.getParameter("applyid");
 			busArchApplyService.updateflg(applyid,-1);
-			writeJson(response, ok("删除成功！"));
+			return ok("删除成功！");
 		} catch (Exception e) {
 			logger.error("删除失败！", e);
-			writeJson(response, fail("删除失败！"));
+			return fail("删除失败！");
 		}
 	}
-	
-	@RequestMapping("/revoke")
-	public void revoke(HttpServletRequest request, HttpServletResponse response, BusArchApply entity) throws BusinessException {
+
+	@ApiOperation("删除申请查看档案")
+	@ApiImplicitParam(name = "applyid",value = "申请id", dataType = "String", required = true, paramType = "query")
+	@RequestMapping(value = "/revoke",method = RequestMethod.POST)
+	public ResponseEntity revoke(HttpServletRequest request, HttpServletResponse response, BusArchApply entity) throws BusinessException {
 		try {
 			String applyid = request.getParameter("applyid");
 			busArchApplyService.updateflg(applyid,0);
-			writeJson(response, ok("撤回成功！"));
+			return ok("撤回成功！");
 		} catch (Exception e) {
 			logger.error("撤回失败！", e);
-			writeJson(response, fail("撤回失败！"));
+			return fail("撤回失败！");
 		}
 	}
-	
-	@RequestMapping("/updateVerifyMessage")
-	public void updateVerifyMessage(HttpServletRequest request, HttpServletResponse response) throws BusinessException {
+
+	@ApiOperation("退回申请查看档案")
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "reason",value = "所要查看档案的理由", dataType = "String", required = true, paramType = "query"),
+			@ApiImplicitParam(name = "operatortype",value = "操作人员 0为申请通过", dataType = "String", required = true, paramType = "query"),
+			@ApiImplicitParam(name = "verifyType",value ="核实类型", dataType = "String", required = true, paramType = "query")
+	})
+	@RequestMapping(value = "/updateVerifyMessage",method = RequestMethod.POST)
+	public ResponseEntity updateVerifyMessage(HttpServletRequest request, HttpServletResponse response) throws BusinessException {
 		try {
 			String reason ="";
 			if(request.getParameter("reason")!=null)reason =request.getParameter("reason").toString();
@@ -274,12 +291,11 @@ public class BusArchApplyController  extends BaseController {
 			else
 			{
 				verifyType=verifyType+1;
-				List<Role> roles = userRoleService.getRolesByUserId(userid);
+				List<Role> roles =  userRoleService.getRolesByUserId(userid);
 				if (roles.size()>0 && roles.stream().filter(temp -> temp.getCode().equals("90")).count() > 0) {
 					verifyType=100;
 				}
 			}
-
 
 			BusArchApply entity= new BusArchApply(applyid, userid, username,reason,Timestamp.valueOf(request.getParameter("endTime")), new Timestamp(System.currentTimeMillis()), username);
 			entity.setVerifyType(verifyType);
@@ -288,11 +304,11 @@ public class BusArchApplyController  extends BaseController {
 			entity.setRevokeReason(revokeReason);
 			entity.setOrdinal(0);
 			busArchApplyService.update(entity);
-			writeJson(response, ok("更新成功！"));
+			return ok("更新成功！");
 		} catch (Exception e) {
 			logger.error("更新失败！", e);
-			writeJson(response, fail("更新失败！"));
+			return fail("更新失败！");
 		}
-	}*/
+	}
 
 }

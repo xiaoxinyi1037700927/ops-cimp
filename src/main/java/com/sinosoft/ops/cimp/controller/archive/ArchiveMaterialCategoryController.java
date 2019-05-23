@@ -120,12 +120,7 @@ public class ArchiveMaterialCategoryController extends BaseController {
 	public void testrelated(HttpServletRequest request, HttpServletResponse response) throws BusinessException {
 		String userid="";
 		String empId=request.getParameter("empId");
-//		if(this.getCurrentUser().getName().equals("sa")){
-//			writeJson(response, ResponseResult.success(0,"查询成功",null));
-//		}else{
-//			
-//		}
-		//this.getCurrentUser().getEMP_ID里的数据不对 所以获取userid 到sys_user中重新获取emp_id
+
 		if(SecurityUtils.getSubject().getCurrentUser().getId().toString().contains("-")){
 			userid=SecurityUtils.getSubject().getCurrentUser().getId().toString().replace("-", "");
 		}else{

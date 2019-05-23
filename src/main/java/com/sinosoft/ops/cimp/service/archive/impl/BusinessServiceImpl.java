@@ -1,6 +1,7 @@
 package com.sinosoft.ops.cimp.service.archive.impl;
 
 
+import com.google.common.collect.Lists;
 import com.sinosoft.ops.cimp.entity.archive.ArchiveMaterial;
 import com.sinosoft.ops.cimp.entity.archive.ArchiveMaterialCategory;
 import com.sinosoft.ops.cimp.repository.archive.ArchiveMaterialCategoryRepository;
@@ -9,9 +10,11 @@ import com.sinosoft.ops.cimp.repository.archive.busarch.BusArchApplyRepository;
 import com.sinosoft.ops.cimp.service.archive.BusinessService;
 import com.sinosoft.ops.cimp.service.archive.bean.bean.PersonAndPost;
 import com.sinosoft.ops.cimp.util.StringUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,11 +34,39 @@ public class BusinessServiceImpl  implements BusinessService {
 	private ArchiveMaterialCategoryRepository archiveMaterialCategoryRepository;
 	@Autowired
 	private ArchiveMaterialRepository archiveMaterialRepository;
-	
+	@Autowired
+	private JdbcTemplate jdbcTemplate;
 	@Override
 	@Transactional(readOnly=true)
 	public List<PersonAndPost> getPersonAndPostByDepid(String Depid) {
-		return busArchApplyRepository.getPersonAndPostByDepid(Depid);
+		String sql = "select t1.emp_id,t1.a01001,A02016_A from EMP_A001 t1  left join (   select *  " +
+				"from (select row_number() over(partition by a02_b.emp_id order by a02_b.A02025 desc) rownumber, " +
+				"a02_b.*  from EMP_A02 a02_b  where a02_b.status = 0 and a02_b.A02055='2') a02_a " +
+				"where a02_a.rownumber = 1  ) a02 on t1.emp_id = a02.emp_id " +
+				"where t1.A01063 = '1'  and  t1.emp_id in( " +
+				"select t_t1.emp_id from EMP_A001 t_t1 where t_t1.A001004_A= ?  " +
+				"union all select a02.emp_id emp_id from EMP_A02 a02 " +
+				" where status=0 and A02055='2' and A02001_B = ? )";
+
+		List<PersonAndPost> result = Lists.newArrayList();
+		List<Map<String, Object>> maps = jdbcTemplate.queryForList(sql, Depid,Depid);
+		for (Map<String, Object> map : maps) {
+			Object emp_id = map.get("emp_id");
+			Object a01001 = map.get("a01001");
+			Object a02016_a = map.get("A02016_A");
+			if (emp_id != null) {
+				PersonAndPost personAndPost = new PersonAndPost();
+				personAndPost.setempid(String.valueOf(emp_id));
+				if (a01001 != null) {
+					personAndPost.setName(String.valueOf(a01001));
+				}
+				if (a02016_a != null) {
+					personAndPost.setPost(String.valueOf(a02016_a));
+				}
+				result.add(personAndPost);
+			}
+		}
+		return result;
 	}
 	
 	@Override
