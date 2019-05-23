@@ -36,8 +36,9 @@ public interface CadreService {
 
     /**
      * 修改干部在单位内排序
+     *
      */
-    boolean modifySortInDep(List<CadreSortInDepModifyModel> modifyModels);
+    boolean modifySortInDep(CadreSortInDepModifyModel modifyModels) throws BusinessException;
 
     /**
      * 修改干部状态

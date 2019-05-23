@@ -3,18 +3,25 @@ package com.sinosoft.ops.cimp.vo.from.cadre;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import java.io.Serializable;
+
 @ApiModel(description = "修改干部在单位内排序模型")
-public class CadreSortInDepModifyModel {
+public class CadreSortInDepModifyModel implements Serializable {
+    private static final long serialVersionUID = -4352440617082895845L;
     /**
      * 单位id
      */
     @ApiModelProperty(value = "单位id")
     private String orgId;
-    /**
-     * 干部id
-     */
-    @ApiModelProperty(value = "干部id")
-    private String empId;
+
+    @ApiModelProperty(value = "需要移动的人员id")
+    private String fromEmpId;
+
+    @ApiModelProperty(value = "被移动的人员id")
+    private String toEmpId;
+
+    @ApiModelProperty(value = "移动类型(0.移动到之前1.移动到之后)")
+    private String moveType;
     /**
      * 排序号
      */
@@ -29,12 +36,28 @@ public class CadreSortInDepModifyModel {
         this.orgId = orgId;
     }
 
-    public String getEmpId() {
-        return empId;
+    public String getFromEmpId() {
+        return fromEmpId;
     }
 
-    public void setEmpId(String empId) {
-        this.empId = empId;
+    public void setFromEmpId(String fromEmpId) {
+        this.fromEmpId = fromEmpId;
+    }
+
+    public String getToEmpId() {
+        return toEmpId;
+    }
+
+    public void setToEmpId(String toEmpId) {
+        this.toEmpId = toEmpId;
+    }
+
+    public String getMoveType() {
+        return moveType;
+    }
+
+    public void setMoveType(String moveType) {
+        this.moveType = moveType;
     }
 
     public String getSortNumber() {
