@@ -2,7 +2,6 @@ package com.sinosoft.ops.cimp.service.cadre.impl;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.sinosoft.ops.cimp.constant.OpsErrorMessage;
 import com.sinosoft.ops.cimp.dao.SysTableInfoDao;
 import com.sinosoft.ops.cimp.dao.domain.sys.table.SysTableModelInfo;
 import com.sinosoft.ops.cimp.entity.emp.EmpPhoto;
@@ -25,10 +24,7 @@ import javax.transaction.Transactional;
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -400,7 +396,10 @@ public class CadreServiceImpl implements CadreService {
                 i = sortInDep.indexOf(toCadreSortInDepModel) + 1;
             }
             List<CadreSortInDepModel> reSortList = sortInDep.subList(i, sortInDep.size());
-
+            if (StringUtils.equals(moveType, "0")) {
+                reSortList.removeIf((e) -> StringUtils.equals(e.getEmpId(), fromEmpId));
+                modifySortNumberMap.put(fromCadreSortInDepModel.getEmpId(), toSortNumber);
+            }
             Map<String, String> reSortMap = reSortList.stream().peek(
                     c -> {
                         String sortNumber = c.getSortNumber();
@@ -427,9 +426,34 @@ public class CadreServiceImpl implements CadreService {
             jdbcTemplate.batchUpdate(sql, params);
 
         } else {
-            throw new BusinessException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE, "移动的两个干部不属于同一个单位无法移动");
+            return false;
         }
         return true;
+    }
+
+    @Transactional
+    @Override
+    public boolean modifySortOrder(List<CadreSortInDepModifyModel> modifyModels) {
+        String sql = "UPDATE EMP_A02 SET A02025 = :sortNumber WHERE EMP_ID = :empId AND A02001_B = :orgId";
+
+        try {
+            List<Object[]> argsList = new ArrayList<>(modifyModels.size());
+            for (CadreSortInDepModifyModel modifyModel : modifyModels) {
+                Object[] args = new Object[3];
+                args[0] = modifyModel.getSortNumber();
+                args[1] = modifyModel.getFromEmpId();
+                args[2] = modifyModel.getOrgId();
+                argsList.add(args);
+
+            }
+            jdbcTemplate.batchUpdate(sql, argsList);
+
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
     }
 
     /**
