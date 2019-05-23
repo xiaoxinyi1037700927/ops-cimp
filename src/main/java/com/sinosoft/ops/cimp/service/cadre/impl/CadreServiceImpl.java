@@ -397,7 +397,8 @@ public class CadreServiceImpl implements CadreService {
             }
             List<CadreSortInDepModel> reSortList = sortInDep.subList(i, sortInDep.size());
             if (StringUtils.equals(moveType, "0")) {
-                reSortList.removeIf((e) -> StringUtils.equals(e.getEmpId(), toEmpId));
+                reSortList.removeIf((e) -> StringUtils.equals(e.getEmpId(), fromEmpId));
+                modifySortNumberMap.put(fromCadreSortInDepModel.getEmpId(), toSortNumber);
             }
             Map<String, String> reSortMap = reSortList.stream().peek(
                     c -> {
