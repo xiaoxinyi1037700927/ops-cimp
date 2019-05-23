@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.sinosoft.ops.cimp.annotation.BusinessApiGroup;
 import com.sinosoft.ops.cimp.annotation.RequiresAuthentication;
+import com.sinosoft.ops.cimp.common.BaseResult;
 import com.sinosoft.ops.cimp.constant.OpsErrorMessage;
 import com.sinosoft.ops.cimp.constant.RolePermissionPageSqlEnum;
 import com.sinosoft.ops.cimp.controller.BaseController;
@@ -333,7 +334,23 @@ public class CadreController extends BaseController {
     @PostMapping("/sortInDep/modify")
     @RequiresAuthentication
     public ResponseEntity modifySortInDep(@RequestBody CadreSortInDepModifyModel modifyModel) throws BusinessException {
-        return cadreService.modifySortInDep(modifyModel) ? ok("修改成功!") : fail("修改失败！");
+        boolean b = cadreService.modifySortInDep(modifyModel);
+        BaseResult baseResult = new BaseResult();
+        baseResult.setCode(400);
+        if (b) {
+            baseResult.setData("修改成功");
+        } else {
+            baseResult.setData("移动的两个干部不属于同一个单位无法移动");
+            baseResult.setMessage("移动的两个干部不属于同一个单位无法移动");
+        }
+        return ok(baseResult);
+    }
+
+    @ApiOperation(value = "修改干部单位内排序")
+    @PostMapping("/sortInDep/modify1")
+    @RequiresAuthentication
+    public ResponseEntity modifySortInDep(@RequestBody List<CadreSortInDepModifyModel> modifyModels) throws BusinessException {
+        return cadreService.modifySortOrder(modifyModels) ? ok("修改成功!") : fail("修改失败！");
     }
 
     @ApiOperation(value = "修改干部状态")
@@ -355,5 +372,17 @@ public class CadreController extends BaseController {
     @RequiresAuthentication
     public ResponseEntity cadreCardIdExist(@RequestParam("cardId") String cardId) throws BusinessException {
         return ok(cadreService.cadreCardIdExist(cardId));
+    }
+
+    @GetMapping(value = "/downloadTableData")
+    @ApiOperation(value = "下载人员某些信息项的数据")
+    public ResponseEntity downloadTableData(@RequestParam("empIds") String empIds, @RequestParam("tableNameEn") String tableNameEn) throws BusinessException {
+        String id = SecurityUtils.getSubject().getCurrentUser().getId();
+        String[] cadreIds = empIds.split(",");
+
+        for (int i = 0; i < cadreIds.length; i++) {
+
+        }
+        return ok("");
     }
 }
