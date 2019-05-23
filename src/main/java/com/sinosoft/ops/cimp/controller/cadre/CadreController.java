@@ -336,10 +336,11 @@ public class CadreController extends BaseController {
     public ResponseEntity modifySortInDep(@RequestBody CadreSortInDepModifyModel modifyModel) throws BusinessException {
         boolean b = cadreService.modifySortInDep(modifyModel);
         BaseResult baseResult = new BaseResult();
-        baseResult.setCode(400);
         if (b) {
+            baseResult.setCode(200);
             baseResult.setData("修改成功");
         } else {
+            baseResult.setCode(400);
             baseResult.setData("移动的两个干部不属于同一个单位无法移动");
             baseResult.setMessage("移动的两个干部不属于同一个单位无法移动");
         }
