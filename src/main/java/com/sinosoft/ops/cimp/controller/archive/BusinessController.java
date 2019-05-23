@@ -48,7 +48,7 @@ public class BusinessController extends BaseController {
 	public void getPersonAndPostByDepid(HttpServletRequest request, HttpServletResponse response) throws Exception{
 		String Depid=request.getParameter("depId");
 		List<PersonAndPost>	personAndPost = businessService.getPersonAndPostByDepid(Depid);
-		writeJson(response,ok(personAndPost));
+		ok(personAndPost);
 	}
 
 	@ApiOperation("")
@@ -57,7 +57,7 @@ public class BusinessController extends BaseController {
 	public void getA02ByDepid(HttpServletRequest request, HttpServletResponse response) throws Exception{
 		String Depid=request.getParameter("depId");
 		List<Map<String, Object>>	A02ByDep = businessService.getA02ByDepid(Depid);
-		writeJson(response, ok(A02ByDep));
+		ok(A02ByDep);
 	}
 	
 /*	@RequestMapping("/updateA02Data")
@@ -89,9 +89,9 @@ public class BusinessController extends BaseController {
 		if(flag){
 			String empid=request.getParameter("empid");
 			List<HashMap<String, Object>> prsonMaterial = businessService.getPersonMaterial(empid);
-			writeJson(response, ok(prsonMaterial));
+			ok(prsonMaterial);
 		}else{
-			writeJson(response, fail("抱歉您无查看档案权限！"));
+			fail("抱歉您无查看档案权限！");
 		}
 	
 	}
@@ -99,10 +99,10 @@ public class BusinessController extends BaseController {
 	@RequestMapping(value = "/getSystemDate",method = RequestMethod.POST)
 	public void revoke(HttpServletRequest request, HttpServletResponse response) throws BusinessException {
 		try {
-			writeJson(response, ok(DateTime.now().toString("yyyy-MM-dd HH:mm:ss")));
+			ok(DateTime.now().toString("yyyy-MM-dd HH:mm:ss"));
 		} catch (Exception e) {
 			logger.error("取得系统时间失败！", e);
-			writeJson(response, fail("取得系统时间失败!"));
+			fail("取得系统时间失败!");
 		}
 	}
 }

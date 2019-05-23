@@ -87,7 +87,7 @@ public class BusArchApplyServiceImpl implements BusArchApplyService {
 			listBus =  busArchApplyRepository.findAllByUseridAndVerifyType(userid);
 			for(BusArchApply busArchApply:listBus)
 			{
-				List<BusArchApplyPerson> ListBusArchApplyPerson =busArchApplyPersonRepository.findAllByApplyId(busArchApply.getId().toString());
+				List<BusArchApplyPerson> ListBusArchApplyPerson =busArchApplyPersonRepository.findAllByApplyId(busArchApply.getId());
 				String strPerson ="";
 				for(BusArchApplyPerson busArchApplyPerson : ListBusArchApplyPerson)
 				{
@@ -105,7 +105,7 @@ public class BusArchApplyServiceImpl implements BusArchApplyService {
 				listBus = busArchApplyRepository.findAllByVerifyType();
 				for(BusArchApply busArchApply:listBus)
 				{
-					List<BusArchApplyPerson> ListBusArchApplyPerson =busArchApplyPersonRepository.findAllByApplyId(busArchApply.getId().toString());
+					List<BusArchApplyPerson> ListBusArchApplyPerson =busArchApplyPersonRepository.findAllByApplyId(busArchApply.getId());
 					String strPerson ="";
 					for(BusArchApplyPerson busArchApplyPerson : ListBusArchApplyPerson)
 					{

@@ -52,13 +52,13 @@ public class ArchiveMaterialController extends BaseController {
 			String categoryId = request.getParameter("categoryId");
 			List<ArchiveMaterial> archiveMaterialList = archiveMaterialService.getArchiveListByEmpIdAndCaterogyId(empId,categoryId);
 			if(archiveMaterialList!=null&&archiveMaterialList.size()>0){
-				writeJson(response,ok(archiveMaterialList));
+				ok(archiveMaterialList);
 			}else{
-				writeJson(response, fail("不存在empId="+empId+"&categoryId="+categoryId+"的记录"));
+				fail("不存在empId="+empId+"&categoryId="+categoryId+"的记录");
 			}
 		} catch (Exception e) {
 			logger.error("查询失败！", e);
-			writeJson(response, fail("查询失败"));
+			fail("查询失败");
 		}
 	}
 
@@ -80,13 +80,13 @@ public class ArchiveMaterialController extends BaseController {
 			String empId = request.getParameter("empId");
 			List<ArchiveMaterial>  archiveMateriaList = archiveMaterialService.getArchiveListByEmpId(empId);
 			if(archiveMateriaList!=null&&archiveMateriaList.size()!=0){
-				writeJson(response,ok(archiveMateriaList));
+				ok(archiveMateriaList);
 			}else{
-				writeJson(response, fail("不存在empId="+empId+"的记录"));
+				fail("不存在empId="+empId+"的记录");
 			}
 		} catch (Exception e) {
 			logger.error("查询失败！", e);
-			writeJson(response, fail("查询失败"));
+			fail("查询失败");
 		}
 	}
 
@@ -109,13 +109,13 @@ public class ArchiveMaterialController extends BaseController {
 			String archiveMaterialID = request.getParameter( "archiveMaterialID");
 			ArchiveMaterial  archiveMaterial = archiveMaterialService.getById(archiveMaterialID);
 			if(archiveMaterial!=null){
-				writeJson(response,ok(archiveMaterial));
+				ok(archiveMaterial);
 			}else{
-				writeJson(response, fail("不存在empId="+archiveMaterialID+"的记录"));
+				fail("不存在empId="+archiveMaterialID+"的记录");
 			}
 		} catch (Exception e) {
 			logger.error("查询失败！", e);
-			writeJson(response, fail("查询失败"));
+			fail("查询失败");
 		}
 	}
 

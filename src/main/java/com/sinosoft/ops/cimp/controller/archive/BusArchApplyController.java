@@ -98,10 +98,10 @@ public class BusArchApplyController  extends BaseController {
 			}		
 
 			busArchApplyService.create(entity,baplist,badlist);
-			writeJson(response, ok("保存成功！"));
+			ok("保存成功！");
 		} catch (Exception e) {
 			logger.error("创建失败！", e);
-			writeJson(response, fail("保存失败！"));
+			fail("保存失败！");
 		}
 	}
 
@@ -112,7 +112,7 @@ public class BusArchApplyController  extends BaseController {
 		String userid =SecurityUtils.getSubject().getCurrentUser().getId();
 		String resouceId = request.getParameter("resouceId");
 		List<BusArchApply> listba = busArchApplyService.getApplyByUser(userid,resouceId);
-		writeJson(response, ok(listba));
+		ok(listba);
 	}
 
 	@ApiOperation("根据id 查询申请详情")
@@ -121,7 +121,7 @@ public class BusArchApplyController  extends BaseController {
 	public void getPersonByApplyId(HttpServletRequest request, HttpServletResponse response) throws BusinessException {
 		String id = request.getParameter("id");
 		List<HashMap<String, Object>> listbap = busArchApplyService.getPersonByApplyId(id);
-		writeJson(response,ok( listbap));
+		ok( listbap);
 	}
 
 	@ApiOperation("申请和审批档案树")
@@ -134,7 +134,7 @@ public class BusArchApplyController  extends BaseController {
 		String id = request.getParameter("applyid");
 		String empid = request.getParameter("empid");
 		List<HashMap<String, Object>> listbap = busArchApplyService.getTreeByApplyId(id,empid);
-		writeJson(response, ok( listbap));
+		ok( listbap);
 	}
 
 	/*@RequestMapping("/getDetailByPersonId")

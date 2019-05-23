@@ -83,7 +83,7 @@ public class ArchiveMaterialCategoryController extends BaseController {
 				//  List<HashMap<String,String>> materialCategorytexts=archiveMaterialCategoryService.findbyempower(empId,this.getCurrentUser().getId().toString());
 
 			}else {
-				writeJson(response, fail("权限不足", BaseResultHttpStatus.FAIL));
+				fail("权限不足", BaseResultHttpStatus.FAIL);
 			}
 				if (materialCategoryAndMaterialList.size() > 0) {
 					if (StringUtil.isEmptyOrNull(code)) {
@@ -96,17 +96,17 @@ public class ArchiveMaterialCategoryController extends BaseController {
 						resultMap.put("children", materialCategoryAndMaterialList);
 						resultMap.put("root", resultMap);
 
-						writeJson(response, ok(resultMap));
+						ok(resultMap);
 
 					} else {
-						writeJson(response, ok(materialCategoryAndMaterialList));
+						ok(materialCategoryAndMaterialList);
 					}
 				}
 
 			
 		} catch (Exception e) {
             logger.error("查询失败！", e);
-			writeJson(response, fail("查询失败", BaseResultHttpStatus.FAIL));
+			fail("查询失败", BaseResultHttpStatus.FAIL);
 		}
 	}
 
@@ -149,18 +149,18 @@ public class ArchiveMaterialCategoryController extends BaseController {
 		
 		if(user_empid==null){
 		String ms="系统提示:请在<用户管理>中为此账户关联人员!";
-		writeJson(response, fail(ms, BaseResultHttpStatus.FAIL));
+		fail(ms, BaseResultHttpStatus.FAIL);
 		}
 		else if(user_empid!=null&&(empId.toUpperCase().contains("-")?empId.toUpperCase().replace("-", ""):empId.toUpperCase()).equals(user_empid.toUpperCase())){
 			String ms="系统提示:不能查询本人档案!";
-			writeJson(response, fail(ms, BaseResultHttpStatus.FAIL));
+			fail(ms, BaseResultHttpStatus.FAIL);
 		}else if(idcards!=null&&idcard!=null&&idcard!=""&&idcards.contains(idcard)){
 			String ms="系统提示:不允许访问本人家庭成员及社会关系档案!";
-			writeJson(response, fail(ms, BaseResultHttpStatus.FAIL));
+			fail(ms, BaseResultHttpStatus.FAIL);
 		}else{
-			writeJson(response, ok("查询成功"));
+			ok("查询成功");
 		}
-		writeJson(response, ok("查询成功"));
+		ok("查询成功");
 	}
 
 }

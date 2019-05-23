@@ -80,13 +80,13 @@ public class ArchiveMaterialFileController extends BaseController {
 				//返回获取的文件名称List 和文件保存相对路径
 				map.put("fileNameList",fileNameList);
 				map.put("location", "resources/download/");
-				writeJson(response, ok(map));
+				ok(map);
 			}else{
-				writeJson(response, fail("不存在Archive_Material_ID="+idList+"的记录"));
+				fail("不存在Archive_Material_ID="+idList+"的记录");
 			}
 		} catch (Exception e) {
 			logger.error("查询失败！", e);
-			writeJson(response, fail("查询失败"));
+			fail("查询失败");
 		}
 	}
 
@@ -125,13 +125,13 @@ public class ArchiveMaterialFileController extends BaseController {
 				System.out.println(path);
 				mongoDbService.downloadToFileDecryptWithAES(fileName, path);
 				map.put("location", "" + fileName);
-				writeJson(response, ok(map));
+				ok(map);
 			}else{
-				writeJson(response, fail("不存在Archive_Material_ID="+archiveMaterialId+"的记录"));
+			fail("不存在Archive_Material_ID="+archiveMaterialId+"的记录");
 			}
 		} catch (Exception e) {
 			logger.error("查询失败！", e);
-			writeJson(response, fail("查询失败"));
+			fail("查询失败");
 		}
 	}
 
@@ -152,13 +152,13 @@ public class ArchiveMaterialFileController extends BaseController {
 			String archiveMaterialId =request.getParameter("archiveMaterialId");
 			ArchiveMaterialFile archiveMaterialFile = archiveMaterialFileService.getById(archiveMaterialId);
 			if(archiveMaterialFile!=null){
-				writeJson(response, ok(archiveMaterialFile));
+				ok(archiveMaterialFile);
 			}else{
-				writeJson(response,fail("不存在archiveMaterialId="+archiveMaterialId+"的记录"));
+				fail("不存在archiveMaterialId="+archiveMaterialId+"的记录");
 			}
 		} catch (Exception e) {
 			logger.error("查询失败！", e);
-			writeJson(response, fail("查询失败"));
+			fail("查询失败");
 		}
 	}
 
@@ -197,13 +197,13 @@ public class ArchiveMaterialFileController extends BaseController {
 				}
 				map.put("fileNameList",fileNameList);
 				map.put("location", "resources/download/");
-				writeJson(response, ok(map));
+				ok(map);
 			}else{
-				writeJson(response, ok("不存在Archive_Material_ID="+archiveMaterialId+"的记录"));
+				fail("不存在Archive_Material_ID="+archiveMaterialId+"的记录");
 			}
 		} catch (Exception e) {
 			logger.error("查询失败！", e);
-			writeJson(response, fail("查询失败"));
+			fail("查询失败");
 		}
 	}
 
@@ -221,13 +221,13 @@ public class ArchiveMaterialFileController extends BaseController {
 			Map<String,  List<ArchiveMaterialFile>> map = 
 					archiveMaterialFileService.getMapByAchiveMaterialIDs(idList);
 			if(map!=null){
-				writeJson(response, ok(map));
+				ok(map);
 			}else{
-				writeJson(response, fail("不存在Archive_Material_ID IN"+archiveMaterialIds+"的记录"));
+				fail("不存在Archive_Material_ID IN"+archiveMaterialIds+"的记录");
 			}
 		} catch (Exception e) {
 			logger.error("查询失败！", e);
-			writeJson(response, fail("查询失败"));
+			fail("查询失败");
 		}
 	}
 
