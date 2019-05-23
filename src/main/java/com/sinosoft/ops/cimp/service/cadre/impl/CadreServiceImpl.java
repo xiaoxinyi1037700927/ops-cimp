@@ -2,6 +2,7 @@ package com.sinosoft.ops.cimp.service.cadre.impl;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.sinosoft.ops.cimp.constant.OpsErrorMessage;
 import com.sinosoft.ops.cimp.dao.SysTableInfoDao;
 import com.sinosoft.ops.cimp.dao.domain.sys.table.SysTableModelInfo;
 import com.sinosoft.ops.cimp.entity.emp.EmpPhoto;
@@ -24,8 +25,8 @@ import javax.transaction.Transactional;
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
-import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -365,27 +366,70 @@ public class CadreServiceImpl implements CadreService {
      */
     @Transactional
     @Override
-    public boolean modifySortInDep(List<CadreSortInDepModifyModel> modifyModels) {
-        String sql = "UPDATE EMP_A02 SET A02025 = :sortNumber WHERE EMP_ID = :empId AND A02001_B = :orgId";
+    public boolean modifySortInDep(CadreSortInDepModifyModel modifyModel) throws BusinessException {
 
-        try {
-            List<Object[]> argsList = new ArrayList<>(modifyModels.size());
-            for (CadreSortInDepModifyModel modifyModel : modifyModels) {
-                Object[] args = new Object[3];
-                args[0] = modifyModel.getSortNumber();
-                args[1] = modifyModel.getEmpId();
-                args[2] = modifyModel.getOrgId();
-                argsList.add(args);
+        //待移动单位
+        String orgId = modifyModel.getOrgId();
+        String fromEmpId = modifyModel.getFromEmpId();
+        String toEmpId = modifyModel.getToEmpId();
+        String moveType = modifyModel.getMoveType();
 
+        //1.判断移动的干部是否是同一个单位
+        List<CadreSortInDepModel> sortInDep = this.getSortInDep(orgId);
+        Map<String, CadreSortInDepModel> cadreMap = sortInDep.stream().collect(Collectors.toMap((CadreSortInDepModel::getEmpId), (v) -> v, (k1, k2) -> k1, LinkedHashMap::new));
+
+        boolean fromB = cadreMap.containsKey(fromEmpId);
+        boolean fromA = cadreMap.containsKey(toEmpId);
+
+        if (fromB && fromA) {
+            Map<String, String> modifySortNumberMap = Maps.newHashMap();
+
+            CadreSortInDepModel fromCadreSortInDepModel = cadreMap.get(fromEmpId);
+            CadreSortInDepModel toCadreSortInDepModel = cadreMap.get(toEmpId);
+
+            String toSortNumber = toCadreSortInDepModel.getSortNumber();
+
+            int i = 0;
+            if (StringUtils.equals(moveType, "0")) {
+                modifySortNumberMap.put(fromCadreSortInDepModel.getEmpId(), toSortNumber);
+                i = sortInDep.indexOf(toCadreSortInDepModel);
             }
-            jdbcTemplate.batchUpdate(sql, argsList);
+            if (StringUtils.equals(moveType, "1")) {
+                Integer reToSort = Integer.parseInt(toSortNumber) + 1;
+                modifySortNumberMap.put(fromCadreSortInDepModel.getEmpId(), String.valueOf(reToSort));
+                i = sortInDep.indexOf(toCadreSortInDepModel) + 1;
+            }
+            List<CadreSortInDepModel> reSortList = sortInDep.subList(i, sortInDep.size());
 
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
+            Map<String, String> reSortMap = reSortList.stream().peek(
+                    c -> {
+                        String sortNumber = c.getSortNumber();
+                        String reSortNumber = String.valueOf(Integer.parseInt(sortNumber) + 1);
+                        c.setSortNumber(reSortNumber);
+                    }
+            ).collect(Collectors.toMap(CadreSortInDepModel::getEmpId, CadreSortInDepModel::getSortNumber, (k1, k2) -> k1));
+            modifySortNumberMap.putAll(reSortMap);
+
+
+            //生成sql语句更新
+            String sql = "UPDATE EMP_A02 SET A02025 = :sortNumber WHERE EMP_ID = :empId AND A02001_B = :orgId";
+            List<Object[]> params = Lists.newArrayList();
+            for (Map.Entry<String, String> entry : modifySortNumberMap.entrySet()) {
+                Object[] temp = new Object[3];
+                String key = entry.getKey();
+                String value = entry.getValue();
+                temp[0] = value;
+                temp[1] = key;
+                temp[2] = orgId;
+                params.add(temp);
+            }
+
+            jdbcTemplate.batchUpdate(sql, params);
+
+        } else {
+            throw new BusinessException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE, "移动的两个干部不属于同一个单位无法移动");
         }
-
-        return false;
+        return true;
     }
 
     /**

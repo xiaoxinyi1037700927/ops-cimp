@@ -332,8 +332,8 @@ public class CadreController extends BaseController {
     @ApiOperation(value = "修改干部单位内排序")
     @PostMapping("/sortInDep/modify")
     @RequiresAuthentication
-    public ResponseEntity modifySortInDep(@RequestBody List<CadreSortInDepModifyModel> modifyModels) throws BusinessException {
-        return cadreService.modifySortInDep(modifyModels) ? ok("修改成功!") : fail("修改失败！");
+    public ResponseEntity modifySortInDep(@RequestBody CadreSortInDepModifyModel modifyModel) throws BusinessException {
+        return cadreService.modifySortInDep(modifyModel) ? ok("修改成功!") : fail("修改失败！");
     }
 
     @ApiOperation(value = "修改干部状态")
