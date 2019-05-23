@@ -87,7 +87,8 @@ public class BracketsNodeProcessor extends NodeProcessor {
 
                 if (first.getReturnType() == Type.BRACKETS.getCode() && !first.isComplete()) {
                     //如果节点类型是括号且不完整，则说明这对括号之间没有表达式
-                    throw new CombinedQueryParseException("括号之间缺失表达式！");
+                    first.setComplete(true);
+                    return first;
                 }
 
                 Node second = stack.pop();

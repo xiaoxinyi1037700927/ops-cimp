@@ -90,4 +90,21 @@ public enum Operator {
     public String getExprFormat() {
         return exprFormat;
     }
+
+
+    public String getExpr(String... params) {
+        if (params.length != paramsType.length) {
+            return "";
+        }
+        return String.format(exprFormat, params);
+    }
+
+    public static Operator getByName(String name) {
+        for (Operator operator : Operator.values()) {
+            if (operator.getName().equals(name)) {
+                return operator;
+            }
+        }
+        return null;
+    }
 }

@@ -3,6 +3,7 @@ package com.sinosoft.ops.cimp.util.combinedQuery.processors.code;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sinosoft.ops.cimp.entity.sys.syscode.QSysCodeItem;
 import com.sinosoft.ops.cimp.entity.sys.syscode.SysCodeItem;
+import com.sinosoft.ops.cimp.util.combinedQuery.beans.CombinedQueryParseException;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.codeSet.CodeSet;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.FieldNode;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.Node;
@@ -28,7 +29,14 @@ public class CodeProcessor {
     }
 
 
-    public void processCode(OperatorNode node) {
+    /**
+     * 码值转换，获取sql之前调用
+     * 例如：等于 '[2]大学本科' -> 在['2','21','22','29']之中
+     *
+     * @param node
+     * @throws CombinedQueryParseException
+     */
+    public void processCode(OperatorNode node) throws CombinedQueryParseException {
         List<Node> subNodes = node.getSubNodes();
 
         Node first = subNodes.get(0);
@@ -77,6 +85,9 @@ public class CodeProcessor {
                     break;
             }
 
+            if (codes.size() == 0) {
+                codes.add("-1");
+            }
 
             //将操作符替换为in
             node.setProcessor(inProcessor);
@@ -85,9 +96,8 @@ public class CodeProcessor {
             ValueNode valueNode = new ValueNode(codes, null, true, true, Type.CODE.getCode());
             node.getSubNodes().add(valueNode);
 
-
         } catch (Exception e) {
-
+            throw new CombinedQueryParseException("码值转换失败！");
         }
     }
 

@@ -1,10 +1,12 @@
 package com.sinosoft.ops.cimp.util.combinedQuery;
 
+import com.sinosoft.ops.cimp.util.IdUtil;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.CombinedQueryParseException;
+import com.sinosoft.ops.cimp.util.combinedQuery.beans.Expr;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.ExprStream;
-import com.sinosoft.ops.cimp.util.combinedQuery.beans.Expression;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.Param;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.*;
+import com.sinosoft.ops.cimp.util.combinedQuery.enums.Operator;
 import com.sinosoft.ops.cimp.util.combinedQuery.processors.code.CodeProcessor;
 import com.sinosoft.ops.cimp.util.combinedQuery.processors.nodes.NodeProcessor;
 import org.apache.commons.lang3.StringUtils;
@@ -15,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class CombinedQueryParser {
@@ -28,56 +31,137 @@ public class CombinedQueryParser {
         this.codeProcessor = codeProcessor;
     }
 
-
-    public List<Expression> parseExpressions(String expression) throws CombinedQueryParseException {
-        Node root = parseGramTree(expression, null);
-
-        List<Expression> expressions = new ArrayList<>();
-
-        if (root != null) {
-            nodeToExpressions(root, expressions, null);
+    /**
+     * 将表达式树解析为表达式
+     *
+     * @param exprs
+     * @return
+     */
+    public String parseExprStr(List<Expr> exprs) {
+        StringBuilder sb = new StringBuilder();
+        for (Expr expr : exprs) {
+            if (expr.isBracketsNode()) {
+                sb.append("(");
+                sb.append(parseExprStr(expr.getSubExprs()));
+                sb.append(")");
+            } else {
+                if (StringUtils.isNotEmpty(expr.getLogicalOperator())) {
+                    sb.append(" ").append(expr.getLogicalOperator()).append(" ");
+                }
+                sb.append(parseExprStr(expr));
+            }
         }
 
-        return expressions;
+        return sb.toString();
     }
 
-    private void nodeToExpressions(Node root, List<Expression> expressions, String logicalOperator) {
+    /**
+     * 将非括号表达式节点转化为文本
+     *
+     * @param expr
+     * @return
+     */
+    public String parseExprStr(Expr expr) {
+        List<Param> params = expr.getParams();
+
+        Operator op = Operator.getByName(expr.getOperator());
+        if (op != null) {
+            return op.getExpr((String[]) (expr.getParams().stream().map(this::parseParamStr).toArray()));
+        }
+
+        return null;
+    }
+
+    /**
+     *
+     * @param param
+     * @return
+     */
+    private String parseParamStr(Param param) {
+        if (param.getIsFunction() == 0) {
+            return param.getText();
+        }
+
+        return param.getFunctionName() +
+                "(" +
+                param.getParams().stream().map(this::parseParamStr).collect(Collectors.joining(",")) +
+                ")";
+    }
+
+    /**
+     * 将表达式解析为表达式树
+     *
+     * @param exprStr
+     * @return
+     * @throws CombinedQueryParseException
+     */
+    public List<Expr> parseExprTree(String exprStr) throws CombinedQueryParseException {
+        Node root = parseGramTree(exprStr, null);
+
+        List<Expr> exprs = new ArrayList<>();
+
+        if (root != null) {
+            GramTreeToExprs(root, exprs, null);
+        }
+
+        return exprs;
+    }
+
+    /**
+     * 将语法树解析为表达式树
+     *
+     * @param root
+     * @param exprs
+     * @param logicalOperator
+     */
+    private void GramTreeToExprs(Node root, List<Expr> exprs, String logicalOperator) {
         if (root instanceof LogicalOperatorNode) {
             //逻辑表达式节点，递归处理子节点
             List<Node> subNodes = root.getSubNodes();
-            nodeToExpressions(subNodes.get(0), expressions, logicalOperator);
-            nodeToExpressions(subNodes.get(1), expressions, ((LogicalOperatorNode) root).getLogicalOperator().getName());
+            GramTreeToExprs(subNodes.get(0), exprs, logicalOperator);
+            GramTreeToExprs(subNodes.get(1), exprs, ((LogicalOperatorNode) root).getLogicalOperator().getName());
         } else if (root instanceof BracketsNode) {
             //添加括号表达式
-            Expression expression = new Expression();
-            List<Expression> subExprs = new ArrayList<>();
-            expression.setBracketsNode(true);
-            expression.setSubExprs(subExprs);
-            expression.setLogicalOperator(logicalOperator);
-            expressions.add(expression);
+            Expr expr = new Expr();
+            List<Expr> subExprs = new ArrayList<>();
+            expr.setId(IdUtil.uuid());
+            expr.setBracketsNode(true);
+            expr.setSubExprs(subExprs);
+            expr.setLogicalOperator(logicalOperator);
+            exprs.add(expr);
 
             //递归处理子节点
-            nodeToExpressions(root.getSubNodes().get(0), subExprs, null);
+            GramTreeToExprs(root.getSubNodes().get(0), subExprs, null);
         } else if (root instanceof OperatorNode) {
-            Expression expression = new Expression();
-            expression.setText(root.getExpr());
+            Expr expr = new Expr();
+            expr.setText(root.getExpr());
+            expr.setId(IdUtil.uuid());
 
-            List<Node> subNodes = root.getSubNodes();
-            expression.setParam1(nodeToParam(subNodes.get(0)));
-            expression.setParam2(subNodes.size() > 1 ? nodeToParam(subNodes.get(1)) : null);
-            expression.setLogicalOperator(logicalOperator);
-            expression.setOperator(((OperatorNode) root).getProcessor().getOperator().getName());
+            List<Param> params = new ArrayList<>();
+            for (Node subNode : root.getSubNodes()) {
+                params.add(nodeToParam(subNode));
+            }
+            expr.setParams(params);
+            expr.setLogicalOperator(logicalOperator);
+            expr.setOperator(((OperatorNode) root).getProcessor().getOperator().getName());
 
-            expressions.add(expression);
+            exprs.add(expr);
         }
     }
 
+    /**
+     * 运算符的参数节点解析为表达式树的节点参数
+     *
+     * @param node
+     * @return
+     */
     private Param nodeToParam(Node node) {
         Param param = new Param();
         param.setText(node.getExpr());
         param.setReturnType(node.getReturnType());
 
         if (node instanceof FunctionNode) {
+            param.setId(IdUtil.uuid());
             param.setIsFunction(1);
             param.setFunctionName(((FunctionNode) node).getProcessor().getFunction().getName());
 
@@ -94,8 +178,8 @@ public class CombinedQueryParser {
     /**
      * 将表达式解析为sql
      */
-    public String parse(String expression) throws CombinedQueryParseException {
-        Node root = parseGramTree(expression, null);
+    public String parseSql(String exprStr) throws CombinedQueryParseException {
+        Node root = parseGramTree(exprStr, null);
 
         if (root == null) {
             return null;
@@ -113,7 +197,7 @@ public class CombinedQueryParser {
      *
      * @param root
      */
-    private void invokeCodeProcessors(Node root) {
+    private void invokeCodeProcessors(Node root) throws CombinedQueryParseException {
         if (root instanceof OperatorNode) {
             codeProcessor.processCode((OperatorNode) root);
             return;
@@ -124,20 +208,40 @@ public class CombinedQueryParser {
         }
     }
 
+    /**
+     * 编译表达式
+     *
+     * @param exprStr
+     * @return
+     */
+    public boolean compile(String exprStr) {
+        try {
+            Node root = parseGramTree(exprStr, null);
+            if (root != null) {
+                return true;
+            }
+        } catch (CombinedQueryParseException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
 
     /**
-     * @param expression
+     * 表达式解析为语法树
+     *
+     * @param exprStr
      * @param parent     父节点为null是根节点
      * @return
      * @throws CombinedQueryParseException
      */
-    private Node parseGramTree(String expression, Node parent) throws CombinedQueryParseException {
-        if (StringUtils.isEmpty(expression)) {
+    private Node parseGramTree(String exprStr, Node parent) throws CombinedQueryParseException {
+        if (StringUtils.isEmpty(exprStr)) {
             return null;
         }
 
         Deque<Node> stack = new LinkedList<>();
-        ExprStream stream = new ExprStream(expression);
+        ExprStream stream = new ExprStream(exprStr);
 
         String expr;
         Node node;
@@ -161,8 +265,8 @@ public class CombinedQueryParser {
             } while (next != null);
 
             //处理子节点
-            for (String exprStr : node.getSubNodeExpr()) {
-                node.addSubNode(parseGramTree(exprStr, node));
+            for (String subNodeExpr : node.getSubNodeExpr()) {
+                node.addSubNode(parseGramTree(subNodeExpr, node));
             }
         }
 
@@ -212,7 +316,7 @@ public class CombinedQueryParser {
                 return nodeProcessor;
             }
         }
-        throw new CombinedQueryParseException("no nodeProcessor for expression: " + expr);
+        throw new CombinedQueryParseException("非法表达式: " + expr);
     }
 
     /**

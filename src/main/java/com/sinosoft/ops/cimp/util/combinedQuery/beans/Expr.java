@@ -2,23 +2,29 @@ package com.sinosoft.ops.cimp.util.combinedQuery.beans;
 
 import java.util.List;
 
-public class Expression {
+public class Expr {
+
+    private String id;
 
     private String logicalOperator;
 
     private String text;
 
-    private Param param1;
+    private List<Param> params;
 
     private String operator;
 
-    private Param param2;
-
-    private Param param3;
-
     private boolean isBracketsNode;
 
-    private List<Expression> subExprs;
+    private List<Expr> subExprs;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getLogicalOperator() {
         return logicalOperator;
@@ -44,28 +50,12 @@ public class Expression {
         this.operator = operator;
     }
 
-    public Param getParam1() {
-        return param1;
+    public List<Param> getParams() {
+        return params;
     }
 
-    public void setParam1(Param param1) {
-        this.param1 = param1;
-    }
-
-    public Param getParam2() {
-        return param2;
-    }
-
-    public void setParam2(Param param2) {
-        this.param2 = param2;
-    }
-
-    public Param getParam3() {
-        return param3;
-    }
-
-    public void setParam3(Param param3) {
-        this.param3 = param3;
+    public void setParams(List<Param> params) {
+        this.params = params;
     }
 
     public boolean isBracketsNode() {
@@ -76,11 +66,11 @@ public class Expression {
         isBracketsNode = bracketsNode;
     }
 
-    public List<Expression> getSubExprs() {
+    public List<Expr> getSubExprs() {
         return subExprs;
     }
 
-    public void setSubExprs(List<Expression> subExprs) {
+    public void setSubExprs(List<Expr> subExprs) {
         this.subExprs = subExprs;
     }
 }

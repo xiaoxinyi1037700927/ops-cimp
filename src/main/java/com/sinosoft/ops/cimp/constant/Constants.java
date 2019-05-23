@@ -18,4 +18,8 @@ public interface Constants {
      * 系统表访问控制缓存
      */
     String SYS_TABLE_ACCESS_CACHE = "SYS_TABLE_ACCESS_CACHE";
+    /**
+     * 组合查询缓存
+     */
+    String COMBINED_QUERY_CACHE = "COMBINED_QUERY_CACHE";
 }
