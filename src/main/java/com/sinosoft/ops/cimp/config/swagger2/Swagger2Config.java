@@ -30,7 +30,8 @@ public class Swagger2Config {
                             && !declaringClass.isAnnotationPresent(SystemApiGroup.class)
                             && !declaringClass.isAnnotationPresent(SystemLimitsApiGroup.class)
                             && !declaringClass.isAnnotationPresent(OrganizationApiGroup.class)
-                            && !declaringClass.isAnnotationPresent(SystemUserApiGroup.class);
+                            && !declaringClass.isAnnotationPresent(SystemUserApiGroup.class)
+                            && !declaringClass.isAnnotationPresent(ArchiveApiGroup.class);
                 })
                 .paths(PathSelectors.any())
                 .build();

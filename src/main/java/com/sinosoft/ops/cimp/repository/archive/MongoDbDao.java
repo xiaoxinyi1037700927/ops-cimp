@@ -1,6 +1,7 @@
 package com.sinosoft.ops.cimp.repository.archive;
 
 import com.mongodb.client.gridfs.model.GridFSFile;
+import com.mongodb.gridfs.GridFSDBFile;
 import com.sinosoft.ops.cimp.repository.archive.ex.CannotFindMongoDbResourceById;
 import org.bson.conversions.Bson;
 
@@ -24,7 +25,7 @@ public interface MongoDbDao {
   void uploadFileFromStream(String id, String fileName, InputStream is, Map<String, Object> extDoc)
       throws IOException;
 
-  GridFSFile downloadFileToStream(String id, OutputStream os)
+  GridFSDBFile downloadFileToStream(String id, OutputStream os)
       throws IOException, CannotFindMongoDbResourceById;
 
   File dowloadToFile(String id, Path path)

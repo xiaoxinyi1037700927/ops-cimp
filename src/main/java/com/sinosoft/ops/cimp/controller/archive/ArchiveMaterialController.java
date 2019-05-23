@@ -26,7 +26,7 @@ import java.util.List;
  * ArchiveMaterial控制器
  */
 @ArchiveApiGroup
-@Api("干部档案控制器")
+@Api(description="干部档案控制器")
 @Controller("archiveMaterialController")
 @RequestMapping("/archiveMaterial")
 public class ArchiveMaterialController extends BaseController {

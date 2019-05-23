@@ -5,6 +5,8 @@ import com.sinosoft.ops.cimp.annotation.ArchiveApiGroup;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.entity.archive.ArchiveMaterialFile;
 import com.sinosoft.ops.cimp.exception.BusinessException;
+import com.sinosoft.ops.cimp.repository.archive.ex.CannotFindMongoDbResourceById;
+import com.sinosoft.ops.cimp.repository.archive.ex.DownloadResourceFromMongoDbError;
 import com.sinosoft.ops.cimp.repository.archive.impl.MongoDbDaoImpl;
 import com.sinosoft.ops.cimp.service.archive.ArchiveMaterialFileService;
 import com.sinosoft.ops.cimp.service.archive.ArchiveMaterialService;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -31,7 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 @ArchiveApiGroup
-@Api("干部档案文件控制器")
+@Api(description="干部档案文件控制器")
 @Controller("archiveMaterialFileController")
 @RequestMapping("/archiveMaterialFile")
 public class ArchiveMaterialFileController extends BaseController {
@@ -42,7 +45,6 @@ public class ArchiveMaterialFileController extends BaseController {
 	private ArchiveMaterialFileService archiveMaterialFileService;
 	@Resource 
 	private ArchiveMaterialService archiveMaterialService;
-
 
 
 	/**
@@ -122,7 +124,7 @@ public class ArchiveMaterialFileController extends BaseController {
 				Path path = Paths.get(relPath,fileName);
 				System.out.println(path);
 				mongoDbService.downloadToFileDecryptWithAES(fileName, path);
-				map.put("location", "resources/download/" + fileName);
+				map.put("location", "" + fileName);
 				writeJson(response, ok(map));
 			}else{
 				writeJson(response, ok("不存在Archive_Material_ID="+archiveMaterialId+"的记录"));

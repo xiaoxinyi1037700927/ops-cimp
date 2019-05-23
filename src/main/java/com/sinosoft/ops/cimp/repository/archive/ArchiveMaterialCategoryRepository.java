@@ -16,7 +16,7 @@ public interface ArchiveMaterialCategoryRepository extends JpaRepository<Archive
     public List<ArchiveMaterialCategory> findByParentCodeOrderBySn(String parentCode);
 
     @Query("select a  from ArchiveMaterialCategory a where a.parentCode='00' order by a.sn")
-    public List<ArchiveMaterialCategory> getCategorysByCode();
+    public List<ArchiveMaterialCategory> findByParentCode();
 
     @Query(value = "select b.* from ARCHIVE_MATERIAL_CATEGORY b ,(select  a.code from  ARCHIVE_MATERIAL_CATEGORY  a where a.id=?1) c where b.parent_code= c.code order by b.sn",nativeQuery=true)
     public List<ArchiveMaterialCategory> findArchiveMaterialCategorysByCategoryId(String categoryId);

@@ -100,7 +100,7 @@ public class ArchiveMaterialCategoryServiceImpl implements ArchiveMaterialCatego
     public List<HashMap<String, Object>> getMaterialCategoryAndMaterial4Tree(String code, String empId, String categoryId) {
         List<ArchiveMaterialCategory> categoryList = null;
         if (StringUtil.isEmptyOrNull(code)) {
-            categoryList = archiveMaterialCategoryRepository.getCategorysByCode();
+            categoryList = archiveMaterialCategoryRepository.findByParentCode();
         } else {
             categoryList = archiveMaterialCategoryRepository.findByParentCodeOrderBySn(code);
         }

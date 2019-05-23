@@ -3,10 +3,15 @@ package com.sinosoft.ops.cimp.controller.archive;
 
 import com.sinosoft.ops.cimp.annotation.ArchiveApiGroup;
 import com.sinosoft.ops.cimp.common.BaseResultHttpStatus;
+import com.sinosoft.ops.cimp.constant.UserRoleConstants;
 import com.sinosoft.ops.cimp.controller.BaseController;
+import com.sinosoft.ops.cimp.entity.user.Role;
+import com.sinosoft.ops.cimp.entity.user.User;
+import com.sinosoft.ops.cimp.entity.user.UserRole;
 import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.service.archive.ArchiveMaterialCategoryService;
 import com.sinosoft.ops.cimp.service.archive.ArchiveMaterialService;
+import com.sinosoft.ops.cimp.service.user.UserRoleService;
 import com.sinosoft.ops.cimp.util.SecurityUtils;
 import com.sinosoft.ops.cimp.util.StringUtil;
 import io.swagger.annotations.Api;
@@ -29,7 +34,7 @@ import java.util.List;
  * 档案分类控制器
  */
 @ArchiveApiGroup
-@Api("档案分类控制器")
+@Api(description="档案分类控制器")
 @Controller("archiveMaterialCategoryController")
 @RequestMapping("/materialCategory")
 public class ArchiveMaterialCategoryController extends BaseController {
@@ -38,7 +43,9 @@ public class ArchiveMaterialCategoryController extends BaseController {
 	private ArchiveMaterialCategoryService archiveMaterialCategoryService;
 	@Autowired
 	private ArchiveMaterialService archiveMaterialService;
-	
+
+	@Autowired
+	private UserRoleService userRoleService;
 	/**
 	 * 档案分类 和 档案材料 树结构
 	 * ArchiveMaterialCategory 和 ArchiveMaterial树结构
@@ -46,7 +53,7 @@ public class ArchiveMaterialCategoryController extends BaseController {
 	 * @param request->empId 人员ID
 	 * @param request->categoryId 档案分类ID
 	 */
-	@ApiOperation("档案分类 和 档案材料 树结构")
+	@ApiOperation(value = "档案分类 和 档案材料 树结构")
 	@ApiImplicitParams({
 			@ApiImplicitParam(name = "id", value = "档案分类的code", dataType = "String", required = true, paramType = "query"),
 			@ApiImplicitParam(name = "empId", value = "人员ID", dataType = "String", required = true, paramType = "query"),
@@ -54,47 +61,48 @@ public class ArchiveMaterialCategoryController extends BaseController {
 	})
 	@RequestMapping(value = "/getTree",method = RequestMethod.POST)
 	public void getMaterialCategoryAndMaterial4Tree(HttpServletRequest request, HttpServletResponse response) throws BusinessException {
-		try {
+		try{
 			String code=request.getParameter("id");//id档案分类的code
 			String empId=request.getParameter("empId");
-			String userid="";
-			
-			//this.getCurrentUser().getEMP_ID里的数据不对 所以获取userid 到sys_user中重新获取emp_id
-			if(SecurityUtils.getSubject().getCurrentUser().getId().toString().contains("-")){
-				userid=SecurityUtils.getSubject().getCurrentUser().getId().toString().replace("-", "");
-			}else{
-				userid=SecurityUtils.getSubject().getCurrentUser().getId().toString();
+			String userid=SecurityUtils.getSubject().getCurrentUser().getId();
+			boolean flag=false;
+
+			List<Role> roles = userRoleService.getRolesByUserId(userid);
+
+			if (roles.size()>0 && roles.stream().filter(temp -> temp.getCode().equals("90")).count() > 0) {
+				flag=true;
 			}
-			System.out.println("useriduseriduserid==="+userid);
-			//判断是不是档案管理员
-			//boolean flag=archiveMaterialCategoryService.testglYorN(userid.toUpperCase());
-			
-		//	String user_empid=archiveMaterialCategoryService.findEmpidByUserID(userid.toUpperCase());
-			String categoryId = request.getParameter("archiveMaterialCategoryId");//档案分类ID
-			List<HashMap<String,Object>> materialCategoryAndMaterialList=
-					archiveMaterialCategoryService.getMaterialCategoryAndMaterial4Tree(code,empId,categoryId);
-			        HashMap<String, Object> resultMap = new HashMap<String,Object>();
-			      //  List<HashMap<String,String>> materialCategorytexts=archiveMaterialCategoryService.findbyempower(empId,this.getCurrentUser().getId().toString());    
 
+			List<HashMap<String, Object>> materialCategoryAndMaterialList=null;
+			HashMap<String, Object> resultMap = new HashMap<String, Object>();
+			if (flag) {
+				//	String user_empid=archiveMaterialCategoryService.findEmpidByUserID(userid.toUpperCase());
+				String categoryId = request.getParameter("archiveMaterialCategoryId");//档案分类ID
+				materialCategoryAndMaterialList = archiveMaterialCategoryService.getMaterialCategoryAndMaterial4Tree(code, empId, categoryId);
 
-				if(materialCategoryAndMaterialList.size()>0){
-					if(StringUtil.isEmptyOrNull(code)){
+				//  List<HashMap<String,String>> materialCategorytexts=archiveMaterialCategoryService.findbyempower(empId,this.getCurrentUser().getId().toString());
+
+			}else {
+				writeJson(response, fail("权限不足", BaseResultHttpStatus.FAIL));
+			}
+				if (materialCategoryAndMaterialList.size() > 0) {
+					if (StringUtil.isEmptyOrNull(code)) {
 						resultMap.put("empId", empId);
-						resultMap.put("text","档案");
-						resultMap.put("code","VirtualRoot");
-						resultMap.put("pptr","VirtualRoot");
+						resultMap.put("text", "档案");
+						resultMap.put("code", "VirtualRoot");
+						resultMap.put("pptr", "VirtualRoot");
 						resultMap.put("expanded", true);
 						resultMap.put("tip", "档案");
-						resultMap.put("children",materialCategoryAndMaterialList);
+						resultMap.put("children", materialCategoryAndMaterialList);
 						resultMap.put("root", resultMap);
 
 						writeJson(response, ok(resultMap));
 
-					}else{
+					} else {
 						writeJson(response, ok(materialCategoryAndMaterialList));
 					}
 				}
-			
+
 			
 		} catch (Exception e) {
             logger.error("查询失败！", e);

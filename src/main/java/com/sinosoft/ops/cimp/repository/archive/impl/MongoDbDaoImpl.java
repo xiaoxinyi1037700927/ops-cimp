@@ -7,6 +7,8 @@ import com.mongodb.client.gridfs.GridFSBuckets;
 import com.mongodb.client.gridfs.GridFSFindIterable;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import com.mongodb.client.gridfs.model.GridFSUploadOptions;
+import com.mongodb.gridfs.GridFS;
+import com.mongodb.gridfs.GridFSDBFile;
 import com.sinosoft.ops.cimp.repository.archive.MongoDbDao;
 import com.sinosoft.ops.cimp.repository.archive.ex.CannotFindMongoDbResourceById;
 import org.apache.commons.io.IOUtils;
@@ -84,17 +86,31 @@ public class MongoDbDaoImpl implements MongoDbDao {
     }
 
     @Override
-    public GridFSFile downloadFileToStream(String id, OutputStream os)
+    public GridFSDBFile downloadFileToStream(String id, OutputStream os)
             throws IOException, CannotFindMongoDbResourceById {
+        GridFSDBFile gridFSOne = null;
 
-        GridFSFile gfsf = null;
+
         try {
+            //链接服务器
+            Mongo mongo = new Mongo("192.168.0.143", 27017);
+            //连接数据库
+            DB db = mongo.getDB("iimp");
+            GridFS gridFS = new GridFS(db);
+
+
+            gridFSOne = gridFS.findOne(id);
+        } finally {
+            IOUtils.closeQuietly(os);
+        }
+      /*   GridFSFile gridFSFile=null;
+       try {
             // 获取文件头信息
             Query queryWhereId = new Query(Criteria.where("_id").is(id));
 
-            gfsf = mongoTemplate.findOne(queryWhereId,GridFSFile.class);
+            gridFSFile = mongoTemplate.findOne(queryWhereId,GridFSFile.class);
 //            gfsf = gridFsTemplate.findOne(queryWhereId);
-            if (gfsf == null)
+            if (gridFSFile == null)
                 throw new CannotFindMongoDbResourceById(queryWhereId);
 //
             // 获取多块二进制数据,写入到输出流
@@ -102,9 +118,10 @@ public class MongoDbDaoImpl implements MongoDbDao {
             gfsb.downloadToStream(new BsonString(id), os);
         } finally {
             IOUtils.closeQuietly(os);
-        }
+        }*/
 
-        return gfsf;
+
+        return gridFSOne;
     }
 
     @Override

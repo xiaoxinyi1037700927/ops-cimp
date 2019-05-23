@@ -15,7 +15,7 @@ public interface ArchiveMaterialRepository extends JpaRepository<ArchiveMaterial
         @Query("select a from ArchiveMaterial a where a.empId=?1 order by a.categoryId,a.seqNum")
         public List<ArchiveMaterial> findAllByEmpIdOrderByCategoryIdSeqNum(String empId);
 
-        @Query("select id from ArchiveMaterial  where empId=?1 and categoryId=?2")
+        @Query("select a.id from ArchiveMaterial a  where a.empId=?1 and a.categoryId=?2")
         public List<String> findByEmpIdAndCategoryId(String empId,String categoryId);
 
         @Query("select a from ArchiveMaterial a where a.empId=?1 and a.categoryId=?2 order by a.seqNum")
