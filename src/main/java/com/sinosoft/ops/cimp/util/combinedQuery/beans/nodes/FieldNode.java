@@ -11,16 +11,18 @@ public class FieldNode extends Node {
     private String tableNameCn;
     private String fieldName;
     private String fieldNameCn;
+    private Integer codeSetId;
     private String codeSetName;
     private int returnType;
 
-    public FieldNode(String tableName, String tableNameCn, String fieldName, String fieldNameCn, int returnType, String codeSetName) {
+    public FieldNode(String tableName, String tableNameCn, String fieldName, String fieldNameCn, int returnType, String codeSetName, Integer codeSetId) {
         super(true, new int[]{});
         this.tableName = tableName;
         this.tableNameCn = tableNameCn;
         this.fieldName = fieldName;
         this.fieldNameCn = fieldNameCn;
         this.returnType = returnType;
+        this.codeSetId = codeSetId;
         this.codeSetName = codeSetName;
     }
 
@@ -54,6 +56,10 @@ public class FieldNode extends Node {
         return String.format(FORMAT, tableNameCn, fieldNameCn);
     }
 
+
+    public Integer getCodeSetId() {
+        return codeSetId;
+    }
 
     public String getCodeSetName() {
         return codeSetName;

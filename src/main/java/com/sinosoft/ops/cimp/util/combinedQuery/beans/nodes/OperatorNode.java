@@ -49,4 +49,8 @@ public class OperatorNode extends Node {
     public OperatorProcessor getProcessor() {
         return processor;
     }
+
+    public void setProcessor(OperatorProcessor processor) {
+        this.processor = processor;
+    }
 }

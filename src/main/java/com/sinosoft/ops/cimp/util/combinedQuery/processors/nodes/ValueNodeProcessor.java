@@ -2,14 +2,12 @@ package com.sinosoft.ops.cimp.util.combinedQuery.processors.nodes;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sinosoft.ops.cimp.entity.sys.syscode.QSysCodeItem;
-import com.sinosoft.ops.cimp.entity.sys.syscode.QSysCodeSet;
 import com.sinosoft.ops.cimp.entity.sys.syscode.SysCodeItem;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.CombinedQueryParseException;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.FieldNode;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.Node;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.ValueNode;
 import com.sinosoft.ops.cimp.util.combinedQuery.enums.Type;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -153,20 +151,19 @@ public class ValueNodeProcessor extends NodeProcessor {
         //判断码值是否正确
         if (node.getReturnType() == Type.CODE.getCode()) {
             ValueNode vNode = (ValueNode) node;
-            String codeSetName = getCodeSetName(node.getParent());
-            if (StringUtils.isEmpty(codeSetName)) {
-                throw new CombinedQueryParseException("没有找到码值对应的字段：" + vNode.getExpr());
+            Integer codeSetId = getCodeSetId(node.getParent());
+            if (codeSetId == null) {
+                throw new CombinedQueryParseException("没有找到码值对应的代码集：" + vNode.getExpr());
             }
 
             for (int i = 0; i < vNode.getValues().size(); i++) {
                 String code = vNode.getValues().get(i);
                 String name = vNode.getCodeNames().get(i);
-                if (!judgeCode(codeSetName, code, name)) {
+                if (!judgeCode(codeSetId, code, name)) {
                     throw new CombinedQueryParseException("错误的码值：[" + code + "]" + name);
                 }
             }
         }
-
     }
 
     /**
@@ -174,10 +171,10 @@ public class ValueNodeProcessor extends NodeProcessor {
      *
      * @return
      */
-    private String getCodeSetName(Node node) {
+    private Integer getCodeSetId(Node node) {
         for (Node subNode : node.getSubNodes()) {
             if (subNode instanceof FieldNode) {
-                return ((FieldNode) subNode).getCodeSetName();
+                return ((FieldNode) subNode).getCodeSetId();
             }
         }
         return null;
@@ -188,13 +185,12 @@ public class ValueNodeProcessor extends NodeProcessor {
      *
      * @return
      */
-    private boolean judgeCode(String codeSetName, String code, String name) {
-        QSysCodeSet qSysCodeSet = QSysCodeSet.sysCodeSet;
+    private boolean judgeCode(Integer codeSetId, String code, String name) {
         QSysCodeItem qSysCodeItem = QSysCodeItem.sysCodeItem;
 
         SysCodeItem sysCodeItem = jpaQueryFactory.select(qSysCodeItem)
-                .from(qSysCodeSet).innerJoin(qSysCodeItem).on(qSysCodeSet.id.eq(qSysCodeItem.codeSetId))
-                .where(qSysCodeSet.name.eq(codeSetName).and(qSysCodeItem.code.eq(code)).and(qSysCodeItem.name.eq(name)))
+                .from(qSysCodeItem)
+                .where(qSysCodeItem.codeSetId.eq(codeSetId).and(qSysCodeItem.code.eq(code)).and(qSysCodeItem.name.eq(name)))
                 .fetchOne();
 
         return sysCodeItem != null;
