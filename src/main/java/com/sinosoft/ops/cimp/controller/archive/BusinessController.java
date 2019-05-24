@@ -44,11 +44,11 @@ public class BusinessController extends BaseController {
 	private UserRoleService userRoleService;
 
 	@ApiOperation("根据depid查申请人信息和岗位")
-	@ApiImplicitParam(name = "depId",value = "depid", dataType = "String", required = true, paramType = "query")
+	@ApiImplicitParam(name = "depid",value = "depid", dataType = "String", required = true, paramType = "query")
 	@RequestMapping(value = "/getPersonAndPostByDepid",method = RequestMethod.POST)
 	public ResponseEntity getPersonAndPostByDepid(HttpServletRequest request, HttpServletResponse response) throws Exception{
 		Map<String,Object> map=new HashMap<String,Object>();
-		String Depid=request.getParameter("depId");
+		String Depid=request.getParameter("depid");
 		List<PersonAndPost>	personAndPost = businessService.getPersonAndPostByDepid(Depid);
 		return ok(personAndPost);
 	}

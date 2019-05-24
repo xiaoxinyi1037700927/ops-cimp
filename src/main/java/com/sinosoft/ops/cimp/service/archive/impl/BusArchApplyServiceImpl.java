@@ -141,7 +141,7 @@ public class BusArchApplyServiceImpl implements BusArchApplyService {
 		for(BusArchApplyPerson bap : listbap){
 			HashMap<String,Object> map = new  HashMap<String,Object>();
 			map.put("personid",bap.getId());
-			map.put("empId",bap.getEmpid());
+			map.put("empid",bap.getEmpid());
 			map.put("name",bap.getName());
 			map.put("position",bap.getPost());
 			map.put("depid",bap.getDepid());
@@ -182,7 +182,7 @@ public class BusArchApplyServiceImpl implements BusArchApplyService {
 		for(BusArchApplyPerson bap : listbap){
 			if(empid.equals(bap.getEmpid()))
 			{
-				strPersonId = bap.getId().toString();
+				strPersonId = bap.getId();
 			}
 		}
 		List<BusArchApplyDetail> listbad = busArchApplyDetailRepository.findAllByPersonid(strPersonId);

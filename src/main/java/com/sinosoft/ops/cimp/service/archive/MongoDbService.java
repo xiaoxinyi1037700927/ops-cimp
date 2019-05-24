@@ -164,4 +164,8 @@ public interface MongoDbService {
                                    Map<String, Object> extendDoc) throws UpdateMongoDbResourceError;
 
   List<GridFSFile> findeFileListById(Collection<String> ids);
+
+  void uploadFileFromStreamEncryptAES(String s, String s1, InputStream inputStream);
+
+  String genMongoDbId();
 }

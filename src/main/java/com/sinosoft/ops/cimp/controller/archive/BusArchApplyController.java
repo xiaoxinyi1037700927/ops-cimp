@@ -75,7 +75,7 @@ public class BusArchApplyController  extends BaseController {
 				bap.setApplyId(applyid);
 				String personid = UUID.randomUUID().toString();
 				bap.setId(personid);
-				bap.setEmpid(temp.getString("empId"));
+				bap.setEmpid(temp.getString("empid"));
 				bap.setName(temp.getString("name"));
 				bap.setPost(temp.getString("position"));
 				bap.setDepid(temp.getString("depid"));
@@ -183,7 +183,7 @@ public class BusArchApplyController  extends BaseController {
 					personid = UUID.fromString(temp.getString("personid")).toString();
 				}
 				bap.setId(personid);
-				bap.setEmpid(temp.getString("empId"));
+				bap.setEmpid(temp.getString("empid"));
 				bap.setName(temp.getString("name"));
 				bap.setPost(temp.getString("position"));
 				bap.setDepid(temp.getString("depid"));

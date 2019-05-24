@@ -10,6 +10,8 @@ import com.mongodb.client.gridfs.model.GridFSUploadOptions;
 import com.mongodb.gridfs.GridFS;
 import com.mongodb.gridfs.GridFSDBFile;
 import com.mongodb.gridfs.GridFSInputFile;
+import com.sinosoft.ops.cimp.entity.archive.ArchiveMaterialFile;
+import com.sinosoft.ops.cimp.repository.archive.ArchiveMaterialFileRepository;
 import com.sinosoft.ops.cimp.repository.archive.MongoDbDao;
 import com.sinosoft.ops.cimp.repository.archive.ex.CannotFindMongoDbResourceById;
 import org.apache.commons.io.IOUtils;
@@ -27,6 +29,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Timestamp;
 import java.util.*;
 
 @Repository("mongoDbDao")
@@ -35,6 +38,7 @@ public class MongoDbDaoImpl implements MongoDbDao {
     @Autowired
     private MongoTemplate mongoTemplate;
 
+    private ArchiveMaterialFileRepository archiveMaterialFileRepository;
     @Value("${mongoClientIp}")
     private String host;
     @Value("${mongoClientPort}")
@@ -71,24 +75,41 @@ public class MongoDbDaoImpl implements MongoDbDao {
     public void uploadFileFromStream(String mongoDbId, String fileName, InputStream is,
                                      Map<String, Object> extDoc) throws IOException {
         try {
-
             String contentType = Files.probeContentType(Paths.get(fileName));
             String fileExtension = com.google.common.io.Files.getFileExtension(fileName);
-
             GridFSBucket gfsb = GridFSBuckets.create(mongoTemplate.getDb());
-
             Document doc = new Document("extension", fileExtension).append("content_type", contentType);
-
             System.out.println("docdoc===" + doc);
             if (extDoc != null) {
                 doc.putAll(extDoc);
             }
             GridFSUploadOptions uploadOptions = new GridFSUploadOptions().metadata(doc);
-
+            gfsb.uploadFromStream(new BsonString(mongoDbId), fileName, is, uploadOptions);
+            ArchiveMaterialFile archiveMaterialFile=new ArchiveMaterialFile();
+            archiveMaterialFile.setArchiveMaterialId("1");
+            archiveMaterialFile.setPageCount(12);
+            archiveMaterialFile.setPageNumber(1);
+            archiveMaterialFile.setFileType("11");
+            archiveMaterialFile.setFileStorageRef(mongoDbId);
+            archiveMaterialFile.setId(UUID.randomUUID().toString());
+            archiveMaterialFile.setFileSize(2132);
+            Timestamp ts = new Timestamp(System.currentTimeMillis());
+            String tsStr = "2011-05-09 11:49:45";
+            try {
+                ts = Timestamp.valueOf(tsStr);
+                System.out.println(ts);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            archiveMaterialFile.setCreatedStamp(ts);
+            archiveMaterialFile.setCreatedTxStamp(ts);
+            archiveMaterialFile.setFileFormat("jpg");
+            archiveMaterialFile.setLastUpdatedStamp(ts);
+            archiveMaterialFile.setLastUpdatedTxStamp(ts);
+            archiveMaterialFileRepository.save(archiveMaterialFile);
         } finally {
             IOUtils.closeQuietly(is);
         }
-
     }
 
 

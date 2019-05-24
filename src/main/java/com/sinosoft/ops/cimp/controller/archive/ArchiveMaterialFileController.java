@@ -8,21 +8,21 @@ import com.sinosoft.ops.cimp.entity.archive.ArchiveMaterialFile;
 import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.repository.archive.ex.CannotFindMongoDbResourceById;
 import com.sinosoft.ops.cimp.repository.archive.ex.DownloadResourceFromMongoDbError;
+import com.sinosoft.ops.cimp.repository.archive.ex.UploadResourceToMongoDbError;
 import com.sinosoft.ops.cimp.repository.archive.impl.MongoDbDaoImpl;
 import com.sinosoft.ops.cimp.service.archive.ArchiveMaterialFileService;
 import com.sinosoft.ops.cimp.service.archive.ArchiveMaterialService;
 import com.sinosoft.ops.cimp.service.archive.MongoDbService;
 import com.sinosoft.ops.cimp.util.StringUtil;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.imageio.ImageIO;
@@ -30,8 +30,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -54,6 +53,20 @@ public class ArchiveMaterialFileController extends BaseController {
 	private ArchiveMaterialService archiveMaterialService;
 	@Resource
 	private MongoDbDaoImpl mongoDbDao;
+
+
+	@ApiOperation("添加图片")
+	@RequestMapping(value = "/upde",consumes = "multipart/*",headers = "content-type=multipart/form-date",method = RequestMethod.POST)
+	public void upde(@ApiParam(value = "上传的文件" ,required = true)MultipartFile file) throws  IOException {
+
+
+		System.out.println(file.getSize());
+		InputStream inputStream1 = file.getInputStream();
+		System.out.println(mongoDbService.genMongoDbId());
+		mongoDbService.uploadFileFromStreamEncryptAES(mongoDbService.genMongoDbId(),file.getName(),inputStream1);
+	}
+
+
 
 	/**
 	 * 根据人员ID+档案分类ID 获取 ArchiveMaterialFile集合
@@ -108,13 +121,12 @@ public class ArchiveMaterialFileController extends BaseController {
 			Map<String,Object> map = new HashMap<String,Object>() ;
 			String fileName=id+".jpg";
 			Path path = Paths.get(relPath,id);
-			/*GridFSDBFile gridFSDBFile = mongoDbService.downloadToFileDecryptWithAES(id, path);
+			File file = mongoDbService.downloadToFileDecryptWithAES(id, path);
 			response.setHeader("Cache-Control", "no-store, no-cache");
 			response.setContentType("image/jpeg");
-			BufferedImage bi = ImageIO.read(gridFSDBFile.getInputStream());
+			BufferedImage bi = ImageIO.read(file);
 			ServletOutputStream out = response.getOutputStream();
-			ImageIO.write(bi, "jpg", out);*/
-
+			ImageIO.write(bi, "jpg", out);
 		} catch (Exception e) {
 			logger.error("查询失败！", e);
 		}

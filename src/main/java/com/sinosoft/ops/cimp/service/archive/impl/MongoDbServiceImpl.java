@@ -78,6 +78,44 @@ public class MongoDbServiceImpl implements MongoDbService {
         return mongoDbId;
     }
 
+
+    @Override
+    public void uploadFileFromStreamEncryptAES(String id, String fileName, InputStream is)  {
+
+        ByteArrayInputStream bais = null;
+        Map<String, Object> extendDoc=null;
+
+        try {
+            System.out.println("isis==" + is);
+            byte[] bytes = IOUtils.toByteArray(is);
+            byte[] encryptedBytes = CryptoUtil.encryptAes(bytes, pwdBytes);//使用加密工具将流加密
+            bais = new ByteArrayInputStream(encryptedBytes);
+            // 原始md5
+            MessageDigest md = MessageDigest.getInstance("MD5");//MessageDigest类用于为应用程序提供信息摘要算法的功能，如 MD5 或 SHA 算法。简单点说就是用于生成散列码。信息摘要是安全的单向哈希函数，它接收任意大小的数据，输出固定长度的哈希值。
+            byte[] thedigest = md.digest(bytes);
+            String realmd5 = String.valueOf(Hex.encodeHex(thedigest)); //hex 16进制编码解码工具   test("白");//编码前【白】编码后【E799BD】解码后【白】
+
+            if (extendDoc == null || extendDoc.isEmpty()) {
+                extendDoc = new HashMap<String, Object>();
+            }
+            extendDoc.put("realmd5", realmd5);
+
+            mongoDbDao.uploadFileFromStream(id, fileName, bais, extendDoc);
+
+        } catch (IOException | InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException
+                | IllegalBlockSizeException | BadPaddingException e) {
+            logger.error("上传文件加密失败", e);
+        } finally {
+            IOUtils.closeQuietly(bais);
+            IOUtils.closeQuietly(is);
+        }
+    }
+
+    @Override
+    public String genMongoDbId() {
+        return mongoDbDao.genMongoDbId();
+    }
+
     @Override
     public void uploadFileFromStreamEncryptWithAES(String id, String fileName, InputStream is,
                                                    Map<String, Object> extendDoc) throws UploadResourceToMongoDbError {
