@@ -57,7 +57,7 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
             Optional<CombinedQuery> optional = combinedQueryRepository.findById(combinedQueryId);
             if (optional.isPresent()) {
                 try {
-                    List<Expr> exprs = parser.parseExprTree(optional.get().getExpression());
+                    List<Expr> exprs = parser.parseExprs(optional.get().getExpression());
                     putCache(userId, combinedQueryId, exprs);
                     o = exprs;
                 } catch (CombinedQueryParseException e) {
@@ -162,15 +162,15 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
         //获取组合查询信息
         CombinedQuery combinedQuery = combinedQueryRepository.getOne(id);
         //将表达式解析为表达式树
-        List<Expr> expr = parser.parseExprTree(combinedQuery.getExpression());
+        List<Expr> exprs = parser.parseExprs(combinedQuery.getExpression());
 
         //将表达式树存入缓存
-        putCache(userId, combinedQuery.getId(), expr);
+        putCache(userId, combinedQuery.getId(), exprs);
 
         CombinedQueryModel model = new CombinedQueryModel();
         model.setCombinedQueryId(id);
-        model.setExprstr(combinedQuery.getExpression());
-        model.setExpr(expr);
+        model.setExprstr(parser.parseExprStr(exprs));
+        model.setExpr(exprs);
 
         return model;
     }
@@ -193,15 +193,15 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
             combinedQueryId = IdUtil.uuid();
         }
 
-        List<Expr> expr = parser.parseExprTree(exprStr);
-        exprStr = parser.parseExprStr(expr);
+        List<Expr> exprs = parser.parseExprs(exprStr);
+        exprStr = parser.parseExprStr(exprs);
 
         //将表达式树存入缓存
-        putCache(userId, combinedQueryId, expr);
+        putCache(userId, combinedQueryId, exprs);
 
         CombinedQueryModel model = new CombinedQueryModel();
         model.setExprstr(exprStr);
-        model.setExpr(expr);
+        model.setExpr(exprs);
 
         return model;
     }
@@ -243,12 +243,12 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
         }
 
         //获取组合查询缓存
-        List<Expr> expr = getCache(userId, combinedQueryId);
+        List<Expr> exprs = getCache(userId, combinedQueryId);
 
         //定位添加表达式的位置,默认添加在最外层最后
-        List<Expr> position = expr;
+        List<Expr> position = exprs;
         if (StringUtils.isNotEmpty(appendModel.getExprId())) {
-            Expr e = getExpr(expr, appendModel.getExprId());
+            Expr e = getExpr(exprs, appendModel.getExprId());
             if (e != null && e.isBracketsNode()) {
                 position = e.getSubExprs();
             }
@@ -270,12 +270,12 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
         //添加表达式
         position.add(newExpr);
         //更新缓存
-        putCache(userId, combinedQueryId, expr);
+        putCache(userId, combinedQueryId, exprs);
 
         ExprModel result = new ExprModel();
         result.setCombinedQueryId(combinedQueryId);
         result.setExpr(newExpr);
-        result.setExprstr(parser.parseExprStr(expr));
+        result.setExprstr(parser.parseExprStr(exprs));
         result.setCompilePass(parser.compile(newExpr.getText()));
 
         return result;
@@ -632,7 +632,7 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
         CompileResultModel result = new CompileResultModel();
 
         try {
-            result.setExprs(parser.parseExprTree(exprStr));
+            result.setExprs(parser.parseExprs(exprStr));
             result.setExprstr(parser.parseExprStr(result.getExprs()));
             result.setCompilePass(true);
         } catch (CombinedQueryParseException e) {

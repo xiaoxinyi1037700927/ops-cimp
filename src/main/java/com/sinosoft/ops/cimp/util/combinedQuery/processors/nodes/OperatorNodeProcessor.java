@@ -139,6 +139,7 @@ public class OperatorNodeProcessor extends NodeProcessor {
      */
     public Node getDefaultNode() throws CombinedQueryParseException {
         OperatorNode node = new OperatorNode(getProcessor(Operator.EQ.getName()));
+        node.setDefault(true);
 
         node.addSubNode(new ValueNode(Collections.singletonList("1"), Collections.emptyList(), false, false, Type.NUMBER.getCode()));
         node.addSubNode(new ValueNode(Collections.singletonList("1"), Collections.emptyList(), false, false, Type.NUMBER.getCode()));

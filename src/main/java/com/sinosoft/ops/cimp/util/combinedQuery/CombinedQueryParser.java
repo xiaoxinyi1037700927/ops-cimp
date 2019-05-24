@@ -45,12 +45,13 @@ public class CombinedQueryParser {
         for (Expr expr : exprs) {
             if (expr.isBracketsNode()) {
                 sb.append(" ").append(expr.getLogicalOperator())
-                        .append(" (")
+                        .append(" (\n")
                         .append(parseExprStr(expr.getSubExprs()))
-                        .append(")");
+                        .append(")\n");
             } else {
                 refreshText(expr);
                 sb.append(expr.getText());
+                sb.append("\n");
             }
         }
 
@@ -112,7 +113,7 @@ public class CombinedQueryParser {
      * @return
      * @throws CombinedQueryParseException
      */
-    public List<Expr> parseExprTree(String exprStr) throws CombinedQueryParseException {
+    public List<Expr> parseExprs(String exprStr) throws CombinedQueryParseException {
         Node root = parseGramTree(exprStr, null);
 
         List<Expr> exprs = new ArrayList<>();
@@ -130,6 +131,11 @@ public class CombinedQueryParser {
      * @param logicalOperator
      */
     private void GramTreeToExprs(Node root, List<Expr> exprs, String logicalOperator) {
+        if (root.isDefault()) {
+            //忽略默认节点1=1
+            return;
+        }
+
         if (root instanceof LogicalOperatorNode) {
             //逻辑表达式节点，递归处理子节点
             List<Node> subNodes = root.getSubNodes();
@@ -265,17 +271,17 @@ public class CombinedQueryParser {
             //将表达式解析为节点
             node = processor.parse(expr);
 
+            //处理子节点
+            for (String subNodeExpr : node.getSubNodeExpr()) {
+                node.addSubNode(parseGramTree(subNodeExpr, node));
+            }
+
             //节点入栈
             Node next = node;
             do {
                 next = processor.pushNode(stack, next);
                 processor = getNodeProcessor(next);
             } while (next != null);
-
-            //处理子节点
-            for (String subNodeExpr : node.getSubNodeExpr()) {
-                node.addSubNode(parseGramTree(subNodeExpr, node));
-            }
         }
 
         if (stack.size() != 1) {
