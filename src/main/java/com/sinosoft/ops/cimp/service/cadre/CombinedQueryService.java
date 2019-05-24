@@ -110,4 +110,6 @@ public interface CombinedQueryService {
      * @return
      */
     ExprStatisticsModel statisticsExpr(String combinedQueryId);
+
+    String getsql(String combinedQueryId);
 }

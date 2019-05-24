@@ -10,8 +10,8 @@ public class ExprStream {
     private int index;
 
     public ExprStream(String expression) {
-        this.expression = expression;
-        this.exprStream = expression.toCharArray();
+        this.expression = expression.replaceAll("\n", "");
+        this.exprStream = this.expression.toCharArray();
         this.total = exprStream.length;
         this.index = 0;
     }

@@ -128,4 +128,11 @@ public class CombinedQueryController extends BaseController {
     public ResponseEntity statisticsExpr(@RequestParam String combinedQueryId) throws BusinessException {
         return ok(combinedQueryService.statisticsExpr(combinedQueryId));
     }
+
+    @ApiOperation(value = "获取表达式sql")
+    @PostMapping("/sql")
+    @RequiresAuthentication
+    public ResponseEntity getsql(@RequestParam String combinedQueryId) throws BusinessException {
+        return ok(combinedQueryService.getsql(combinedQueryId));
+    }
 }

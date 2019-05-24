@@ -1,11 +1,11 @@
 package com.sinosoft.ops.cimp.util.combinedQuery.processors.nodes;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.sinosoft.ops.cimp.dao.SysTableInfoDao;
+import com.sinosoft.ops.cimp.dao.domain.sys.table.SysTableFieldInfo;
+import com.sinosoft.ops.cimp.dao.domain.sys.table.SysTableInfo;
 import com.sinosoft.ops.cimp.entity.sys.syscode.QSysCodeSet;
-import com.sinosoft.ops.cimp.entity.sys.systable.QSysTable;
-import com.sinosoft.ops.cimp.entity.sys.systable.QSysTableField;
-import com.sinosoft.ops.cimp.entity.sys.systable.SysTable;
-import com.sinosoft.ops.cimp.entity.sys.systable.SysTableField;
+import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.CombinedQueryParseException;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.FieldNode;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.Node;
@@ -25,9 +25,11 @@ public class FieldNodeProcessor extends NodeProcessor {
     private static final Pattern pattern = Pattern.compile("^([\\u4e00-\\u9fa5_a-zA-Z0-9\\-]+)\\.([\\u4e00-\\u9fa5_a-zA-Z0-9\\-]+)$");
 
     private final JPAQueryFactory jpaQueryFactory;
+    private final SysTableInfoDao sysTableInfoDao;
 
-    public FieldNodeProcessor(JPAQueryFactory jpaQueryFactory) {
+    public FieldNodeProcessor(JPAQueryFactory jpaQueryFactory, SysTableInfoDao sysTableInfoDao) {
         this.jpaQueryFactory = jpaQueryFactory;
+        this.sysTableInfoDao = sysTableInfoDao;
     }
 
 
@@ -71,12 +73,12 @@ public class FieldNodeProcessor extends NodeProcessor {
         String tableName = matcher.group(1);
         String fieldName = matcher.group(2);
 
-        SysTable table = getSysTable(tableName);
+        SysTableInfo table = getTable(tableName);
         if (table == null) {
             throw new CombinedQueryParseException("未知的表名：" + tableName);
         }
 
-        SysTableField field = getSysTableField(table.getId(), fieldName);
+        SysTableFieldInfo field = getSysTableField(table, fieldName);
         if (field == null) {
             throw new CombinedQueryParseException("未知的字段名：" + fieldName);
         }
@@ -86,7 +88,7 @@ public class FieldNodeProcessor extends NodeProcessor {
             throw new CombinedQueryParseException("未定义的字段类型：" + tableName + "." + fieldName);
         }
 
-        return new FieldNode(table.getDbTableName(), table.getNameCn(), field.getDbFieldName(), field.getNameCn(), returnType.getCode(), field.getSysCodeSetName(), getCodeSetId(field.getSysCodeSetName()));
+        return new FieldNode(table.getDbTableName(), table.getNameCn(), field.getDbFieldName(), field.getNameCn(), returnType.getCode(), field.getCodeSetName(), getCodeSetId(field.getCodeSetName()));
     }
 
     private Integer getCodeSetId(String sysCodeSetName) {
@@ -106,29 +108,33 @@ public class FieldNodeProcessor extends NodeProcessor {
      * @param tableName
      * @return
      */
-    private SysTable getSysTable(String tableName) {
-        QSysTable qSysTable = QSysTable.sysTable;
-        return jpaQueryFactory.select(qSysTable).from(qSysTable)
-                .where(qSysTable.nameCn.eq(tableName)
-                        .or(qSysTable.nameEn.equalsIgnoreCase(tableName))
-                        .or(qSysTable.dbTableName.equalsIgnoreCase(tableName))).fetchOne();
+    private SysTableInfo getTable(String tableName) throws CombinedQueryParseException {
+        try {
+            for (SysTableInfo table : sysTableInfoDao.getTableInfo("cadreInfo").getTables()) {
+                if (table.getNameCn().equals(tableName) || table.getNameEn().equalsIgnoreCase(tableName) || table.getDbTableName().equalsIgnoreCase(tableName)) {
+                    return table;
+                }
+            }
+            return null;
+        } catch (BusinessException e) {
+            throw new CombinedQueryParseException("获取字段信息失败！");
+        }
     }
 
     /**
      * 获取系统表字段
      *
-     * @param sysTableId
+     * @param table
      * @param fieldName
      * @return
      */
-    private SysTableField getSysTableField(String sysTableId, String fieldName) {
-        QSysTableField qSysTableField = QSysTableField.sysTableField;
-        return jpaQueryFactory.select(qSysTableField).from(qSysTableField)
-                .where(qSysTableField.sysTableId.eq(sysTableId).and(
-                        qSysTableField.nameCn.eq(fieldName)
-                                .or(qSysTableField.nameEn.equalsIgnoreCase(fieldName))
-                                .or(qSysTableField.dbFieldName.equalsIgnoreCase(fieldName))
-                )).fetchOne();
+    private SysTableFieldInfo getSysTableField(SysTableInfo table, String fieldName) {
+        for (SysTableFieldInfo field : table.getTableFields()) {
+            if (field.getNameCn().equals(fieldName) || field.getNameEn().equalsIgnoreCase(fieldName) || field.getDbFieldName().equalsIgnoreCase(fieldName)) {
+                return field;
+            }
+        }
+        return null;
     }
 
     /**
@@ -137,14 +143,14 @@ public class FieldNodeProcessor extends NodeProcessor {
      * @param field
      * @return
      */
-    private Type getReturnType(SysTableField field) {
+    private Type getReturnType(SysTableFieldInfo field) {
         String fieldType = field.getDbFieldDataType();
         if (StringUtils.isEmpty(fieldType)) {
             return null;
         }
         fieldType = fieldType.toLowerCase();
 
-        if (StringUtils.isNotEmpty(field.getSysCodeSetName())) {
+        if (StringUtils.isNotEmpty(field.getCodeSetName())) {
             return Type.CODE;
         } else if (fieldType.contains("char")) {
             return Type.STRING;

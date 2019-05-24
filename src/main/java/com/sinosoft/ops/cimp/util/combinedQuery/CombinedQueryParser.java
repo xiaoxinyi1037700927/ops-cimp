@@ -249,7 +249,7 @@ public class CombinedQueryParser {
      * @throws CombinedQueryParseException
      */
     private Node parseGramTree(String exprStr, Node parent) throws CombinedQueryParseException {
-        if (StringUtils.isEmpty(exprStr)) {
+        if (StringUtils.isEmpty(exprStr) && parent == null) {
             //如果表达式为空，返回默认的1=1
             return operatorNodeProcessor.getDefaultNode();
         }
@@ -271,17 +271,25 @@ public class CombinedQueryParser {
             //将表达式解析为节点
             node = processor.parse(expr);
 
-            //处理子节点
-            for (String subNodeExpr : node.getSubNodeExpr()) {
-                node.addSubNode(parseGramTree(subNodeExpr, node));
-            }
-
             //节点入栈
+            //先入栈后处理子节点是为了保证子节点的添加顺序
             Node next = node;
             do {
                 next = processor.pushNode(stack, next);
                 processor = getNodeProcessor(next);
             } while (next != null);
+
+
+            //处理子节点
+            if (node.getSubNodeExpr().size() > 0) {
+                for (String subNodeExpr : node.getSubNodeExpr()) {
+                    node.addSubNode(parseGramTree(subNodeExpr, node));
+                }
+                if (stack.peek().equals(node)) {
+                    node = stack.pop();
+                    getNodeProcessor(node).pushNode(stack, node);
+                }
+            }
         }
 
         if (stack.size() != 1) {

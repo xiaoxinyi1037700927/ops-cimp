@@ -663,6 +663,18 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
         return result;
     }
 
+    @Override
+    public String getsql(String combinedQueryId) {
+        String userId = SecurityUtils.getSubject().getCurrentUser().getId();
+        try {
+
+            return parser.parseSql(parser.parseExprStr(getCache(userId, combinedQueryId)));
+        } catch (CombinedQueryParseException e) {
+            e.printStackTrace();
+            return e.getMessage();
+        }
+    }
+
     /**
      * 统计表达式数量
      *
