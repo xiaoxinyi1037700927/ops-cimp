@@ -4,6 +4,7 @@ import com.sinosoft.ops.cimp.util.combinedQuery.beans.CombinedQueryParseExceptio
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.LogicalOperatorNode;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.Node;
 import com.sinosoft.ops.cimp.util.combinedQuery.enums.LogicalOperator;
+import com.sinosoft.ops.cimp.util.combinedQuery.enums.Type;
 import org.springframework.stereotype.Component;
 
 import java.util.Deque;
@@ -18,7 +19,10 @@ import java.util.regex.Pattern;
 public class LogicalOperatorNodeProcessor extends NodeProcessor {
     private static Map<LogicalOperator, Pattern> logicalOperators = new HashMap<>();
 
-    public LogicalOperatorNodeProcessor() {
+    private final OperatorNodeProcessor operatorNodeProcessor;
+
+    public LogicalOperatorNodeProcessor(OperatorNodeProcessor operatorNodeProcessor) {
+        this.operatorNodeProcessor = operatorNodeProcessor;
         //预编译逻辑操作符的正则表达式
         for (LogicalOperator logicalOperator : LogicalOperator.values()) {
             logicalOperators.put(logicalOperator, Pattern.compile(logicalOperator.getRegex()));
@@ -79,6 +83,10 @@ public class LogicalOperatorNodeProcessor extends NodeProcessor {
     public Node pushNode(Deque<Node> stack, Node node) throws CombinedQueryParseException {
         if (node.isComplete()) {
             stack.push(node);
+        } else if (stack.size() == 0 || (stack.peek().getReturnType() == Type.BRACKETS.getCode() && !stack.peek().isComplete())) {
+            //如果逻辑操作符在表达式或括号开始处，前面添加1=1
+            node.addSubNode(operatorNodeProcessor.getDefaultNode());
+            stack.push(node);
         } else if (stack.size() > 0 && (stack.peek().getReturnType() & node.getNextSubType()) != 0) {
             Node first = stack.pop();
             node.addSubNode(first);
@@ -89,5 +97,6 @@ public class LogicalOperatorNodeProcessor extends NodeProcessor {
 
         return null;
     }
+
 
 }

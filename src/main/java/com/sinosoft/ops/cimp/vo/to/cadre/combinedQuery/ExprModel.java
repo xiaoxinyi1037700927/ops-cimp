@@ -26,7 +26,7 @@ public class ExprModel {
      * 编译是否通过
      */
     @ApiModelProperty(value = "编译是否通过")
-    private boolean complilePass;
+    private boolean compilePass;
 
     public String getCombinedQueryId() {
         return combinedQueryId;
@@ -52,11 +52,11 @@ public class ExprModel {
         this.expr = expr;
     }
 
-    public boolean isComplilePass() {
-        return complilePass;
+    public boolean isCompilePass() {
+        return compilePass;
     }
 
-    public void setComplilePass(boolean complilePass) {
-        this.complilePass = complilePass;
+    public void setCompilePass(boolean compilePass) {
+        this.compilePass = compilePass;
     }
 }

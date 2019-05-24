@@ -114,4 +114,25 @@ public class CombinedQueryController extends BaseController {
     public ResponseEntity modifyExpr(@RequestBody ExprModifyModel modifyModel) throws BusinessException {
         return ok(combinedQueryService.modifyExpr(modifyModel));
     }
+
+    @ApiOperation(value = "编译表达式")
+    @PostMapping("/exprStr/compile")
+    @RequiresAuthentication
+    public ResponseEntity compileExprStr(@RequestParam String exprStr) throws BusinessException {
+        return ok(combinedQueryService.compileExprStr(exprStr));
+    }
+
+    @ApiOperation(value = "统计表达式数量")
+    @PostMapping("/expr/statistics")
+    @RequiresAuthentication
+    public ResponseEntity statisticsExpr(@RequestParam String combinedQueryId) throws BusinessException {
+        return ok(combinedQueryService.statisticsExpr(combinedQueryId));
+    }
+
+    @ApiOperation(value = "获取表达式sql")
+    @PostMapping("/sql")
+    @RequiresAuthentication
+    public ResponseEntity getsql(@RequestParam String combinedQueryId) throws BusinessException {
+        return ok(combinedQueryService.getsql(combinedQueryId));
+    }
 }

@@ -9,6 +9,7 @@ import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.*;
 import com.sinosoft.ops.cimp.util.combinedQuery.enums.Operator;
 import com.sinosoft.ops.cimp.util.combinedQuery.processors.code.CodeProcessor;
 import com.sinosoft.ops.cimp.util.combinedQuery.processors.nodes.NodeProcessor;
+import com.sinosoft.ops.cimp.util.combinedQuery.processors.nodes.OperatorNodeProcessor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -24,11 +25,13 @@ public class CombinedQueryParser {
 
     private final NodeProcessor[] nodeProcessors;
     private final CodeProcessor codeProcessor;
+    private final OperatorNodeProcessor operatorNodeProcessor;
 
     @Autowired
-    public CombinedQueryParser(NodeProcessor[] nodeProcessors, CodeProcessor codeProcessor) {
+    public CombinedQueryParser(NodeProcessor[] nodeProcessors, CodeProcessor codeProcessor, OperatorNodeProcessor operatorNodeProcessor) {
         this.nodeProcessors = nodeProcessors;
         this.codeProcessor = codeProcessor;
+        this.operatorNodeProcessor = operatorNodeProcessor;
     }
 
     /**
@@ -42,12 +45,13 @@ public class CombinedQueryParser {
         for (Expr expr : exprs) {
             if (expr.isBracketsNode()) {
                 sb.append(" ").append(expr.getLogicalOperator())
-                        .append(" (")
+                        .append(" (\n")
                         .append(parseExprStr(expr.getSubExprs()))
-                        .append(")");
+                        .append(")\n");
             } else {
                 refreshText(expr);
                 sb.append(expr.getText());
+                sb.append("\n");
             }
         }
 
@@ -109,14 +113,12 @@ public class CombinedQueryParser {
      * @return
      * @throws CombinedQueryParseException
      */
-    public List<Expr> parseExprTree(String exprStr) throws CombinedQueryParseException {
+    public List<Expr> parseExprs(String exprStr) throws CombinedQueryParseException {
         Node root = parseGramTree(exprStr, null);
 
         List<Expr> exprs = new ArrayList<>();
 
-        if (root != null) {
-            GramTreeToExprs(root, exprs, null);
-        }
+        GramTreeToExprs(root, exprs, null);
 
         return exprs;
     }
@@ -129,6 +131,11 @@ public class CombinedQueryParser {
      * @param logicalOperator
      */
     private void GramTreeToExprs(Node root, List<Expr> exprs, String logicalOperator) {
+        if (root.isDefault()) {
+            //忽略默认节点1=1
+            return;
+        }
+
         if (root instanceof LogicalOperatorNode) {
             //逻辑表达式节点，递归处理子节点
             List<Node> subNodes = root.getSubNodes();
@@ -193,10 +200,6 @@ public class CombinedQueryParser {
     public String parseSql(String exprStr) throws CombinedQueryParseException {
         Node root = parseGramTree(exprStr, null);
 
-        if (root == null) {
-            return null;
-        }
-
         //调用码值处理器
         invokeCodeProcessors(root);
 
@@ -228,10 +231,8 @@ public class CombinedQueryParser {
      */
     public boolean compile(String exprStr) {
         try {
-            Node root = parseGramTree(exprStr, null);
-            if (root != null) {
-                return true;
-            }
+            parseGramTree(exprStr, null);
+            return true;
         } catch (CombinedQueryParseException e) {
 //            e.printStackTrace();
         }
@@ -248,8 +249,9 @@ public class CombinedQueryParser {
      * @throws CombinedQueryParseException
      */
     private Node parseGramTree(String exprStr, Node parent) throws CombinedQueryParseException {
-        if (StringUtils.isEmpty(exprStr)) {
-            return null;
+        if (StringUtils.isEmpty(exprStr) && parent == null) {
+            //如果表达式为空，返回默认的1=1
+            return operatorNodeProcessor.getDefaultNode();
         }
 
         Deque<Node> stack = new LinkedList<>();
@@ -270,15 +272,23 @@ public class CombinedQueryParser {
             node = processor.parse(expr);
 
             //节点入栈
+            //先入栈后处理子节点是为了保证子节点的添加顺序
             Node next = node;
             do {
                 next = processor.pushNode(stack, next);
                 processor = getNodeProcessor(next);
             } while (next != null);
 
+
             //处理子节点
-            for (String subNodeExpr : node.getSubNodeExpr()) {
-                node.addSubNode(parseGramTree(subNodeExpr, node));
+            if (node.getSubNodeExpr().size() > 0) {
+                for (String subNodeExpr : node.getSubNodeExpr()) {
+                    node.addSubNode(parseGramTree(subNodeExpr, node));
+                }
+                if (stack.peek().equals(node)) {
+                    node = stack.pop();
+                    getNodeProcessor(node).pushNode(stack, node);
+                }
             }
         }
 

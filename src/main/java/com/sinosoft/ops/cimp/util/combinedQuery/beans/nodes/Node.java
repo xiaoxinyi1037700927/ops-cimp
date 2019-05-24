@@ -36,6 +36,10 @@ public abstract class Node {
      * 子节点
      */
     protected List<Node> subNodes = new ArrayList<>();
+    /**
+     * 是否是默认节点(1=1)，它在页面上不显示
+     */
+    private boolean isDefault;
 
     public Node getParent() {
         return parent;
@@ -67,6 +71,14 @@ public abstract class Node {
 
     public List<Node> getSubNodes() {
         return subNodes;
+    }
+
+    public boolean isDefault() {
+        return isDefault;
+    }
+
+    public void setDefault(boolean aDefault) {
+        isDefault = aDefault;
     }
 
     /**
