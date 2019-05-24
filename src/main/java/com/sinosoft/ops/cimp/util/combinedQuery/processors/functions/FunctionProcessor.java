@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public abstract class FunctionProcessor {
+public class FunctionProcessor {
     private Function function;
     private Pattern pattern;
 
@@ -82,7 +82,7 @@ public abstract class FunctionProcessor {
      * @param expr
      * @return
      */
-    protected List<String> getParams(String expr) throws CombinedQueryParseException {
+    private List<String> getParams(String expr) throws CombinedQueryParseException {
         List<String> params = new ArrayList<>();
         if (StringUtils.isBlank(expr)) {
             return params;

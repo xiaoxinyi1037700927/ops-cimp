@@ -49,6 +49,10 @@ public abstract class Node {
         return isComplete;
     }
 
+    public void setComplete(boolean complete) {
+        isComplete = complete;
+    }
+
     public int getNextSubType() {
         if (supportSubTypes.length > subNodes.size()) {
             return supportSubTypes[subNodes.size()];

@@ -3,11 +3,15 @@ package com.sinosoft.ops.cimp.util.combinedQuery.processors.nodes;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.CombinedQueryParseException;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.FunctionNode;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.Node;
+import com.sinosoft.ops.cimp.util.combinedQuery.enums.Function;
 import com.sinosoft.ops.cimp.util.combinedQuery.enums.Type;
 import com.sinosoft.ops.cimp.util.combinedQuery.processors.functions.FunctionProcessor;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+import java.util.ArrayList;
 import java.util.Deque;
+import java.util.List;
 
 /**
  * 函数节点处理器
@@ -15,10 +19,17 @@ import java.util.Deque;
 @Component
 public class FunctionNodeProcessor extends NodeProcessor {
 
-    private final FunctionProcessor[] functionProcessors;
+    private List<FunctionProcessor> functionProcessors;
 
-    public FunctionNodeProcessor(FunctionProcessor[] functionProcessors) {
-        this.functionProcessors = functionProcessors;
+    /**
+     * 初始化函数处理器
+     */
+    @PostConstruct
+    public void init() {
+        functionProcessors = new ArrayList<>(Function.values().length);
+        for (Function function : Function.values()) {
+            functionProcessors.add(new FunctionProcessor(function));
+        }
     }
 
     /**

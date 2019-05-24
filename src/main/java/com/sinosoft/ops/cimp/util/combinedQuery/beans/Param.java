@@ -4,6 +4,17 @@ import java.util.List;
 
 public class Param {
 
+    public Param() {
+
+    }
+
+    public Param(String id, String text) {
+        this.id = id;
+        this.text = text;
+    }
+
+    private String id;
+
     private String text;
 
     private int returnType;
@@ -13,6 +24,14 @@ public class Param {
     private String functionName;
 
     private List<Param> params;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getText() {
         return text;

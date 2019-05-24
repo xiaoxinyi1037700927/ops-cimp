@@ -111,5 +111,11 @@
                 <param name="cacheTemplateName" value="scriptCacheTemplate"/>
             </params>
         </CacheItem>
+        <!-- 组合查询缓存 -->
+        <CacheItem>
+            <cacheName>COMBINED_QUERY_CACHE</cacheName>
+            <engineName>hashCache</engineName>
+            <cacheDesc>组合查询缓存</cacheDesc>
+        </CacheItem>
     </CacheItems>
 </CacheManagerInfo>
