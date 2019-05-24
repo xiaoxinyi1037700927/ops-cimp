@@ -27,10 +27,7 @@ import com.sinosoft.ops.cimp.vo.to.cadre.combinedQuery.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -54,6 +51,21 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
     @SuppressWarnings("unchecked")
     private List<Expr> getCache(String userId, String combinedQueryId) {
         Object o = CacheManager.getInstance().get(Constants.COMBINED_QUERY_CACHE, userId + "/" + combinedQueryId);
+
+        if (o == null) {
+            //如果缓存中没有，尝试去数据库中获取
+            Optional<CombinedQuery> optional = combinedQueryRepository.findById(combinedQueryId);
+            if (optional.isPresent()) {
+                try {
+                    List<Expr> exprs = parser.parseExprTree(optional.get().getExpression());
+                    putCache(userId, combinedQueryId, exprs);
+                    o = exprs;
+                } catch (CombinedQueryParseException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
         return o != null ? (List<Expr>) o : new ArrayList<>();
     }
 
@@ -264,7 +276,7 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
         result.setCombinedQueryId(combinedQueryId);
         result.setExpr(newExpr);
         result.setExprstr(parser.parseExprStr(expr));
-        result.setComplilePass(parser.compile(newExpr.getText()));
+        result.setCompilePass(parser.compile(newExpr.getText()));
 
         return result;
     }
@@ -288,7 +300,7 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
         ExprModel result = new ExprModel();
         result.setCombinedQueryId(combinedQueryId);
         result.setExprstr(parser.parseExprStr(exprs));
-        result.setComplilePass(parser.compile(result.getExprstr()));
+        result.setCompilePass(parser.compile(result.getExprstr()));
 
         return result;
     }
@@ -321,7 +333,7 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
         result.setExpr(expr);
         result.setExprstr(parser.parseExprStr(exprs));
         result.setCombinedQueryId(combinedQueryId);
-        result.setComplilePass(parser.compile(expr.getText()));
+        result.setCompilePass(parser.compile(expr.getText()));
 
         return result;
     }
@@ -354,14 +366,19 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
             newFunction.setIsFunction(1);
             newFunction.setFunctionName(appendModel.getFunctionName());
 
+
+            Function func = Function.getByName(appendModel.getFunctionName());
+            int paramNum = func != null ? func.getParamsNum() : 0;
+
             List<Param> newParams = new ArrayList<>();
-            newParams.add(target);
-            if (appendModel.getParams() != null) {
-                for (String str : appendModel.getParams()) {
-                    newParams.add(new Param(IdUtil.uuid(), str));
+            newFunction.setParams(newParams);
+
+            if (paramNum > 0) {
+                newParams.add(target);
+                for (int i = 1; i < paramNum; i++) {
+                    newParams.add(new Param(IdUtil.uuid(), "''"));
                 }
             }
-            newFunction.setParams(newParams);
 
             params.add(index, newFunction);
             return true;
@@ -399,7 +416,7 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
         result.setExpr(expr);
         result.setExprstr(parser.parseExprStr(exprs));
         result.setCombinedQueryId(combinedQueryId);
-        result.setComplilePass(parser.compile(expr.getText()));
+        result.setCompilePass(parser.compile(expr.getText()));
 
         return result;
     }
@@ -474,7 +491,7 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
         result.setExpr(expr);
         result.setExprstr(parser.parseExprStr(exprs));
         result.setCombinedQueryId(combinedQueryId);
-        result.setComplilePass(parser.compile(expr.getText()));
+        result.setCompilePass(parser.compile(expr.getText()));
 
         return result;
     }
@@ -601,5 +618,65 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
             }
         }
         return false;
+    }
+
+
+    /**
+     * 编译表达式
+     *
+     * @param exprStr
+     * @return
+     */
+    @Override
+    public CompileResultModel compileExprStr(String exprStr) {
+        CompileResultModel result = new CompileResultModel();
+
+        try {
+            result.setExprs(parser.parseExprTree(exprStr));
+            result.setExprstr(parser.parseExprStr(result.getExprs()));
+            result.setCompilePass(true);
+        } catch (CombinedQueryParseException e) {
+            e.printStackTrace();
+            result.setCompilePass(false);
+            result.setWrongMessage(e.getMessage());
+        }
+
+        return result;
+    }
+
+    /**
+     * 统计表达式数量
+     *
+     * @param combinedQueryId
+     * @return
+     */
+    @Override
+    public ExprStatisticsModel statisticsExpr(String combinedQueryId) {
+        String userId = SecurityUtils.getSubject().getCurrentUser().getId();
+
+        ExprStatisticsModel result = new ExprStatisticsModel();
+
+        List<Expr> exprs = getCache(userId, combinedQueryId);
+
+        statictics(result, exprs);
+
+        return result;
+    }
+
+    /**
+     * 统计表达式数量
+     *
+     * @param result
+     * @param exprs
+     */
+    private void statictics(ExprStatisticsModel result, List<Expr> exprs) {
+        for (Expr expr : exprs) {
+            if (expr.isBracketsNode()) {
+                result.incrNestedExprNum();
+                statictics(result, expr.getSubExprs());
+            } else {
+                result.incrGeneralExprNum();
+            }
+        }
     }
 }

@@ -94,4 +94,20 @@ public interface CombinedQueryService {
      * @return
      */
     ExprModel modifyExpr(ExprModifyModel modifyModel);
+
+    /**
+     * 编译表达式
+     *
+     * @param exprStr
+     * @return
+     */
+    CompileResultModel compileExprStr(String exprStr);
+
+    /**
+     * 统计表达式数量
+     *
+     * @param combinedQueryId
+     * @return
+     */
+    ExprStatisticsModel statisticsExpr(String combinedQueryId);
 }

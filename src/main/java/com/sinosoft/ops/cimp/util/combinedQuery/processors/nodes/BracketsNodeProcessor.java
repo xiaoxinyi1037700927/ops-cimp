@@ -20,6 +20,12 @@ public class BracketsNodeProcessor extends NodeProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(BracketsNodeProcessor.class);
 
+    private final OperatorNodeProcessor operatorNodeProcessor;
+
+    public BracketsNodeProcessor(OperatorNodeProcessor operatorNodeProcessor) {
+        this.operatorNodeProcessor = operatorNodeProcessor;
+    }
+
     /**
      * 表达式是否满足节点
      *
@@ -86,8 +92,8 @@ public class BracketsNodeProcessor extends NodeProcessor {
                 Node first = stack.pop();
 
                 if (first.getReturnType() == Type.BRACKETS.getCode() && !first.isComplete()) {
-                    //如果节点类型是括号且不完整，则说明这对括号之间没有表达式
-                    first.setComplete(true);
+                    //如果节点类型是括号且不完整，说明这对括号之间没有表达式，添加默认的1=1
+                    first.addSubNode(operatorNodeProcessor.getDefaultNode());
                     return first;
                 }
 

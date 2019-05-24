@@ -53,4 +53,5 @@ public class OperatorNode extends Node {
     public void setProcessor(OperatorProcessor processor) {
         this.processor = processor;
     }
+
 }

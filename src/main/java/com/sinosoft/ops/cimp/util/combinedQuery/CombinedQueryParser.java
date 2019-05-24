@@ -9,6 +9,7 @@ import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.*;
 import com.sinosoft.ops.cimp.util.combinedQuery.enums.Operator;
 import com.sinosoft.ops.cimp.util.combinedQuery.processors.code.CodeProcessor;
 import com.sinosoft.ops.cimp.util.combinedQuery.processors.nodes.NodeProcessor;
+import com.sinosoft.ops.cimp.util.combinedQuery.processors.nodes.OperatorNodeProcessor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -24,11 +25,13 @@ public class CombinedQueryParser {
 
     private final NodeProcessor[] nodeProcessors;
     private final CodeProcessor codeProcessor;
+    private final OperatorNodeProcessor operatorNodeProcessor;
 
     @Autowired
-    public CombinedQueryParser(NodeProcessor[] nodeProcessors, CodeProcessor codeProcessor) {
+    public CombinedQueryParser(NodeProcessor[] nodeProcessors, CodeProcessor codeProcessor, OperatorNodeProcessor operatorNodeProcessor) {
         this.nodeProcessors = nodeProcessors;
         this.codeProcessor = codeProcessor;
+        this.operatorNodeProcessor = operatorNodeProcessor;
     }
 
     /**
@@ -114,9 +117,7 @@ public class CombinedQueryParser {
 
         List<Expr> exprs = new ArrayList<>();
 
-        if (root != null) {
-            GramTreeToExprs(root, exprs, null);
-        }
+        GramTreeToExprs(root, exprs, null);
 
         return exprs;
     }
@@ -193,10 +194,6 @@ public class CombinedQueryParser {
     public String parseSql(String exprStr) throws CombinedQueryParseException {
         Node root = parseGramTree(exprStr, null);
 
-        if (root == null) {
-            return null;
-        }
-
         //调用码值处理器
         invokeCodeProcessors(root);
 
@@ -228,10 +225,8 @@ public class CombinedQueryParser {
      */
     public boolean compile(String exprStr) {
         try {
-            Node root = parseGramTree(exprStr, null);
-            if (root != null) {
-                return true;
-            }
+            parseGramTree(exprStr, null);
+            return true;
         } catch (CombinedQueryParseException e) {
 //            e.printStackTrace();
         }
@@ -249,7 +244,8 @@ public class CombinedQueryParser {
      */
     private Node parseGramTree(String exprStr, Node parent) throws CombinedQueryParseException {
         if (StringUtils.isEmpty(exprStr)) {
-            return null;
+            //如果表达式为空，返回默认的1=1
+            return operatorNodeProcessor.getDefaultNode();
         }
 
         Deque<Node> stack = new LinkedList<>();

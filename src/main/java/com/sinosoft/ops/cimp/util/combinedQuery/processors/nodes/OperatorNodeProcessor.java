@@ -4,10 +4,13 @@ package com.sinosoft.ops.cimp.util.combinedQuery.processors.nodes;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.CombinedQueryParseException;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.Node;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.OperatorNode;
+import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.ValueNode;
+import com.sinosoft.ops.cimp.util.combinedQuery.enums.Operator;
 import com.sinosoft.ops.cimp.util.combinedQuery.enums.Type;
 import com.sinosoft.ops.cimp.util.combinedQuery.processors.operators.OperatorProcessor;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.Deque;
 
 /**
@@ -128,5 +131,19 @@ public class OperatorNodeProcessor extends NodeProcessor {
 
     }
 
+    /**
+     * 表达式开始处或括号开始处默认的1=1
+     *
+     * @return
+     * @throws CombinedQueryParseException
+     */
+    public Node getDefaultNode() throws CombinedQueryParseException {
+        OperatorNode node = new OperatorNode(getProcessor(Operator.EQ.getName()));
+
+        node.addSubNode(new ValueNode(Collections.singletonList("1"), Collections.emptyList(), false, false, Type.NUMBER.getCode()));
+        node.addSubNode(new ValueNode(Collections.singletonList("1"), Collections.emptyList(), false, false, Type.NUMBER.getCode()));
+
+        return node;
+    }
 
 }
