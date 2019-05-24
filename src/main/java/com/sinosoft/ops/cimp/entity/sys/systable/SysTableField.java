@@ -130,7 +130,7 @@ public class SysTableField implements Serializable {
     private String sysCodeSetName;
 
     /**
-     * 默认代码集类型（0：一般类型，1：树类型）
+     * 默认代码集类型（0：一般类型，1：树类型,2:标签类型）
      */
     @Column(name = "SYS_CODE_SET_TYPE", length = 50)
     private String sysCodeSetType;

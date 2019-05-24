@@ -430,15 +430,34 @@ public class SysTableModelInfoServiceImpl implements SysTableModelInfoService {
             SysTableFieldInfoDTO sysTableFieldInfoDTO = sysTableFieldInfoDTOS.get(0);
             String codeSetName = sysTableFieldInfoDTO.getCodeSetName();
             String codeSetType = sysTableFieldInfoDTO.getCodeSetType();
+
+            translateField = new TranslateField();
+            translateField.setFieldName(fieldName);
+            translateField.setFieldValue(fieldValue);
             if (StringUtils.equals(codeSetType, "1")) {
                 if (StringUtils.isNotEmpty(codeSetName)) {
-                    translateField = new TranslateField();
-                    translateField.setFieldName(fieldName);
-                    translateField.setFieldValue(fieldValue);
                     Organization organization = OrganizationCacheManager.getSubject().getOrganizationById(String.valueOf(fieldValue));
                     if (organization != null) {
                         translateField.setFieldTranslateValue(organization.getName());
                         return translateField;
+                    }
+                }
+            } else if (StringUtils.equals(codeSetType, "2")) {
+                if (StringUtils.isNotEmpty(codeSetName)) {
+                    String sql = "";
+                    String columnName = "";
+                    if (StringUtils.equals(codeSetName, "TAG_CATEGORY")) {
+                        columnName = "TAG_CATEGORY_NAME";
+                        sql = "SELECT TAG_CATEGORY_NAME FROM SYS_TAG_CATEGORY WHERE ID = ?";
+                    }
+                    if (StringUtils.equals(codeSetName, "TAG")) {
+                        columnName = "TAG";
+                        sql = "SELECT TAG FROM SYS_TAG WHERE ID = ?";
+                    }
+                    List<Map<String, Object>> maps = jdbcTemplate.queryForList(sql, String.valueOf(fieldValue));
+                    if (maps.size() > 0) {
+                        Object valueName = maps.get(0).get(columnName);
+                        translateField.setFieldTranslateValue(String.valueOf(valueName));
                     }
                 }
             }
