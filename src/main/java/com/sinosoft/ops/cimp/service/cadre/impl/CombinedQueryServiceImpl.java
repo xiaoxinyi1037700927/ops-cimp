@@ -12,8 +12,6 @@ import com.sinosoft.ops.cimp.entity.combinedQuery.QCombinedQuery;
 import com.sinosoft.ops.cimp.entity.user.UserRole;
 import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.repository.combinedQuery.CombinedQueryRepository;
-import com.sinosoft.ops.cimp.repository.sys.systable.SysTableFieldRepository;
-import com.sinosoft.ops.cimp.repository.sys.systable.SysTableRepository;
 import com.sinosoft.ops.cimp.service.cadre.CombinedQueryService;
 import com.sinosoft.ops.cimp.util.IdUtil;
 import com.sinosoft.ops.cimp.util.SecurityUtils;
@@ -24,12 +22,14 @@ import com.sinosoft.ops.cimp.util.combinedQuery.beans.Param;
 import com.sinosoft.ops.cimp.util.combinedQuery.enums.Function;
 import com.sinosoft.ops.cimp.util.combinedQuery.enums.Operator;
 import com.sinosoft.ops.cimp.util.combinedQuery.enums.Type;
+import com.sinosoft.ops.cimp.vo.from.cadre.combinedQuery.*;
 import com.sinosoft.ops.cimp.vo.to.cadre.combinedQuery.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,16 +38,12 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
 
     private final CombinedQueryParser parser;
     private final CombinedQueryRepository combinedQueryRepository;
-    private final SysTableRepository tableRepository;
-    private final SysTableFieldRepository fieldRepository;
     private final SysTableInfoDao sysTableInfoDao;
 
 
-    public CombinedQueryServiceImpl(CombinedQueryParser parser, CombinedQueryRepository combinedQueryRepository, SysTableRepository tableRepository, SysTableFieldRepository fieldRepository, SysTableInfoDao sysTableInfoDao) {
+    public CombinedQueryServiceImpl(CombinedQueryParser parser, CombinedQueryRepository combinedQueryRepository, SysTableInfoDao sysTableInfoDao) {
         this.parser = parser;
         this.combinedQueryRepository = combinedQueryRepository;
-        this.tableRepository = tableRepository;
-        this.fieldRepository = fieldRepository;
         this.sysTableInfoDao = sysTableInfoDao;
     }
 
@@ -255,8 +251,9 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
             newExpr.setSubExprs(new ArrayList<>());
         } else {
             newExpr.setOperator(appendModel.getOperator());
-            newExpr.setParams(appendModel.getParams().stream().map(Param::new).collect(Collectors.toList()));
+            newExpr.setParams(appendModel.getParams().stream().map(text -> new Param(IdUtil.uuid(), text)).collect(Collectors.toList()));
         }
+        newExpr.setText(parser.parseExprStr(Collections.singletonList(newExpr)));
 
         //添加表达式
         position.add(newExpr);
@@ -267,7 +264,7 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
         result.setCombinedQueryId(combinedQueryId);
         result.setExpr(newExpr);
         result.setExprstr(parser.parseExprStr(expr));
-        result.setComplilePass(parser.compile(parser.parseExprStr(newExpr)));
+        result.setComplilePass(parser.compile(newExpr.getText()));
 
         return result;
     }
@@ -295,6 +292,261 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
 
         return result;
     }
+
+    /**
+     * 添加函数
+     *
+     * @param appendModel
+     * @return
+     */
+    @Override
+    public ExprModel appendFunction(FunctionAppendModel appendModel) {
+        String userId = SecurityUtils.getSubject().getCurrentUser().getId();
+        String combinedQueryId = appendModel.getCombinedQueryId();
+
+        List<Expr> exprs = getCache(userId, combinedQueryId);
+
+        Expr expr = getExpr(exprs, appendModel.getExprId());
+
+        //添加函数
+        doAppendFunction(expr.getParams(), appendModel);
+
+        //刷新表达式下所有text
+        parser.refreshText(expr);
+
+        putCache(userId, combinedQueryId, exprs);
+
+
+        ExprModel result = new ExprModel();
+        result.setExpr(expr);
+        result.setExprstr(parser.parseExprStr(exprs));
+        result.setCombinedQueryId(combinedQueryId);
+        result.setComplilePass(parser.compile(expr.getText()));
+
+        return result;
+    }
+
+    /**
+     * 添加函数
+     *
+     * @param params
+     * @param appendModel
+     */
+    private boolean doAppendFunction(List<Param> params, FunctionAppendModel appendModel) {
+        Param target = null;
+        for (Param param : params) {
+            if (param.getId().equals(appendModel.getParamId())) {
+                target = param;
+                break;
+            }
+
+            if (param.getIsFunction() == 1 && doAppendFunction(param.getParams(), appendModel)) {
+                return true;
+            }
+        }
+
+        if (target != null) {
+            int index = params.indexOf(target);
+            params.remove(target);
+
+            Param newFunction = new Param();
+            newFunction.setId(IdUtil.uuid());
+            newFunction.setIsFunction(1);
+            newFunction.setFunctionName(appendModel.getFunctionName());
+
+            List<Param> newParams = new ArrayList<>();
+            newParams.add(target);
+            if (appendModel.getParams() != null) {
+                for (String str : appendModel.getParams()) {
+                    newParams.add(new Param(IdUtil.uuid(), str));
+                }
+            }
+            newFunction.setParams(newParams);
+
+            params.add(index, newFunction);
+            return true;
+        }
+
+        return false;
+    }
+
+
+    /**
+     * 删除函数
+     *
+     * @param deleteModel
+     * @return
+     */
+    @Override
+    public ExprModel deleteFunction(FunctionDeleteModel deleteModel) {
+        String userId = SecurityUtils.getSubject().getCurrentUser().getId();
+        String combinedQueryId = deleteModel.getCombinedQueryId();
+
+        List<Expr> exprs = getCache(userId, combinedQueryId);
+
+        Expr expr = getExpr(exprs, deleteModel.getExprId());
+
+        //删除函数
+        doDeleteFunction(expr.getParams(), deleteModel);
+
+        //刷新表达式下所有text
+        parser.refreshText(expr);
+
+        putCache(userId, combinedQueryId, exprs);
+
+
+        ExprModel result = new ExprModel();
+        result.setExpr(expr);
+        result.setExprstr(parser.parseExprStr(exprs));
+        result.setCombinedQueryId(combinedQueryId);
+        result.setComplilePass(parser.compile(expr.getText()));
+
+        return result;
+    }
+
+    /**
+     * 删除函数
+     *
+     * @param params
+     * @param deleteModel
+     */
+    private boolean doDeleteFunction(List<Param> params, FunctionDeleteModel deleteModel) {
+        Param target = null;
+        for (Param param : params) {
+            if (param.getId().equals(deleteModel.getParamId())) {
+                target = param;
+                break;
+            }
+
+            if (param.getIsFunction() == 1 && doDeleteFunction(param.getParams(), deleteModel)) {
+                return true;
+            }
+        }
+
+        if (target != null) {
+            int index = params.indexOf(target);
+            params.remove(target);
+
+            params.add(index, target.getParams().size() > 0 ? target.getParams().get(0) : new Param(IdUtil.uuid(), "''"));
+            return true;
+        }
+
+        return false;
+    }
+
+
+    /**
+     * 修改表达式
+     *
+     * @param modifyModel
+     * @return
+     */
+    @Override
+    public ExprModel modifyExpr(ExprModifyModel modifyModel) {
+        String userId = SecurityUtils.getSubject().getCurrentUser().getId();
+        String combinedQueryId = modifyModel.getCombinedQueryId();
+
+        List<Expr> exprs = getCache(userId, combinedQueryId);
+
+        Expr expr = getExpr(exprs, modifyModel.getExprId());
+
+        if (StringUtils.isEmpty(modifyModel.getParamId())) {
+            if (StringUtils.isNotEmpty(modifyModel.getLogicalOperator())) {
+                //修改逻辑操作符
+                expr.setLogicalOperator(modifyModel.getLogicalOperator());
+            } else {
+                //修改运算符
+                doModifyOperator(expr, modifyModel);
+            }
+        } else {
+            //修改参数
+            doModifyParam(expr.getParams(), modifyModel);
+        }
+
+
+        //刷新表达式下所有text
+        parser.refreshText(expr);
+
+        putCache(userId, combinedQueryId, exprs);
+
+
+        ExprModel result = new ExprModel();
+        result.setExpr(expr);
+        result.setExprstr(parser.parseExprStr(exprs));
+        result.setCombinedQueryId(combinedQueryId);
+        result.setComplilePass(parser.compile(expr.getText()));
+
+        return result;
+    }
+
+    /**
+     * 修改运算符
+     *
+     * @param expr
+     * @param modifyModel
+     */
+    private void doModifyOperator(Expr expr, ExprModifyModel modifyModel) {
+        expr.setOperator(modifyModel.getOperator());
+
+        Operator op = Operator.getByName(expr.getOperator());
+        int paramsNum = op != null ? op.getParamsNum() : 1;
+
+        List<Param> oldParams = expr.getParams();
+        if (oldParams.size() > paramsNum) {
+            while (oldParams.size() > paramsNum) {
+                oldParams.remove(paramsNum);
+            }
+        } else if (oldParams.size() < paramsNum) {
+            while (oldParams.size() < paramsNum) {
+                oldParams.add(new Param(IdUtil.uuid(), "''"));
+            }
+        }
+
+    }
+
+    /**
+     * 修改函数
+     *
+     * @param params
+     * @param modifyModel
+     */
+    private boolean doModifyParam(List<Param> params, ExprModifyModel modifyModel) {
+        for (Param param : params) {
+            if (param.getId().equals(modifyModel.getParamId())) {
+                if (param.getIsFunction() == 0) {
+                    //值
+                    param.setText(modifyModel.getValue());
+                } else {
+                    //函数
+                    param.setFunctionName(modifyModel.getFunctionName());
+
+                    //修正函数参数数量
+                    Function func = Function.getByName(modifyModel.getFunctionName());
+                    int paramsNum = func != null ? func.getParamsNum() : 0;
+
+                    List<Param> oldParams = param.getParams();
+                    if (oldParams.size() > paramsNum) {
+                        while (oldParams.size() > paramsNum) {
+                            oldParams.remove(paramsNum);
+                        }
+                    } else if (oldParams.size() < paramsNum) {
+                        while (oldParams.size() < paramsNum) {
+                            oldParams.add(new Param(IdUtil.uuid(), "''"));
+                        }
+                    }
+                }
+
+                return true;
+            }
+
+            if (param.getIsFunction() == 1 && doModifyParam(param.getParams(), modifyModel)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 
     /**
      * 根据id获取表达式
@@ -333,7 +585,7 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
      */
     private boolean deleteExpr(List<Expr> exprs, String id) {
         if (exprs == null || exprs.size() == 0) {
-            return true;
+            return false;
         }
 
         for (Expr expr : exprs) {

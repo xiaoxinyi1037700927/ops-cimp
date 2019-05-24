@@ -1,4 +1,4 @@
-package com.sinosoft.ops.cimp.vo.to.cadre.combinedQuery;
+package com.sinosoft.ops.cimp.vo.from.cadre.combinedQuery;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

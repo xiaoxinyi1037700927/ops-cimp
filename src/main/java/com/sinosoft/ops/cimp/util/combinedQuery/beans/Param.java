@@ -8,7 +8,8 @@ public class Param {
 
     }
 
-    public Param(String text) {
+    public Param(String id, String text) {
+        this.id = id;
         this.text = text;
     }
 

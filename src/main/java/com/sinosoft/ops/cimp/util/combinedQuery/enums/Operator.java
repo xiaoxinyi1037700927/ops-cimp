@@ -1,5 +1,7 @@
 package com.sinosoft.ops.cimp.util.combinedQuery.enums;
 
+import java.util.List;
+
 public enum Operator {
     EQ("等于", "",
             new int[]{Type.ALL_FIELD_TYPE.getCode(), Type.ALL_FIELD_TYPE.getCode()},
@@ -92,11 +94,11 @@ public enum Operator {
     }
 
 
-    public String getExpr(String... params) {
-        if (params.length != paramsType.length) {
+    public String getExpr(List<String> params) {
+        if (params.size() != paramsType.length) {
             return "";
         }
-        return String.format(exprFormat, params);
+        return String.format(exprFormat, params.toArray());
     }
 
     public static Operator getByName(String name) {

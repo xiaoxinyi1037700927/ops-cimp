@@ -99,5 +99,14 @@ public enum Function {
     public String getExprFormat() {
         return exprFormat;
     }
+
+    public static Function getByName(String name) {
+        for (Function function : Function.values()) {
+            if (function.getName().equals(name)) {
+                return function;
+            }
+        }
+        return null;
+    }
 }
 

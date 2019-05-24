@@ -6,9 +6,7 @@ import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.service.cadre.CombinedQueryService;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.CombinedQueryParseException;
-import com.sinosoft.ops.cimp.vo.to.cadre.combinedQuery.ExprAppendModel;
-import com.sinosoft.ops.cimp.vo.to.cadre.combinedQuery.ExprDeleteModel;
-import com.sinosoft.ops.cimp.vo.to.cadre.combinedQuery.ExprStrModifyModel;
+import com.sinosoft.ops.cimp.vo.from.cadre.combinedQuery.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.ResponseEntity;
@@ -94,4 +92,26 @@ public class CombinedQueryController extends BaseController {
     }
 
 
+    @ApiOperation(value = "添加函数")
+    @PostMapping("/function/append")
+    @RequiresAuthentication
+    public ResponseEntity appendFunction(@RequestBody FunctionAppendModel appendModel) throws BusinessException {
+        return ok(combinedQueryService.appendFunction(appendModel));
+    }
+
+
+    @ApiOperation(value = "删除函数")
+    @PostMapping("/function/delete")
+    @RequiresAuthentication
+    public ResponseEntity deleteFunction(@RequestBody FunctionDeleteModel deleteModel) throws BusinessException {
+        return ok(combinedQueryService.deleteFunction(deleteModel));
+    }
+
+
+    @ApiOperation(value = "修改表达式")
+    @PostMapping("/expr/modify")
+    @RequiresAuthentication
+    public ResponseEntity modifyExpr(@RequestBody ExprModifyModel modifyModel) throws BusinessException {
+        return ok(combinedQueryService.modifyExpr(modifyModel));
+    }
 }

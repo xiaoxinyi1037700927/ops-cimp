@@ -41,14 +41,13 @@ public class CombinedQueryParser {
         StringBuilder sb = new StringBuilder();
         for (Expr expr : exprs) {
             if (expr.isBracketsNode()) {
-                sb.append("(");
-                sb.append(parseExprStr(expr.getSubExprs()));
-                sb.append(")");
+                sb.append(" ").append(expr.getLogicalOperator())
+                        .append(" (")
+                        .append(parseExprStr(expr.getSubExprs()))
+                        .append(")");
             } else {
-                if (StringUtils.isNotEmpty(expr.getLogicalOperator())) {
-                    sb.append(" ").append(expr.getLogicalOperator()).append(" ");
-                }
-                sb.append(parseExprStr(expr));
+                refreshText(expr);
+                sb.append(expr.getText());
             }
         }
 
@@ -56,36 +55,51 @@ public class CombinedQueryParser {
     }
 
     /**
-     * 将非括号表达式节点转化为文本
+     * 刷新非括号表达式节点下各级的text
      *
      * @param expr
      * @return
      */
-    public String parseExprStr(Expr expr) {
+    public void refreshText(Expr expr) {
+        //刷新参数的text
+        refreshParams(expr.getParams());
+
         List<Param> params = expr.getParams();
+        String opStr = " " + expr.getLogicalOperator() + " ";
 
         Operator op = Operator.getByName(expr.getOperator());
         if (op != null) {
-            return op.getExpr((String[]) (expr.getParams().stream().map(this::parseParamStr).toArray()));
+            //如果是已定义的运算符，使用运算符定义的格式
+            expr.setText(opStr + op.getExpr(params.stream().map(Param::getText).collect(Collectors.toList())));
+        } else {
+            //使用默认格式
+            StringBuilder sb = new StringBuilder(opStr);
+            sb.append(params.get(0).getText());
+            sb.append(" ").append(expr.getOperator()).append(" ");
+            for (int i = 1; i < params.size(); i++) {
+                sb.append(params.get(i).getText());
+            }
+            expr.setText(sb.toString());
         }
-
-        return null;
     }
 
     /**
+     * 刷新参数节点下各级的text
      *
-     * @param param
+     * @param params
      * @return
      */
-    private String parseParamStr(Param param) {
-        if (param.getIsFunction() == 0) {
-            return param.getText();
-        }
+    private void refreshParams(List<Param> params) {
+        for (Param param : params) {
+            if (param.getIsFunction() == 0) {
+                continue;
+            }
 
-        return param.getFunctionName() +
-                "(" +
-                param.getParams().stream().map(this::parseParamStr).collect(Collectors.joining(",")) +
-                ")";
+            refreshParams(param.getParams());
+
+            param.setText(param.getFunctionName() + "(" +
+                    param.getParams().stream().map(Param::getText).collect(Collectors.joining(",")) + ")");
+        }
     }
 
     /**
@@ -156,12 +170,10 @@ public class CombinedQueryParser {
      * @return
      */
     private Param nodeToParam(Node node) {
-        Param param = new Param();
-        param.setText(node.getExpr());
+        Param param = new Param(IdUtil.uuid(), node.getExpr());
         param.setReturnType(node.getReturnType());
 
         if (node instanceof FunctionNode) {
-            param.setId(IdUtil.uuid());
             param.setIsFunction(1);
             param.setFunctionName(((FunctionNode) node).getProcessor().getFunction().getName());
 
@@ -221,7 +233,7 @@ public class CombinedQueryParser {
                 return true;
             }
         } catch (CombinedQueryParseException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
         }
         return false;
     }
@@ -231,7 +243,7 @@ public class CombinedQueryParser {
      * 表达式解析为语法树
      *
      * @param exprStr
-     * @param parent     父节点为null是根节点
+     * @param parent  父节点为null是根节点
      * @return
      * @throws CombinedQueryParseException
      */

@@ -2,9 +2,9 @@ package com.sinosoft.ops.cimp.service.cadre;
 
 import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.CombinedQueryParseException;
+import com.sinosoft.ops.cimp.vo.from.cadre.combinedQuery.*;
 import com.sinosoft.ops.cimp.vo.to.cadre.combinedQuery.*;
 
-import javax.persistence.Table;
 import java.util.List;
 
 public interface CombinedQueryService {
@@ -70,4 +70,28 @@ public interface CombinedQueryService {
      * @return
      */
     ExprModel deleteExpr(ExprDeleteModel deleteModel);
+
+    /**
+     * 添加函数
+     *
+     * @param appendModel
+     * @return
+     */
+    ExprModel appendFunction(FunctionAppendModel appendModel);
+
+    /**
+     * 删除函数
+     *
+     * @param deleteModel
+     * @return
+     */
+    ExprModel deleteFunction(FunctionDeleteModel deleteModel);
+
+    /**
+     * 修改表达式
+     *
+     * @param modifyModel
+     * @return
+     */
+    ExprModel modifyExpr(ExprModifyModel modifyModel);
 }
