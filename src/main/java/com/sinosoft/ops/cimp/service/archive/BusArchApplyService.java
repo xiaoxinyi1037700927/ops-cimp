@@ -10,7 +10,7 @@ import java.util.List;
 public interface BusArchApplyService {
 	public void update(BusArchApply entity);
 	public void create(BusArchApply entity, List<BusArchApplyPerson> baplist, List<BusArchApplyDetail> badlist)  throws Exception;
-	public void update(BusArchApply entity, List<BusArchApplyPerson> baplist, List<BusArchApplyDetail> badlist, List<String> listDelPerson, List<String> listDelArch)  throws Exception;
+	public void update(BusArchApply entity, List<BusArchApplyPerson> baplist, List<BusArchApplyDetail> badlist)  throws Exception;
 	public void updateflg(String id, Integer type) throws Exception;
 	public List<BusArchApply> getApplyByUser(String userid, String resourceid);
 	public List<HashMap<String, Object>> getTreeByApplyId(String applyid, String empid);

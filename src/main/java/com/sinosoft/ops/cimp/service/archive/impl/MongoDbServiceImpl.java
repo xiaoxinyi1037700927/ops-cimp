@@ -121,11 +121,13 @@ public class MongoDbServiceImpl implements MongoDbService {
             baos = new ByteArrayOutputStream();
             mongoDbDao.downloadFileToStream(id, baos);
             byte[] unDecryptBytes = baos.toByteArray();
-            //byte[] decryptedBytes = CryptoUtil.decryptAes(unDecryptBytes, pwdBytes);
+            System.out.println(unDecryptBytes);
+            byte[] decryptedBytes = CryptoUtil.decryptAes(unDecryptBytes, pwdBytes);
             IOUtils.write(unDecryptBytes, os);
             // TODO MD5 验证
 
-        } catch (IOException e) {
+        } catch (IOException | InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException
+                | IllegalBlockSizeException | BadPaddingException e) {
             logger.error("下载文件解密失败", e);
             throw new DownloadResourceFromMongoDbError();
         } finally {

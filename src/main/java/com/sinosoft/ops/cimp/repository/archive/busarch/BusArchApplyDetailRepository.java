@@ -11,6 +11,6 @@ import java.util.List;
 @Repository
 public interface BusArchApplyDetailRepository extends JpaRepository<BusArchApplyDetail, String>, QuerydslPredicateExecutor<BusArchApplyDetail> {
 
-    @Query("select a from BusArchApplyDetail a where a.personid=?1")
+    @Query("select a from BusArchApplyDetail a where a.personid=?1 ")
     public List<BusArchApplyDetail> findAllByPersonid(String personid);
 }

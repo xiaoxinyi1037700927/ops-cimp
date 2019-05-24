@@ -1,6 +1,7 @@
 package com.sinosoft.ops.cimp.controller.archive;
 
 
+import com.mongodb.gridfs.GridFSDBFile;
 import com.sinosoft.ops.cimp.annotation.ArchiveApiGroup;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.entity.archive.ArchiveMaterialFile;
@@ -24,8 +25,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.annotation.Resource;
+import javax.imageio.ImageIO;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -34,6 +38,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+
 @ArchiveApiGroup
 @Api(description="干部档案文件控制器")
 @Controller("archiveMaterialFileController")
@@ -46,7 +52,8 @@ public class ArchiveMaterialFileController extends BaseController {
 	private ArchiveMaterialFileService archiveMaterialFileService;
 	@Resource 
 	private ArchiveMaterialService archiveMaterialService;
-
+	@Resource
+	private MongoDbDaoImpl mongoDbDao;
 
 	/**
 	 * 根据人员ID+档案分类ID 获取 ArchiveMaterialFile集合
@@ -90,7 +97,28 @@ public class ArchiveMaterialFileController extends BaseController {
 			fail("查询失败");
 		}
 	}
+	@ApiOperation("根据指定imgID获取图片")
+	@ApiImplicitParam(name = "id", value = "图片id", dataType = "String", required = true, paramType = "query")
+	@RequestMapping(value = "/imgbyid",method = RequestMethod.POST)
+	public void imgbyid(HttpServletRequest request, HttpServletResponse response) throws BusinessException {
+		try {
+			String id =request.getParameter("id");
+			String relPath = request.getSession().getServletContext().getRealPath("\\");
+			//返回 保存路径 和 文件名列表
+			Map<String,Object> map = new HashMap<String,Object>() ;
+			String fileName=id+".jpg";
+			Path path = Paths.get(relPath,id);
+			/*GridFSDBFile gridFSDBFile = mongoDbService.downloadToFileDecryptWithAES(id, path);
+			response.setHeader("Cache-Control", "no-store, no-cache");
+			response.setContentType("image/jpeg");
+			BufferedImage bi = ImageIO.read(gridFSDBFile.getInputStream());
+			ServletOutputStream out = response.getOutputStream();
+			ImageIO.write(bi, "jpg", out);*/
 
+		} catch (Exception e) {
+			logger.error("查询失败！", e);
+		}
+	}
 	/**
 	 * 根据指定档案ID 和pageNo获取
 	 * @param request->archiveMaterialId: ArchiveMaterialFile archiveMaterialId;
@@ -115,20 +143,13 @@ public class ArchiveMaterialFileController extends BaseController {
 			Integer pageNumber=Integer.valueOf(pageNo);
 			ArchiveMaterialFile archiveMaterialFile = archiveMaterialFileService.findbypageNo(archiveMaterialId, pageNumber,type);
 			if(archiveMaterialFile!=null){
-				//保存路径
-				String relPath = request.getSession().getServletContext().getRealPath("/");
-				System.out.println(relPath);
-
 				//返回 保存路径 和 文件名列表
 				Map<String,Object> map = new HashMap<String,Object>() ;
 				String id = archiveMaterialFile.getFileStorageRef();
-				String fileName=id+".jpg";
-				Path path = Paths.get(relPath,fileName);
-				System.out.println(path);
-				mongoDbService.downloadToFileDecryptWithAES(fileName, path);
-				map.put("location", "" + fileName);
+				map.put("img",  id);
 				map.put("PageCount",archiveMaterialFile.getPageCount());
 				map.put("PageNumber",archiveMaterialFile.getPageNumber());
+
 				return ok(map);
 			}else{
 				return fail("不存在Archive_Material_ID="+archiveMaterialId+"的记录");

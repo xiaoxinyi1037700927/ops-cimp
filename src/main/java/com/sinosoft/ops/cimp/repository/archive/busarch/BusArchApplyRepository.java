@@ -20,6 +20,9 @@ public interface BusArchApplyRepository extends JpaRepository<BusArchApply, Stri
     @Query("select a from BusArchApply a where a.userid=?1 and a.verifyType>=0 order by a.createdTime")
     public List<BusArchApply> findAllByUseridAndVerifyType(String userid);
 
+    @Query("select a from BusArchApply a where a.id=?1 ")
+    public BusArchApply findByIdAnd(String userid);
+
     @Modifying
     @Query("update BusArchApply a set a.verifyType=?1 where a.id=?2 and a.verifyType <> 100")
     public void updArch(Integer verifyType,String id);

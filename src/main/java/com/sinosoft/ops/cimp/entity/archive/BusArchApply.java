@@ -26,7 +26,7 @@ public class BusArchApply implements java.io.Serializable {
     private Integer verifyType;
     private Timestamp verifyTime;
     private String verifyBy;
-    
+
     @Transient
     private String personName;
 

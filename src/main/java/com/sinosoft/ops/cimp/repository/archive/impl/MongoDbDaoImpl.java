@@ -9,6 +9,7 @@ import com.mongodb.client.gridfs.model.GridFSFile;
 import com.mongodb.client.gridfs.model.GridFSUploadOptions;
 import com.mongodb.gridfs.GridFS;
 import com.mongodb.gridfs.GridFSDBFile;
+import com.mongodb.gridfs.GridFSInputFile;
 import com.sinosoft.ops.cimp.repository.archive.MongoDbDao;
 import com.sinosoft.ops.cimp.repository.archive.ex.CannotFindMongoDbResourceById;
 import org.apache.commons.io.IOUtils;
@@ -84,13 +85,12 @@ public class MongoDbDaoImpl implements MongoDbDao {
             }
             GridFSUploadOptions uploadOptions = new GridFSUploadOptions().metadata(doc);
 
-            gfsb.uploadFromStream(new BsonString(mongoDbId), fileName, is, uploadOptions);
-
         } finally {
             IOUtils.closeQuietly(is);
         }
 
     }
+
 
     @Override
     public GridFSDBFile downloadFileToStream(String id, OutputStream os)

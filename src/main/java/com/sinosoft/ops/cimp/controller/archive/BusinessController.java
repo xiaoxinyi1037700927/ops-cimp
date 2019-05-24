@@ -50,7 +50,6 @@ public class BusinessController extends BaseController {
 		Map<String,Object> map=new HashMap<String,Object>();
 		String Depid=request.getParameter("depId");
 		List<PersonAndPost>	personAndPost = businessService.getPersonAndPostByDepid(Depid);
-		System.out.println(personAndPost);
 		return ok(personAndPost);
 	}
 

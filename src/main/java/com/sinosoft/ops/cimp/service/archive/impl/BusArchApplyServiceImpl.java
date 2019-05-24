@@ -56,16 +56,19 @@ public class BusArchApplyServiceImpl implements BusArchApplyService {
 
 	@Override
 	@Transactional
-	public void update(BusArchApply entity,List<BusArchApplyPerson> baplist,List<BusArchApplyDetail> badlist,List<String> listDelPerson,List<String> listDelArch) throws Exception{
-		
-		for(String bapid:listDelPerson)
+	public void update(BusArchApply entity,List<BusArchApplyPerson> baplist,List<BusArchApplyDetail> badlist) throws Exception{
+		List<BusArchApplyPerson> listbap =  busArchApplyPersonRepository.findAllByApplyId(entity.getId());
+
+		for(BusArchApplyPerson Person:listbap)
 		{
-			busArchApplyPersonRepository.deleteById(bapid);
+			busArchApplyPersonRepository.deleteById(Person.getId());
+			List<BusArchApplyDetail> listbad = busArchApplyDetailRepository.findAllByPersonid(Person.getId());
+			for(BusArchApplyDetail Detail:listbad)
+			{
+				busArchApplyDetailRepository.deleteById(Detail.getId());
+			}
 		}
-		for(String badid:listDelArch)
-		{
-			busArchApplyDetailRepository.deleteById(badid);
-		}
+
 		busArchApplyRepository.save(entity);
 		for(BusArchApplyPerson bap:baplist)
 		{
@@ -76,7 +79,8 @@ public class BusArchApplyServiceImpl implements BusArchApplyService {
 			busArchApplyDetailRepository.save(bad);
 		}
 	}
-	
+
+
 	@Override
 	@Transactional
 	public List<BusArchApply> getApplyByUser(String userid,String resouceId)
@@ -103,7 +107,6 @@ public class BusArchApplyServiceImpl implements BusArchApplyService {
 //			Collection<UserRole> listsysUserRole = busArchApplyRepository.getByUserId(UUID.fromString(userid));
 //			if (listsysUserRole.size()>0 && listsysUserRole.stream().filter(temp -> temp.getRoleId() == 400).count() > 0) {
 				listBus = busArchApplyRepository.findAllByVerifyType();
-				System.out.println(listBus.get(0).getId());
 				for(BusArchApply busArchApply:listBus)
 				{
 					List<BusArchApplyPerson> ListBusArchApplyPerson =busArchApplyPersonRepository.findAllByApplyId(busArchApply.getId());
@@ -128,18 +131,21 @@ public class BusArchApplyServiceImpl implements BusArchApplyService {
 	@Transactional
 	public List<HashMap<String, Object>> getPersonByApplyId(String applyid)
 	{
+		BusArchApply busArchApplies=busArchApplyRepository.findByIdAnd(applyid);
 		List<BusArchApplyPerson> listbap =  busArchApplyPersonRepository.findAllByApplyId(applyid);
 		List<HashMap<String, Object>> listpm = new ArrayList<HashMap<String, Object>>();
-	
+		HashMap<String,Object> apply = new  HashMap<String,Object>();
+		apply.put("endtime",busArchApplies.getEndTime());
+		apply.put("reason",busArchApplies.getReason());
+		listpm.add(apply);
 		for(BusArchApplyPerson bap : listbap){
 			HashMap<String,Object> map = new  HashMap<String,Object>();
-
 			map.put("personid",bap.getId());
 			map.put("empId",bap.getEmpid());
 			map.put("name",bap.getName());
 			map.put("position",bap.getPost());
-
-			List<HashMap<String, Object>> nextchild = getDetailArray(bap.getId().toString());
+			map.put("depid",bap.getDepid());
+			List<HashMap<String, Object>> nextchild = getDetailArray(bap.getId());
 			if(nextchild!=null&& nextchild.size()>0)
 			{
 				map.put("archivesData", nextchild);

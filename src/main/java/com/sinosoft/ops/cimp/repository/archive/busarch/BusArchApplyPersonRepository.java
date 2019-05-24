@@ -14,4 +14,5 @@ public interface BusArchApplyPersonRepository extends JpaRepository<BusArchApply
 
     @Query("select a from BusArchApplyPerson a where a.applyId=?1")
     public List<BusArchApplyPerson>  findAllByApplyId(String applyId);
+
 }

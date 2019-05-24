@@ -48,12 +48,12 @@ public class BusArchApplyController  extends BaseController {
 	@ApiImplicitParams({
 			@ApiImplicitParam(name = "reason",value = "所要查看档案的理由", dataType = "String", required = true, paramType = "query"),
 			@ApiImplicitParam(name = "endTime",value = "结束时间", dataType = "String", required = true, paramType = "query"),
-			@ApiImplicitParam(name = "data",value = "数据", dataType = "String", required = true, paramType = "query")
+            @ApiImplicitParam(name = "data",value = "数据", dataType = "String", required = true, paramType = "query")
 	})
 	@RequestMapping(value = "/create",method = RequestMethod.POST)
 	public ResponseEntity create(HttpServletRequest request, HttpServletResponse response, BusArchApply entity) throws BusinessException {
 		try {
-			
+
 			String reason ="";
 			if(request.getParameter("reason")!=null)reason =request.getParameter("reason").toString();
 			User user = SecurityUtils.getSubject().getCurrentUser();
@@ -78,6 +78,7 @@ public class BusArchApplyController  extends BaseController {
 				bap.setEmpid(temp.getString("empId"));
 				bap.setName(temp.getString("name"));
 				bap.setPost(temp.getString("position"));
+				bap.setDepid(temp.getString("depid"));
 				bap.setOrdinal(i); i++;
 				baplist.add(bap);
 				
@@ -122,7 +123,7 @@ public class BusArchApplyController  extends BaseController {
 	public ResponseEntity getPersonByApplyId(HttpServletRequest request, HttpServletResponse response) throws BusinessException {
 		String id = request.getParameter("id");
 		List<HashMap<String, Object>> listbap = busArchApplyService.getPersonByApplyId(id);
-		return  ok( listbap);
+		return  ok(listbap);
 	}
 
 	@ApiOperation("申请和审批档案树")
@@ -149,7 +150,8 @@ public class BusArchApplyController  extends BaseController {
 	@ApiOperation("修改申请查看档案")
 	@ApiImplicitParams({
 			@ApiImplicitParam(name = "reason",value = "所要查看档案的理由", dataType = "String", required = true, paramType = "query"),
-			@ApiImplicitParam(name = "endTime",value = "结束时间", dataType = "String", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "endTime",value = "结束时间", dataType = "String", required = true, paramType = "query"),
+			@ApiImplicitParam(name = "applyid",value = "申请的id",dataType = "String",required = true,paramType = "query"),
 			@ApiImplicitParam(name = "data",value = "数据和创建一样", dataType = "String", required = true, paramType = "query")
 	})
 	@RequestMapping(value = "/update",method = RequestMethod.POST)
@@ -157,7 +159,7 @@ public class BusArchApplyController  extends BaseController {
 		try {
 
 			String reason ="";
-			if(request.getParameter("reason")!=null)reason =request.getParameter("reason").toString();
+			if(request.getParameter("reason")!=null)reason =request.getParameter("reason");
 			String userid =  SecurityUtils.getSubject().getCurrentUser().getId();
 			String username = SecurityUtils.getSubject().getCurrentUser().getLoginName();
 			
@@ -174,7 +176,7 @@ public class BusArchApplyController  extends BaseController {
 			{
 				BusArchApplyPerson bap = new BusArchApplyPerson();
 				JSONObject temp = JSONObject.parseObject(ob.toString());
-				bap.setApplyId(applyid.toString());
+				bap.setApplyId(applyid);
 				String personid = UUID.randomUUID().toString();
 				if(temp.getString("personid")!=null && !temp.getString("personid").equals(""))
 				{
@@ -184,6 +186,7 @@ public class BusArchApplyController  extends BaseController {
 				bap.setEmpid(temp.getString("empId"));
 				bap.setName(temp.getString("name"));
 				bap.setPost(temp.getString("position"));
+				bap.setDepid(temp.getString("depid"));
 				bap.setOrdinal(i); i++;
 				baplist.add(bap);
 				
@@ -199,8 +202,8 @@ public class BusArchApplyController  extends BaseController {
 					}
 
 					bad.setId(detailid);
-					bad.setApplyid(applyid.toString());
-					bad.setPersonid(personid.toString());
+					bad.setApplyid(applyid);
+					bad.setPersonid(personid);
 					bad.setArchiveMaterialId(tempdetail.getString("archiveMaterialId"));
 					bad.setArchiveMaterialText(tempdetail.getString("archiveMaterialText"));
 					bad.setCategoryId(tempdetail.getString("categoryId"));
@@ -209,28 +212,8 @@ public class BusArchApplyController  extends BaseController {
 				}
 			}			
 
-			JSONArray dellist = JSON.parseArray(request.getParameter("delArchivesData"));
-			List<String> listDelPerson = new ArrayList<String>();
-			List<String> listDelArch = new ArrayList<String>();
-			for(Object ob :dellist)
-			{
-				JSONObject temp = JSONObject.parseObject(ob.toString());
-				if(temp.getString("personid")!=null && !temp.getString("personid").equals(""))
-				{
-					listDelPerson.add(temp.getString("personid"));
-				}
-				
-				JSONArray ArrayDetail = JSON.parseArray(temp.getString("detailid"));
-				for(Object obdetail :ArrayDetail)
-				{
-					if(obdetail.toString()!=null && !obdetail.toString().equals(""))
-					{
-						listDelArch.add(obdetail.toString());
-					}
-				}
-			}
 			
-			busArchApplyService.update(entity,baplist,badlist,listDelPerson,listDelArch);
+			busArchApplyService.update(entity,baplist,badlist);
 			return ok("保存成功！");
 		} catch (Exception e) {
 			logger.error("保存失败！", e);
@@ -252,7 +235,7 @@ public class BusArchApplyController  extends BaseController {
 		}
 	}
 
-	@ApiOperation("删除申请查看档案")
+	@ApiOperation("撤回申请查看档案")
 	@ApiImplicitParam(name = "applyid",value = "申请id", dataType = "String", required = true, paramType = "query")
 	@RequestMapping(value = "/revoke",method = RequestMethod.POST)
 	public ResponseEntity revoke(HttpServletRequest request, HttpServletResponse response, BusArchApply entity) throws BusinessException {
@@ -276,7 +259,7 @@ public class BusArchApplyController  extends BaseController {
 	public ResponseEntity updateVerifyMessage(HttpServletRequest request, HttpServletResponse response) throws BusinessException {
 		try {
 			String reason ="";
-			if(request.getParameter("reason")!=null)reason =request.getParameter("reason").toString();
+			if(request.getParameter("reason")!=null)reason =request.getParameter("reason");
 			String userid = SecurityUtils.getSubject().getCurrentUser().getId();
 			String username = SecurityUtils.getSubject().getCurrentUser().getLoginName();
 

@@ -22,6 +22,17 @@ public class BusArchApplyPerson implements java.io.Serializable {
     private String post;
     private String description;
     private Integer ordinal;
+    private String depid;
+
+    @Column(name = "DEP_ID")
+    public String getDepid() {
+        return depid;
+    }
+
+    public void setDepid(String depid) {
+        this.depid = depid;
+    }
+
 
     // Constructors
 
@@ -30,12 +41,13 @@ public class BusArchApplyPerson implements java.io.Serializable {
     }
 
     /** minimal constructor */
-    public BusArchApplyPerson(String id,String applyid, String empid, String name, String post) {
+    public BusArchApplyPerson(String id,String applyid, String empid, String name, String post,String depid) {
         this.id = id;
         this.applyId=applyid;
         this.empid = empid;
         this.name = name;
         this.post = post;
+        this.depid = depid;
     }
 
     // Property accessors
