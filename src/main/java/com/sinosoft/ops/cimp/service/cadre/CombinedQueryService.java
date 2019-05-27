@@ -1,7 +1,6 @@
 package com.sinosoft.ops.cimp.service.cadre;
 
 import com.sinosoft.ops.cimp.exception.BusinessException;
-import com.sinosoft.ops.cimp.util.combinedQuery.beans.CombinedQueryParseException;
 import com.sinosoft.ops.cimp.vo.from.cadre.combinedQuery.*;
 import com.sinosoft.ops.cimp.vo.to.cadre.combinedQuery.*;
 
@@ -27,6 +26,7 @@ public interface CombinedQueryService {
      * 获取系统表字段
      *
      * @return
+     * @throws BusinessException
      */
     List<TableModel> getSysTableFields() throws BusinessException;
 
@@ -35,18 +35,9 @@ public interface CombinedQueryService {
      *
      * @param id
      * @return
-     * @throws CombinedQueryParseException
+     * @throws BusinessException
      */
-    CombinedQueryModel getCombinedQuery(String id) throws CombinedQueryParseException;
-
-    /**
-     * 修改表达式
-     *
-     * @param modifyModel
-     * @return
-     * @throws CombinedQueryParseException
-     */
-    CombinedQueryModel modifyExprStr(ExprStrModifyModel modifyModel) throws CombinedQueryParseException;
+    CombinedQueryModel getCombinedQuery(String id) throws BusinessException;
 
     /**
      * 获取当前用户所有的组合查询信息
@@ -111,5 +102,18 @@ public interface CombinedQueryService {
      */
     ExprStatisticsModel statisticsExpr(String combinedQueryId);
 
+    /**
+     * @param combinedQueryId
+     * @return
+     */
     String getsql(String combinedQueryId);
+
+
+    /**
+     * 保存组合查询
+     *
+     * @param saveModel
+     * @throws BusinessException
+     */
+    void saveCombinedQuery(ExprSaveModel saveModel) throws BusinessException;
 }

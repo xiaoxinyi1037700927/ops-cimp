@@ -7,18 +7,22 @@ package com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes;
 public class FieldNode extends Node {
     private static final String FORMAT = "%s.%s";
 
+    private String tableId;
     private String tableName;
     private String tableNameCn;
+    private String fieldId;
     private String fieldName;
     private String fieldNameCn;
     private Integer codeSetId;
     private String codeSetName;
     private int returnType;
 
-    public FieldNode(String tableName, String tableNameCn, String fieldName, String fieldNameCn, int returnType, String codeSetName, Integer codeSetId) {
+    public FieldNode(String tableId, String tableName, String tableNameCn, String fieldId, String fieldName, String fieldNameCn, int returnType, String codeSetName, Integer codeSetId) {
         super(true, new int[]{});
+        this.tableId = tableId;
         this.tableName = tableName;
         this.tableNameCn = tableNameCn;
+        this.fieldId = fieldId;
         this.fieldName = fieldName;
         this.fieldNameCn = fieldNameCn;
         this.returnType = returnType;
@@ -63,6 +67,14 @@ public class FieldNode extends Node {
 
     public String getCodeSetName() {
         return codeSetName;
+    }
+
+    public String getTableId() {
+        return tableId;
+    }
+
+    public String getFieldId() {
+        return fieldId;
     }
 }
 

@@ -25,6 +25,10 @@ public class Param {
 
     private List<Param> params;
 
+    private String tableId;
+
+    private String fieldId;
+
     public String getId() {
         return id;
     }
@@ -71,5 +75,21 @@ public class Param {
 
     public void setParams(List<Param> params) {
         this.params = params;
+    }
+
+    public String getTableId() {
+        return tableId;
+    }
+
+    public void setTableId(String tableId) {
+        this.tableId = tableId;
+    }
+
+    public String getFieldId() {
+        return fieldId;
+    }
+
+    public void setFieldId(String fieldId) {
+        this.fieldId = fieldId;
     }
 }
