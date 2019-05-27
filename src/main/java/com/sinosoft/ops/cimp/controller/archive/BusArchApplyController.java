@@ -260,7 +260,7 @@ public class BusArchApplyController  extends BaseController {
 		try {
 
 			String reason ="";
-			if(request.getParameter("reason")!=null)reason =request.getParameter("reason");
+			if(request.getParameter("reason")!=null&&request.getParameter("reason").equals(""))reason =request.getParameter("reason");
 			String userid = SecurityUtils.getSubject().getCurrentUser().getId();
 			String username = SecurityUtils.getSubject().getCurrentUser().getLoginName();
 
@@ -276,10 +276,8 @@ public class BusArchApplyController  extends BaseController {
 			else
 			{
 				message="通过";
-				List<Role> roles =  userRoleService.getRolesByUserId(userid);
-				if (roles.size()>0 && roles.stream().filter(temp -> temp.getCode().equals("90")).count() > 0) {
-					verifyType=100;
-				}
+				verifyType=100;
+
 			}
 
 			BusArchApply entity= new BusArchApply(applyid, userid, username,reason,Timestamp.valueOf(request.getParameter("endTime")), new Timestamp(System.currentTimeMillis()), username);
