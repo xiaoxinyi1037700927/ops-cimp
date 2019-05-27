@@ -10,6 +10,11 @@ import java.util.List;
 @ApiModel(description = "表达式编译结果模型")
 public class CompileResultModel {
     /**
+     * 组合查询id
+     */
+    @ApiModelProperty(value = "组合查询id")
+    private String combinedQueryId;
+    /**
      * 是否编译通过
      */
     @ApiModelProperty(value = "是否编译通过")
@@ -29,6 +34,14 @@ public class CompileResultModel {
      */
     @ApiModelProperty(value = "表达式字符串")
     private String exprstr;
+
+    public String getCombinedQueryId() {
+        return combinedQueryId;
+    }
+
+    public void setCombinedQueryId(String combinedQueryId) {
+        this.combinedQueryId = combinedQueryId;
+    }
 
     public boolean isCompilePass() {
         return compilePass;

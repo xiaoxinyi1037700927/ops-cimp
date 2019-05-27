@@ -195,4 +195,23 @@ public class ValueNodeProcessor extends NodeProcessor {
 
         return sysCodeItem != null;
     }
+
+    /**
+     * 判断表达式是否是码值
+     *
+     * @param expr
+     * @return
+     */
+    public boolean isCode(String expr) {
+        List<String> list = Arrays.asList(expr.substring(expr.indexOf("'") + 1, expr.lastIndexOf("'")).split("'\\s*,\\s*'"));
+
+        Matcher matcher;
+        for (String s : list) {
+            matcher = PATTERN_CODE.matcher(s);
+            if (!matcher.matches()) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

@@ -2,6 +2,7 @@ package com.sinosoft.ops.cimp.service.cadre;
 
 import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.vo.from.cadre.combinedQuery.*;
+import com.sinosoft.ops.cimp.vo.to.cadre.CadreDataVO;
 import com.sinosoft.ops.cimp.vo.to.cadre.combinedQuery.*;
 
 import java.util.List;
@@ -89,10 +90,11 @@ public interface CombinedQueryService {
     /**
      * 编译表达式
      *
+     * @param combinedQueryId
      * @param exprStr
      * @return
      */
-    CompileResultModel compileExprStr(String exprStr);
+    CompileResultModel compileExprStr(String combinedQueryId, String exprStr);
 
     /**
      * 统计表达式数量
@@ -116,4 +118,13 @@ public interface CombinedQueryService {
      * @throws BusinessException
      */
     void saveCombinedQuery(ExprSaveModel saveModel) throws BusinessException;
+
+    /**
+     * 获取干部列表
+     *
+     * @param searchModel
+     * @return
+     * @throws BusinessException
+     */
+    CadreDataVO listCadre(CadreSearchModel searchModel) throws BusinessException;
 }

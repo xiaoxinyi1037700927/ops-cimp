@@ -25,11 +25,14 @@ import com.sinosoft.ops.cimp.util.combinedQuery.enums.Function;
 import com.sinosoft.ops.cimp.util.combinedQuery.enums.Operator;
 import com.sinosoft.ops.cimp.util.combinedQuery.enums.Type;
 import com.sinosoft.ops.cimp.util.combinedQuery.processors.nodes.FieldNodeProcessor;
+import com.sinosoft.ops.cimp.util.combinedQuery.processors.nodes.ValueNodeProcessor;
 import com.sinosoft.ops.cimp.vo.from.cadre.combinedQuery.*;
+import com.sinosoft.ops.cimp.vo.to.cadre.CadreDataVO;
 import com.sinosoft.ops.cimp.vo.to.cadre.combinedQuery.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -40,13 +43,15 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
     private final CombinedQueryRepository combinedQueryRepository;
     private final SysTableInfoDao sysTableInfoDao;
     private final FieldNodeProcessor fieldNodeProcessor;
+    private final ValueNodeProcessor valueNodeProcessor;
 
 
-    public CombinedQueryServiceImpl(CombinedQueryParser parser, CombinedQueryRepository combinedQueryRepository, SysTableInfoDao sysTableInfoDao, FieldNodeProcessor fieldNodeProcessor) {
+    public CombinedQueryServiceImpl(CombinedQueryParser parser, CombinedQueryRepository combinedQueryRepository, SysTableInfoDao sysTableInfoDao, FieldNodeProcessor fieldNodeProcessor, ValueNodeProcessor valueNodeProcessor) {
         this.parser = parser;
         this.combinedQueryRepository = combinedQueryRepository;
         this.sysTableInfoDao = sysTableInfoDao;
         this.fieldNodeProcessor = fieldNodeProcessor;
+        this.valueNodeProcessor = valueNodeProcessor;
     }
 
     private void putCache(String userId, String combinedQueryId, List<Expr> expr) {
@@ -144,6 +149,7 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
                 field.setId(sysTableFieldInfo.getId());
                 field.setName(sysTableFieldInfo.getNameCn());
                 field.setCodeSetName(sysTableFieldInfo.getCodeSetName());
+                field.setType(fieldNodeProcessor.getReturnType(sysTableFieldInfo).getCode());
 
                 fields.add(field);
             }
@@ -247,11 +253,12 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
             newExpr.setParams(appendModel.getParams().stream()
                     .map(text -> {
                         Param param = new Param(IdUtil.uuid(), text);
-                        processTableField(param);
+                        processParam(param);
                         return param;
                     }).collect(Collectors.toList()));
         }
         newExpr.setText(parser.parseExprStr(Collections.singletonList(newExpr), false));
+
 
         //添加表达式
         position.add(newExpr);
@@ -268,20 +275,33 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
     }
 
     /**
-     * 添加表字段的id
+     * 参数处理
      *
      * @param param
      */
-    private void processTableField(Param param) {
+    private void processParam(Param param) {
+        String text = param.getText();
         try {
-            if (fieldNodeProcessor.support(param.getText())) {
-                FieldNode node = (FieldNode) fieldNodeProcessor.parse(param.getText());
+            if (fieldNodeProcessor.support(text)) {
+                //为字段值添加id和返回类型
+                FieldNode node = (FieldNode) fieldNodeProcessor.parse(text);
                 param.setTableId(node.getTableId());
                 param.setFieldId(node.getFieldId());
+                param.setReturnType(node.getReturnType());
+            } else if (valueNodeProcessor.isCode(text)) {
+                //码值
+                param.setReturnType(Type.CODE.getCode());
+            } else {
+                try {
+                    //判断输入值是否可转为数字
+                    new BigDecimal(text.substring(text.indexOf("'") + 1, text.lastIndexOf("'")));
+                    param.setReturnType(Type.STRING.getCode() | Type.NUMBER.getCode());
+                } catch (Exception e) {
+                    param.setReturnType(Type.STRING.getCode());
+                }
             }
-
         } catch (CombinedQueryParseException e) {
-
+            param.setReturnType(Type.UNKNOWN.getCode());
         }
     }
 
@@ -376,6 +396,7 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
 
             List<Param> newParams = new ArrayList<>();
             newFunction.setParams(newParams);
+            newFunction.setReturnType(func.getReturnType());
 
             if (paramNum > 0) {
                 newParams.add(target);
@@ -537,7 +558,7 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
                 if (param.getIsFunction() == 0) {
                     //值
                     param.setText(modifyModel.getValue());
-                    processTableField(param);
+                    processParam(param);
                 } else {
                     //函数
                     param.setFunctionName(modifyModel.getFunctionName());
@@ -546,6 +567,7 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
                     Function func = Function.getByName(modifyModel.getFunctionName());
                     int paramsNum = func != null ? func.getParamsNum() : 0;
 
+                    param.setReturnType(func.getReturnType());
                     List<Param> oldParams = param.getParams();
                     if (oldParams.size() > paramsNum) {
                         while (oldParams.size() > paramsNum) {
@@ -629,17 +651,25 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
     /**
      * 编译表达式
      *
+     * @param combinedQueryId
      * @param exprStr
      * @return
      */
     @Override
-    public CompileResultModel compileExprStr(String exprStr) {
+    public CompileResultModel compileExprStr(String combinedQueryId, String exprStr) {
+        String userId = SecurityUtils.getSubject().getCurrentUser().getId();
         CompileResultModel result = new CompileResultModel();
-
         try {
+            if (StringUtils.isBlank(combinedQueryId)) {
+                combinedQueryId = IdUtil.uuid();
+            }
+
+            result.setCombinedQueryId(combinedQueryId);
             result.setExprs(parser.parseExprs(exprStr));
             result.setExprstr(parser.parseExprStr(result.getExprs(), true));
             result.setCompilePass(true);
+
+            putCache(userId, combinedQueryId, result.getExprs());
         } catch (CombinedQueryParseException e) {
             e.printStackTrace();
             result.setCompilePass(false);
@@ -697,6 +727,8 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
         } else {
             combinedQuery = new CombinedQuery();
             combinedQuery.setId(saveModel.getCombinedQueryId());
+            combinedQuery.setUserId(userId);
+
             combinedQuery.setCreateId(userId);
             combinedQuery.setCreateTime(new Date());
         }
@@ -714,6 +746,151 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
         combinedQuery.setModifyTime(new Date());
 
         combinedQueryRepository.save(combinedQuery);
+    }
+
+    /**
+     * 获取干部列表
+     *
+     * @param searchModel
+     * @return
+     * @throws BusinessException
+     */
+    @Override
+    public CadreDataVO listCadre(CadreSearchModel searchModel) throws BusinessException {
+        boolean includeSubNode = "1".equals(searchModel.getIncludeSubNode());
+        int pageIndex = searchModel.getPageIndex() > 0 ? searchModel.getPageIndex() : 1;
+        int pageSize = searchModel.getPageSize() > 0 ? searchModel.getPageSize() : 10;
+        int startIndex = (pageIndex - 1) * pageSize;
+        int endIndex = pageIndex * pageSize;
+
+        Optional<CombinedQuery> optional = combinedQueryRepository.findById(searchModel.getCombinedQueryId());
+        String combinedQuerySql = "";
+        if (optional.isPresent()) {
+            try {
+                combinedQuerySql = parser.parseSql(optional.get().getExpression());
+            } catch (CombinedQueryParseException e) {
+                throw new BusinessException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE, "组合查询解析失败，请核对组合查询信息!");
+            }
+        }
+
+        String sql = "SELECT\n" +
+                "  EMP_ID                                      AS \"EMP_ID\",\n" +
+                "  A01001                                      AS \"a01001\",\n" +
+                "  A01004                                      AS \"a01004\",\n" +
+                "  (SELECT name\n" +
+                "   FROM SYS_CODE_ITEM\n" +
+                "   WHERE CODE_SET_ID = 18 AND code = A01004)  AS \"a01004value\",\n" +
+                "  to_char(A01007, 'yyyy-mm-dd')               AS \"a01007\",\n" +
+                "  A01017                                      AS \"a01017\",\n" +
+                "  (SELECT name\n" +
+                "   FROM SYS_CODE_ITEM\n" +
+                "   WHERE CODE_SET_ID = 23 AND code = A01017)  AS \"a01017value\",\n" +
+                "  A01011_A                                    AS \"a01011A\",\n" +
+                "  A01014_B                                    AS \"a01014B\",\n" +
+                "  A01011_B                                    AS \"a01014B\",\n" +
+                "  to_char(A01034, 'yyyy-mm-dd')               AS \"a01034\",\n" +
+                "  A01028                                      AS \"a01028\",\n" +
+                "  A001003                                     AS \"A001003\",\n" +
+                "  A01060                                      AS \"A01060\",\n" +
+                "  (SELECT name\n" +
+                "   FROM SYS_CODE_ITEM\n" +
+                "   WHERE CODE_SET_ID = 161 AND code = A01060) AS \"A01060value\",\n" +
+                "  A01057_A                                    AS \"a01057A\",\n" +
+                "  A01065                                      AS \"a01065\",\n" +
+                "  (SELECT name\n" +
+                "   FROM SYS_CODE_ITEM\n" +
+                "   WHERE CODE_SET_ID = 162 AND code = A01065) AS \"a01065value\",\n" +
+                "  A01057                                      AS \"a01057\",\n" +
+                "  A01111                                      AS \"a01111\",\n" +
+                "  A01062                                      AS \"a01062\",\n" +
+                "  (SELECT name\n" +
+                "   FROM SYS_CODE_ITEM\n" +
+                "   WHERE CODE_SET_ID = 9 AND code = A01062)   AS \"a01062value\",\n" +
+                "  A01081                                      AS \"a01081\",\n" +
+                "  A01063                                      AS \"a01063\",\n" +
+                "  (SELECT name\n" +
+                "   FROM SYS_CODE_ITEM\n" +
+                "   WHERE CODE_SET_ID = 101 AND code = A01063) AS \"a01063value\",\n" +
+                "  A01031                                      AS \"a01031\",\n" +
+                "  (SELECT name\n" +
+                "   FROM SYS_CODE_ITEM\n" +
+                "   WHERE CODE_SET_ID = 24 AND code = A01031)  AS \"a01031value\",\n" +
+                "  A01057_B                                    AS \"a01057B\",\n" +
+                "  A01027                                      AS \"a01027\",\n" +
+                "  (SELECT name\n" +
+                "   FROM SYS_CODE_ITEM\n" +
+                "   WHERE CODE_SET_ID = 20 AND code = A01027)  AS \"a01027value\",\n" +
+                "  A01002_A                                    AS \"a01002A\",\n" +
+                "  A01015                                      AS \"a01015\",\n" +
+                "  A01002_B                                    AS \"a01002B\",\n" +
+                "  to_char(A01040, 'yyyy-mm-dd')               AS \"a01040\",\n" +
+                "  A01051                                      AS \"a01051\",\n" +
+                "  to_char(A01094, 'yyyy-mm-dd')               AS \"a01094\",\n" +
+                "  A01088                                      AS \"a01088\",\n" +
+                "  A01061                                      AS \"a01061\",\n" +
+                "  A01087                                      AS \"a01087\",\n" +
+                "  A01097                                      AS \"a01097\",\n" +
+                "  A01014_Z                                    AS \"a01014Z\",\n" +
+                "  A01110                                      AS \"a01110\",\n" +
+                "  A001004_A                                   AS \"a001004a\",\n" +
+                "  A01014_A                                    AS \"a01014A\",\n" +
+                "  A01067                                      AS \"a01067\",\n" +
+                "  (SELECT name\n" +
+                "   FROM SYS_CODE_ITEM\n" +
+                "   WHERE CODE_SET_ID = 166 AND code = A01067) AS \"a01067value\",\n" +
+                "  A01058                                      AS \"a01058\",\n" +
+                "  A01071                                      AS \"a01071\",\n" +
+                "  (SELECT name\n" +
+                "   FROM SYS_CODE_ITEM\n" +
+                "   WHERE CODE_SET_ID = 86 AND code = A01071)  AS \"a01071value\",\n" +
+                "  A01074                                      AS \"a01074\",\n" +
+                "  (SELECT name\n" +
+                "   FROM SYS_CODE_ITEM\n" +
+                "   WHERE CODE_SET_ID = 1 AND code = A01074)   AS \"a01074value\",\n" +
+                "  A01103                                      AS \"a01103\",\n" +
+                "  A01107                                      AS \"a01107\",\n" +
+                "  A01073                                      AS \"a01073\",\n" +
+                "  A01090                                      AS \"a01090\",\n" +
+                "  to_char(A01054, 'yyyy-mm-dd')               AS \"a01054\",\n" +
+                "  A01052                                      AS \"a01052\",\n" +
+                "  (SELECT name\n" +
+                "   FROM SYS_CODE_ITEM\n" +
+                "   WHERE CODE_SET_ID = 106 AND code = A01052) AS \"a01052value\",\n" +
+                "  A01048                                      AS \"a01048\",\n" +
+                "  (SELECT name\n" +
+                "   FROM SYS_CODE_ITEM\n" +
+                "   WHERE CODE_SET_ID = 19 AND code = A01048)  AS \"a01048value\",\n" +
+                "  A01108                                      AS \"a01108\",\n" +
+                "  A01086                                      AS \"a01086\",\n" +
+                "  A01037                                      AS \"a01037\",\n" +
+                "  A01044                                      AS \"a01044\",\n" +
+                "  A01084                                      AS \"a01084\",\n" +
+                "  A01083                                      AS \"a01083\"\n" +
+                "FROM (SELECT\n" +
+                "        ROWNUM AS rn,\n" +
+                "        t.*\n" +
+                "      FROM (SELECT\n" +
+                "              a001.*,\n" +
+                "              nvl(tmp.codeLen, '99999') as codeLen,\n" +
+                "              nvl(tmp.code, '99999') as code,\n" +
+                "              nvl(tmp.sortNum, '99999') as sortNum,\n" +
+                "              nvl(tmp.orgSortNum, '99999') as orgSortNum\n" +
+                "            FROM EMP_A001 a001 LEFT JOIN (SELECT\n" +
+                "                                             a02.EMP_ID,\n" +
+                "                                             min(length(nvl(org.code, '99999')))         AS codeLen,\n" +
+                "                                             nvl(min(nvl(org.code, '99999')), '99999')   AS code,\n" +
+                "                                             nvl(min(nvl(a02.A02025, '99999')), '99999') AS orgSortNum,\n" +
+                "                                             nvl(min(nvl(a02.A02023, '99999')), '99999') AS sortNum\n" +
+                "                                           FROM EMP_A02 a02 INNER JOIN ORGANIZATION org ON a02.A02001_B = org.ID\n" +
+                "                                           WHERE a02.STATUS = '0' AND a02.A02055 = '2' AND org.CODE LIKE (SELECT code " + (includeSubNode ? "|| '%'" : "") + " FROM ORGANIZATION WHERE ID = '" + searchModel.getDeptId() + "')\n" +
+                "                                           GROUP BY a02.EMP_ID) tmp ON a001.EMP_ID = tmp.EMP_ID\n" +
+                "            WHERE a001.A01063 = '1' AND a001.STATUS = '0' " + combinedQuerySql +
+                (includeSubNode ? "  ORDER BY codeLen, code, sortNum, a001.ORDINAL" : "ORDER BY orgSortNum ") +
+                "    ) t  WHERE ROWNUM <= '" + endIndex + "') t\n" +
+                "WHERE rn > '" + startIndex + "'";
+
+
+        return null;
     }
 
 

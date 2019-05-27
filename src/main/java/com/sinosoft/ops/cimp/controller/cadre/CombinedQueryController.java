@@ -25,6 +25,7 @@ public class CombinedQueryController extends BaseController {
 
     @ApiOperation(value = "获取函数列表")
     @PostMapping("/functions")
+    @RequiresAuthentication
     public ResponseEntity getFunctions() throws BusinessException {
         return ok(combinedQueryService.getFunctions());
     }
@@ -102,8 +103,8 @@ public class CombinedQueryController extends BaseController {
     @ApiOperation(value = "编译表达式")
     @PostMapping("/exprStr/compile")
     @RequiresAuthentication
-    public ResponseEntity compileExprStr(@RequestParam String exprStr) throws BusinessException {
-        return ok(combinedQueryService.compileExprStr(exprStr));
+    public ResponseEntity compileExprStr(@RequestParam(required = false) String combinedQueryId, @RequestParam String exprStr) throws BusinessException {
+        return ok(combinedQueryService.compileExprStr(combinedQueryId, exprStr));
     }
 
     @ApiOperation(value = "统计表达式数量")
@@ -126,5 +127,12 @@ public class CombinedQueryController extends BaseController {
     public ResponseEntity saveCombinedQuery(@RequestBody ExprSaveModel saveModel) throws BusinessException {
         combinedQueryService.saveCombinedQuery(saveModel);
         return ok("保存成功");
+    }
+
+    @ApiOperation(value = "获取干部列表")
+    @PostMapping("/cadre/list")
+    @RequiresAuthentication
+    public ResponseEntity listCadre(@RequestBody CadreSearchModel searchModel) throws BusinessException {
+        return ok(combinedQueryService.listCadre(searchModel));
     }
 }

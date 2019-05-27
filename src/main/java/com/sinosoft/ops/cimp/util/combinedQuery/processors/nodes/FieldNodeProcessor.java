@@ -143,7 +143,7 @@ public class FieldNodeProcessor extends NodeProcessor {
      * @param field
      * @return
      */
-    private Type getReturnType(SysTableFieldInfo field) {
+    public Type getReturnType(SysTableFieldInfo field) {
         String fieldType = field.getDbFieldDataType();
         if (StringUtils.isEmpty(fieldType)) {
             return null;

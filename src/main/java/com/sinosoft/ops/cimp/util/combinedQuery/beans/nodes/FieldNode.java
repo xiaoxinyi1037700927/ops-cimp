@@ -76,5 +76,9 @@ public class FieldNode extends Node {
     public String getFieldId() {
         return fieldId;
     }
+
+    public String getTableName() {
+        return tableName;
+    }
 }
 
