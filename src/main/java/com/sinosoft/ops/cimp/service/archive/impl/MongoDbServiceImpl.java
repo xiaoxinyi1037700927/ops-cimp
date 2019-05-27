@@ -160,9 +160,7 @@ public class MongoDbServiceImpl implements MongoDbService {
             baos = new ByteArrayOutputStream();
             GridFSDBFile gridFSDBFile = mongoDbDao.downloadFileToStream(id, baos);
             InputStream inputStream = gridFSDBFile.getInputStream();
-            byte[] unDecryptBytes = baos.toByteArray();
             byte [] bytes=IOUtils.toByteArray(inputStream);
-            System.out.println(unDecryptBytes);
             byte[] decryptedBytes = CryptoUtil.decryptAes(bytes, pwdBytes);
             IOUtils.write(decryptedBytes, os);
             // TODO MD5 验证

@@ -95,9 +95,10 @@ public class MongoDbDaoImpl implements MongoDbDao {
             archiveMaterialFile.setId(UUID.randomUUID().toString());
             archiveMaterialFile.setFileSize(is.available());
             Timestamp ts = new Timestamp(System.currentTimeMillis());
-            String tsStr = "2011-05-09 11:49:45";
+            Date time=new Date();
+            String ntime = time.toString();
             try {
-                ts = Timestamp.valueOf(tsStr);
+                ts = Timestamp.valueOf(ntime);
                 System.out.println(ts);
             } catch (Exception e) {
                 e.printStackTrace();

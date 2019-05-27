@@ -278,7 +278,7 @@ public class BusArchApplyController  extends BaseController {
 			{
 				message="通过";
 				List<Role> roles =  userRoleService.getRolesByUserId(userid);
-				if (roles.size()>0 && roles.stream().filter(temp -> temp.getCode().equals("90")).count() > 0) {
+				if (roles.size()>0 && roles.stream().filter(temp -> temp.getCode().equals("13")).count() > 0) {
 					verifyType=100;
 				}
 			}

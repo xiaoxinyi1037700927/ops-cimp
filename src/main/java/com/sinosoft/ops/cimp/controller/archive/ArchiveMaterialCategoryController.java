@@ -69,7 +69,7 @@ public class ArchiveMaterialCategoryController extends BaseController {
             boolean flag = false;
 
             List<Role> roles = userRoleService.getRolesByUserId(userid);
-            if (roles.size() > 0 && roles.stream().filter(temp -> temp.getCode().equals("90")).count() > 0) {
+            if (roles.size() > 0 && roles.stream().filter(temp -> temp.getCode().equals("13")).count() > 0) {
                 flag = true;
             }
 

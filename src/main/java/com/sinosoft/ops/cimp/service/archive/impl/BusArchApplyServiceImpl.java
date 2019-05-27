@@ -116,7 +116,7 @@ public class BusArchApplyServiceImpl implements BusArchApplyService {
 		else
 		{
 			List<Role> roles =  userRoleService.getRolesByUserId(userid);
-			if (roles.size()>0 && roles.stream().filter(temp -> temp.getCode() == "90").count() > 0) {
+			if (roles.size()>0 && roles.stream().filter(temp -> temp.getCode() == "13").count() > 0) {
 				listBus = busArchApplyRepository.findAllByVerifyType();
 				for(BusArchApply busArchApply:listBus)
 				{
