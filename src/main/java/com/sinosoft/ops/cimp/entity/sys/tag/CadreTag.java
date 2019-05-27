@@ -14,8 +14,8 @@ public class CadreTag implements Serializable {
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid")
-    @Column(name = "ID", length = 36)
-    private String id;
+    @Column(name = "SUB_ID", length = 36)
+    private String subId;
 
     //干部id
     @Column(name = "EMP_ID", length = 36)
@@ -27,12 +27,12 @@ public class CadreTag implements Serializable {
     @Column(name = "TAG_ID", length = 36)
     private String tagId;
 
-    public String getId() {
-        return id;
+    public String getSubId() {
+        return subId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setSubId(String subId) {
+        this.subId = subId;
     }
 
     public String getEmpId() {
@@ -64,7 +64,7 @@ public class CadreTag implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         CadreTag cadreTag = (CadreTag) o;
-        return Objects.equals(id, cadreTag.id) &&
+        return Objects.equals(subId, cadreTag.subId) &&
                 Objects.equals(empId, cadreTag.empId) &&
                 Objects.equals(tagCategoryId, cadreTag.tagCategoryId) &&
                 Objects.equals(tagId, cadreTag.tagId);
@@ -73,13 +73,13 @@ public class CadreTag implements Serializable {
     @Override
     public int hashCode() {
 
-        return Objects.hash(id, empId, tagCategoryId, tagId);
+        return Objects.hash(subId, empId, tagCategoryId, tagId);
     }
 
     @Override
     public String toString() {
         return "CadreTag{" +
-                "id='" + id + '\'' +
+                "subId='" + subId + '\'' +
                 ", empId='" + empId + '\'' +
                 ", tagCategoryId='" + tagCategoryId + '\'' +
                 ", tagId='" + tagId + '\'' +

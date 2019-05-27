@@ -72,7 +72,7 @@ public class CadreTagServiceImpl implements CadreTagService {
                     CadreTag cadreTag = new CadreTag();
 
                     Object o = map.get(tagTargetName);
-                    cadreTag.setId(IdUtil.uuidWithoutMinus());
+                    cadreTag.setSubId(IdUtil.uuidWithoutMinus());
                     cadreTag.setTagCategoryId(tagCategoryId);
                     cadreTag.setTagId(tagId);
                     cadreTag.setEmpId(String.valueOf(o));
@@ -95,7 +95,7 @@ public class CadreTagServiceImpl implements CadreTagService {
                 Object o = map.get(tagTargetName);
                 CadreTag cadreTag = new CadreTag();
 
-                cadreTag.setId(IdUtil.uuidWithoutMinus());
+                cadreTag.setSubId(IdUtil.uuidWithoutMinus());
                 cadreTag.setTagCategoryId(tagCategoryId);
                 cadreTag.setTagId(tagId);
                 cadreTag.setEmpId(String.valueOf(o));
