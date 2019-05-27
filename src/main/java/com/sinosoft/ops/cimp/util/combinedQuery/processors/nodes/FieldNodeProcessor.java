@@ -88,7 +88,7 @@ public class FieldNodeProcessor extends NodeProcessor {
             throw new CombinedQueryParseException("未定义的字段类型：" + tableName + "." + fieldName);
         }
 
-        return new FieldNode(table.getDbTableName(), table.getNameCn(), field.getDbFieldName(), field.getNameCn(), returnType.getCode(), field.getCodeSetName(), getCodeSetId(field.getCodeSetName()));
+        return new FieldNode(table.getId(), table.getDbTableName(), table.getNameCn(), field.getId(), field.getDbFieldName(), field.getNameCn(), returnType.getCode(), field.getCodeSetName(), getCodeSetId(field.getCodeSetName()));
     }
 
     private Integer getCodeSetId(String sysCodeSetName) {

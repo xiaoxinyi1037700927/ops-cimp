@@ -3,6 +3,7 @@ package com.sinosoft.ops.cimp.service.cadre.impl;
 import com.google.common.collect.Lists;
 import com.sinosoft.ops.cimp.cache.CacheManager;
 import com.sinosoft.ops.cimp.constant.Constants;
+import com.sinosoft.ops.cimp.constant.OpsErrorMessage;
 import com.sinosoft.ops.cimp.dao.SysTableInfoDao;
 import com.sinosoft.ops.cimp.dao.domain.sys.table.SysTableFieldInfo;
 import com.sinosoft.ops.cimp.dao.domain.sys.table.SysTableInfo;
@@ -19,9 +20,11 @@ import com.sinosoft.ops.cimp.util.combinedQuery.CombinedQueryParser;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.CombinedQueryParseException;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.Expr;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.Param;
+import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.FieldNode;
 import com.sinosoft.ops.cimp.util.combinedQuery.enums.Function;
 import com.sinosoft.ops.cimp.util.combinedQuery.enums.Operator;
 import com.sinosoft.ops.cimp.util.combinedQuery.enums.Type;
+import com.sinosoft.ops.cimp.util.combinedQuery.processors.nodes.FieldNodeProcessor;
 import com.sinosoft.ops.cimp.vo.from.cadre.combinedQuery.*;
 import com.sinosoft.ops.cimp.vo.to.cadre.combinedQuery.*;
 import org.apache.commons.lang3.StringUtils;
@@ -36,12 +39,14 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
     private final CombinedQueryParser parser;
     private final CombinedQueryRepository combinedQueryRepository;
     private final SysTableInfoDao sysTableInfoDao;
+    private final FieldNodeProcessor fieldNodeProcessor;
 
 
-    public CombinedQueryServiceImpl(CombinedQueryParser parser, CombinedQueryRepository combinedQueryRepository, SysTableInfoDao sysTableInfoDao) {
+    public CombinedQueryServiceImpl(CombinedQueryParser parser, CombinedQueryRepository combinedQueryRepository, SysTableInfoDao sysTableInfoDao, FieldNodeProcessor fieldNodeProcessor) {
         this.parser = parser;
         this.combinedQueryRepository = combinedQueryRepository;
         this.sysTableInfoDao = sysTableInfoDao;
+        this.fieldNodeProcessor = fieldNodeProcessor;
     }
 
     private void putCache(String userId, String combinedQueryId, List<Expr> expr) {
@@ -62,6 +67,7 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
                     o = exprs;
                 } catch (CombinedQueryParseException e) {
                     e.printStackTrace();
+                    return null;
                 }
             }
         }
@@ -153,58 +159,33 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
      *
      * @param id
      * @return
-     * @throws CombinedQueryParseException
+     * @throws BusinessException
      */
     @Override
-    public CombinedQueryModel getCombinedQuery(String id) throws CombinedQueryParseException {
+    public CombinedQueryModel getCombinedQuery(String id) throws BusinessException {
         String userId = SecurityUtils.getSubject().getCurrentUser().getId();
 
         //获取组合查询信息
         CombinedQuery combinedQuery = combinedQueryRepository.getOne(id);
-        //将表达式解析为表达式树
-        List<Expr> exprs = parser.parseExprs(combinedQuery.getExpression());
+        List<Expr> exprs = null;
+        try {
+            //解析表达式字符串
+            exprs = parser.parseExprs(combinedQuery.getExpression());
+        } catch (CombinedQueryParseException e) {
+            throw new BusinessException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE, e.getMessage());
+        }
 
-        //将表达式树存入缓存
+        //将表达式信息存入缓存
         putCache(userId, combinedQuery.getId(), exprs);
 
         CombinedQueryModel model = new CombinedQueryModel();
         model.setCombinedQueryId(id);
-        model.setExprstr(parser.parseExprStr(exprs));
+        model.setExprstr(parser.parseExprStr(exprs, true));
         model.setExpr(exprs);
 
         return model;
     }
 
-    /**
-     * 修改表达式
-     *
-     * @param modifyModel
-     * @return
-     * @throws CombinedQueryParseException
-     */
-    @Override
-    public CombinedQueryModel modifyExprStr(ExprStrModifyModel modifyModel) throws CombinedQueryParseException {
-        String userId = SecurityUtils.getSubject().getCurrentUser().getId();
-        String combinedQueryId = modifyModel.getCombinedQueryId();
-        String exprStr = modifyModel.getExprStr();
-
-        //如果id为空，创建
-        if (StringUtils.isEmpty(combinedQueryId)) {
-            combinedQueryId = IdUtil.uuid();
-        }
-
-        List<Expr> exprs = parser.parseExprs(exprStr);
-        exprStr = parser.parseExprStr(exprs);
-
-        //将表达式树存入缓存
-        putCache(userId, combinedQueryId, exprs);
-
-        CombinedQueryModel model = new CombinedQueryModel();
-        model.setExprstr(exprStr);
-        model.setExpr(exprs);
-
-        return model;
-    }
 
     /**
      * 获取当前用户所有的组合查询信息
@@ -263,9 +244,14 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
             newExpr.setSubExprs(new ArrayList<>());
         } else {
             newExpr.setOperator(appendModel.getOperator());
-            newExpr.setParams(appendModel.getParams().stream().map(text -> new Param(IdUtil.uuid(), text)).collect(Collectors.toList()));
+            newExpr.setParams(appendModel.getParams().stream()
+                    .map(text -> {
+                        Param param = new Param(IdUtil.uuid(), text);
+                        processTableField(param);
+                        return param;
+                    }).collect(Collectors.toList()));
         }
-        newExpr.setText(parser.parseExprStr(Collections.singletonList(newExpr)));
+        newExpr.setText(parser.parseExprStr(Collections.singletonList(newExpr), false));
 
         //添加表达式
         position.add(newExpr);
@@ -275,10 +261,28 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
         ExprModel result = new ExprModel();
         result.setCombinedQueryId(combinedQueryId);
         result.setExpr(newExpr);
-        result.setExprstr(parser.parseExprStr(exprs));
+        result.setExprstr(parser.parseExprStr(exprs, true));
         result.setCompilePass(parser.compile(newExpr.getText()));
 
         return result;
+    }
+
+    /**
+     * 添加表字段的id
+     *
+     * @param param
+     */
+    private void processTableField(Param param) {
+        try {
+            if (fieldNodeProcessor.support(param.getText())) {
+                FieldNode node = (FieldNode) fieldNodeProcessor.parse(param.getText());
+                param.setTableId(node.getTableId());
+                param.setFieldId(node.getFieldId());
+            }
+
+        } catch (CombinedQueryParseException e) {
+
+        }
     }
 
     /**
@@ -299,7 +303,7 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
 
         ExprModel result = new ExprModel();
         result.setCombinedQueryId(combinedQueryId);
-        result.setExprstr(parser.parseExprStr(exprs));
+        result.setExprstr(parser.parseExprStr(exprs, true));
         result.setCompilePass(parser.compile(result.getExprstr()));
 
         return result;
@@ -331,7 +335,7 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
 
         ExprModel result = new ExprModel();
         result.setExpr(expr);
-        result.setExprstr(parser.parseExprStr(exprs));
+        result.setExprstr(parser.parseExprStr(exprs, true));
         result.setCombinedQueryId(combinedQueryId);
         result.setCompilePass(parser.compile(expr.getText()));
 
@@ -414,7 +418,7 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
 
         ExprModel result = new ExprModel();
         result.setExpr(expr);
-        result.setExprstr(parser.parseExprStr(exprs));
+        result.setExprstr(parser.parseExprStr(exprs, true));
         result.setCombinedQueryId(combinedQueryId);
         result.setCompilePass(parser.compile(expr.getText()));
 
@@ -489,7 +493,7 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
 
         ExprModel result = new ExprModel();
         result.setExpr(expr);
-        result.setExprstr(parser.parseExprStr(exprs));
+        result.setExprstr(parser.parseExprStr(exprs, true));
         result.setCombinedQueryId(combinedQueryId);
         result.setCompilePass(parser.compile(expr.getText()));
 
@@ -522,7 +526,7 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
     }
 
     /**
-     * 修改函数
+     * 修改参数
      *
      * @param params
      * @param modifyModel
@@ -533,6 +537,7 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
                 if (param.getIsFunction() == 0) {
                     //值
                     param.setText(modifyModel.getValue());
+                    processTableField(param);
                 } else {
                     //函数
                     param.setFunctionName(modifyModel.getFunctionName());
@@ -633,7 +638,7 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
 
         try {
             result.setExprs(parser.parseExprs(exprStr));
-            result.setExprstr(parser.parseExprStr(result.getExprs()));
+            result.setExprstr(parser.parseExprStr(result.getExprs(), true));
             result.setCompilePass(true);
         } catch (CombinedQueryParseException e) {
             e.printStackTrace();
@@ -668,12 +673,49 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
         String userId = SecurityUtils.getSubject().getCurrentUser().getId();
         try {
 
-            return parser.parseSql(parser.parseExprStr(getCache(userId, combinedQueryId)));
+            return parser.parseSql(parser.parseExprStr(getCache(userId, combinedQueryId), false));
         } catch (CombinedQueryParseException e) {
             e.printStackTrace();
             return e.getMessage();
         }
     }
+
+    /**
+     * 保存组合查询
+     *
+     * @param saveModel
+     * @throws BusinessException
+     */
+    @Override
+    public void saveCombinedQuery(ExprSaveModel saveModel) throws BusinessException {
+        String userId = SecurityUtils.getSubject().getCurrentUser().getId();
+        Optional<CombinedQuery> optional = combinedQueryRepository.findById(saveModel.getCombinedQueryId());
+
+        CombinedQuery combinedQuery = null;
+        if (optional.isPresent()) {
+            combinedQuery = optional.get();
+        } else {
+            combinedQuery = new CombinedQuery();
+            combinedQuery.setId(saveModel.getCombinedQueryId());
+            combinedQuery.setCreateId(userId);
+            combinedQuery.setCreateTime(new Date());
+        }
+
+        List<Expr> exprs;
+        try {
+            exprs = parser.parseExprs(saveModel.getExprStr());
+        } catch (CombinedQueryParseException e) {
+            throw new BusinessException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE, e.getMessage());
+        }
+
+        combinedQuery.setExpression(parser.parseExprStr(exprs, true));
+        combinedQuery.setName(saveModel.getName());
+        combinedQuery.setModifyId(userId);
+        combinedQuery.setModifyTime(new Date());
+
+        combinedQueryRepository.save(combinedQuery);
+    }
+
 
     /**
      * 统计表达式数量

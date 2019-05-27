@@ -5,7 +5,6 @@ import com.sinosoft.ops.cimp.annotation.RequiresAuthentication;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.service.cadre.CombinedQueryService;
-import com.sinosoft.ops.cimp.util.combinedQuery.beans.CombinedQueryParseException;
 import com.sinosoft.ops.cimp.vo.from.cadre.combinedQuery.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -57,22 +56,7 @@ public class CombinedQueryController extends BaseController {
     @PostMapping("/getById")
     @RequiresAuthentication
     public ResponseEntity getCombinedQuery(@RequestParam String id) throws BusinessException {
-        try {
-            return ok(combinedQueryService.getCombinedQuery(id));
-        } catch (CombinedQueryParseException e) {
-            return fail(e.getMessage());
-        }
-    }
-
-    @ApiOperation(value = "修改表达式")
-    @PostMapping("/expreStr/modify")
-    @RequiresAuthentication
-    public ResponseEntity modifyExprStr(@RequestBody ExprStrModifyModel modifyModel) throws BusinessException {
-        try {
-            return ok(combinedQueryService.modifyExprStr(modifyModel));
-        } catch (CombinedQueryParseException e) {
-            return fail(e.getMessage());
-        }
+        return ok(combinedQueryService.getCombinedQuery(id));
     }
 
 
@@ -134,5 +118,13 @@ public class CombinedQueryController extends BaseController {
     @RequiresAuthentication
     public ResponseEntity getsql(@RequestParam String combinedQueryId) throws BusinessException {
         return ok(combinedQueryService.getsql(combinedQueryId));
+    }
+
+    @ApiOperation(value = "保存组合查询")
+    @PostMapping("/save")
+    @RequiresAuthentication
+    public ResponseEntity saveCombinedQuery(@RequestBody ExprSaveModel saveModel) throws BusinessException {
+        combinedQueryService.saveCombinedQuery(saveModel);
+        return ok("保存成功");
     }
 }

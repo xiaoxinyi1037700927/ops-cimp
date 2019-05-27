@@ -40,18 +40,17 @@ public class CombinedQueryParser {
      * @param exprs
      * @return
      */
-    public String parseExprStr(List<Expr> exprs) {
+    public String parseExprStr(List<Expr> exprs, boolean format) {
         StringBuilder sb = new StringBuilder();
         for (Expr expr : exprs) {
             if (expr.isBracketsNode()) {
                 sb.append(" ").append(expr.getLogicalOperator())
-                        .append(" (\n")
-                        .append(parseExprStr(expr.getSubExprs()))
-                        .append(")\n");
+                        .append(" (").append(format ? "\n" : "")
+                        .append(parseExprStr(expr.getSubExprs(), format))
+                        .append(")").append(format ? "\n" : "");
             } else {
                 refreshText(expr);
-                sb.append(expr.getText());
-                sb.append("\n");
+                sb.append(expr.getText()).append(format ? "\n" : "");
             }
         }
 
@@ -62,7 +61,6 @@ public class CombinedQueryParser {
      * 刷新非括号表达式节点下各级的text
      *
      * @param expr
-     * @return
      */
     public void refreshText(Expr expr) {
         //刷新参数的text
@@ -189,6 +187,9 @@ public class CombinedQueryParser {
                 params.add(nodeToParam(subNode));
             }
             param.setParams(params);
+        } else if (node instanceof FieldNode) {
+            param.setTableId(((FieldNode) node).getTableId());
+            param.setFieldId(((FieldNode) node).getFieldId());
         }
 
         return param;
