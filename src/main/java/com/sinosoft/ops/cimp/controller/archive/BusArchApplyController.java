@@ -161,8 +161,8 @@ public class BusArchApplyController  extends BaseController {
 			if(request.getParameter("reason")!=null)reason =request.getParameter("reason");
 			String userid =  SecurityUtils.getSubject().getCurrentUser().getId();
 			String username = SecurityUtils.getSubject().getCurrentUser().getLoginName();
-			String applyid = UUID.fromString(request.getParameter("applyid")).toString();
-			entity= new BusArchApply(applyid, userid, username,reason,Timestamp.valueOf(request.getParameter("reason")), new Timestamp(System.currentTimeMillis()), username);
+			String applyid = request.getParameter("applyid");
+			entity= new BusArchApply(applyid, userid, username,reason,Timestamp.valueOf(request.getParameter("endTime")), new Timestamp(System.currentTimeMillis()), username);
 			entity.setVerifyType(1);
 			entity.setOrdinal(0);
 			
