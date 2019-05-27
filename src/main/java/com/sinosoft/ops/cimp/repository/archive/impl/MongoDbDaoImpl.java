@@ -99,7 +99,6 @@ public class MongoDbDaoImpl implements MongoDbDao {
             String ntime = time.toString();
             try {
                 ts = Timestamp.valueOf(ntime);
-                System.out.println(ts);
             } catch (Exception e) {
                 e.printStackTrace();
             }

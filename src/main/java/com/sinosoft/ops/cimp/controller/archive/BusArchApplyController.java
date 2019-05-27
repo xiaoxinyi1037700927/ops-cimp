@@ -161,9 +161,8 @@ public class BusArchApplyController  extends BaseController {
 			if(request.getParameter("reason")!=null)reason =request.getParameter("reason");
 			String userid =  SecurityUtils.getSubject().getCurrentUser().getId();
 			String username = SecurityUtils.getSubject().getCurrentUser().getLoginName();
-			
 			String applyid = UUID.fromString(request.getParameter("applyid")).toString();
-			entity= new BusArchApply(applyid, userid, username,reason,Timestamp.valueOf(request.getParameter("endTime")), new Timestamp(System.currentTimeMillis()), username);
+			entity= new BusArchApply(applyid, userid, username,reason,Timestamp.valueOf(request.getParameter("reason")), new Timestamp(System.currentTimeMillis()), username);
 			entity.setVerifyType(1);
 			entity.setOrdinal(0);
 			
@@ -278,7 +277,7 @@ public class BusArchApplyController  extends BaseController {
 			{
 				message="通过";
 				List<Role> roles =  userRoleService.getRolesByUserId(userid);
-				if (roles.size()>0 && roles.stream().filter(temp -> temp.getCode().equals("13")).count() > 0) {
+				if (roles.size()>0 && roles.stream().filter(temp -> temp.getCode().equals("90")).count() > 0) {
 					verifyType=100;
 				}
 			}
