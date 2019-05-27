@@ -112,7 +112,7 @@ public class ArchiveMaterialFileController extends BaseController {
 
     @ApiOperation("根据指定imgID获取图片")
     @ApiImplicitParam(name = "id", value = "图片id", dataType = "String", required = true, paramType = "query")
-    @RequestMapping(value = "/imgbyid", method = RequestMethod.POST)
+    @RequestMapping(value = "/imgbyid", method = RequestMethod.GET)
     public void imgbyid(HttpServletRequest request, HttpServletResponse response) throws BusinessException {
         try {
             String id = request.getParameter("id");
@@ -122,8 +122,9 @@ public class ArchiveMaterialFileController extends BaseController {
             String fileName = id + ".jpg";
             Path path = Paths.get(relPath, id);
             File file = mongoDbService.downloadToFileDecryptWithAES(id, path);
-            response.setHeader("Cache-Control", "no-store, no-cache");
-            response.setContentType("image/jpeg");
+            //设置向浏览器端传送的文件格式
+            response.setContentType("application/x-download");
+            response.addHeader("Content-Disposition", "attachment;filename=" + fileName);
             BufferedImage bi = ImageIO.read(file);
             ServletOutputStream out = response.getOutputStream();
             ImageIO.write(bi, "jpg", out);

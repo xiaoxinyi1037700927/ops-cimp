@@ -268,7 +268,7 @@ public class BusArchApplyController  extends BaseController {
 			Integer operatortype = Integer.parseInt(request.getParameter("operatortype"));			
 			Integer verifyType = Integer.parseInt(request.getParameter("verifyType"));
 			String revokeReason = request.getParameter("revokeReason");
-			if(operatortype==0)
+			if(operatortype == 0)
 			{
 				message="退回";
 				verifyType=99;
@@ -277,7 +277,6 @@ public class BusArchApplyController  extends BaseController {
 			{
 				message="通过";
 				verifyType=100;
-
 			}
 
 			BusArchApply entity= new BusArchApply(applyid, userid, username,reason,Timestamp.valueOf(request.getParameter("endTime")), new Timestamp(System.currentTimeMillis()), username);
