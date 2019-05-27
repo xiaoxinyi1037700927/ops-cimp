@@ -227,7 +227,7 @@ public class CombinedQueryParser {
             sql.append(" INNER JOIN ").append(tmp2).append(" ON ")
                     .append(tmp).append(".EMP_ID = ").append(tmp2).append(".EMP_ID ");
         }
-        sql.append(" WHERE ").append(root.getSql());
+        sql.append(" WHERE ").append(root.getSql()).append(" )");
 
         return sql.toString();
     }
