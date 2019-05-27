@@ -122,9 +122,8 @@ public class ArchiveMaterialFileController extends BaseController {
             String fileName = id + ".jpg";
             Path path = Paths.get(relPath, id);
             File file = mongoDbService.downloadToFileDecryptWithAES(id, path);
-            //设置向浏览器端传送的文件格式
-            response.setContentType("application/x-download");
-            response.addHeader("Content-Disposition", "attachment;filename=" + fileName);
+            response.setHeader("Cache-Control", "no-store, no-cache");
+            response.setContentType("image/jpeg");
             BufferedImage bi = ImageIO.read(file);
             ServletOutputStream out = response.getOutputStream();
             ImageIO.write(bi, "jpg", out);
