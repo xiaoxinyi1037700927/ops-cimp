@@ -38,6 +38,7 @@ public class MongoDbDaoImpl implements MongoDbDao {
     @Autowired
     private MongoTemplate mongoTemplate;
 
+    @Autowired
     private ArchiveMaterialFileRepository archiveMaterialFileRepository;
     @Value("${mongoClientIp}")
     private String host;
@@ -85,14 +86,14 @@ public class MongoDbDaoImpl implements MongoDbDao {
             }
             GridFSUploadOptions uploadOptions = new GridFSUploadOptions().metadata(doc);
             gfsb.uploadFromStream(new BsonString(mongoDbId), fileName, is, uploadOptions);
-            ArchiveMaterialFile archiveMaterialFile=new ArchiveMaterialFile();
+            ArchiveMaterialFile archiveMaterialFile = new ArchiveMaterialFile();
             archiveMaterialFile.setArchiveMaterialId("1");
             archiveMaterialFile.setPageCount(12);
             archiveMaterialFile.setPageNumber(1);
             archiveMaterialFile.setFileType("11");
             archiveMaterialFile.setFileStorageRef(mongoDbId);
             archiveMaterialFile.setId(UUID.randomUUID().toString());
-            archiveMaterialFile.setFileSize(2132);
+            archiveMaterialFile.setFileSize(is.available());
             Timestamp ts = new Timestamp(System.currentTimeMillis());
             String tsStr = "2011-05-09 11:49:45";
             try {
@@ -126,11 +127,10 @@ public class MongoDbDaoImpl implements MongoDbDao {
             DB db = mongo.getDB(mongoDbName);
             GridFS gridFS = new GridFS(db);
 
-            BasicDBObject basicDBObject=new BasicDBObject();
-            basicDBObject.put("_id",id);
-            DBObject query=basicDBObject;
+            BasicDBObject basicDBObject = new BasicDBObject();
+            basicDBObject.put("_id", id);
+            DBObject query = basicDBObject;
             gridFSOne = gridFS.findOne(query);
-            System.out.println(gridFSOne);
 
             GridFSBucket gfsb = GridFSBuckets.create(mongoTemplate.getDb());
             gfsb.downloadToStream(new BsonString(id), os);
@@ -142,7 +142,6 @@ public class MongoDbDaoImpl implements MongoDbDao {
             // 获取文件头信息
            BasicDBObject queryWhereId=new BasicDBObject();
            queryWhereId.put("_id",id);
-           gfsf = mongoTemplate.findAll(GridFSFile.class).get(1);
            System.out.println(gfsf);
 //            gfsf = gridFsTemplate.findOne(queryWhereId);
 //            if (gfsf == null)

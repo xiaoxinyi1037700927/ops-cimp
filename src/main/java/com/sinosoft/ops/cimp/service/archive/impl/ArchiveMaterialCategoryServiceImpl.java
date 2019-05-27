@@ -110,7 +110,6 @@ public class ArchiveMaterialCategoryServiceImpl implements ArchiveMaterialCatego
         List<HashMap<String, Object>> materialCategoryAndMaterialList = new ArrayList<HashMap<String, Object>>();
 
         if (empId == null || empId == "") {
-
             if (categoryList != null && categoryList.size() > 0) {
                 materialCategoryAndMaterialList = buildArchiveMaterialCategory(categoryList);
 

@@ -13,53 +13,53 @@ import java.util.Map;
 
 public interface MongoDbDao {
 
-  String uploadFromFile(File file) throws IOException;
+    String uploadFromFile(File file) throws IOException;
 
-  String uploadFromFile(File file, Map<String, Object> extendDoc) throws IOException;
+    String uploadFromFile(File file, Map<String, Object> extendDoc) throws IOException;
 
-  String uploadFileFromStream(String fileName, InputStream is) throws IOException;
+    String uploadFileFromStream(String fileName, InputStream is) throws IOException;
 
-  String uploadFileFromStream(String fileName, InputStream is, Map<String, Object> extendDoc)
-      throws IOException;
+    String uploadFileFromStream(String fileName, InputStream is, Map<String, Object> extendDoc)
+            throws IOException;
 
-  void uploadFileFromStream(String id, String fileName, InputStream is, Map<String, Object> extDoc)
-      throws IOException;
+    void uploadFileFromStream(String id, String fileName, InputStream is, Map<String, Object> extDoc)
+            throws IOException;
 
-  GridFSDBFile downloadFileToStream(String id, OutputStream os)
-      throws IOException, CannotFindMongoDbResourceById;
+    GridFSDBFile downloadFileToStream(String id, OutputStream os)
+            throws IOException, CannotFindMongoDbResourceById;
 
-  File dowloadToFile(String id, Path path)
-      throws FileNotFoundException, IOException, CannotFindMongoDbResourceById;
+    File dowloadToFile(String id, Path path)
+            throws FileNotFoundException, IOException, CannotFindMongoDbResourceById;
 
-  File dowloadToFile(String id, String path)
-      throws FileNotFoundException, IOException, CannotFindMongoDbResourceById;
+    File dowloadToFile(String id, String path)
+            throws FileNotFoundException, IOException, CannotFindMongoDbResourceById;
 
-  void dowloadToFile(String id, File file)
-      throws FileNotFoundException, IOException, CannotFindMongoDbResourceById;
+    void dowloadToFile(String id, File file)
+            throws FileNotFoundException, IOException, CannotFindMongoDbResourceById;
 
-  void deleteFileById(String id);
+    void deleteFileById(String id);
 
-  GridFSFile findFileById(String id);
+    GridFSFile findFileById(String id);
 
-  List<GridFSFile> findFileByConditions(Bson filters);
+    List<GridFSFile> findFileByConditions(Bson filters);
 
-  List<GridFSFile> findFileByConditions(Bson filters, Bson sort);
+    List<GridFSFile> findFileByConditions(Bson filters, Bson sort);
 
-  List<GridFSFile> findFileByConditions(Bson filters, Bson sort, int limit);
+    List<GridFSFile> findFileByConditions(Bson filters, Bson sort, int limit);
 
-  List<GridFSFile> findFileByConditions(Bson filters, Bson sort, int limit, int skip);
+    List<GridFSFile> findFileByConditions(Bson filters, Bson sort, int limit, int skip);
 
 
-  void updateFromFile(String id, File file) throws IOException;
+    void updateFromFile(String id, File file) throws IOException;
 
-  void updateFromFile(String id, File file, Map<String, Object> extendDoc) throws IOException;
+    void updateFromFile(String id, File file, Map<String, Object> extendDoc) throws IOException;
 
-  void updateFileFromStream(String id, String fileName, InputStream is) throws IOException;
+    void updateFileFromStream(String id, String fileName, InputStream is) throws IOException;
 
-  void updateFileFromStream(String id, String fileName, InputStream is,
-                            Map<String, Object> extendDoc) throws IOException;
+    void updateFileFromStream(String id, String fileName, InputStream is,
+                              Map<String, Object> extendDoc) throws IOException;
 
-  String genMongoDbId();
+    String genMongoDbId();
 
-  List<GridFSFile> findeFileListById(Collection<String> ids);
+    List<GridFSFile> findeFileListById(Collection<String> ids);
 }

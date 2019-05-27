@@ -58,7 +58,6 @@ public class BusArchApplyController  extends BaseController {
 			if(request.getParameter("reason")!=null)reason =request.getParameter("reason").toString();
 			User user = SecurityUtils.getSubject().getCurrentUser();
 
-			
 			String applyid = UUID.randomUUID().toString();
 			entity= new BusArchApply(applyid, user.getId(), user.getLoginName(),reason,Timestamp.valueOf(request.getParameter("endTime")), new Timestamp(System.currentTimeMillis()), user.getLoginName());
 			entity.setVerifyType(1);
@@ -180,7 +179,7 @@ public class BusArchApplyController  extends BaseController {
 				String personid = UUID.randomUUID().toString();
 				if(temp.getString("personid")!=null && !temp.getString("personid").equals(""))
 				{
-					personid = UUID.fromString(temp.getString("personid")).toString();
+					personid = temp.getString("personid");
 				}
 				bap.setId(personid);
 				bap.setEmpid(temp.getString("empid"));
@@ -198,7 +197,7 @@ public class BusArchApplyController  extends BaseController {
 					String detailid = UUID.randomUUID().toString();
 					if(tempdetail.getString("detailid")!=null && !tempdetail.getString("detailid").equals(""))
 					{
-						detailid = UUID.fromString(tempdetail.getString("detailid")).toString();
+						detailid = tempdetail.getString("detailid");
 					}
 
 					bad.setId(detailid);
@@ -212,7 +211,6 @@ public class BusArchApplyController  extends BaseController {
 				}
 			}			
 
-			
 			busArchApplyService.update(entity,baplist,badlist);
 			return ok("保存成功！");
 		} catch (Exception e) {
@@ -252,28 +250,33 @@ public class BusArchApplyController  extends BaseController {
 	@ApiOperation("退回申请查看档案")
 	@ApiImplicitParams({
 			@ApiImplicitParam(name = "reason",value = "所要查看档案的理由", dataType = "String", required = true, paramType = "query"),
-			@ApiImplicitParam(name = "operatortype",value = "操作人员 0为申请通过", dataType = "String", required = true, paramType = "query"),
-			@ApiImplicitParam(name = "verifyType",value ="核实类型", dataType = "String", required = true, paramType = "query")
+			@ApiImplicitParam(name = "operatortype",value = "操作人员 0为申请退回", dataType = "String", required = true, paramType = "query"),
+			@ApiImplicitParam(name = "verifyType",value ="核实类型", dataType = "String", required = true, paramType = "query"),
+			@ApiImplicitParam(name = "applyid",value ="申请id", dataType = "String", required = true, paramType = "query"),
+			@ApiImplicitParam(name = "endTime",value ="结束时间", dataType = "String", required = true, paramType = "query")
 	})
 	@RequestMapping(value = "/updateVerifyMessage",method = RequestMethod.POST)
 	public ResponseEntity updateVerifyMessage(HttpServletRequest request, HttpServletResponse response) throws BusinessException {
+		String message="";
 		try {
+
 			String reason ="";
 			if(request.getParameter("reason")!=null)reason =request.getParameter("reason");
 			String userid = SecurityUtils.getSubject().getCurrentUser().getId();
 			String username = SecurityUtils.getSubject().getCurrentUser().getLoginName();
 
-			String applyid = UUID.fromString(request.getParameter("applyid")).toString();
+			String applyid =request.getParameter("applyid");
 			Integer operatortype = Integer.parseInt(request.getParameter("operatortype"));			
 			Integer verifyType = Integer.parseInt(request.getParameter("verifyType"));
 			String revokeReason = request.getParameter("revokeReason");
 			if(operatortype==0)
 			{
+				message="退回";
 				verifyType=99;
 			}
 			else
 			{
-				verifyType=verifyType+1;
+				message="通过";
 				List<Role> roles =  userRoleService.getRolesByUserId(userid);
 				if (roles.size()>0 && roles.stream().filter(temp -> temp.getCode().equals("90")).count() > 0) {
 					verifyType=100;
@@ -290,7 +293,7 @@ public class BusArchApplyController  extends BaseController {
 			return ok("更新成功！");
 		} catch (Exception e) {
 			logger.error("更新失败！", e);
-			return fail("更新失败！");
+			return fail(message+"更新失败！");
 		}
 	}
 

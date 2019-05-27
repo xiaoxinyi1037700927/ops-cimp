@@ -1,6 +1,7 @@
 package com.sinosoft.ops.cimp.service.archive.impl;
 
 import com.mongodb.client.gridfs.model.GridFSFile;
+import com.mongodb.gridfs.GridFSDBFile;
 import com.sinosoft.ops.cimp.repository.archive.MongoDbDao;
 import com.sinosoft.ops.cimp.repository.archive.ex.CannotFindMongoDbResourceById;
 import com.sinosoft.ops.cimp.repository.archive.ex.DownloadResourceFromMongoDbError;
@@ -80,7 +81,7 @@ public class MongoDbServiceImpl implements MongoDbService {
 
 
     @Override
-    public void uploadFileFromStreamEncryptAES(String id, String fileName, InputStream is)  {
+    public void uploadFileFromStreamEncryptAES(String id, String fileName, InputStream is){
 
         ByteArrayInputStream bais = null;
         Map<String, Object> extendDoc=null;
@@ -157,11 +158,13 @@ public class MongoDbServiceImpl implements MongoDbService {
         try {
 
             baos = new ByteArrayOutputStream();
-            mongoDbDao.downloadFileToStream(id, baos);
+            GridFSDBFile gridFSDBFile = mongoDbDao.downloadFileToStream(id, baos);
+            InputStream inputStream = gridFSDBFile.getInputStream();
             byte[] unDecryptBytes = baos.toByteArray();
+            byte [] bytes=IOUtils.toByteArray(inputStream);
             System.out.println(unDecryptBytes);
-            byte[] decryptedBytes = CryptoUtil.decryptAes(unDecryptBytes, pwdBytes);
-            IOUtils.write(unDecryptBytes, os);
+            byte[] decryptedBytes = CryptoUtil.decryptAes(bytes, pwdBytes);
+            IOUtils.write(decryptedBytes, os);
             // TODO MD5 验证
 
         } catch (IOException | InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException

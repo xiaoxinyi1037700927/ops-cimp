@@ -3,6 +3,7 @@ package com.sinosoft.ops.cimp.service.archive.impl;
 import com.sinosoft.ops.cimp.entity.archive.BusArchApply;
 import com.sinosoft.ops.cimp.entity.archive.BusArchApplyDetail;
 import com.sinosoft.ops.cimp.entity.archive.BusArchApplyPerson;
+import com.sinosoft.ops.cimp.entity.user.Role;
 import com.sinosoft.ops.cimp.entity.user.UserRole;
 import com.sinosoft.ops.cimp.repository.archive.busarch.BusArchApplyDetailRepository;
 import com.sinosoft.ops.cimp.repository.archive.busarch.BusArchApplyPersonRepository;
@@ -10,6 +11,7 @@ import com.sinosoft.ops.cimp.repository.archive.busarch.BusArchApplyRepository;
 import com.sinosoft.ops.cimp.repository.user.UserRoleRepository;
 import com.sinosoft.ops.cimp.service.archive.BusArchApplyService;
 import com.sinosoft.ops.cimp.service.archive.BusinessService;
+import com.sinosoft.ops.cimp.service.user.UserRoleService;
 import oracle.sql.RAW;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -32,6 +34,8 @@ public class BusArchApplyServiceImpl implements BusArchApplyService {
 	@Autowired
 	private BusinessService businessService;
 
+	@Autowired
+	private UserRoleService userRoleService;
 
 
 	@Override
@@ -61,11 +65,18 @@ public class BusArchApplyServiceImpl implements BusArchApplyService {
 
 		for(BusArchApplyPerson Person:listbap)
 		{
-			busArchApplyPersonRepository.deleteById(Person.getId());
 			List<BusArchApplyDetail> listbad = busArchApplyDetailRepository.findAllByPersonid(Person.getId());
+			boolean b1 = busArchApplyPersonRepository.existsById(Person.getId());
+			if (b1) {
+				busArchApplyPersonRepository.deleteById(Person.getId());
+			}
+
 			for(BusArchApplyDetail Detail:listbad)
 			{
-				busArchApplyDetailRepository.deleteById(Detail.getId());
+				boolean b = busArchApplyDetailRepository.existsById(Detail.getId());
+				if (b) {
+					busArchApplyDetailRepository.deleteById(Detail.getId());
+				}
 			}
 		}
 
@@ -104,8 +115,8 @@ public class BusArchApplyServiceImpl implements BusArchApplyService {
 		}
 		else
 		{
-//			Collection<UserRole> listsysUserRole = busArchApplyRepository.getByUserId(UUID.fromString(userid));
-//			if (listsysUserRole.size()>0 && listsysUserRole.stream().filter(temp -> temp.getRoleId() == 400).count() > 0) {
+			List<Role> roles =  userRoleService.getRolesByUserId(userid);
+			if (roles.size()>0 && roles.stream().filter(temp -> temp.getCode() == "90").count() > 0) {
 				listBus = busArchApplyRepository.findAllByVerifyType();
 				for(BusArchApply busArchApply:listBus)
 				{
@@ -121,9 +132,9 @@ public class BusArchApplyServiceImpl implements BusArchApplyService {
 				}
 				return listBus;
 				
-//			} else {
-//				return listBus;
-//			}
+			} else {
+				return listBus;
+			}
 		}		
 	}
 	
