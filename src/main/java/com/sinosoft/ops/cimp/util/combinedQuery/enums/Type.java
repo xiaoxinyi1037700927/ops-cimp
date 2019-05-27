@@ -10,6 +10,7 @@ public enum Type {
     DATE("日期", 1 << 5),
     LOB("大字段", 1 << 6),
     CODE("码值", 1 << 7),
+    UNKNOWN("未知类型", 1 << 8),
     ALL_FIELD_TYPE("所有字段类型", STRING.code | NUMBER.code | DATE.code | LOB.code | CODE.code),
     ALL("所有类型", (1 << 30) - 1);
 

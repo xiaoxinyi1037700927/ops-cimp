@@ -20,6 +20,11 @@ public class FieldModel {
      */
     @ApiModelProperty(value = "代码集名称")
     private String codeSetName;
+    /**
+     * 字段类型
+     */
+    @ApiModelProperty(value = "字段类型")
+    private int type;
 
     public String getId() {
         return id;
@@ -43,5 +48,13 @@ public class FieldModel {
 
     public void setCodeSetName(String codeSetName) {
         this.codeSetName = codeSetName;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
     }
 }

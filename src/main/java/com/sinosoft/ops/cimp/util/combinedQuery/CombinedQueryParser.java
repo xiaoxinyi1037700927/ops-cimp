@@ -6,6 +6,7 @@ import com.sinosoft.ops.cimp.util.combinedQuery.beans.Expr;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.ExprStream;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.Param;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.*;
+import com.sinosoft.ops.cimp.util.combinedQuery.enums.LogicalOperator;
 import com.sinosoft.ops.cimp.util.combinedQuery.enums.Operator;
 import com.sinosoft.ops.cimp.util.combinedQuery.processors.code.CodeProcessor;
 import com.sinosoft.ops.cimp.util.combinedQuery.processors.nodes.NodeProcessor;
@@ -14,10 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -133,6 +131,9 @@ public class CombinedQueryParser {
             //忽略默认节点1=1
             return;
         }
+        if (logicalOperator == null) {
+            logicalOperator = LogicalOperator.AND.getName();
+        }
 
         if (root instanceof LogicalOperatorNode) {
             //逻辑表达式节点，递归处理子节点
@@ -204,7 +205,48 @@ public class CombinedQueryParser {
         //调用码值处理器
         invokeCodeProcessors(root);
 
-        return root.getSql();
+        //获取表达式所需的表名，并排序
+        Set<String> set = new HashSet<>();
+        getTableNames(root, set);
+        List<String> tables = new ArrayList<>(set);
+        tables.sort(String::compareTo);
+
+        if (tables.size() == 0) {
+            return "AND" + root.getSql();
+        }
+
+
+        String tmp = tables.get(0);
+        StringBuilder sql = new StringBuilder();
+        sql.append(" AND A001.EMP_ID IN(SELECT DISTINCT ")
+                .append(tmp)
+                .append(".EMP_ID FROM ")
+                .append(tmp);
+        for (int i = 1; i < tables.size(); i++) {
+            String tmp2 = tables.get(i);
+            sql.append(" INNER JOIN ").append(tmp2).append(" ON ")
+                    .append(tmp).append(".EMP_ID = ").append(tmp2).append(".EMP_ID ");
+        }
+        sql.append(" WHERE ").append(root.getSql());
+
+        return sql.toString();
+    }
+
+    /**
+     * 获取表达式所需的所有表名
+     *
+     * @param node
+     * @param tables
+     */
+    private void getTableNames(Node node, Set<String> tables) {
+        if (node instanceof FieldNode) {
+            tables.add(((FieldNode) node).getTableName());
+        }
+
+        for (Node subNode : node.getSubNodes()) {
+            getTableNames(subNode, tables);
+        }
+
     }
 
 
