@@ -18,9 +18,9 @@ public class CombinedQueryUtil {
     public static int getValueType(String value) {
         if (isNumber(value)) {
             return Type.NUMBER.getCode();
-        } else if (isDate(value)) {
+        } /*else if (isDate(value)) {
             return Type.DATE.getCode();
-        }
+        }*/
 
         return Type.STRING.getCode();
     }
