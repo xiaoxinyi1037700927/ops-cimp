@@ -251,9 +251,10 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
             newExpr.setOperator(appendModel.getOperator());
             newExpr.setParams(appendModel.getParams().stream()
                     .map(text -> new Param(IdUtil.uuid(), text)).collect(Collectors.toList()));
-            processParams(newExpr.getParams());
+            processParams(newExpr.getParams(), appendModel.getOperator());
         }
         newExpr.setText(parser.parseExprStr(Collections.singletonList(newExpr), false));
+        newExpr.setCompilePass(parser.compile(newExpr.getText()));
 
 
         //添加表达式
@@ -265,7 +266,6 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
         result.setCombinedQueryId(combinedQueryId);
         result.setExpr(newExpr);
         result.setExprstr(parser.parseExprStr(exprs, true));
-        result.setCompilePass(parser.compile(newExpr.getText()));
 
         return result;
     }
@@ -274,9 +274,13 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
      * 参数处理
      *
      * @param params
+     * @param operator
      */
-    private void processParams(List<Param> params) {
+    private void processParams(List<Param> params, String operator) {
         String codeSetName = null;
+        String codes;
+        boolean multiselect = operator != null && Operator.getByName(operator).isArray();
+
         for (Param param : params) {
             if (param.getIsFunction() == 1) {
                 continue;
@@ -291,13 +295,16 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
                     param.setReturnType(node.getReturnType());
                     param.setType(Param.Type.FIELD.getName());
                     codeSetName = node.getCodeSetName();
-                } else if (valueNodeProcessor.isCode(text)) {
+                } else if ((codes = valueNodeProcessor.isCode(text)) != null) {
                     //码值
                     param.setReturnType(Type.CODE.getCode());
                     param.setType(Param.Type.CODE.getName());
                     param.setCodeSetName(codeSetName);
+                    param.setFieldId(codes);
+                    param.setMultiselect(multiselect);
                 } else {
                     param.setType(Param.Type.VALUE.getName());
+                    param.setMultiselect(multiselect);
                     try {
                         //判断输入值是否可转为数字
                         new BigDecimal(text.substring(text.indexOf("'") + 1, text.lastIndexOf("'")));
@@ -331,7 +338,6 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
         ExprModel result = new ExprModel();
         result.setCombinedQueryId(combinedQueryId);
         result.setExprstr(parser.parseExprStr(exprs, true));
-        result.setCompilePass(parser.compile(result.getExprstr()));
 
         return result;
     }
@@ -356,6 +362,7 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
 
         //刷新表达式下所有text
         parser.refreshText(expr);
+        expr.setCompilePass(parser.compile(expr.getText()));
 
         putCache(userId, combinedQueryId, exprs);
 
@@ -364,7 +371,6 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
         result.setExpr(expr);
         result.setExprstr(parser.parseExprStr(exprs, true));
         result.setCombinedQueryId(combinedQueryId);
-        result.setCompilePass(parser.compile(expr.getText()));
 
         return result;
     }
@@ -442,6 +448,8 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
         //刷新表达式下所有text
         parser.refreshText(expr);
 
+        expr.setCompilePass(parser.compile(expr.getText()));
+
         putCache(userId, combinedQueryId, exprs);
 
 
@@ -449,7 +457,6 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
         result.setExpr(expr);
         result.setExprstr(parser.parseExprStr(exprs, true));
         result.setCombinedQueryId(combinedQueryId);
-        result.setCompilePass(parser.compile(expr.getText()));
 
         return result;
     }
@@ -517,6 +524,8 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
         //刷新表达式下所有text
         parser.refreshText(expr);
 
+        expr.setCompilePass(parser.compile(expr.getText()));
+
         putCache(userId, combinedQueryId, exprs);
 
 
@@ -524,7 +533,6 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
         result.setExpr(expr);
         result.setExprstr(parser.parseExprStr(exprs, true));
         result.setCombinedQueryId(combinedQueryId);
-        result.setCompilePass(parser.compile(expr.getText()));
 
         return result;
     }
@@ -552,6 +560,7 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
             }
         }
 
+        processParams(oldParams, modifyModel.getOperator());
     }
 
     /**
@@ -587,6 +596,7 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
                     }
                 }
 
+                processParams(params, null);
                 return true;
             }
 
@@ -595,7 +605,6 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
             }
         }
 
-        processParams(params);
 
         return false;
     }
@@ -756,6 +765,10 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
                 statictics(result, expr.getSubExprs());
             } else {
                 result.incrGeneralExprNum();
+            }
+
+            if (!expr.isCompilePass()) {
+                result.incrWrongExprNum();
             }
         }
     }

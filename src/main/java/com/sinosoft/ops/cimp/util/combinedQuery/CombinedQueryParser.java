@@ -9,9 +9,9 @@ import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.*;
 import com.sinosoft.ops.cimp.util.combinedQuery.enums.LogicalOperator;
 import com.sinosoft.ops.cimp.util.combinedQuery.enums.Operator;
 import com.sinosoft.ops.cimp.util.combinedQuery.enums.Type;
-import com.sinosoft.ops.cimp.util.combinedQuery.processors.code.CodeProcessor;
 import com.sinosoft.ops.cimp.util.combinedQuery.processors.nodes.NodeProcessor;
 import com.sinosoft.ops.cimp.util.combinedQuery.processors.nodes.OperatorNodeProcessor;
+import com.sinosoft.ops.cimp.util.combinedQuery.processors.post.PostProcessor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -23,14 +23,14 @@ import java.util.stream.Collectors;
 public class CombinedQueryParser {
 
     private final NodeProcessor[] nodeProcessors;
-    private final CodeProcessor codeProcessor;
     private final OperatorNodeProcessor operatorNodeProcessor;
+    private final PostProcessor[] postProcessors;
 
     @Autowired
-    public CombinedQueryParser(NodeProcessor[] nodeProcessors, CodeProcessor codeProcessor, OperatorNodeProcessor operatorNodeProcessor) {
+    public CombinedQueryParser(NodeProcessor[] nodeProcessors, OperatorNodeProcessor operatorNodeProcessor, PostProcessor[] postProcessors) {
         this.nodeProcessors = nodeProcessors;
-        this.codeProcessor = codeProcessor;
         this.operatorNodeProcessor = operatorNodeProcessor;
+        this.postProcessors = postProcessors;
     }
 
     /**
@@ -195,11 +195,21 @@ public class CombinedQueryParser {
             param.setType(Param.Type.FIELD.getName());
             param.setTableId(((FieldNode) node).getTableId());
             param.setFieldId(((FieldNode) node).getFieldId());
-        } else if (node instanceof ValueNode && node.getReturnType() == Type.CODE.getCode()) {
-            param.setType(Param.Type.CODE.getName());
-            param.setCodeSetName(((ValueNode) node).getCodeSetName());
-        } else {
-            param.setType(Param.Type.VALUE.getName());
+        } else if (node instanceof ValueNode) {
+            if (node.getReturnType() == Type.CODE.getCode()) {
+                param.setType(Param.Type.CODE.getName());
+                param.setCodeSetName(((ValueNode) node).getCodeSetName());
+                param.setFieldId(String.join(",", ((ValueNode) node).getValues()));
+            } else {
+                param.setType(Param.Type.VALUE.getName());
+            }
+
+            //判断值节点是否是多选的
+            Node parent = node.getParent();
+            if (parent instanceof OperatorNode) {
+                param.setMultiselect(((OperatorNode) parent).getProcessor().getOperator().isArray());
+            }
+
         }
 
         return param;
@@ -212,7 +222,7 @@ public class CombinedQueryParser {
         Node root = parseGramTree(exprStr, null);
 
         //调用码值处理器
-        invokeCodeProcessors(root);
+        invokePostProcessorBoforeGetSql(root);
 
         //获取表达式所需的表名，并排序
         Set<String> set = new HashSet<>();
@@ -242,6 +252,24 @@ public class CombinedQueryParser {
     }
 
     /**
+     * invokePostProcessorBoforeGetSql
+     *
+     * @param node
+     * @throws CombinedQueryParseException
+     */
+    private void invokePostProcessorBoforeGetSql(Node node) throws CombinedQueryParseException {
+        for (PostProcessor postProcessor : postProcessors) {
+            if (postProcessor.support(node)) {
+                postProcessor.postProcessorBeforeGetSql(node);
+            }
+        }
+
+        for (Node subNode : node.getSubNodes()) {
+            invokePostProcessorBoforeGetSql(subNode);
+        }
+    }
+
+    /**
      * 获取表达式所需的所有表名
      *
      * @param node
@@ -260,22 +288,6 @@ public class CombinedQueryParser {
 
 
     /**
-     * 调用码值处理器,生成sql前调用
-     *
-     * @param root
-     */
-    private void invokeCodeProcessors(Node root) throws CombinedQueryParseException {
-        if (root instanceof OperatorNode) {
-            codeProcessor.processCode((OperatorNode) root);
-            return;
-        }
-
-        for (Node subNode : root.getSubNodes()) {
-            invokeCodeProcessors(subNode);
-        }
-    }
-
-    /**
      * 编译表达式
      *
      * @param exprStr
@@ -283,7 +295,8 @@ public class CombinedQueryParser {
      */
     public boolean compile(String exprStr) {
         try {
-            parseGramTree(exprStr, null);
+            String sql = parseSql(exprStr);
+            System.out.println(sql);
             return true;
         } catch (CombinedQueryParseException e) {
 //            e.printStackTrace();

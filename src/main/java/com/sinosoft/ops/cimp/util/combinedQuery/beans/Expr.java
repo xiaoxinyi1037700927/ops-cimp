@@ -18,6 +18,8 @@ public class Expr {
 
     private List<Expr> subExprs;
 
+    private boolean compilePass = true;
+
     public String getId() {
         return id;
     }
@@ -72,5 +74,13 @@ public class Expr {
 
     public void setSubExprs(List<Expr> subExprs) {
         this.subExprs = subExprs;
+    }
+
+    public boolean isCompilePass() {
+        return compilePass;
+    }
+
+    public void setCompilePass(boolean compilePass) {
+        this.compilePass = compilePass;
     }
 }

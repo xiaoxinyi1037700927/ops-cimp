@@ -36,6 +36,8 @@ public class Param {
 
     private String codeSetName;
 
+    private boolean multiselect;
+
     public String getId() {
         return id;
     }
@@ -114,6 +116,14 @@ public class Param {
 
     public void setCodeSetName(String codeSetName) {
         this.codeSetName = codeSetName;
+    }
+
+    public boolean isMultiselect() {
+        return multiselect;
+    }
+
+    public void setMultiselect(boolean multiselect) {
+        this.multiselect = multiselect;
     }
 
     public enum Type {

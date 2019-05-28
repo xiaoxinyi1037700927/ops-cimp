@@ -93,7 +93,7 @@ public abstract class OperatorProcessor {
             }
 
             if (first.getReturnType() != next.getReturnType()) {
-                throw new CombinedQueryParseException("类型不匹配！");
+                throw new CombinedQueryParseException("类型不匹配：" + next.getExpr());
             }
         }
 

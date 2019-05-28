@@ -16,6 +16,11 @@ public class ExprStatisticsModel {
      */
     @ApiModelProperty(value = "基础表达式数量")
     private int generalExprNum;
+    /**
+     * 错误表达式数量
+     */
+    @ApiModelProperty(value = "错误表达式数量")
+    private int wrongExprNum;
 
     public void incrNestedExprNum() {
         nestedExprNum++;
@@ -23,6 +28,10 @@ public class ExprStatisticsModel {
 
     public void incrGeneralExprNum() {
         generalExprNum++;
+    }
+
+    public void incrWrongExprNum() {
+        wrongExprNum++;
     }
 
     public int getNestedExprNum() {
@@ -39,5 +48,13 @@ public class ExprStatisticsModel {
 
     public void setGeneralExprNum(int generalExprNum) {
         this.generalExprNum = generalExprNum;
+    }
+
+    public int getWrongExprNum() {
+        return wrongExprNum;
+    }
+
+    public void setWrongExprNum(int wrongExprNum) {
+        this.wrongExprNum = wrongExprNum;
     }
 }
