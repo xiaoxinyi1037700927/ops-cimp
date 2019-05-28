@@ -26,12 +26,12 @@ import com.sinosoft.ops.cimp.util.combinedQuery.enums.Operator;
 import com.sinosoft.ops.cimp.util.combinedQuery.enums.Type;
 import com.sinosoft.ops.cimp.util.combinedQuery.processors.nodes.FieldNodeProcessor;
 import com.sinosoft.ops.cimp.util.combinedQuery.processors.nodes.ValueNodeProcessor;
+import com.sinosoft.ops.cimp.util.combinedQuery.utils.CombinedQueryUtil;
 import com.sinosoft.ops.cimp.vo.from.cadre.combinedQuery.*;
 import com.sinosoft.ops.cimp.vo.to.cadre.combinedQuery.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -139,6 +139,12 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
                     } else {
                         //编辑函数
 
+                        //编辑时过滤原函数
+                        if (param.getFunctionName().equalsIgnoreCase(function.getName())) {
+                            iterator.remove();
+                            continue;
+                        }
+
                         //判断参数个数是否和原来一样
                         if (param.getParams().size() != function.getParamsType().size()) {
                             iterator.remove();
@@ -153,7 +159,7 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
                                 break;
                             }
                         }
-                        if(!isMatch){
+                        if (!isMatch) {
                             iterator.remove();
                             continue;
                         }
@@ -386,13 +392,16 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
                 } else {
                     param.setType(Param.Type.VALUE.getName());
                     param.setMultiselect(multiselect);
-                    try {
-                        //判断输入值是否可转为数字
-                        new BigDecimal(text.substring(text.indexOf("'") + 1, text.lastIndexOf("'")));
-                        param.setReturnType(Type.STRING.getCode() | Type.NUMBER.getCode());
-                    } catch (Exception e) {
-                        param.setReturnType(Type.STRING.getCode());
+
+                    int type = Type.STRING.getCode();
+                    String value = text.substring(text.indexOf("'") + 1, text.lastIndexOf("'"));
+                    if (CombinedQueryUtil.isNumber(value)) {
+                        type |= Type.NUMBER.getCode();
+                    } else if (CombinedQueryUtil.isDate(value)) {
+                        type |= Type.DATE.getCode();
                     }
+
+                    param.setReturnType(type);
                 }
             } catch (Exception e) {
                 param.setReturnType(Type.UNKNOWN.getCode());
