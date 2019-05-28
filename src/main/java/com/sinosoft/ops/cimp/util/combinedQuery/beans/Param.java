@@ -4,23 +4,6 @@ import java.util.List;
 
 public class Param {
 
-    public enum Type {
-        FUNCTION("function"),
-        FIELD("field"),
-        CODE("code"),
-        VALUE("value");
-
-        private String name;
-
-        Type(String name) {
-            this.name = name;
-        }
-
-        public String getName() {
-            return name;
-        }
-    }
-
     public Param() {
 
     }
@@ -46,7 +29,12 @@ public class Param {
 
     private String fieldId;
 
+    /**
+     * 参数类型
+     */
     private String type = Type.VALUE.getName();
+
+    private String codeSetName;
 
     public String getId() {
         return id;
@@ -118,5 +106,30 @@ public class Param {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getCodeSetName() {
+        return codeSetName;
+    }
+
+    public void setCodeSetName(String codeSetName) {
+        this.codeSetName = codeSetName;
+    }
+
+    public enum Type {
+        FUNCTION("function"),
+        FIELD("field"),
+        CODE("code"),
+        VALUE("value");
+
+        private String name;
+
+        Type(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
     }
 }

@@ -195,8 +195,9 @@ public class CombinedQueryParser {
             param.setType(Param.Type.FIELD.getName());
             param.setTableId(((FieldNode) node).getTableId());
             param.setFieldId(((FieldNode) node).getFieldId());
-        } else if (node.getReturnType() == Type.CODE.getCode()) {
+        } else if (node instanceof ValueNode && node.getReturnType() == Type.CODE.getCode()) {
             param.setType(Param.Type.CODE.getName());
+            param.setCodeSetName(((ValueNode) node).getCodeSetName());
         } else {
             param.setType(Param.Type.VALUE.getName());
         }

@@ -2,7 +2,7 @@ package com.sinosoft.ops.cimp.util.combinedQuery.enums;
 
 public enum Function {
     LENGTH("求长度", "^求长度\\((.*?)\\)$",
-            Type.NUMBER.getCode(), new int[]{Type.ALL.getCode()},
+            Type.NUMBER.getCode(), new int[]{Type.STRING.getCode() | Type.NUMBER.getCode()},
             "length(%s)", "求长度(%s)"),
     SYSDATE("系统日期", "^系统日期\\((.*?)\\)$",
             Type.DATE.getCode(), new int[]{},

@@ -20,6 +20,11 @@ public class OperatorModel {
      */
     @ApiModelProperty(value = "参数数量")
     private int paramsNum;
+    /**
+     * 是否多选
+     */
+    @ApiModelProperty(value = "是否多选")
+    private boolean multiselect;
 
     public String getName() {
         return name;
@@ -43,5 +48,13 @@ public class OperatorModel {
 
     public void setParamsNum(int paramsNum) {
         this.paramsNum = paramsNum;
+    }
+
+    public boolean isMultiselect() {
+        return multiselect;
+    }
+
+    public void setMultiselect(boolean multiselect) {
+        this.multiselect = multiselect;
     }
 }

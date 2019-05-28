@@ -116,6 +116,7 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
             model.setName(operator.getName());
             model.setParamsType(operator.getParamsType());
             model.setParamsNum(operator.getParamsType().length);
+            model.setMultiselect(operator.isArray());
 
             result.add(model);
         }
@@ -249,11 +250,8 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
         } else {
             newExpr.setOperator(appendModel.getOperator());
             newExpr.setParams(appendModel.getParams().stream()
-                    .map(text -> {
-                        Param param = new Param(IdUtil.uuid(), text);
-                        processParam(param);
-                        return param;
-                    }).collect(Collectors.toList()));
+                    .map(text -> new Param(IdUtil.uuid(), text)).collect(Collectors.toList()));
+            processParams(newExpr.getParams());
         }
         newExpr.setText(parser.parseExprStr(Collections.singletonList(newExpr), false));
 
@@ -275,34 +273,42 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
     /**
      * 参数处理
      *
-     * @param param
+     * @param params
      */
-    private void processParam(Param param) {
-        String text = param.getText();
-        try {
-            if (fieldNodeProcessor.support(text)) {
-                //为字段值添加id和返回类型
-                FieldNode node = (FieldNode) fieldNodeProcessor.parse(text);
-                param.setTableId(node.getTableId());
-                param.setFieldId(node.getFieldId());
-                param.setReturnType(node.getReturnType());
-                param.setType(Param.Type.FIELD.getName());
-            } else if (valueNodeProcessor.isCode(text)) {
-                //码值
-                param.setReturnType(Type.CODE.getCode());
-                param.setType(Param.Type.CODE.getName());
-            } else {
-                param.setType(Param.Type.VALUE.getName());
-                try {
-                    //判断输入值是否可转为数字
-                    new BigDecimal(text.substring(text.indexOf("'") + 1, text.lastIndexOf("'")));
-                    param.setReturnType(Type.STRING.getCode() | Type.NUMBER.getCode());
-                } catch (Exception e) {
-                    param.setReturnType(Type.STRING.getCode());
-                }
+    private void processParams(List<Param> params) {
+        String codeSetName = null;
+        for (Param param : params) {
+            if (param.getIsFunction() == 1) {
+                continue;
             }
-        } catch (CombinedQueryParseException e) {
-            param.setReturnType(Type.UNKNOWN.getCode());
+            String text = param.getText();
+            try {
+                if (fieldNodeProcessor.support(text)) {
+                    //为字段值添加id和返回类型
+                    FieldNode node = (FieldNode) fieldNodeProcessor.parse(text);
+                    param.setTableId(node.getTableId());
+                    param.setFieldId(node.getFieldId());
+                    param.setReturnType(node.getReturnType());
+                    param.setType(Param.Type.FIELD.getName());
+                    codeSetName = node.getCodeSetName();
+                } else if (valueNodeProcessor.isCode(text)) {
+                    //码值
+                    param.setReturnType(Type.CODE.getCode());
+                    param.setType(Param.Type.CODE.getName());
+                    param.setCodeSetName(codeSetName);
+                } else {
+                    param.setType(Param.Type.VALUE.getName());
+                    try {
+                        //判断输入值是否可转为数字
+                        new BigDecimal(text.substring(text.indexOf("'") + 1, text.lastIndexOf("'")));
+                        param.setReturnType(Type.STRING.getCode() | Type.NUMBER.getCode());
+                    } catch (Exception e) {
+                        param.setReturnType(Type.STRING.getCode());
+                    }
+                }
+            } catch (CombinedQueryParseException e) {
+                param.setReturnType(Type.UNKNOWN.getCode());
+            }
         }
     }
 
@@ -560,7 +566,6 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
                 if (param.getIsFunction() == 0) {
                     //值
                     param.setText(modifyModel.getValue());
-                    processParam(param);
                 } else {
                     //函数
                     param.setFunctionName(modifyModel.getFunctionName());
@@ -589,6 +594,8 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
                 return true;
             }
         }
+
+        processParams(params);
 
         return false;
     }

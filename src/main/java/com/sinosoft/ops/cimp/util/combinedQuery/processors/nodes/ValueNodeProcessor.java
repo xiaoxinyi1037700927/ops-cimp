@@ -151,32 +151,36 @@ public class ValueNodeProcessor extends NodeProcessor {
         //判断码值是否正确
         if (node.getReturnType() == Type.CODE.getCode()) {
             ValueNode vNode = (ValueNode) node;
-            Integer codeSetId = getCodeSetId(node.getParent());
-            if (codeSetId == null) {
+            FieldNode fieldNode = getFieldNode(node.getParent());
+            if (fieldNode == null || fieldNode.getCodeSetId() == null) {
                 throw new CombinedQueryParseException("没有找到码值对应的代码集：" + vNode.getExpr());
             }
 
             for (int i = 0; i < vNode.getValues().size(); i++) {
                 String code = vNode.getValues().get(i);
                 String name = vNode.getCodeNames().get(i);
-                if (!judgeCode(codeSetId, code, name)) {
+                if (!judgeCode(fieldNode.getCodeSetId(), code, name)) {
                     throw new CombinedQueryParseException("错误的码值：[" + code + "]" + name);
                 }
             }
+
+            //设置码值对应的代码集名称
+            vNode.setCodeSetName(fieldNode.getCodeSetName());
         }
     }
 
     /**
-     * 获取代码集
+     * 获取码值对应的字段节点
      *
      * @return
      */
-    private Integer getCodeSetId(Node node) {
+    private FieldNode getFieldNode(Node node) {
         for (Node subNode : node.getSubNodes()) {
             if (subNode instanceof FieldNode) {
-                return ((FieldNode) subNode).getCodeSetId();
+                return ((FieldNode) subNode);
             }
         }
+
         return null;
     }
 
