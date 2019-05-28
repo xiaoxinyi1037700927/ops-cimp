@@ -365,7 +365,6 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
      */
     private void processParams(List<Param> params, String operator) {
         String codeSetName = null;
-        String codes;
         boolean multiselect = operator != null && Operator.getByName(operator).isArray();
 
         for (Param param : params) {
@@ -382,12 +381,12 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
                     param.setReturnType(node.getReturnType());
                     param.setType(Param.Type.FIELD.getName());
                     codeSetName = node.getCodeSetName();
-                } else if ((codes = valueNodeProcessor.isCode(text)) != null) {
+                } else if (codeSetName != null) {
                     //码值
                     param.setReturnType(Type.CODE.getCode());
                     param.setType(Param.Type.CODE.getName());
                     param.setCodeSetName(codeSetName);
-                    param.setFieldId(codes);
+                    param.setFieldId(valueNodeProcessor.getCodes(text));
                     param.setMultiselect(multiselect);
                 } else {
                     param.setType(Param.Type.VALUE.getName());

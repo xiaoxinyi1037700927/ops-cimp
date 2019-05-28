@@ -195,23 +195,27 @@ public class ValueNodeProcessor extends NodeProcessor {
     }
 
     /**
-     * 判断表达式是否是码值
+     * 获取码值
      *
      * @param expr
      * @return 码值code(多个时以逗号分隔)
      */
-    public String isCode(String expr) {
-        List<String> list = Arrays.asList(expr.substring(expr.indexOf("'") + 1, expr.lastIndexOf("'")).split("'\\s*,\\s*'"));
+    public String getCodes(String expr) {
+        try {
+            List<String> list = Arrays.asList(expr.substring(expr.indexOf("'") + 1, expr.lastIndexOf("'")).split("'\\s*,\\s*'"));
 
-        List<String> codes = new ArrayList<>();
-        Matcher matcher;
-        for (String s : list) {
-            matcher = PATTERN_CODE.matcher(s);
-            if (!matcher.matches()) {
-                return null;
+            List<String> codes = new ArrayList<>();
+            Matcher matcher;
+            for (String s : list) {
+                matcher = PATTERN_CODE.matcher(s);
+                if (!matcher.matches()) {
+                    return null;
+                }
+                codes.add(matcher.group(1));
             }
-            codes.add(matcher.group(1));
+            return String.join(",", codes);
+        } catch (Exception e) {
+            return null;
         }
-        return String.join(",", codes);
     }
 }
