@@ -8,9 +8,9 @@ import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.FieldNode;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.Node;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.ValueNode;
 import com.sinosoft.ops.cimp.util.combinedQuery.enums.Type;
+import com.sinosoft.ops.cimp.util.combinedQuery.utils.CombinedQueryUtil;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Deque;
@@ -96,13 +96,7 @@ public class ValueNodeProcessor extends NodeProcessor {
             } else {
                 values.add(s);
 
-                //判断值是不是number类型
-                try {
-                    new BigDecimal(s);
-                    returnType |= Type.NUMBER.getCode();
-                } catch (Exception e) {
-                    returnType |= Type.STRING.getCode();
-                }
+                returnType |= CombinedQueryUtil.getValueType(s);
             }
         }
 
@@ -111,7 +105,7 @@ public class ValueNodeProcessor extends NodeProcessor {
             throw new CombinedQueryParseException("码值和非码值不能同时存在：" + expr);
         }
 
-        if (returnType != Type.NUMBER.getCode() && returnType != Type.STRING.getCode() && returnType != Type.CODE.getCode()) {
+        if (CombinedQueryUtil.getTypeNum(returnType) != 1) {
             //如果存在多个类型的值，统一作为字符串处理
             returnType = Type.STRING.getCode();
         }
@@ -151,32 +145,36 @@ public class ValueNodeProcessor extends NodeProcessor {
         //判断码值是否正确
         if (node.getReturnType() == Type.CODE.getCode()) {
             ValueNode vNode = (ValueNode) node;
-            Integer codeSetId = getCodeSetId(node.getParent());
-            if (codeSetId == null) {
+            FieldNode fieldNode = getFieldNode(node.getParent());
+            if (fieldNode == null || fieldNode.getCodeSetId() == null) {
                 throw new CombinedQueryParseException("没有找到码值对应的代码集：" + vNode.getExpr());
             }
 
             for (int i = 0; i < vNode.getValues().size(); i++) {
                 String code = vNode.getValues().get(i);
                 String name = vNode.getCodeNames().get(i);
-                if (!judgeCode(codeSetId, code, name)) {
+                if (!judgeCode(fieldNode.getCodeSetId(), code, name)) {
                     throw new CombinedQueryParseException("错误的码值：[" + code + "]" + name);
                 }
             }
+
+            //设置码值对应的代码集名称
+            vNode.setCodeSetName(fieldNode.getCodeSetName());
         }
     }
 
     /**
-     * 获取代码集
+     * 获取码值对应的字段节点
      *
      * @return
      */
-    private Integer getCodeSetId(Node node) {
+    private FieldNode getFieldNode(Node node) {
         for (Node subNode : node.getSubNodes()) {
             if (subNode instanceof FieldNode) {
-                return ((FieldNode) subNode).getCodeSetId();
+                return ((FieldNode) subNode);
             }
         }
+
         return null;
     }
 
@@ -200,18 +198,20 @@ public class ValueNodeProcessor extends NodeProcessor {
      * 判断表达式是否是码值
      *
      * @param expr
-     * @return
+     * @return 码值code(多个时以逗号分隔)
      */
-    public boolean isCode(String expr) {
+    public String isCode(String expr) {
         List<String> list = Arrays.asList(expr.substring(expr.indexOf("'") + 1, expr.lastIndexOf("'")).split("'\\s*,\\s*'"));
 
+        List<String> codes = new ArrayList<>();
         Matcher matcher;
         for (String s : list) {
             matcher = PATTERN_CODE.matcher(s);
             if (!matcher.matches()) {
-                return false;
+                return null;
             }
+            codes.add(matcher.group(1));
         }
-        return true;
+        return String.join(",", codes);
     }
 }

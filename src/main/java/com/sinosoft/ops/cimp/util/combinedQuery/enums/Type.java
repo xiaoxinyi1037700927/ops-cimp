@@ -12,6 +12,8 @@ public enum Type {
     CODE("码值", 1 << 7),
     UNKNOWN("未知类型", 1 << 8),
     ALL_FIELD_TYPE("所有字段类型", STRING.code | NUMBER.code | DATE.code | LOB.code | CODE.code),
+    ALL_FIELD_TYPE_WITHOUT_CODE("除了码值的字段类型", STRING.code | NUMBER.code | DATE.code | LOB.code),
+    SRING_NUMBBER("数字和字符串", STRING.code | NUMBER.code),
     ALL("所有类型", (1 << 30) - 1);
 
     private String name;

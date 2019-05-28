@@ -17,6 +17,7 @@ public class ValueNode extends Node {
     private boolean isCode;
     private boolean isArray;
     private int returnType;
+    private String codeSetName;
 
     public ValueNode(List<String> values, List<String> codeNames, boolean isCode, boolean isArray, int returnType) {
         super(true, new int[]{});
@@ -83,5 +84,13 @@ public class ValueNode extends Node {
 
     public boolean isArray() {
         return isArray;
+    }
+
+    public String getCodeSetName() {
+        return codeSetName;
+    }
+
+    public void setCodeSetName(String codeSetName) {
+        this.codeSetName = codeSetName;
     }
 }

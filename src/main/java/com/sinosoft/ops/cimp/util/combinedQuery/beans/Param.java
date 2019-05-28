@@ -29,6 +29,15 @@ public class Param {
 
     private String fieldId;
 
+    /**
+     * 参数类型
+     */
+    private String type = Type.VALUE.getName();
+
+    private String codeSetName;
+
+    private boolean multiselect;
+
     public String getId() {
         return id;
     }
@@ -91,5 +100,46 @@ public class Param {
 
     public void setFieldId(String fieldId) {
         this.fieldId = fieldId;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getCodeSetName() {
+        return codeSetName;
+    }
+
+    public void setCodeSetName(String codeSetName) {
+        this.codeSetName = codeSetName;
+    }
+
+    public boolean isMultiselect() {
+        return multiselect;
+    }
+
+    public void setMultiselect(boolean multiselect) {
+        this.multiselect = multiselect;
+    }
+
+    public enum Type {
+        FUNCTION("function"),
+        FIELD("field"),
+        CODE("code"),
+        VALUE("value");
+
+        private String name;
+
+        Type(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
     }
 }

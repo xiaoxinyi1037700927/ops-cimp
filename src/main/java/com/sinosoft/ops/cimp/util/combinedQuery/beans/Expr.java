@@ -18,6 +18,10 @@ public class Expr {
 
     private List<Expr> subExprs;
 
+    private boolean compilePass = true;
+
+    private String wrongMessage;
+
     public String getId() {
         return id;
     }
@@ -72,5 +76,21 @@ public class Expr {
 
     public void setSubExprs(List<Expr> subExprs) {
         this.subExprs = subExprs;
+    }
+
+    public boolean isCompilePass() {
+        return compilePass;
+    }
+
+    public void setCompilePass(boolean compilePass) {
+        this.compilePass = compilePass;
+    }
+
+    public String getWrongMessage() {
+        return wrongMessage;
+    }
+
+    public void setWrongMessage(String wrongMessage) {
+        this.wrongMessage = wrongMessage;
     }
 }

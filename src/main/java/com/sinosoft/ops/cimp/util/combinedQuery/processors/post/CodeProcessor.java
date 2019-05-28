@@ -1,4 +1,4 @@
-package com.sinosoft.ops.cimp.util.combinedQuery.processors.code;
+package com.sinosoft.ops.cimp.util.combinedQuery.processors.post;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sinosoft.ops.cimp.entity.sys.syscode.QSysCodeItem;
@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class CodeProcessor {
+public class CodeProcessor implements PostProcessor {
 
     private final JPAQueryFactory jpaQueryFactory;
     private final InProcessor inProcessor;
@@ -28,6 +28,30 @@ public class CodeProcessor {
         this.inProcessor = inProcessor;
     }
 
+    /**
+     * 获取代码集
+     *
+     * @param codeSetId
+     * @return
+     */
+    private List<SysCodeItem> getCodeItems(int codeSetId) {
+        QSysCodeItem qItem = QSysCodeItem.sysCodeItem;
+        return jpaQueryFactory.select(qItem).from(qItem)
+                .where(qItem.codeSetId.eq(codeSetId).and(qItem.status.eq(0)))
+                .orderBy(qItem.ordinal.asc()).fetch();
+
+    }
+
+    /**
+     * 处理器是否支持节点
+     *
+     * @param node
+     * @return
+     */
+    @Override
+    public boolean support(Node node) {
+        return node instanceof OperatorNode;
+    }
 
     /**
      * 码值转换，获取sql之前调用
@@ -36,7 +60,9 @@ public class CodeProcessor {
      * @param node
      * @throws CombinedQueryParseException
      */
-    public void processCode(OperatorNode node) throws CombinedQueryParseException {
+    @Override
+    public void postProcessorBeforeGetSql(Node node) throws CombinedQueryParseException {
+        OperatorNode oNode = (OperatorNode) node;
         List<Node> subNodes = node.getSubNodes();
 
         Node first = subNodes.get(0);
@@ -49,11 +75,10 @@ public class CodeProcessor {
         List<SysCodeItem> sysCodeItem = getCodeItems(((FieldNode) first).getCodeSetId());
         CodeSet codeSet = new CodeSet(codeSetName, sysCodeItem);
 
-
         List<String> codes = new ArrayList<>();
         String code = ((ValueNode) subNodes.get(1)).getValues().get(0);
         try {
-            switch (node.getProcessor().getOperator()) {
+            switch (oNode.getProcessor().getOperator()) {
                 case EQ:
                     codeSet.getCodesByEq(code, codeSet.getItems(), codes);
                     break;
@@ -82,7 +107,7 @@ public class CodeProcessor {
                     codeSet.getCodesByNotIn((((ValueNode) subNodes.get(1)).getValues()), codes);
                     break;
                 default:
-                    break;
+                    return;
             }
 
             if (codes.size() == 0) {
@@ -90,29 +115,14 @@ public class CodeProcessor {
             }
 
             //将操作符替换为in
-            node.setProcessor(inProcessor);
-            node.getSubNodes().clear();
-            node.getSubNodes().add(first);
+            oNode.setProcessor(inProcessor);
+            oNode.getSubNodes().clear();
+            oNode.getSubNodes().add(first);
             ValueNode valueNode = new ValueNode(codes, null, true, true, Type.CODE.getCode());
-            node.getSubNodes().add(valueNode);
+            oNode.getSubNodes().add(valueNode);
 
         } catch (Exception e) {
             throw new CombinedQueryParseException("码值转换失败！");
         }
-    }
-
-
-    /**
-     * 获取代码集
-     *
-     * @param codeSetId
-     * @return
-     */
-    private List<SysCodeItem> getCodeItems(int codeSetId) {
-        QSysCodeItem qItem = QSysCodeItem.sysCodeItem;
-        return jpaQueryFactory.select(qItem).from(qItem)
-                .where(qItem.codeSetId.eq(codeSetId).and(qItem.status.eq(0)))
-                .orderBy(qItem.ordinal.asc()).fetch();
-
     }
 }

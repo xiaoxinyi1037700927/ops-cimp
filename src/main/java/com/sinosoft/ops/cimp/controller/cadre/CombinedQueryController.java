@@ -26,8 +26,8 @@ public class CombinedQueryController extends BaseController {
     @ApiOperation(value = "获取函数列表")
     @PostMapping("/functions")
     @RequiresAuthentication
-    public ResponseEntity getFunctions() throws BusinessException {
-        return ok(combinedQueryService.getFunctions());
+    public ResponseEntity getFunctions(@RequestBody FunctionSearchModel searchModel) throws BusinessException {
+        return ok(combinedQueryService.getFunctions(searchModel));
     }
 
 
@@ -114,13 +114,6 @@ public class CombinedQueryController extends BaseController {
         return ok(combinedQueryService.statisticsExpr(combinedQueryId));
     }
 
-    @ApiOperation(value = "获取表达式sql")
-    @PostMapping("/sql")
-    @RequiresAuthentication
-    public ResponseEntity getsql(@RequestParam String combinedQueryId) throws BusinessException {
-        return ok(combinedQueryService.getsql(combinedQueryId));
-    }
-
     @ApiOperation(value = "保存组合查询")
     @PostMapping("/save")
     @RequiresAuthentication
@@ -129,10 +122,4 @@ public class CombinedQueryController extends BaseController {
         return ok("保存成功");
     }
 
-    @ApiOperation(value = "获取干部列表")
-    @PostMapping("/cadre/list")
-    @RequiresAuthentication
-    public ResponseEntity listCadre(@RequestBody CadreSearchModel searchModel) throws BusinessException {
-        return ok(combinedQueryService.listCadre(searchModel));
-    }
 }

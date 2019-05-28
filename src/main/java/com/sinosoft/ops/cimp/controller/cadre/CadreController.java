@@ -8,13 +8,17 @@ import com.sinosoft.ops.cimp.common.BaseResult;
 import com.sinosoft.ops.cimp.constant.OpsErrorMessage;
 import com.sinosoft.ops.cimp.constant.RolePermissionPageSqlEnum;
 import com.sinosoft.ops.cimp.controller.BaseController;
+import com.sinosoft.ops.cimp.entity.combinedQuery.CombinedQuery;
 import com.sinosoft.ops.cimp.entity.user.User;
 import com.sinosoft.ops.cimp.entity.user.UserRole;
 import com.sinosoft.ops.cimp.exception.BusinessException;
+import com.sinosoft.ops.cimp.repository.combinedQuery.CombinedQueryRepository;
 import com.sinosoft.ops.cimp.service.cadre.CadreService;
 import com.sinosoft.ops.cimp.service.user.RolePermissionPageSqlService;
 import com.sinosoft.ops.cimp.util.JsonUtil;
 import com.sinosoft.ops.cimp.util.SecurityUtils;
+import com.sinosoft.ops.cimp.util.combinedQuery.CombinedQueryParser;
+import com.sinosoft.ops.cimp.util.combinedQuery.beans.CombinedQueryParseException;
 import com.sinosoft.ops.cimp.vo.from.cadre.CadreOrgModifyModel;
 import com.sinosoft.ops.cimp.vo.from.cadre.CadreSortInDepModifyModel;
 import com.sinosoft.ops.cimp.vo.from.cadre.CadreStatusModifyModel;
@@ -50,12 +54,16 @@ public class CadreController extends BaseController {
     private final RolePermissionPageSqlService rolePermissionPageSqlService;
     private final JdbcTemplate jdbcTemplate;
     private final CadreService cadreService;
+    private final CombinedQueryParser parser;
+    private final CombinedQueryRepository combinedQueryRepository;
 
     @Autowired
-    public CadreController(RolePermissionPageSqlService rolePermissionPageSqlService, JdbcTemplate jdbcTemplate, CadreService cadreService) {
+    public CadreController(RolePermissionPageSqlService rolePermissionPageSqlService, JdbcTemplate jdbcTemplate, CadreService cadreService, CombinedQueryParser parser, CombinedQueryRepository combinedQueryRepository) {
         this.rolePermissionPageSqlService = rolePermissionPageSqlService;
         this.jdbcTemplate = jdbcTemplate;
         this.cadreService = cadreService;
+        this.parser = parser;
+        this.combinedQueryRepository = combinedQueryRepository;
     }
 
     @ApiOperation(value = "查询干部列表")
@@ -65,7 +73,8 @@ public class CadreController extends BaseController {
             @RequestParam("deptId") String deptId,
             @RequestParam("includeSubNode") String includeSubNode,
             @RequestParam("pageIndex") String pageIndex,
-            @RequestParam("pageSize") String pageSize) throws BusinessException {
+            @RequestParam("pageSize") String pageSize,
+            @RequestParam(value = "combinedQueryId", required = false) String combinedQueryId) throws BusinessException {
 
         if (StringUtils.isEmpty(pageIndex) || StringUtils.equals(pageIndex, "0")) {
             pageIndex = "1";
@@ -100,6 +109,20 @@ public class CadreController extends BaseController {
                     .replaceAll("\\$\\{endIndex\\}", endIndex);
 
             String execCadreCountSql = execCountSql.replaceAll("\\$\\{deptId\\}", deptId);
+
+            //组合查询
+            if (StringUtils.isNotEmpty(combinedQueryId)) {
+                Optional<CombinedQuery> optional = combinedQueryRepository.findById(combinedQueryId);
+                if (optional.isPresent()) {
+                    try {
+                        String combinedQuerySql = parser.parseSql(optional.get().getExpression());
+                        execCadreListSql = execCadreListSql.replaceAll("(?i)order by", combinedQuerySql + " ORDER BY");
+                        execCadreCountSql += combinedQuerySql;
+                    } catch (CombinedQueryParseException e) {
+                        throw new BusinessException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE, "组合查询解析失败，请核对组合查询信息!");
+                    }
+                }
+            }
 
             List<Map<String, Object>> mapList = jdbcTemplate.queryForList(execCadreListSql);
             Map<String, Object> countMap = jdbcTemplate.queryForMap(execCadreCountSql);

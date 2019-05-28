@@ -2,7 +2,6 @@ package com.sinosoft.ops.cimp.service.cadre;
 
 import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.vo.from.cadre.combinedQuery.*;
-import com.sinosoft.ops.cimp.vo.to.cadre.CadreDataVO;
 import com.sinosoft.ops.cimp.vo.to.cadre.combinedQuery.*;
 
 import java.util.List;
@@ -13,8 +12,9 @@ public interface CombinedQueryService {
      * 获取组合查询支持的函数
      *
      * @return
+     * @param searchModel
      */
-    List<FunctionModel> getFunctions();
+    List<FunctionModel> getFunctions(FunctionSearchModel searchModel);
 
     /**
      * 获取组合查询支持的运算符
@@ -104,12 +104,6 @@ public interface CombinedQueryService {
      */
     ExprStatisticsModel statisticsExpr(String combinedQueryId);
 
-    /**
-     * @param combinedQueryId
-     * @return
-     */
-    String getsql(String combinedQueryId);
-
 
     /**
      * 保存组合查询
@@ -119,12 +113,4 @@ public interface CombinedQueryService {
      */
     void saveCombinedQuery(ExprSaveModel saveModel) throws BusinessException;
 
-    /**
-     * 获取干部列表
-     *
-     * @param searchModel
-     * @return
-     * @throws BusinessException
-     */
-    CadreDataVO listCadre(CadreSearchModel searchModel) throws BusinessException;
 }
