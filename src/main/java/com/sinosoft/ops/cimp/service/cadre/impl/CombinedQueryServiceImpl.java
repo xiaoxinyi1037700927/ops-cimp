@@ -81,12 +81,14 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
     /**
      * 获取组合查询支持的函数
      *
+     * @param searchModel
      * @return
      */
     @Override
-    public List<FunctionModel> getFunctions() {
+    public List<FunctionModel> getFunctions(FunctionSearchModel searchModel) {
+        String userId = SecurityUtils.getSubject().getCurrentUser().getId();
+        //获取全部函数
         List<FunctionModel> result = new ArrayList<>();
-
         for (Function function : Function.values()) {
             FunctionModel model = new FunctionModel();
             model.setName(function.getName());
@@ -99,7 +101,83 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
             result.add(model);
         }
 
+        //过滤函数
+        List<Expr> exprs = getCache(userId, searchModel.getCombinedQueryId());
+        Expr expr = getExpr(exprs, searchModel.getExprId());
+
+        if (expr != null) {
+            filterFunction(result, expr.getParams(), null, searchModel);
+        }
+
         return result;
+    }
+
+    /**
+     * 过滤函数
+     *
+     * @param result
+     * @param params
+     * @param parent
+     * @param searchModel
+     * @return
+     */
+    private boolean filterFunction(List<FunctionModel> result, List<Param> params, Param parent, FunctionSearchModel searchModel) {
+        for (int i = 0; i < params.size(); i++) {
+            Param param = params.get(i);
+            if (param.getId().equals(searchModel.getParamId())) {
+                Iterator<FunctionModel> iterator = result.iterator();
+                while (iterator.hasNext()) {
+                    FunctionModel function = iterator.next();
+                    if (searchModel.getAddOrUpdate() == 0) {
+                        //新增函数
+
+                        //参数为空字符串时，可以加任意函数，不为空时，根据参数类型过滤
+                        if (StringUtils.isNotEmpty(param.getText()) && (function.getParamsNum() == 0 || (function.getParamsType().get(0).getCode() & param.getReturnType()) == 0)) {
+                            iterator.remove();
+                            continue;
+                        }
+                    } else {
+                        //编辑函数
+
+                        //判断参数个数是否和原来一样
+                        if (param.getParams().size() != function.getParamsType().size()) {
+                            iterator.remove();
+                            continue;
+                        }
+
+                        //判断各个参数类型是否匹配
+                        boolean isMatch = true;
+                        for (int j = 0; j < function.getParamsType().size(); j++) {
+                            if ((function.getParamsType().get(j).getCode() & param.getParams().get(j).getReturnType()) == 0) {
+                                isMatch = false;
+                                break;
+                            }
+                        }
+                        if(!isMatch){
+                            iterator.remove();
+                            continue;
+                        }
+                    }
+
+                    //如果有外层函数，判断返回类型是否一样
+                    if (parent != null) {
+                        //获取上级函数
+                        Function func = Function.getByName(parent.getFunctionName());
+
+                        if ((func.getParamsType()[i] & function.getReturnType().getCode()) == 0) {
+                            iterator.remove();
+                        }
+                    }
+                }
+            }
+
+            //递归处理下一级
+            if (param.getIsFunction() == 1 && filterFunction(result, param.getParams(), param, searchModel)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

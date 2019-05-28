@@ -26,8 +26,8 @@ public class CombinedQueryController extends BaseController {
     @ApiOperation(value = "获取函数列表")
     @PostMapping("/functions")
     @RequiresAuthentication
-    public ResponseEntity getFunctions() throws BusinessException {
-        return ok(combinedQueryService.getFunctions());
+    public ResponseEntity getFunctions(@RequestBody FunctionSearchModel searchModel) throws BusinessException {
+        return ok(combinedQueryService.getFunctions(searchModel));
     }
 
 

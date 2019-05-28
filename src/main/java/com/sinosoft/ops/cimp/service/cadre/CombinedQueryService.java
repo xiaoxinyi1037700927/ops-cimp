@@ -12,8 +12,9 @@ public interface CombinedQueryService {
      * 获取组合查询支持的函数
      *
      * @return
+     * @param searchModel
      */
-    List<FunctionModel> getFunctions();
+    List<FunctionModel> getFunctions(FunctionSearchModel searchModel);
 
     /**
      * 获取组合查询支持的运算符
