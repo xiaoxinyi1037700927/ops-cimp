@@ -71,7 +71,6 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
                     o = exprs;
                 } catch (CombinedQueryParseException e) {
                     e.printStackTrace();
-                    return null;
                 }
             }
         }
@@ -287,10 +286,13 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
                 param.setTableId(node.getTableId());
                 param.setFieldId(node.getFieldId());
                 param.setReturnType(node.getReturnType());
+                param.setType(Param.Type.FIELD.getName());
             } else if (valueNodeProcessor.isCode(text)) {
                 //码值
                 param.setReturnType(Type.CODE.getCode());
+                param.setType(Param.Type.CODE.getName());
             } else {
+                param.setType(Param.Type.VALUE.getName());
                 try {
                     //判断输入值是否可转为数字
                     new BigDecimal(text.substring(text.indexOf("'") + 1, text.lastIndexOf("'")));
@@ -388,6 +390,7 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
             newFunction.setId(IdUtil.uuid());
             newFunction.setIsFunction(1);
             newFunction.setFunctionName(appendModel.getFunctionName());
+            newFunction.setType(Param.Type.FUNCTION.getName());
 
 
             Function func = Function.getByName(appendModel.getFunctionName());
@@ -599,10 +602,6 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
      * @return
      */
     private Expr getExpr(List<Expr> exprs, String id) {
-        if (exprs == null || exprs.size() == 0) {
-            return null;
-        }
-
         for (Expr expr : exprs) {
             if (expr.getId().equals(id)) {
                 return expr;

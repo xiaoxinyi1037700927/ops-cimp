@@ -8,6 +8,7 @@ import com.sinosoft.ops.cimp.util.combinedQuery.beans.Param;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.*;
 import com.sinosoft.ops.cimp.util.combinedQuery.enums.LogicalOperator;
 import com.sinosoft.ops.cimp.util.combinedQuery.enums.Operator;
+import com.sinosoft.ops.cimp.util.combinedQuery.enums.Type;
 import com.sinosoft.ops.cimp.util.combinedQuery.processors.code.CodeProcessor;
 import com.sinosoft.ops.cimp.util.combinedQuery.processors.nodes.NodeProcessor;
 import com.sinosoft.ops.cimp.util.combinedQuery.processors.nodes.OperatorNodeProcessor;
@@ -36,6 +37,7 @@ public class CombinedQueryParser {
      * 将表达式树解析为表达式
      *
      * @param exprs
+     * @param format
      * @return
      */
     public String parseExprStr(List<Expr> exprs, boolean format) {
@@ -180,6 +182,7 @@ public class CombinedQueryParser {
         param.setReturnType(node.getReturnType());
 
         if (node instanceof FunctionNode) {
+            param.setType(Param.Type.FUNCTION.getName());
             param.setIsFunction(1);
             param.setFunctionName(((FunctionNode) node).getProcessor().getFunction().getName());
 
@@ -189,8 +192,13 @@ public class CombinedQueryParser {
             }
             param.setParams(params);
         } else if (node instanceof FieldNode) {
+            param.setType(Param.Type.FIELD.getName());
             param.setTableId(((FieldNode) node).getTableId());
             param.setFieldId(((FieldNode) node).getFieldId());
+        } else if (node.getReturnType() == Type.CODE.getCode()) {
+            param.setType(Param.Type.CODE.getName());
+        } else {
+            param.setType(Param.Type.VALUE.getName());
         }
 
         return param;
@@ -319,7 +327,9 @@ public class CombinedQueryParser {
             Node next = node;
             do {
                 next = processor.pushNode(stack, next);
-                processor = getNodeProcessor(next);
+                if (next != null) {
+                    processor = getNodeProcessor(next);
+                }
             } while (next != null);
 
 
@@ -388,9 +398,6 @@ public class CombinedQueryParser {
      * 获取节点处理器
      */
     private NodeProcessor getNodeProcessor(Node node) throws CombinedQueryParseException {
-        if (node == null) {
-            return null;
-        }
         for (NodeProcessor nodeProcessor : nodeProcessors) {
             if (nodeProcessor.support(node)) {
                 return nodeProcessor;
