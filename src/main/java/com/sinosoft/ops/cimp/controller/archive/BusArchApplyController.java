@@ -76,8 +76,9 @@ public class BusArchApplyController  extends BaseController {
 				bap.setId(personid);
 				bap.setEmpid(temp.getString("empid"));
 				bap.setName(temp.getString("name"));
-				bap.setPost(temp.getString("position"));
+				bap.setPost(temp.getString("post"));
 				bap.setDepid(temp.getString("depid"));
+				bap.setA001003(temp.getString("a001003"));
 				bap.setOrdinal(i); i++;
 				baplist.add(bap);
 				
@@ -183,8 +184,9 @@ public class BusArchApplyController  extends BaseController {
 				bap.setId(personid);
 				bap.setEmpid(temp.getString("empid"));
 				bap.setName(temp.getString("name"));
-				bap.setPost(temp.getString("position"));
+				bap.setPost(temp.getString("post"));
 				bap.setDepid(temp.getString("depid"));
+				bap.setA001003(temp.getString("a001003"));
 				bap.setOrdinal(i); i++;
 				baplist.add(bap);
 				
@@ -260,7 +262,7 @@ public class BusArchApplyController  extends BaseController {
 		try {
 
 			String reason ="";
-			if(request.getParameter("reason")!=null&&request.getParameter("reason").equals(""))reason =request.getParameter("reason");
+			if(request.getParameter("reason")!=null)reason =request.getParameter("reason");
 			String userid = SecurityUtils.getSubject().getCurrentUser().getId();
 			String username = SecurityUtils.getSubject().getCurrentUser().getLoginName();
 

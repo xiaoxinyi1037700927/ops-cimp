@@ -39,7 +39,7 @@ public class BusinessServiceImpl  implements BusinessService {
 	@Override
 	@Transactional(readOnly=true)
 	public List<PersonAndPost> getPersonAndPostByDepid(String Depid) {
-		String sql = "select t1.emp_id,t1.a01001,A02016_A from EMP_A001 t1  left join (   select *  " +
+		String sql = "select t1.emp_id,t1.a01001,A02016_A,A001003 from EMP_A001 t1  left join (   select *  " +
 				"from (select row_number() over(partition by a02_b.emp_id order by a02_b.A02025 desc) rownumber, " +
 				"a02_b.*  from EMP_A02 a02_b  where a02_b.status = 0 and a02_b.A02055='2') a02_a " +
 				"where a02_a.rownumber = 1  ) a02 on t1.emp_id = a02.emp_id " +
@@ -51,6 +51,7 @@ public class BusinessServiceImpl  implements BusinessService {
 		List<PersonAndPost> result = Lists.newArrayList();
 		List<Map<String, Object>> maps = jdbcTemplate.queryForList(sql, Depid,Depid);
 		for (Map<String, Object> map : maps) {
+			Object  a001003= map.get("A001003");
 			Object emp_id = map.get("emp_id");
 			Object a01001 = map.get("a01001");
 			Object a02016_a = map.get("A02016_A");
@@ -62,6 +63,9 @@ public class BusinessServiceImpl  implements BusinessService {
 				}
 				if (a02016_a != null) {
 					personAndPost.setPost(String.valueOf(a02016_a));
+				}
+				if (a001003 != null) {
+					personAndPost.setName(String.valueOf(a001003));
 				}
 				result.add(personAndPost);
 			}
@@ -131,7 +135,7 @@ public class BusinessServiceImpl  implements BusinessService {
 		for (HashMap<String, Object> cate0 : materialCategoryAndMaterialList) {
 			if (cate0.get("children") != null) {
 				List<HashMap<String, Object>> tempmap1 = (List<HashMap<String, Object>>) cate0.get("children");
-				if (tempmap1.get(0).get("leaf").toString().equals("false")) {
+		 		if (tempmap1.get(0).get("leaf").toString().equals("false")) {
 					for (HashMap<String, Object> cate1 : tempmap1) {
 						List<ArchiveMaterial> listArch = archiveMaterialRepository.findAllByEmpIdAndCategoryIdOrderBySeqNum(empId,
 								cate1.get("categoryId").toString());

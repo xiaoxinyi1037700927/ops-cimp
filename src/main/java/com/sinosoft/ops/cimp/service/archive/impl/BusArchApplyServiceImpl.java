@@ -4,15 +4,12 @@ import com.sinosoft.ops.cimp.entity.archive.BusArchApply;
 import com.sinosoft.ops.cimp.entity.archive.BusArchApplyDetail;
 import com.sinosoft.ops.cimp.entity.archive.BusArchApplyPerson;
 import com.sinosoft.ops.cimp.entity.user.Role;
-import com.sinosoft.ops.cimp.entity.user.UserRole;
 import com.sinosoft.ops.cimp.repository.archive.busarch.BusArchApplyDetailRepository;
 import com.sinosoft.ops.cimp.repository.archive.busarch.BusArchApplyPersonRepository;
 import com.sinosoft.ops.cimp.repository.archive.busarch.BusArchApplyRepository;
-import com.sinosoft.ops.cimp.repository.user.UserRoleRepository;
 import com.sinosoft.ops.cimp.service.archive.BusArchApplyService;
 import com.sinosoft.ops.cimp.service.archive.BusinessService;
 import com.sinosoft.ops.cimp.service.user.UserRoleService;
-import oracle.sql.RAW;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -116,7 +113,7 @@ public class BusArchApplyServiceImpl implements BusArchApplyService {
 		else
 		{
 			List<Role> roles =  userRoleService.getRolesByUserId(userid);
-			if (roles.size()>0 && roles.stream().filter(temp -> temp.getCode().equals("90")).count() > 0) {
+			if (roles.size()>0 && roles.stream().filter(temp -> temp.getCode().equals("13")).count() > 0) {
 				listBus = busArchApplyRepository.findAllByVerifyType();
 				for(BusArchApply busArchApply:listBus)
 				{
@@ -154,8 +151,9 @@ public class BusArchApplyServiceImpl implements BusArchApplyService {
 			map.put("personid",bap.getId());
 			map.put("empid",bap.getEmpid());
 			map.put("name",bap.getName());
-			map.put("position",bap.getPost());
+			map.put("post",bap.getPost());
 			map.put("depid",bap.getDepid());
+			map.put("a001003",bap.getA001003());
 			List<HashMap<String, Object>> nextchild = getDetailArray(bap.getId());
 			if(nextchild!=null&& nextchild.size()>0)
 			{
@@ -187,6 +185,7 @@ public class BusArchApplyServiceImpl implements BusArchApplyService {
 	public List<HashMap<String, Object>> getTreeByApplyId(String applyid,String empid)
 	{
 		List<HashMap<String, Object>> listpm = businessService.getPersonMaterial(empid);
+		System.out.println(listpm);
 		List<BusArchApplyPerson> listbap =  busArchApplyPersonRepository.findAllByApplyId(applyid);
 		
 		String strPersonId=null;

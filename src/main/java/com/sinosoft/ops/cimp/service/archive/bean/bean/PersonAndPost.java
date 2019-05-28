@@ -5,6 +5,15 @@ public class PersonAndPost {
 	private  String emp_id;
 	private  String name;
 	private  String post;
+	private String a001003;
+
+	public String getA001003() {
+		return a001003;
+	}
+
+	public void setA001003(String a001003) {
+		this.a001003 = a001003;
+	}
 	public String getempid() {
 		return emp_id;
 	}

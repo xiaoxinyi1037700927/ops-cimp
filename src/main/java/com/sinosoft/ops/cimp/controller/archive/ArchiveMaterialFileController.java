@@ -1,14 +1,10 @@
 package com.sinosoft.ops.cimp.controller.archive;
 
 
-import com.mongodb.gridfs.GridFSDBFile;
 import com.sinosoft.ops.cimp.annotation.ArchiveApiGroup;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.entity.archive.ArchiveMaterialFile;
 import com.sinosoft.ops.cimp.exception.BusinessException;
-import com.sinosoft.ops.cimp.repository.archive.ex.CannotFindMongoDbResourceById;
-import com.sinosoft.ops.cimp.repository.archive.ex.DownloadResourceFromMongoDbError;
-import com.sinosoft.ops.cimp.repository.archive.ex.UploadResourceToMongoDbError;
 import com.sinosoft.ops.cimp.repository.archive.impl.MongoDbDaoImpl;
 import com.sinosoft.ops.cimp.service.archive.ArchiveMaterialFileService;
 import com.sinosoft.ops.cimp.service.archive.ArchiveMaterialService;
@@ -21,7 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
@@ -150,7 +145,6 @@ public class ArchiveMaterialFileController extends BaseController {
             String archiveMaterialId = request.getParameter("archiveMaterialId");
             String pageNo = request.getParameter("pageNo");
             String type = request.getParameter("type");
-
             if (StringUtil.isEmptyOrNull(pageNo)) {
                 pageNo = "1";
             }
