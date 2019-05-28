@@ -111,7 +111,7 @@ public class FieldNodeProcessor extends NodeProcessor {
     private SysTableInfo getTable(String tableName) throws CombinedQueryParseException {
         try {
             for (SysTableInfo table : sysTableInfoDao.getTableInfo("cadreInfo").getTables()) {
-                if (table.getNameCn().equals(tableName) || table.getNameEn().equalsIgnoreCase(tableName) || table.getDbTableName().equalsIgnoreCase(tableName)) {
+                if (tableName.equals(table.getNameCn()) || tableName.equalsIgnoreCase(table.getNameEn()) || tableName.equalsIgnoreCase(table.getDbTableName())) {
                     return table;
                 }
             }
@@ -130,7 +130,7 @@ public class FieldNodeProcessor extends NodeProcessor {
      */
     private SysTableFieldInfo getSysTableField(SysTableInfo table, String fieldName) {
         for (SysTableFieldInfo field : table.getTableFields()) {
-            if (field.getNameCn().equals(fieldName) || field.getNameEn().equalsIgnoreCase(fieldName) || field.getDbFieldName().equalsIgnoreCase(fieldName)) {
+            if (fieldName.equals(field.getNameCn()) || fieldName.equalsIgnoreCase(field.getNameEn()) || fieldName.equalsIgnoreCase(field.getDbFieldName())) {
                 return field;
             }
         }

@@ -254,7 +254,10 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
             processParams(newExpr.getParams(), appendModel.getOperator());
         }
         newExpr.setText(parser.parseExprStr(Collections.singletonList(newExpr), false));
-        newExpr.setCompilePass(parser.compile(newExpr.getText()));
+
+        //编译表达式
+        newExpr.setWrongMessage(parser.compile(newExpr.getText()));
+        newExpr.setCompilePass(newExpr.getWrongMessage() == null);
 
 
         //添加表达式
@@ -313,7 +316,7 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
                         param.setReturnType(Type.STRING.getCode());
                     }
                 }
-            } catch (CombinedQueryParseException e) {
+            } catch (Exception e) {
                 param.setReturnType(Type.UNKNOWN.getCode());
             }
         }
@@ -362,7 +365,9 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
 
         //刷新表达式下所有text
         parser.refreshText(expr);
-        expr.setCompilePass(parser.compile(expr.getText()));
+        //编译表达式
+        expr.setWrongMessage(parser.compile(expr.getText()));
+        expr.setCompilePass(expr.getWrongMessage() == null);
 
         putCache(userId, combinedQueryId, exprs);
 
@@ -448,7 +453,9 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
         //刷新表达式下所有text
         parser.refreshText(expr);
 
-        expr.setCompilePass(parser.compile(expr.getText()));
+        //编译表达式
+        expr.setWrongMessage(parser.compile(expr.getText()));
+        expr.setCompilePass(expr.getWrongMessage() == null);
 
         putCache(userId, combinedQueryId, exprs);
 
@@ -524,7 +531,9 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
         //刷新表达式下所有text
         parser.refreshText(expr);
 
-        expr.setCompilePass(parser.compile(expr.getText()));
+        //编译表达式
+        expr.setWrongMessage(parser.compile(expr.getText()));
+        expr.setCompilePass(expr.getWrongMessage() == null);
 
         putCache(userId, combinedQueryId, exprs);
 
@@ -604,7 +613,6 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
                 return true;
             }
         }
-
 
         return false;
     }
@@ -750,7 +758,6 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
 
         combinedQueryRepository.save(combinedQuery);
     }
-
 
     /**
      * 统计表达式数量

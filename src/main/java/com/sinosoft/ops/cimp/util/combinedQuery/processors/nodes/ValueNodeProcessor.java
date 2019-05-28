@@ -8,9 +8,9 @@ import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.FieldNode;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.Node;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.ValueNode;
 import com.sinosoft.ops.cimp.util.combinedQuery.enums.Type;
+import com.sinosoft.ops.cimp.util.combinedQuery.utils.CombinedQueryUtil;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Deque;
@@ -96,13 +96,7 @@ public class ValueNodeProcessor extends NodeProcessor {
             } else {
                 values.add(s);
 
-                //判断值是不是number类型
-                try {
-                    new BigDecimal(s);
-                    returnType |= Type.NUMBER.getCode();
-                } catch (Exception e) {
-                    returnType |= Type.STRING.getCode();
-                }
+                returnType |= CombinedQueryUtil.getValueType(s);
             }
         }
 
@@ -111,7 +105,7 @@ public class ValueNodeProcessor extends NodeProcessor {
             throw new CombinedQueryParseException("码值和非码值不能同时存在：" + expr);
         }
 
-        if (returnType != Type.NUMBER.getCode() && returnType != Type.STRING.getCode() && returnType != Type.CODE.getCode()) {
+        if (CombinedQueryUtil.getTypeNum(returnType) != 1) {
             //如果存在多个类型的值，统一作为字符串处理
             returnType = Type.STRING.getCode();
         }

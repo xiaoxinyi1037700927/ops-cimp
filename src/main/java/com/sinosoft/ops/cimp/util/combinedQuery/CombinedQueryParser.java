@@ -293,15 +293,14 @@ public class CombinedQueryParser {
      * @param exprStr
      * @return
      */
-    public boolean compile(String exprStr) {
+    public String compile(String exprStr) {
         try {
             String sql = parseSql(exprStr);
             System.out.println(sql);
-            return true;
         } catch (CombinedQueryParseException e) {
-//            e.printStackTrace();
+            return e.getMessage();
         }
-        return false;
+        return null;
     }
 
 
@@ -338,14 +337,7 @@ public class CombinedQueryParser {
 
             //节点入栈
             //先入栈后处理子节点是为了保证子节点的添加顺序
-            Node next = node;
-            do {
-                next = processor.pushNode(stack, next);
-                if (next != null) {
-                    processor = getNodeProcessor(next);
-                }
-            } while (next != null);
-
+            pushNode(stack, node);
 
             //处理子节点
             if (node.getSubNodeExpr().size() > 0) {
@@ -354,7 +346,7 @@ public class CombinedQueryParser {
                 }
                 if (stack.peek().equals(node)) {
                     node = stack.pop();
-                    getNodeProcessor(node).pushNode(stack, node);
+                    pushNode(stack, node);
                 }
             }
         }
@@ -378,6 +370,13 @@ public class CombinedQueryParser {
         }
 
         return node;
+    }
+
+    private void pushNode(Deque<Node> stack, Node node) throws CombinedQueryParseException {
+        while (node != null) {
+            NodeProcessor processor = getNodeProcessor(node);
+            node = processor.pushNode(stack, node);
+        }
     }
 
     /**

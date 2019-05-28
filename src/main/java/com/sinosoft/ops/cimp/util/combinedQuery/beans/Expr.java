@@ -20,6 +20,8 @@ public class Expr {
 
     private boolean compilePass = true;
 
+    private String wrongMessage;
+
     public String getId() {
         return id;
     }
@@ -82,5 +84,13 @@ public class Expr {
 
     public void setCompilePass(boolean compilePass) {
         this.compilePass = compilePass;
+    }
+
+    public String getWrongMessage() {
+        return wrongMessage;
+    }
+
+    public void setWrongMessage(String wrongMessage) {
+        this.wrongMessage = wrongMessage;
     }
 }
