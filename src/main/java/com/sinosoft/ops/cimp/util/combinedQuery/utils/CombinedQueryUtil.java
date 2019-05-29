@@ -7,7 +7,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 public class CombinedQueryUtil {
-    private static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
+    public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
 
     /**
      * 获取值的类型
@@ -18,9 +18,9 @@ public class CombinedQueryUtil {
     public static int getValueType(String value) {
         if (isNumber(value)) {
             return Type.NUMBER.getCode();
-        } /*else if (isDate(value)) {
+        } else if (isDate(value)) {
             return Type.DATE.getCode();
-        }*/
+        }
 
         return Type.STRING.getCode();
     }
