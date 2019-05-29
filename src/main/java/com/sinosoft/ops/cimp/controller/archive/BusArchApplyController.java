@@ -277,8 +277,11 @@ public class BusArchApplyController  extends BaseController {
 			}
 			else
 			{
-				message="通过";
-				verifyType=100;
+				List<Role> roles = userRoleService.getRolesByUserId(userid);
+				if (roles.size()>0 && roles.stream().filter(temp -> temp.getCode().equals("13")).count() > 0) {
+					message="通过";
+					verifyType=100;
+				}
 			}
 
 			BusArchApply entity= new BusArchApply(applyid, userid, username,reason,Timestamp.valueOf(request.getParameter("endTime")), new Timestamp(System.currentTimeMillis()), username);

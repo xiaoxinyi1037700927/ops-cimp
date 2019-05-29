@@ -65,7 +65,7 @@ public class BusinessServiceImpl  implements BusinessService {
 					personAndPost.setPost(String.valueOf(a02016_a));
 				}
 				if (a001003 != null) {
-					personAndPost.setName(String.valueOf(a001003));
+					personAndPost.setA001003(String.valueOf(a001003));
 				}
 				result.add(personAndPost);
 			}
