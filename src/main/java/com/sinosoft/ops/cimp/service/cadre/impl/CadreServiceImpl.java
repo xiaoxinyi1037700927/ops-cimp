@@ -2,19 +2,31 @@ package com.sinosoft.ops.cimp.service.cadre.impl;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.sinosoft.ops.cimp.constant.OpsErrorMessage;
+import com.sinosoft.ops.cimp.constant.RolePermissionPageSqlEnum;
 import com.sinosoft.ops.cimp.dao.SysTableInfoDao;
 import com.sinosoft.ops.cimp.dao.domain.sys.table.SysTableModelInfo;
+import com.sinosoft.ops.cimp.entity.combinedQuery.CombinedQuery;
 import com.sinosoft.ops.cimp.entity.emp.EmpPhoto;
+import com.sinosoft.ops.cimp.entity.user.User;
+import com.sinosoft.ops.cimp.entity.user.UserRole;
 import com.sinosoft.ops.cimp.exception.BusinessException;
+import com.sinosoft.ops.cimp.repository.combinedQuery.CombinedQueryRepository;
 import com.sinosoft.ops.cimp.repository.emp.EmpPhotoRepository;
 import com.sinosoft.ops.cimp.service.cadre.CadreService;
+import com.sinosoft.ops.cimp.service.user.RolePermissionPageSqlService;
 import com.sinosoft.ops.cimp.util.IdUtil;
+import com.sinosoft.ops.cimp.util.JsonUtil;
+import com.sinosoft.ops.cimp.util.SecurityUtils;
+import com.sinosoft.ops.cimp.util.combinedQuery.CombinedQueryParser;
+import com.sinosoft.ops.cimp.util.combinedQuery.beans.CombinedQueryParseException;
 import com.sinosoft.ops.cimp.vo.from.cadre.CadreOrgModifyModel;
+import com.sinosoft.ops.cimp.vo.from.cadre.CadreSearchModel;
 import com.sinosoft.ops.cimp.vo.from.cadre.CadreSortInDepModifyModel;
 import com.sinosoft.ops.cimp.vo.from.cadre.CadreStatusModifyModel;
-import com.sinosoft.ops.cimp.vo.to.cadre.CadreBasicInfoVO;
-import com.sinosoft.ops.cimp.vo.to.cadre.CadreSearchVO;
-import com.sinosoft.ops.cimp.vo.to.cadre.CadreSortInDepModel;
+import com.sinosoft.ops.cimp.vo.from.user.rolePermissionPageSql.RPPageSqlSearchModel;
+import com.sinosoft.ops.cimp.vo.to.cadre.*;
+import com.sinosoft.ops.cimp.vo.to.user.rolePermissionPageSql.RPPageSqlViewModel;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -33,11 +45,164 @@ public class CadreServiceImpl implements CadreService {
     private final JdbcTemplate jdbcTemplate;
     private final EmpPhotoRepository empPhotoRepository;
     private final SysTableInfoDao sysTableInfoDao;
+    private final CombinedQueryParser parser;
+    private final CombinedQueryRepository combinedQueryRepository;
+    private final RolePermissionPageSqlService rolePermissionPageSqlService;
 
-    public CadreServiceImpl(JdbcTemplate jdbcTemplate, EmpPhotoRepository empPhotoRepository, SysTableInfoDao sysTableInfoDao) {
+    public CadreServiceImpl(JdbcTemplate jdbcTemplate, EmpPhotoRepository empPhotoRepository, SysTableInfoDao sysTableInfoDao, CombinedQueryParser parser, CombinedQueryRepository combinedQueryRepository, RolePermissionPageSqlService rolePermissionPageSqlService) {
         this.jdbcTemplate = jdbcTemplate;
         this.empPhotoRepository = empPhotoRepository;
         this.sysTableInfoDao = sysTableInfoDao;
+        this.parser = parser;
+        this.combinedQueryRepository = combinedQueryRepository;
+        this.rolePermissionPageSqlService = rolePermissionPageSqlService;
+    }
+
+
+    /**
+     * 干部列表查询
+     *
+     * @param searchModel
+     * @return
+     * @throws BusinessException
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public CadreDataVO listCadre(CadreSearchModel searchModel) throws BusinessException {
+        int pageIndex = searchModel.getPageIndex() > 0 ? searchModel.getPageIndex() : 1;
+        int pageSize = searchModel.getPageSize() > 0 ? searchModel.getPageSize() : 10;
+        int startIndex = (pageIndex - 1) * pageSize;
+        int endIndex = pageIndex * pageSize;
+
+        User currentUser = SecurityUtils.getSubject().getCurrentUser();
+        if (currentUser == null) {
+            throw new BusinessException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE, "请登陆之后访问接口");
+        }
+        List<UserRole> currentUserRole = SecurityUtils.getSubject().getCurrentUserRole();
+        List<String> roleIds = currentUserRole.stream().map(UserRole::getRoleId).collect(Collectors.toList());
+
+        RPPageSqlSearchModel rpPageSqlSearchModel = new RPPageSqlSearchModel();
+        rpPageSqlSearchModel.setRoleIds(roleIds);
+
+        List<RPPageSqlViewModel> pageSqlByRoleList = rolePermissionPageSqlService.findRPPageSqlListByRoleIds(rpPageSqlSearchModel);
+        Optional<RPPageSqlViewModel> sqlViewModel = pageSqlByRoleList.stream().filter(s -> StringUtils.equals(s.getSqlNameEn(), RolePermissionPageSqlEnum.NAME_EN.干部集合.value)).filter(s -> StringUtils.equals(s.getIncludeSubNode(), searchModel.getIncludeSubNode())).findFirst();
+        if (sqlViewModel.isPresent()) {
+            RPPageSqlViewModel rpPageSqlViewModel = sqlViewModel.get();
+            String execListSql = rpPageSqlViewModel.getExecListSql();
+            String execCountSql = rpPageSqlViewModel.getExecCountSql();
+            String selectCountFieldEn = rpPageSqlViewModel.getSelectCountFieldEn();
+            String selectListFieldsEn = rpPageSqlViewModel.getSelectListFieldsEn();
+
+            String execCadreListSql = execListSql.replaceAll("\\$\\{deptId}", searchModel.getDeptId())
+                    .replaceAll("\\$\\{startIndex}", String.valueOf(startIndex))
+                    .replaceAll("\\$\\{endIndex}", String.valueOf(endIndex));
+
+            String execCadreCountSql = execCountSql.replaceAll("\\$\\{deptId}", searchModel.getDeptId());
+
+            //额外的查询条件
+            String additionalSql = "";
+
+            //组合查询
+            if (StringUtils.isNotEmpty(searchModel.getCombinedQueryId())) {
+                Optional<CombinedQuery> optional = combinedQueryRepository.findById(searchModel.getCombinedQueryId());
+                if (optional.isPresent()) {
+                    try {
+                        additionalSql += parser.parseSql(optional.get().getExpression());
+                    } catch (CombinedQueryParseException e) {
+                        throw new BusinessException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE, "组合查询解析失败，请核对组合查询信息!");
+                    }
+                }
+            }
+
+            //标签查询
+            if (StringUtils.isNotEmpty(searchModel.getCadreTagIds())) {
+                String tagIds = Arrays.stream(searchModel.getCadreTagIds().split(",")).collect(Collectors.joining("','", "('", "')"));
+                additionalSql += " AND a001.EMP_ID IN (SELECT DISTINCT EMP_ID FROM CADRE_TAG WHERE TAG_ID IN " + tagIds + ") ";
+            }
+
+            //高级查询
+            if (StringUtils.isNotEmpty(searchModel.getTableConditions())) {
+                SysTableModelInfo cadreInfo = sysTableInfoDao.getTableInfo("CadreInfo");
+                List<String> tableNames = new ArrayList<>();
+                StringBuilder whereSql = new StringBuilder();
+
+                //解析查询条件
+                Map<String, Object> conditions = JsonUtil.parseStringToObject(searchModel.getTableConditions(), HashMap.class);
+                for (Map.Entry<String, Object> condition : conditions.entrySet()) {
+                    String tableName = cadreInfo.getTableNameEnAndSaveTableMap().get(condition.getKey());
+                    tableNames.add(tableName);
+
+                    for (Map map : (List<Map>) condition.getValue()) {
+                        String fieldName = map.get("fieldName").toString();
+                        String op = map.get("condition").toString();
+                        String conditionValue = map.get("conditionValue").toString();
+
+                        if (StringUtils.equalsIgnoreCase(op, "like")) {
+                            conditionValue = "%" + conditionValue + "%";
+                        }
+
+                        whereSql.append(" and ").append(tableName).append(".").append(fieldName).append(" ")
+                                .append(op).append(" '").append(conditionValue).append("' ");
+                    }
+                }
+
+                String firstTable = tableNames.get(0);
+                StringBuilder conditionSql = new StringBuilder();
+                conditionSql.append(" AND a001.EMP_ID IN(SELECT DISTINCT ")
+                        .append(firstTable).append(".EMP_ID ")
+                        .append(" FROM ").append(firstTable);
+                for (int i = 1; i < tableNames.size(); i++) {
+                    String tableName = tableNames.get(i);
+                    conditionSql.append(" INNER JOIN ").append(tableName).append(" ON ")
+                            .append(firstTable).append(".EMP_ID = ").append(tableName).append(".EMP_ID ");
+                }
+
+                conditionSql.append(" WHERE 1=1 ").append(whereSql).append(") ");
+
+                additionalSql += conditionSql;
+            }
+
+            if (StringUtils.isNotEmpty(additionalSql)) {
+                //将查询条件拼接到列表查询sql中
+                execCadreListSql = execCadreListSql.replaceAll("(?i)order by", additionalSql + " ORDER BY");
+                execCadreCountSql += additionalSql;
+            }
+
+            List<Map<String, Object>> mapList = jdbcTemplate.queryForList(execCadreListSql);
+            Map<String, Object> countMap = jdbcTemplate.queryForMap(execCadreCountSql);
+
+            CadreDataVO cadreDataVO = new CadreDataVO();
+            cadreDataVO.setPageIndex(pageIndex);
+            cadreDataVO.setPageSize(pageSize);
+            Object cadreCount = countMap.get(selectCountFieldEn);
+            if (cadreCount == null) {
+                cadreDataVO.setDataCount(0L);
+            } else {
+                cadreDataVO.setDataCount(Long.parseLong(String.valueOf(cadreCount)));
+            }
+            List<CadreVO> cadreVOS = Lists.newArrayList();
+            Map selectFields = JsonUtil.parseStringToObject(selectListFieldsEn, LinkedHashMap.class);
+
+            for (Map<String, Object> map : mapList) {
+                CadreVO cadreVO = new CadreVO();
+                List<CadreFieldVO> fieldVOS = Lists.newArrayList();
+                selectFields.forEach((k, v) -> {
+                    CadreFieldVO fieldVO = new CadreFieldVO();
+                    Object o = map.get(k);
+                    fieldVO.setFieldNameEn(k);
+                    fieldVO.setFieldNameCn(v);
+                    fieldVO.setFieldValue(o);
+                    fieldVOS.add(fieldVO);
+                });
+                cadreVO.setFields(fieldVOS);
+                cadreVOS.add(cadreVO);
+            }
+            cadreDataVO.setCadres(cadreVOS);
+            cadreDataVO.setTableFields(selectFields);
+            return cadreDataVO;
+        } else {
+            throw new BusinessException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE, "请检查角色配置的干部信息数据权限");
+        }
     }
 
     @Override

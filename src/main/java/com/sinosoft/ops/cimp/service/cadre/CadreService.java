@@ -2,9 +2,11 @@ package com.sinosoft.ops.cimp.service.cadre;
 
 import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.vo.from.cadre.CadreOrgModifyModel;
+import com.sinosoft.ops.cimp.vo.from.cadre.CadreSearchModel;
 import com.sinosoft.ops.cimp.vo.from.cadre.CadreSortInDepModifyModel;
 import com.sinosoft.ops.cimp.vo.from.cadre.CadreStatusModifyModel;
 import com.sinosoft.ops.cimp.vo.to.cadre.CadreBasicInfoVO;
+import com.sinosoft.ops.cimp.vo.to.cadre.CadreDataVO;
 import com.sinosoft.ops.cimp.vo.to.cadre.CadreSearchVO;
 import com.sinosoft.ops.cimp.vo.to.cadre.CadreSortInDepModel;
 import org.springframework.web.multipart.MultipartFile;
@@ -13,6 +15,15 @@ import java.util.List;
 import java.util.Map;
 
 public interface CadreService {
+
+    /**
+     * 干部列表查询
+     *
+     * @param searchModel
+     * @return
+     * @throws BusinessException
+     */
+    CadreDataVO listCadre(CadreSearchModel searchModel) throws BusinessException;
 
     CadreBasicInfoVO getCadreBasicInfo(String empId);
 

@@ -5,21 +5,16 @@ import com.google.common.collect.Maps;
 import com.sinosoft.ops.cimp.annotation.BusinessApiGroup;
 import com.sinosoft.ops.cimp.annotation.RequiresAuthentication;
 import com.sinosoft.ops.cimp.common.BaseResult;
-import com.sinosoft.ops.cimp.constant.OpsErrorMessage;
 import com.sinosoft.ops.cimp.constant.RolePermissionPageSqlEnum;
 import com.sinosoft.ops.cimp.controller.BaseController;
-import com.sinosoft.ops.cimp.entity.combinedQuery.CombinedQuery;
-import com.sinosoft.ops.cimp.entity.user.User;
 import com.sinosoft.ops.cimp.entity.user.UserRole;
 import com.sinosoft.ops.cimp.exception.BusinessException;
-import com.sinosoft.ops.cimp.repository.combinedQuery.CombinedQueryRepository;
 import com.sinosoft.ops.cimp.service.cadre.CadreService;
 import com.sinosoft.ops.cimp.service.user.RolePermissionPageSqlService;
 import com.sinosoft.ops.cimp.util.JsonUtil;
 import com.sinosoft.ops.cimp.util.SecurityUtils;
-import com.sinosoft.ops.cimp.util.combinedQuery.CombinedQueryParser;
-import com.sinosoft.ops.cimp.util.combinedQuery.beans.CombinedQueryParseException;
 import com.sinosoft.ops.cimp.vo.from.cadre.CadreOrgModifyModel;
+import com.sinosoft.ops.cimp.vo.from.cadre.CadreSearchModel;
 import com.sinosoft.ops.cimp.vo.from.cadre.CadreSortInDepModifyModel;
 import com.sinosoft.ops.cimp.vo.from.cadre.CadreStatusModifyModel;
 import com.sinosoft.ops.cimp.vo.from.user.rolePermissionPageSql.RPPageSqlSearchModel;
@@ -54,111 +49,25 @@ public class CadreController extends BaseController {
     private final RolePermissionPageSqlService rolePermissionPageSqlService;
     private final JdbcTemplate jdbcTemplate;
     private final CadreService cadreService;
-    private final CombinedQueryParser parser;
-    private final CombinedQueryRepository combinedQueryRepository;
 
     @Autowired
-    public CadreController(RolePermissionPageSqlService rolePermissionPageSqlService, JdbcTemplate jdbcTemplate, CadreService cadreService, CombinedQueryParser parser, CombinedQueryRepository combinedQueryRepository) {
+    public CadreController(RolePermissionPageSqlService rolePermissionPageSqlService, JdbcTemplate jdbcTemplate, CadreService cadreService) {
         this.rolePermissionPageSqlService = rolePermissionPageSqlService;
         this.jdbcTemplate = jdbcTemplate;
         this.cadreService = cadreService;
-        this.parser = parser;
-        this.combinedQueryRepository = combinedQueryRepository;
     }
 
     @ApiOperation(value = "查询干部列表")
     @GetMapping(value = "/list")
     @RequiresAuthentication
-    public ResponseEntity listCadre(
-            @RequestParam("deptId") String deptId,
-            @RequestParam("includeSubNode") String includeSubNode,
-            @RequestParam("pageIndex") String pageIndex,
-            @RequestParam("pageSize") String pageSize,
-            @RequestParam(value = "combinedQueryId", required = false) String combinedQueryId) throws BusinessException {
-
-        if (StringUtils.isEmpty(pageIndex) || StringUtils.equals(pageIndex, "0")) {
-            pageIndex = "1";
-        }
-        if (StringUtils.isEmpty(pageSize)) {
-            pageSize = "10";
-        }
-        String startIndex = String.valueOf((Integer.parseInt(pageIndex) - 1) * Integer.parseInt(pageSize));
-        String endIndex = String.valueOf(Integer.parseInt(pageIndex) * Integer.parseInt(pageSize));
-
-        User currentUser = SecurityUtils.getSubject().getCurrentUser();
-        if (currentUser == null) {
-            throw new BusinessException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE, "请登陆之后访问接口");
-        }
-        List<UserRole> currentUserRole = SecurityUtils.getSubject().getCurrentUserRole();
-        List<String> roleIds = currentUserRole.stream().map(UserRole::getRoleId).collect(Collectors.toList());
-
-        RPPageSqlSearchModel rpPageSqlSearchModel = new RPPageSqlSearchModel();
-        rpPageSqlSearchModel.setRoleIds(roleIds);
-
-        List<RPPageSqlViewModel> pageSqlByRoleList = rolePermissionPageSqlService.findRPPageSqlListByRoleIds(rpPageSqlSearchModel);
-        Optional<RPPageSqlViewModel> sqlViewModel = pageSqlByRoleList.stream().filter(s -> StringUtils.equals(s.getSqlNameEn(), RolePermissionPageSqlEnum.NAME_EN.干部集合.value)).filter(s -> StringUtils.equals(s.getIncludeSubNode(), includeSubNode)).findFirst();
-        if (sqlViewModel.isPresent()) {
-            RPPageSqlViewModel rpPageSqlViewModel = sqlViewModel.get();
-            String execListSql = rpPageSqlViewModel.getExecListSql();
-            String execCountSql = rpPageSqlViewModel.getExecCountSql();
-            String selectCountFieldEn = rpPageSqlViewModel.getSelectCountFieldEn();
-            String selectListFieldsEn = rpPageSqlViewModel.getSelectListFieldsEn();
-
-            String execCadreListSql = execListSql.replaceAll("\\$\\{deptId\\}", deptId)
-                    .replaceAll("\\$\\{startIndex\\}", startIndex)
-                    .replaceAll("\\$\\{endIndex\\}", endIndex);
-
-            String execCadreCountSql = execCountSql.replaceAll("\\$\\{deptId\\}", deptId);
-
-            //组合查询
-            if (StringUtils.isNotEmpty(combinedQueryId)) {
-                Optional<CombinedQuery> optional = combinedQueryRepository.findById(combinedQueryId);
-                if (optional.isPresent()) {
-                    try {
-                        String combinedQuerySql = parser.parseSql(optional.get().getExpression());
-                        execCadreListSql = execCadreListSql.replaceAll("(?i)order by", combinedQuerySql + " ORDER BY");
-                        execCadreCountSql += combinedQuerySql;
-                    } catch (CombinedQueryParseException e) {
-                        throw new BusinessException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE, "组合查询解析失败，请核对组合查询信息!");
-                    }
-                }
-            }
-
-            List<Map<String, Object>> mapList = jdbcTemplate.queryForList(execCadreListSql);
-            Map<String, Object> countMap = jdbcTemplate.queryForMap(execCadreCountSql);
-
-            CadreDataVO cadreDataVO = new CadreDataVO();
-            cadreDataVO.setPageIndex(Integer.parseInt(pageIndex));
-            cadreDataVO.setPageSize(Integer.parseInt(pageSize));
-            Object cadreCount = countMap.get(selectCountFieldEn);
-            if (cadreCount == null) {
-                cadreDataVO.setDataCount(0L);
-            } else {
-                cadreDataVO.setDataCount(Long.parseLong(String.valueOf(cadreCount)));
-            }
-            List<CadreVO> cadreVOS = Lists.newArrayList();
-            Map selectFields = JsonUtil.parseStringToObject(selectListFieldsEn, LinkedHashMap.class);
-
-            for (Map<String, Object> map : mapList) {
-                CadreVO cadreVO = new CadreVO();
-                List<CadreFieldVO> fieldVOS = Lists.newArrayList();
-                selectFields.forEach((k, v) -> {
-                    CadreFieldVO fieldVO = new CadreFieldVO();
-                    Object o = map.get(k);
-                    fieldVO.setFieldNameEn(k);
-                    fieldVO.setFieldNameCn(v);
-                    fieldVO.setFieldValue(o);
-                    fieldVOS.add(fieldVO);
-                });
-                cadreVO.setFields(fieldVOS);
-                cadreVOS.add(cadreVO);
-            }
-            cadreDataVO.setCadres(cadreVOS);
-            cadreDataVO.setTableFields(selectFields);
-            return ok(cadreDataVO);
-        } else {
-            throw new BusinessException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE, "请检查角色配置的干部信息数据权限");
-        }
+    public ResponseEntity listCadre(@RequestParam String deptId,
+                                    @RequestParam String includeSubNode,
+                                    @RequestParam int pageIndex,
+                                    @RequestParam int pageSize,
+                                    @RequestParam(required = false) String combinedQueryId,
+                                    @RequestParam(required = false) String cadreTagIds,
+                                    @RequestParam(required = false) String tableConditions) throws BusinessException {
+        return ok(cadreService.listCadre(new CadreSearchModel(deptId, includeSubNode, combinedQueryId, cadreTagIds, tableConditions)));
     }
 
     @ApiOperation(value = "查询干部列表")
