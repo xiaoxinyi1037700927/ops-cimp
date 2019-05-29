@@ -1,5 +1,7 @@
 package com.sinosoft.ops.cimp.util.combinedQuery.enums;
 
+import com.sinosoft.ops.cimp.util.combinedQuery.beans.CombinedQueryParseException;
+
 import java.util.List;
 
 public enum Operator {
@@ -116,12 +118,12 @@ public enum Operator {
         return String.format(exprFormat, params.toArray());
     }
 
-    public static Operator getByName(String name) {
+    public static Operator getByName(String name) throws CombinedQueryParseException {
         for (Operator operator : Operator.values()) {
             if (operator.getName().equals(name)) {
                 return operator;
             }
         }
-        return null;
+        throw new CombinedQueryParseException("未定义的运算符：" + name);
     }
 }

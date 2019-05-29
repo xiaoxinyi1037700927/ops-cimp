@@ -1,10 +1,15 @@
 package com.sinosoft.ops.cimp.util.combinedQuery.utils;
 
 import com.sinosoft.ops.cimp.util.combinedQuery.enums.Type;
+import com.sinosoft.ops.cimp.util.combinedQuery.processors.nodes.ValueNodeProcessor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.regex.Matcher;
 
 public class CombinedQueryUtil {
     public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
@@ -69,6 +74,31 @@ public class CombinedQueryUtil {
         }
 
         return count;
+    }
+
+    /**
+     * 解析表达式,如果是码值的话返回码值
+     *
+     * @param expr
+     * @return 码值code(多个时以逗号分隔)
+     */
+    public static String getCodes(String expr) {
+        try {
+            List<String> list = Arrays.asList(expr.substring(expr.indexOf("'") + 1, expr.lastIndexOf("'")).split("'\\s*,\\s*'"));
+
+            List<String> codes = new ArrayList<>();
+            Matcher matcher;
+            for (String s : list) {
+                matcher = ValueNodeProcessor.PATTERN_CODE.matcher(s);
+                if (!matcher.matches()) {
+                    return null;
+                }
+                codes.add(matcher.group(1));
+            }
+            return String.join(",", codes);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
 }

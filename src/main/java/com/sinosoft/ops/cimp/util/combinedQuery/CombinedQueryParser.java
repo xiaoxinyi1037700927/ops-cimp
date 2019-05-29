@@ -69,12 +69,13 @@ public class CombinedQueryParser {
         List<Param> params = expr.getParams();
         String opStr = " " + expr.getLogicalOperator() + " ";
 
-        Operator op = Operator.getByName(expr.getOperator());
-        if (op != null) {
+        Operator op = null;
+        try {
+            op = Operator.getByName(expr.getOperator());
             //如果是已定义的运算符，使用运算符定义的格式
             expr.setText(opStr + op.getExpr(params.stream().map(Param::getText).collect(Collectors.toList())));
-        } else {
-            //使用默认格式
+        } catch (CombinedQueryParseException e) {
+            //未定义运算符,使用默认格式
             StringBuilder sb = new StringBuilder(opStr);
             sb.append(params.get(0).getText());
             sb.append(" ").append(expr.getOperator()).append(" ");
@@ -83,6 +84,7 @@ public class CombinedQueryParser {
             }
             expr.setText(sb.toString());
         }
+
     }
 
     /**
