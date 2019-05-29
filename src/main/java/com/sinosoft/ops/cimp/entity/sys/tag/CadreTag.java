@@ -4,6 +4,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.Objects;
 
 @Entity
@@ -26,6 +27,15 @@ public class CadreTag implements Serializable {
 
     @Column(name = "TAG_ID", length = 36)
     private String tagId;
+
+    @Column(name = "TAG_TYPE", length = 50)
+    private String tagType;
+
+    @Column(name = "CREATE_TIME")
+    private Date createTime;
+
+    @Column(name = "STATUS", length = 2, columnDefinition = "NUMBER(2) default 0")
+    private Integer status;
 
     public String getSubId() {
         return subId;
@@ -59,6 +69,30 @@ public class CadreTag implements Serializable {
         this.tagId = tagId;
     }
 
+    public String getTagType() {
+        return tagType;
+    }
+
+    public void setTagType(String tagType) {
+        this.tagType = tagType;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -67,13 +101,15 @@ public class CadreTag implements Serializable {
         return Objects.equals(subId, cadreTag.subId) &&
                 Objects.equals(empId, cadreTag.empId) &&
                 Objects.equals(tagCategoryId, cadreTag.tagCategoryId) &&
-                Objects.equals(tagId, cadreTag.tagId);
+                Objects.equals(tagId, cadreTag.tagId) &&
+                Objects.equals(tagType, cadreTag.tagType) &&
+                Objects.equals(createTime, cadreTag.createTime) &&
+                Objects.equals(status, cadreTag.status);
     }
 
     @Override
     public int hashCode() {
-
-        return Objects.hash(subId, empId, tagCategoryId, tagId);
+        return Objects.hash(subId, empId, tagCategoryId, tagId, tagType, createTime, status);
     }
 
     @Override
@@ -83,6 +119,9 @@ public class CadreTag implements Serializable {
                 ", empId='" + empId + '\'' +
                 ", tagCategoryId='" + tagCategoryId + '\'' +
                 ", tagId='" + tagId + '\'' +
+                ", tagType='" + tagType + '\'' +
+                ", createTime=" + createTime +
+                ", status=" + status +
                 '}';
     }
 }
