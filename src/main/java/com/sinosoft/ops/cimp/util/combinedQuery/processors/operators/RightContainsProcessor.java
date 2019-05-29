@@ -24,6 +24,6 @@ public class RightContainsProcessor extends OperatorProcessor {
             value = value.substring(value.indexOf("'") + 1, value.lastIndexOf("'"));
         }
 
-        return String.format(Operator.CONTAINS.getSqlFormat(), subNodes.get(0).getSql(), value);
+        return String.format(Operator.RIGHT_CONTAINS.getSqlFormat(), subNodes.get(0).getSql(), value);
     }
 }

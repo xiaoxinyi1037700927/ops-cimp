@@ -51,7 +51,7 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
     }
 
     private void putCache(String userId, String combinedQueryId, List<Expr> expr) {
-        CacheManager.getInstance().put(Constants.COMBINED_QUERY_CACHE, userId + "/" + combinedQueryId, expr);
+        CacheManager.getInstance().put(Constants.COMBINED_QUERY_CACHE, userId + "/" + combinedQueryId, expr, 86400);
     }
 
     @SuppressWarnings("unchecked")
@@ -287,7 +287,7 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
         List<String> roleIds = SecurityUtils.getSubject().getCurrentUserRole().stream().map(UserRole::getRoleId).collect(Collectors.toList());
 
         QCombinedQuery qCombinedQuery = QCombinedQuery.combinedQuery;
-        Iterable<CombinedQuery> iterable = combinedQueryRepository.findAll(qCombinedQuery.roleId.in(roleIds).or(qCombinedQuery.userId.eq(userId)));
+        Iterable<CombinedQuery> iterable = combinedQueryRepository.findAll();
 
         return Lists.newArrayList(iterable).stream().map(combinedQuery -> {
             CombinedQueryModel model = new CombinedQueryModel();
@@ -874,7 +874,7 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
             combinedQuery.setCreateTime(new Date());
         }
 
-        if(StringUtils.isNotEmpty(combinedQuery.getRoleId())){
+        if (StringUtils.isNotEmpty(combinedQuery.getRoleId())) {
             //如果是查询模板,创建新的副本
             combinedQuery = new CombinedQuery();
             combinedQuery.setId(IdUtil.uuid());

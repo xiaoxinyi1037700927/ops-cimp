@@ -233,7 +233,7 @@ public class CombinedQueryParser {
         tables.sort(String::compareTo);
 
         if (tables.size() == 0) {
-            return "AND" + root.getSql();
+            return " AND " + root.getSql();
         }
 
 
@@ -353,7 +353,12 @@ public class CombinedQueryParser {
             }
         }
 
-        if (stack.size() != 1) {
+        if(parent == null && stack.size() == 0){
+            return operatorNodeProcessor.getDefaultNode();
+        }
+
+
+        if (stack.size() > 1) {
             //如果处理结束后堆栈中的节点数大于1，说明解析出错
             throw new CombinedQueryParseException("非法表达式!");
         }
