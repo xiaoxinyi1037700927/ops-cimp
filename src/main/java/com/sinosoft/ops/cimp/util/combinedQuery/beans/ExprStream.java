@@ -10,7 +10,7 @@ public class ExprStream {
     private int index;
 
     public ExprStream(String expression) {
-        this.expression = expression.replaceAll("\n", "");
+        this.expression = expression.replaceAll("\n", " ");
         this.exprStream = this.expression.toCharArray();
         this.total = exprStream.length;
         this.index = 0;
@@ -68,4 +68,29 @@ public class ExprStream {
         return sb.toString();
     }
 
+
+    /**
+     * 获取到下一个单引号
+     *
+     * @return
+     * @throws CombinedQueryParseException
+     */
+    public String getUtilNextSingleQuotes() throws CombinedQueryParseException {
+        StringBuilder sb = new StringBuilder();
+
+        char c;
+        while (true) {
+            if (!hasNext()) {
+                //如果没找到，抛出异常
+                throw new CombinedQueryParseException("缺失的 ' ：" + sb.toString());
+            }
+
+            c = next();
+            sb.append(c);
+            if (c == '\'') {
+                break;
+            }
+        }
+        return sb.toString();
+    }
 }
