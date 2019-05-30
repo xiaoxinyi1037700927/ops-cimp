@@ -2,10 +2,8 @@ package com.sinosoft.ops.cimp.controller.archive;
 
 
 import com.sinosoft.ops.cimp.annotation.ArchiveApiGroup;
-import com.sinosoft.ops.cimp.constant.UserRoleConstants;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.entity.user.Role;
-import com.sinosoft.ops.cimp.entity.user.UserRole;
 import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.service.archive.BusinessService;
 import com.sinosoft.ops.cimp.service.archive.bean.bean.PersonAndPost;
@@ -13,7 +11,6 @@ import com.sinosoft.ops.cimp.service.user.UserRoleService;
 import com.sinosoft.ops.cimp.util.SecurityUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -96,7 +93,7 @@ public class BusinessController extends BaseController {
 		}
 	
 	}
-	/*@ApiOperation("获取系统时间")
+	@ApiOperation("获取系统时间")
 	@RequestMapping(value = "/getSystemDate",method = RequestMethod.POST)
 	public ResponseEntity revoke(HttpServletRequest request, HttpServletResponse response) throws BusinessException {
 		try {
@@ -105,5 +102,5 @@ public class BusinessController extends BaseController {
 			logger.error("取得系统时间失败！", e);
 			return fail("取得系统时间失败!");
 		}
-	}*/
+	}
 }

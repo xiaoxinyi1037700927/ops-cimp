@@ -1,7 +1,6 @@
 package com.sinosoft.ops.cimp.repository.archive.busarch;
 
 import com.sinosoft.ops.cimp.entity.archive.BusArchApplyPerson;
-import oracle.sql.RAW;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;

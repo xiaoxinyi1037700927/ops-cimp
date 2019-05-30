@@ -133,7 +133,7 @@ public class ArchiveMaterialFileController extends BaseController {
      * @param request->archiveMaterialId: ArchiveMaterialFile archiveMaterialId;
      * @param request->pageNo:            ArchiveMaterialFile pageNumbe
      */
-    @ApiOperation("根据指定档案ID 和pageNo获取")
+    @ApiOperation("根据指定档案ID 和pageNo和图片类型 获取图片id")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "pageNo", value = "页数", dataType = "String", required = true, paramType = "query"),
             @ApiImplicitParam(name = "archiveMaterialId", value = "档案id", dataType = "String", required = true, paramType = "query"),
