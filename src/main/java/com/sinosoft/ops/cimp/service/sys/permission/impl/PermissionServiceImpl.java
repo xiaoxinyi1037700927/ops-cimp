@@ -144,7 +144,7 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     public List<MenuChildViewModel> menuListByParentId(String parentId) {
         JPAQuery<Permission> where = queryFactory.select(QPermission.permission).from(QPermissionMenuGroupRel.permissionMenuGroupRel)
-                .leftJoin(QPermission.permission).on(QPermission.permission.id.eq(QPermissionMenuGroupRel.permissionMenuGroupRel.permissionId))
+                .innerJoin(QPermission.permission).on(QPermission.permission.id.eq(QPermissionMenuGroupRel.permissionMenuGroupRel.permissionId))
                 .where(QPermissionMenuGroupRel.permissionMenuGroupRel.menuGroupId.eq(parentId));
         List<Permission> fetch = Lists.newArrayList(where.orderBy(QPermissionMenuGroupRel.permissionMenuGroupRel.sortNumber.asc()).fetch());
         List<MenuChildViewModel> collect = fetch.stream().map(x -> MenuMapper.INSTANCE.entityToMenuChildViewModel(x)).collect(Collectors.toList());
@@ -291,7 +291,7 @@ public class PermissionServiceImpl implements PermissionService {
 //        } else {
 //            long count = roleRepository.countByCodeAndSystemType(viewModel.getCode());
 //            if (count > 0) return "1";
-            role = new Role();
+        role = new Role();
 
 
         role.setName(viewModel.getName());

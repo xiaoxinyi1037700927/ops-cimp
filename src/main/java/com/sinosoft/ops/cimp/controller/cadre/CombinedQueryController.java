@@ -122,4 +122,12 @@ public class CombinedQueryController extends BaseController {
         return ok("保存成功");
     }
 
+    @ApiOperation(value = "删除组合查询")
+    @PostMapping("/delete")
+    @RequiresAuthentication
+    public ResponseEntity deleteCombinedQuery(@RequestParam String combinedQueryId) throws BusinessException {
+        combinedQueryService.deleteCombinedQuery(combinedQueryId);
+        return ok("删除成功");
+    }
+
 }

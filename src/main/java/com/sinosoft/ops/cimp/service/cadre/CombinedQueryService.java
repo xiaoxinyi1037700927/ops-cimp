@@ -120,4 +120,9 @@ public interface CombinedQueryService {
      */
     void saveCombinedQuery(ExprSaveModel saveModel) throws BusinessException;
 
+    /**
+     * 删除组合查询
+     * @param combinedQueryId
+     */
+    void deleteCombinedQuery(String combinedQueryId);
 }
