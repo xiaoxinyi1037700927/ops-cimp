@@ -102,6 +102,11 @@ public class CadreServiceImpl implements CadreService {
             //额外的查询条件
             String additionalSql = "";
 
+            //姓名搜索
+            if (StringUtils.isNotEmpty(searchModel.getName())) {
+                additionalSql += " AND a001.A01001 LIKE '%" + searchModel.getName() + "%' ";
+            }
+
             //组合查询
             if (StringUtils.isNotEmpty(searchModel.getCombinedQueryId())) {
                 Optional<CombinedQuery> optional = combinedQueryRepository.findById(searchModel.getCombinedQueryId());

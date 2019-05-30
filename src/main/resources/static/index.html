@@ -1,1 +1,31 @@
-<!DOCTYPE html><html><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>干部信息管理</title><link rel=stylesheet type=text/css href=./static/ifIE/css/loading.css><link rel=stylesheet type=text/css href=./static/style/font/iconfont.css><link rel="shortcut icon" href=./static/img/favicon.png><link href=./static/css/app.1a90dd1cd8b73c3f495dfe56f7d69675.css rel=stylesheet></head><body><div id=app></div><script src=./static/ifIE/js/loading.js></script><script></script><script type=text/javascript src=./static/js/manifest.3ad1d5771e9b13dbdad2.js></script><script type=text/javascript src=./static/js/vendor.0c0313d4d817d336e07b.js></script><script type=text/javascript src=./static/js/app.8233c520fc643baaffa6.js></script></body></html>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset=utf-8>
+    <meta name=viewport content="width=device-width,initial-scale=1">
+    <title>干部信息管理</title>
+    <link rel=stylesheet type=text/css href=./static/ifIE/css/loading.css>
+    <link rel=stylesheet type=text/css href=./static/style/font/iconfont.css>
+    <link rel="shortcut icon" href=./static/img/favicon.png>
+    <link href=./static/css/app.d87f1be9a51f71f80b2ab36f29ddd508.css rel=stylesheet>
+</head>
+<body>
+<div id=app></div>
+<script th:inline="javascript">
+    var appInfo = {
+        appName:[[${appName}]],
+        appIcon:[[${appIcon}]]
+    };
+    localStorage.appInfo = JSON.stringify(appInfo);
+</script>
+<script src=./static/ifIE/js/loading.js></script>
+<script>if (localStorage.appInfo) {
+    var appInfo = JSON.parse(localStorage.appInfo);
+    document.title = appInfo.appName;
+}</script>
+<script type=text/javascript src=./static/js/manifest.3ad1d5771e9b13dbdad2.js></script>
+<script type=text/javascript src=./static/js/vendor.416e0c5b45c913a34108.js></script>
+<script type=text/javascript src=./static/js/app.f0a8245daf75c8fbb743.js></script>
+</body>
+</html>
+

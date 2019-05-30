@@ -58,16 +58,10 @@ public class CadreController extends BaseController {
     }
 
     @ApiOperation(value = "查询干部列表")
-    @GetMapping(value = "/list")
+    @PostMapping(value = "/list")
     @RequiresAuthentication
-    public ResponseEntity listCadre(@RequestParam String deptId,
-                                    @RequestParam String includeSubNode,
-                                    @RequestParam int pageIndex,
-                                    @RequestParam int pageSize,
-                                    @RequestParam(required = false) String combinedQueryId,
-                                    @RequestParam(required = false) String cadreTagIds,
-                                    @RequestParam(required = false) String tableConditions) throws BusinessException {
-        return ok(cadreService.listCadre(new CadreSearchModel(deptId, includeSubNode, combinedQueryId, cadreTagIds, tableConditions)));
+    public ResponseEntity listCadre(@RequestBody CadreSearchModel searchModel) throws BusinessException {
+        return ok(cadreService.listCadre(searchModel));
     }
 
     @ApiOperation(value = "查询干部列表")

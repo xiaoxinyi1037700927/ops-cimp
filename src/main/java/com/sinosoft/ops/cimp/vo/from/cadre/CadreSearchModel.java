@@ -9,12 +9,13 @@ public class CadreSearchModel extends RePagination {
     public CadreSearchModel() {
     }
 
-    public CadreSearchModel(String deptId, String includeSubNode, String combinedQueryId, String cadreTagIds, String tableConditions) {
+    public CadreSearchModel(String deptId, String includeSubNode, String combinedQueryId, String cadreTagIds, String tableConditions, String name) {
         this.deptId = deptId;
         this.includeSubNode = includeSubNode;
         this.combinedQueryId = combinedQueryId;
         this.cadreTagIds = cadreTagIds;
         this.tableConditions = tableConditions;
+        this.name = name;
     }
 
     /**
@@ -42,6 +43,11 @@ public class CadreSearchModel extends RePagination {
      */
     @ApiModelProperty(value = "查询条件")
     private String tableConditions;
+    /**
+     * 姓名
+     */
+    @ApiModelProperty(value = "姓名")
+    private String name;
 
     public String getDeptId() {
         return deptId;
@@ -83,5 +89,12 @@ public class CadreSearchModel extends RePagination {
         this.tableConditions = tableConditions;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 }
 
