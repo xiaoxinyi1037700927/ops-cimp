@@ -1,5 +1,7 @@
 package com.sinosoft.ops.cimp.util.combinedQuery.enums;
 
+import com.sinosoft.ops.cimp.util.combinedQuery.beans.CombinedQueryParseException;
+
 public enum Function {
     LENGTH("求长度", "^求长度\\((.*?)\\)$",
             Type.NUMBER.getCode(), new int[]{Type.STRING.getCode() | Type.NUMBER.getCode()},
@@ -100,13 +102,13 @@ public enum Function {
         return exprFormat;
     }
 
-    public static Function getByName(String name) {
+    public static Function getByName(String name) throws CombinedQueryParseException {
         for (Function function : Function.values()) {
             if (function.getName().equals(name)) {
                 return function;
             }
         }
-        return null;
+        throw new CombinedQueryParseException("未定义的函数：" + name);
     }
 }
 

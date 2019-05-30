@@ -1,15 +1,14 @@
 package com.sinosoft.ops.cimp.util.combinedQuery.processors.nodes;
 
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sinosoft.ops.cimp.dao.SysTableInfoDao;
 import com.sinosoft.ops.cimp.dao.domain.sys.table.SysTableFieldInfo;
 import com.sinosoft.ops.cimp.dao.domain.sys.table.SysTableInfo;
-import com.sinosoft.ops.cimp.entity.sys.syscode.QSysCodeSet;
 import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.CombinedQueryParseException;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.FieldNode;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.Node;
 import com.sinosoft.ops.cimp.util.combinedQuery.enums.Type;
+import com.sinosoft.ops.cimp.util.combinedQuery.utils.CodeUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -24,12 +23,12 @@ import java.util.regex.Pattern;
 public class FieldNodeProcessor extends NodeProcessor {
     private static final Pattern pattern = Pattern.compile("^([\\u4e00-\\u9fa5_a-zA-Z0-9\\-]+)\\.([\\u4e00-\\u9fa5_a-zA-Z0-9\\-]+)$");
 
-    private final JPAQueryFactory jpaQueryFactory;
     private final SysTableInfoDao sysTableInfoDao;
+    private final CodeUtil codeUtil;
 
-    public FieldNodeProcessor(JPAQueryFactory jpaQueryFactory, SysTableInfoDao sysTableInfoDao) {
-        this.jpaQueryFactory = jpaQueryFactory;
+    public FieldNodeProcessor(SysTableInfoDao sysTableInfoDao, CodeUtil codeUtil) {
         this.sysTableInfoDao = sysTableInfoDao;
+        this.codeUtil = codeUtil;
     }
 
 
@@ -88,19 +87,8 @@ public class FieldNodeProcessor extends NodeProcessor {
             throw new CombinedQueryParseException("未定义的字段类型：" + tableName + "." + fieldName);
         }
 
-        return new FieldNode(table.getId(), table.getDbTableName(), table.getNameCn(), field.getId(), field.getDbFieldName(), field.getNameCn(), returnType.getCode(), field.getCodeSetName(), getCodeSetId(field.getCodeSetName()));
+        return new FieldNode(table.getId(), table.getDbTableName(), table.getNameCn(), field.getId(), field.getDbFieldName(), field.getNameCn(), returnType.getCode(), field.getCodeSetName(), codeUtil.getCodeSetIdByName(field.getCodeSetName()));
     }
-
-    private Integer getCodeSetId(String sysCodeSetName) {
-        if (sysCodeSetName == null) {
-            return null;
-        }
-
-        QSysCodeSet qSysCodeSet = QSysCodeSet.sysCodeSet;
-        return jpaQueryFactory.select(qSysCodeSet.id).from(qSysCodeSet)
-                .where(qSysCodeSet.name.eq(sysCodeSetName)).fetchOne();
-    }
-
 
     /**
      * 获取系统表

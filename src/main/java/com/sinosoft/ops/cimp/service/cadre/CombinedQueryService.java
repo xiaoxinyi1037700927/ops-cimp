@@ -11,8 +11,8 @@ public interface CombinedQueryService {
     /**
      * 获取组合查询支持的函数
      *
-     * @return
      * @param searchModel
+     * @return
      */
     List<FunctionModel> getFunctions(FunctionSearchModel searchModel);
 
@@ -52,40 +52,45 @@ public interface CombinedQueryService {
      *
      * @param appendModel
      * @return
+     * @throws BusinessException
      */
-    ExprModel appendExpr(ExprAppendModel appendModel);
+    ExprModel appendExpr(ExprAppendModel appendModel) throws BusinessException;
 
     /**
      * 删除表达式
      *
      * @param deleteModel
      * @return
+     * @throws BusinessException
      */
-    ExprModel deleteExpr(ExprDeleteModel deleteModel);
+    ExprModel deleteExpr(ExprDeleteModel deleteModel) throws BusinessException;
 
     /**
      * 添加函数
      *
      * @param appendModel
      * @return
+     * @throws BusinessException
      */
-    ExprModel appendFunction(FunctionAppendModel appendModel);
+    ExprModel appendFunction(FunctionAppendModel appendModel) throws BusinessException;
 
     /**
      * 删除函数
      *
      * @param deleteModel
      * @return
+     * @throws BusinessException
      */
-    ExprModel deleteFunction(FunctionDeleteModel deleteModel);
+    ExprModel deleteFunction(FunctionDeleteModel deleteModel) throws BusinessException;
 
     /**
      * 修改表达式
      *
      * @param modifyModel
      * @return
+     * @throws BusinessException
      */
-    ExprModel modifyExpr(ExprModifyModel modifyModel);
+    ExprModel modifyExpr(ExprModifyModel modifyModel) throws BusinessException;
 
     /**
      * 编译表达式
@@ -93,16 +98,18 @@ public interface CombinedQueryService {
      * @param combinedQueryId
      * @param exprStr
      * @return
+     * @throws BusinessException
      */
-    CompileResultModel compileExprStr(String combinedQueryId, String exprStr);
+    CompileResultModel compileExprStr(String combinedQueryId, String exprStr) throws BusinessException;
 
     /**
      * 统计表达式数量
      *
      * @param combinedQueryId
      * @return
+     * @throws BusinessException
      */
-    ExprStatisticsModel statisticsExpr(String combinedQueryId);
+    ExprStatisticsModel statisticsExpr(String combinedQueryId) throws BusinessException;
 
 
     /**

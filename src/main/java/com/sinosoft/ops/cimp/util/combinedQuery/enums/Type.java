@@ -38,6 +38,6 @@ public enum Type {
                 return type.getName();
             }
         }
-        return "未定义类型";
+        return "";
     }
 }

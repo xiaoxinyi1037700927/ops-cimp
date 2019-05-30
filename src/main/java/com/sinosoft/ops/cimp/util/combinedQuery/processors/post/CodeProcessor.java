@@ -1,7 +1,5 @@
 package com.sinosoft.ops.cimp.util.combinedQuery.processors.post;
 
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.sinosoft.ops.cimp.entity.sys.syscode.QSysCodeItem;
 import com.sinosoft.ops.cimp.entity.sys.syscode.SysCodeItem;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.CombinedQueryParseException;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.codeSet.CodeSet;
@@ -11,6 +9,7 @@ import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.OperatorNode;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.ValueNode;
 import com.sinosoft.ops.cimp.util.combinedQuery.enums.Type;
 import com.sinosoft.ops.cimp.util.combinedQuery.processors.operators.InProcessor;
+import com.sinosoft.ops.cimp.util.combinedQuery.utils.CodeUtil;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -19,27 +18,13 @@ import java.util.List;
 @Component
 public class CodeProcessor implements PostProcessor {
 
-    private final JPAQueryFactory jpaQueryFactory;
     private final InProcessor inProcessor;
+    private final CodeUtil codeUtil;
 
 
-    public CodeProcessor(JPAQueryFactory jpaQueryFactory, InProcessor inProcessor) {
-        this.jpaQueryFactory = jpaQueryFactory;
+    public CodeProcessor(InProcessor inProcessor, CodeUtil codeUtil) {
         this.inProcessor = inProcessor;
-    }
-
-    /**
-     * 获取代码集
-     *
-     * @param codeSetId
-     * @return
-     */
-    private List<SysCodeItem> getCodeItems(int codeSetId) {
-        QSysCodeItem qItem = QSysCodeItem.sysCodeItem;
-        return jpaQueryFactory.select(qItem).from(qItem)
-                .where(qItem.codeSetId.eq(codeSetId).and(qItem.status.eq(0)))
-                .orderBy(qItem.ordinal.asc()).fetch();
-
+        this.codeUtil = codeUtil;
     }
 
     /**
@@ -72,7 +57,7 @@ public class CodeProcessor implements PostProcessor {
 
         //初始化代码集数据
         String codeSetName = ((FieldNode) first).getCodeSetName();
-        List<SysCodeItem> sysCodeItem = getCodeItems(((FieldNode) first).getCodeSetId());
+        List<SysCodeItem> sysCodeItem = codeUtil.getSysCodeItems(((FieldNode) first).getCodeSetId());
         CodeSet codeSet = new CodeSet(codeSetName, sysCodeItem);
 
         List<String> codes = new ArrayList<>();

@@ -69,12 +69,13 @@ public class CombinedQueryParser {
         List<Param> params = expr.getParams();
         String opStr = " " + expr.getLogicalOperator() + " ";
 
-        Operator op = Operator.getByName(expr.getOperator());
-        if (op != null) {
+        Operator op = null;
+        try {
+            op = Operator.getByName(expr.getOperator());
             //如果是已定义的运算符，使用运算符定义的格式
             expr.setText(opStr + op.getExpr(params.stream().map(Param::getText).collect(Collectors.toList())));
-        } else {
-            //使用默认格式
+        } catch (CombinedQueryParseException e) {
+            //未定义运算符,使用默认格式
             StringBuilder sb = new StringBuilder(opStr);
             sb.append(params.get(0).getText());
             sb.append(" ").append(expr.getOperator()).append(" ");
@@ -83,6 +84,7 @@ public class CombinedQueryParser {
             }
             expr.setText(sb.toString());
         }
+
     }
 
     /**
@@ -231,7 +233,7 @@ public class CombinedQueryParser {
         tables.sort(String::compareTo);
 
         if (tables.size() == 0) {
-            return "AND" + root.getSql();
+            return " AND " + root.getSql();
         }
 
 
@@ -351,7 +353,12 @@ public class CombinedQueryParser {
             }
         }
 
-        if (stack.size() != 1) {
+        if(parent == null && stack.size() == 0){
+            return operatorNodeProcessor.getDefaultNode();
+        }
+
+
+        if (stack.size() > 1) {
             //如果处理结束后堆栈中的节点数大于1，说明解析出错
             throw new CombinedQueryParseException("非法表达式!");
         }

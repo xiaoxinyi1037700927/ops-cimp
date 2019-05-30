@@ -25,7 +25,7 @@ public class LogicalOperatorNodeProcessor extends NodeProcessor {
         this.operatorNodeProcessor = operatorNodeProcessor;
         //预编译逻辑操作符的正则表达式
         for (LogicalOperator logicalOperator : LogicalOperator.values()) {
-            logicalOperators.put(logicalOperator, Pattern.compile(logicalOperator.getRegex()));
+            logicalOperators.put(logicalOperator, Pattern.compile(logicalOperator.getRegex(), Pattern.CASE_INSENSITIVE));
         }
     }
 

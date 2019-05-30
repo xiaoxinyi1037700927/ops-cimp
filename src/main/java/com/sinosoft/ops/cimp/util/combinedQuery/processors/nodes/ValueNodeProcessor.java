@@ -1,13 +1,11 @@
 package com.sinosoft.ops.cimp.util.combinedQuery.processors.nodes;
 
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.sinosoft.ops.cimp.entity.sys.syscode.QSysCodeItem;
-import com.sinosoft.ops.cimp.entity.sys.syscode.SysCodeItem;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.CombinedQueryParseException;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.FieldNode;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.Node;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.ValueNode;
 import com.sinosoft.ops.cimp.util.combinedQuery.enums.Type;
+import com.sinosoft.ops.cimp.util.combinedQuery.utils.CodeUtil;
 import com.sinosoft.ops.cimp.util.combinedQuery.utils.CombinedQueryUtil;
 import org.springframework.stereotype.Component;
 
@@ -24,13 +22,12 @@ import java.util.regex.Pattern;
 @Component
 public class ValueNodeProcessor extends NodeProcessor {
     private static final Pattern PATTERN = Pattern.compile("^['|\\[](.*?)['|\\]]$");
-    private static final Pattern PATTERN_CODE = Pattern.compile("^\\[(.+?)](.+?)$");
+    public static final Pattern PATTERN_CODE = Pattern.compile("^\\[(.+?)](.+?)$");
 
+    private final CodeUtil codeUtil;
 
-    private final JPAQueryFactory jpaQueryFactory;
-
-    public ValueNodeProcessor(JPAQueryFactory jpaQueryFactory) {
-        this.jpaQueryFactory = jpaQueryFactory;
+    public ValueNodeProcessor(CodeUtil codeUtil) {
+        this.codeUtil = codeUtil;
     }
 
     /**
@@ -153,7 +150,7 @@ public class ValueNodeProcessor extends NodeProcessor {
             for (int i = 0; i < vNode.getValues().size(); i++) {
                 String code = vNode.getValues().get(i);
                 String name = vNode.getCodeNames().get(i);
-                if (!judgeCode(fieldNode.getCodeSetId(), code, name)) {
+                if (!codeUtil.judgeCode(fieldNode.getCodeSetId(), code, name)) {
                     throw new CombinedQueryParseException("错误的码值：[" + code + "]" + name);
                 }
             }
@@ -178,44 +175,5 @@ public class ValueNodeProcessor extends NodeProcessor {
         return null;
     }
 
-    /**
-     * 判断码值的正确性
-     *
-     * @return
-     */
-    private boolean judgeCode(Integer codeSetId, String code, String name) {
-        QSysCodeItem qSysCodeItem = QSysCodeItem.sysCodeItem;
 
-        SysCodeItem sysCodeItem = jpaQueryFactory.select(qSysCodeItem)
-                .from(qSysCodeItem)
-                .where(qSysCodeItem.codeSetId.eq(codeSetId).and(qSysCodeItem.code.eq(code)).and(qSysCodeItem.name.eq(name)))
-                .fetchOne();
-
-        return sysCodeItem != null;
-    }
-
-    /**
-     * 获取码值
-     *
-     * @param expr
-     * @return 码值code(多个时以逗号分隔)
-     */
-    public String getCodes(String expr) {
-        try {
-            List<String> list = Arrays.asList(expr.substring(expr.indexOf("'") + 1, expr.lastIndexOf("'")).split("'\\s*,\\s*'"));
-
-            List<String> codes = new ArrayList<>();
-            Matcher matcher;
-            for (String s : list) {
-                matcher = PATTERN_CODE.matcher(s);
-                if (!matcher.matches()) {
-                    return null;
-                }
-                codes.add(matcher.group(1));
-            }
-            return String.join(",", codes);
-        } catch (Exception e) {
-            return null;
-        }
-    }
 }

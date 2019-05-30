@@ -59,6 +59,38 @@ public class SysTagController extends BaseController {
         return ok(Lists.newArrayList());
     }
 
+    @RequestMapping(value = "/getSysTagCategoryAndTag", method = RequestMethod.GET)
+    public ResponseEntity<List<SysTagModel>> getSysTagCategoryAndTag() throws BusinessException {
+        String cadreTagCategory = "CadreInfo";
+
+        List<SysTagCategory> tagCategories = sysTagCategoryService.findAllByModelName(cadreTagCategory);
+        List<String> tagCategoryIds = tagCategories.stream().map(SysTagCategory::getId).collect(Collectors.toList());
+
+        List<SysTag> sysTags = sysTagService.findAll(tagCategoryIds);
+        Map<String, List<SysTag>> sysTagMap = sysTags.stream().collect(Collectors.groupingBy(SysTag::getTagCategoryId));
+
+        List<SysTagModel> result = Lists.newArrayList();
+        for (SysTagCategory tagCategory : tagCategories) {
+            SysTagModel sysTagModel = new SysTagModel();
+            sysTagModel.setTagCategoryName(tagCategory.getTagCategoryName());
+            sysTagModel.setTagCategoryId(tagCategory.getId());
+            sysTagModel.setTagModel(tagCategory.getTagModel());
+            List<SysTag> sysTagList = sysTagMap.get(tagCategory.getId());
+            if (sysTagList != null && sysTagList.size() > 0) {
+                List<SysTagVO> sysTagVOS = Lists.newArrayList();
+                for (SysTag sysTag : sysTagList) {
+                    SysTagVO sysTagVO = new SysTagVO();
+                    sysTagVO.setTagId(sysTag.getId());
+                    sysTagVO.setTagName(sysTag.getTag());
+                    sysTagVOS.add(sysTagVO);
+                }
+                sysTagModel.setSysTags(sysTagVOS);
+            }
+            result.add(sysTagModel);
+        }
+        return ok(result);
+    }
+
     @RequestMapping(value = "/saveSysTagCategory", method = RequestMethod.POST)
     public ResponseEntity<SysTagCategory> saveSysTagCategory(@RequestBody SysTagCategory sysTagCategory) throws BusinessException {
         if (sysTagCategory != null) {

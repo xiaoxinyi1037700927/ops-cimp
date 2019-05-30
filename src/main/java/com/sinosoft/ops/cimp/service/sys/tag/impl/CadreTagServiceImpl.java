@@ -14,6 +14,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.math.RoundingMode;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletionService;
@@ -46,7 +47,7 @@ public class CadreTagServiceImpl implements CadreTagService {
         String tagTargetName = sysTag.getTagTargetName();
 
         //执行该tag之前先把原来的删掉
-        String sql = "DELETE FROM CADRE_TAG WHERE TAG_ID = '%s'";
+        String sql = "DELETE FROM CADRE_TAG WHERE TAG_ID = '%s' AND TAG_TYPE = '0'";
         String execSql = String.format(sql, tagId);
         jdbcTemplate.update(execSql);
         int tagCountNumber = 0;
@@ -76,7 +77,9 @@ public class CadreTagServiceImpl implements CadreTagService {
                     cadreTag.setTagCategoryId(tagCategoryId);
                     cadreTag.setTagId(tagId);
                     cadreTag.setEmpId(String.valueOf(o));
-
+                    cadreTag.setTagType("0");
+                    cadreTag.setCreateTime(new Date());
+                    
                     cadreTagList.add(cadreTag);
                 }
                 cadreTagRepository.saveAll(cadreTagList);
@@ -129,7 +132,7 @@ public class CadreTagServiceImpl implements CadreTagService {
     @Override
     public void deleteTag(String tagId) {
         if (StringUtils.isNotEmpty(tagId)) {
-            String sql = "DELETE FROM CADRE_TAG WHERE TAG_ID = '%s'";
+            String sql = "DELETE FROM CADRE_TAG WHERE TAG_ID = '%s' WHERE CADRE_TYPE = '0'";
             String execSql = String.format(sql, tagId);
             jdbcTemplate.update(execSql);
         }
