@@ -31,10 +31,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
 public class CombinedQueryServiceImpl implements CombinedQueryService {
+
+    private static final Pattern PATTERN_EMPTY_STRING = Pattern.compile("^'\\s*'$");
 
     private final CombinedQueryParser parser;
     private final CombinedQueryRepository combinedQueryRepository;
@@ -143,7 +146,7 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
                         //新增函数
 
                         //参数为空字符串时，可以加任意函数，不为空时，根据参数类型过滤
-                        if (!StringUtils.equals(param.getText(), "''") && (function.getParamsNum() == 0 || (function.getParamsType().get(0).getCode() & param.getReturnType()) == 0)) {
+                        if (!PATTERN_EMPTY_STRING.matcher(param.getText()).matches() && (function.getParamsNum() == 0 || (function.getParamsType().get(0).getCode() & param.getReturnType()) == 0)) {
                             iterator.remove();
                             continue;
                         }

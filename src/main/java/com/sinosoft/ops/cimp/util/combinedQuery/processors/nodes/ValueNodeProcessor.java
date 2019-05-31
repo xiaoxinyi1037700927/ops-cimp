@@ -121,7 +121,10 @@ public class ValueNodeProcessor extends NodeProcessor {
      */
     @Override
     public Node pushNode(Deque<Node> stack, Node node) throws CombinedQueryParseException {
-        if (stack.size() > 0 && (stack.peek().getNextSubType() & node.getReturnType()) != 0) {
+        //值节点返回类型都支持string类型
+        int returnType = node.getReturnType() | Type.STRING.getCode();
+
+        if (stack.size() > 0 && (stack.peek().getNextSubType() & returnType) != 0) {
             //如果栈首支持value类型的子节点，合并
             Node first = stack.pop();
             first.addSubNode(node);

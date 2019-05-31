@@ -20,7 +20,7 @@ public class ContainsProcessor extends OperatorProcessor {
 
 
         //如果值节点返回类型是string，去掉sql中默认包含的''
-        if (Type.STRING.getCode() == subNodes.get(1).getReturnType()) {
+        if (Type.NUMBER.getCode() != subNodes.get(1).getReturnType()) {
             value = value.substring(value.indexOf("'") + 1, value.lastIndexOf("'"));
         }
 
