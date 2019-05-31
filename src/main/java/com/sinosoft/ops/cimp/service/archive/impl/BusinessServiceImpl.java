@@ -35,6 +35,12 @@ public class BusinessServiceImpl  implements BusinessService {
 	private ArchiveMaterialRepository archiveMaterialRepository;
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
+
+	/**
+	 * 根据depid查申请人信息和岗位
+	 * @param Depid
+	 * @return
+	 */
 	@Override
 	@Transactional(readOnly=true)
 	public List<PersonAndPost> getPersonAndPostByDepid(String Depid) {
@@ -95,7 +101,12 @@ public class BusinessServiceImpl  implements BusinessService {
 		}
 		return i;
 	}
-	
+
+	/**
+	 * 根据empid查看树结构
+	 * @param empId
+	 * @return
+	 */
 	@Override
 	@Transactional(readOnly=true)
 	public List<HashMap<String, Object>> getPersonMaterial(String empId) {

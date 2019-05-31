@@ -111,17 +111,22 @@ public class ArchiveMaterialFileController extends BaseController {
     public void imgbyid(HttpServletRequest request, HttpServletResponse response) throws BusinessException {
         try {
             String id = request.getParameter("id");
-            String relPath = request.getSession().getServletContext().getRealPath("\\");
-            //返回 保存路径 和 文件名列表
-            Map<String, Object> map = new HashMap<String, Object>();
-            String fileName = id + ".jpg";
-            Path path = Paths.get(relPath, id);
-            File file = mongoDbService.downloadToFileDecryptWithAES(id, path);
+            byte[] file = mongoDbService.downloadToFileDecryptWithAES(id);
             response.setHeader("Cache-Control", "no-store, no-cache");
             response.setContentType("image/jpeg");
-            BufferedImage bi = ImageIO.read(file);
-            ServletOutputStream out = response.getOutputStream();
-            ImageIO.write(bi, "jpg", out);
+            //写入流
+            if (file != null) {
+                try (InputStream in = new ByteArrayInputStream(file);
+                     OutputStream os = response.getOutputStream()) {
+                    byte[] b = new byte[1024 * 10];
+                    int i = 0;
+                    while ((i = in.read(b)) > 0) {
+                        os.write(b, 0, i);
+                    }
+                    os.flush();
+                }
+            }
+
         } catch (Exception e) {
             logger.error("查询失败！", e);
         }

@@ -11,8 +11,10 @@ import com.sinosoft.ops.cimp.service.archive.BusArchApplyService;
 import com.sinosoft.ops.cimp.service.archive.BusinessService;
 import com.sinosoft.ops.cimp.service.user.UserRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+
 
 import java.util.*;
 
@@ -35,6 +37,13 @@ public class BusArchApplyServiceImpl implements BusArchApplyService {
 	private UserRoleService userRoleService;
 
 
+	/**
+	 * 创建申请
+	 * @param entity
+	 * @param baplist
+	 * @param badlist
+	 * @throws Exception
+	 */
 	@Override
 	@Transactional
 	public void create(BusArchApply entity,List<BusArchApplyPerson> baplist,List<BusArchApplyDetail> badlist) throws Exception{
@@ -55,6 +64,13 @@ public class BusArchApplyServiceImpl implements BusArchApplyService {
 		busArchApplyRepository.save(entity);
 	}
 
+	/**
+	 * 修改申请查看档案
+	 * @param entity
+	 * @param baplist
+	 * @param badlist
+	 * @throws Exception
+	 */
 	@Override
 	@Transactional
 	public void update(BusArchApply entity,List<BusArchApplyPerson> baplist,List<BusArchApplyDetail> badlist) throws Exception{
@@ -88,15 +104,24 @@ public class BusArchApplyServiceImpl implements BusArchApplyService {
 		}
 	}
 
-
+	/**
+	 * 分页查看申请或审批
+	 * @param userid
+	 * @param resouceId
+	 * @param pageIndex
+	 * @param pageSize
+	 * @return
+	 */
 	@Override
 	@Transactional
-	public List<BusArchApply> getApplyByUser(String userid,String resouceId)
+	public List<BusArchApply> getApplyByUser(String userid,String resouceId,Integer pageIndex,Integer pageSize)
 	{
+
 		List<BusArchApply> listBus =new ArrayList<BusArchApply>();
 		if(resouceId.equals("11"))
 		{
-			listBus =  busArchApplyRepository.findAllByUseridAndVerifyType(userid);
+			listBus=busArchApplyRepository.findAllByUseridAndVerifyType(userid, PageRequest.of(pageIndex,pageSize));
+//
 			for(BusArchApply busArchApply:listBus)
 			{
 				List<BusArchApplyPerson> ListBusArchApplyPerson =busArchApplyPersonRepository.findAllByApplyId(busArchApply.getId());
@@ -114,7 +139,7 @@ public class BusArchApplyServiceImpl implements BusArchApplyService {
 		{
 			List<Role> roles =  userRoleService.getRolesByUserId(userid);
 			if (roles.size()>0 && roles.stream().filter(temp -> temp.getCode().equals("13")).count() > 0) {
-				listBus = busArchApplyRepository.findAllByVerifyType();
+				listBus = busArchApplyRepository.findAllByVerifyType(PageRequest.of(pageIndex,pageSize));
 				for(BusArchApply busArchApply:listBus)
 				{
 					List<BusArchApplyPerson> ListBusArchApplyPerson =busArchApplyPersonRepository.findAllByApplyId(busArchApply.getId());
@@ -134,7 +159,12 @@ public class BusArchApplyServiceImpl implements BusArchApplyService {
 			}
 		}		
 	}
-	
+
+	/**
+	 * 根据id查看申请详情
+	 * @param applyid
+	 * @return
+	 */
 	@Override
 	@Transactional
 	public List<HashMap<String, Object>> getPersonByApplyId(String applyid)
@@ -179,7 +209,13 @@ public class BusArchApplyServiceImpl implements BusArchApplyService {
 		}
 		return lstmapbad;
 	}
-	
+
+	/**
+	 * 申请和审批档案树
+	 * @param applyid
+	 * @param empid
+	 * @return
+	 */
 	@Override
 	@Transactional
 	public List<HashMap<String, Object>> getTreeByApplyId(String applyid,String empid)
@@ -216,7 +252,23 @@ public class BusArchApplyServiceImpl implements BusArchApplyService {
 
 		return listpm;
 	}
-	
+
+	/**
+	 * 分页查看申请或审批的总数
+	 * @param resourceid
+	 * @return
+	 */
+	@Override
+	public Integer getBusArchApplyNum(String resourceid,String userid) {
+		Integer total;
+		if (resourceid.equals("11")) {
+			total = busArchApplyRepository.getBusArchApplyByVerifyTypeAAndUserid(userid);
+		}else {
+			total = busArchApplyRepository.getBusArchApplyByVerifyType();
+		}
+		return total;
+	}
+
 	private List<HashMap<String, Object>> getChildCate(List<HashMap<String, Object>> listpm, String archiveMaterialId) {
 		for (HashMap<String, Object> pm : listpm) {
 			if (pm.get("children") != null) {
@@ -233,7 +285,12 @@ public class BusArchApplyServiceImpl implements BusArchApplyService {
 	}
 
 
-
+	/**
+	 * 根据id删除查看申请
+	 * @param id
+	 * @param type
+	 * @throws Exception
+	 */
 	@Override
 	@Transactional
 	public void updateflg(String id,Integer type) throws Exception {

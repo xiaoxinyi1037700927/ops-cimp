@@ -57,11 +57,10 @@ public interface MongoDbService {
      * 下载文件到输出流,并使用AES算法解密
      *
      * @param id MongoDB 唯一主键
-     * @param os 输出流
      * @throws DownloadResourceFromMongoDbError 下载异常，详细堆栈见系统日志
      * @throws CannotFindMongoDbResourceById    MongoDB 主键不存在
      */
-    void downloadFileToStreamDecryptWithAES(String id, OutputStream os)
+    byte[] downloadFileToStreamDecryptWithAES(String id)
             throws DownloadResourceFromMongoDbError, CannotFindMongoDbResourceById;
 
     /**
@@ -88,6 +87,16 @@ public interface MongoDbService {
     File downloadToFileDecryptWithAES(String id, Path path)
             throws DownloadResourceFromMongoDbError, CannotFindMongoDbResourceById;
 
+    /**
+     * 下载到指定文件路径,并使用AES算法解密
+     *
+     * @param id   MongoDB 唯一主键
+     * @return 文件对象
+     * @throws DownloadResourceFromMongoDbError 下载异常，详细堆栈见系统日志
+     * @throws CannotFindMongoDbResourceById    MongoDB 主键不存在
+     */
+    byte[] downloadToFileDecryptWithAES(String id)
+            throws DownloadResourceFromMongoDbError, CannotFindMongoDbResourceById;
     /**
      * 下载到指定文件,并使用AES算法解密
      *

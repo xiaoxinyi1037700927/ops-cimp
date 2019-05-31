@@ -150,7 +150,7 @@ public class MongoDbServiceImpl implements MongoDbService {
     }
 
     @Override
-    public void downloadFileToStreamDecryptWithAES(String id, OutputStream os)
+    public byte[] downloadFileToStreamDecryptWithAES(String id)
             throws DownloadResourceFromMongoDbError, CannotFindMongoDbResourceById {
 
         ByteArrayOutputStream baos = null;
@@ -162,15 +162,13 @@ public class MongoDbServiceImpl implements MongoDbService {
             InputStream inputStream = gridFSDBFile.getInputStream();
             byte [] bytes=IOUtils.toByteArray(inputStream);
             byte[] decryptedBytes = CryptoUtil.decryptAes(bytes, pwdBytes);
-            IOUtils.write(decryptedBytes, os);
             // TODO MD5 验证
-
+            return decryptedBytes;
         } catch (IOException | InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException
                 | IllegalBlockSizeException | BadPaddingException e) {
             logger.error("下载文件解密失败", e);
             throw new DownloadResourceFromMongoDbError();
         } finally {
-            IOUtils.closeQuietly(os);
             IOUtils.closeQuietly(baos);
         }
     }
@@ -193,19 +191,15 @@ public class MongoDbServiceImpl implements MongoDbService {
     }
 
     @Override
-    public void downloadToFileDecryptWithAES(String id, File file)
+    public byte[] downloadToFileDecryptWithAES(String id)
             throws DownloadResourceFromMongoDbError, CannotFindMongoDbResourceById {
+            byte[] bytes = downloadFileToStreamDecryptWithAES(id);
+            return bytes;
 
-        FileOutputStream fos = null;
+    }
 
-        try {
-            fos = new FileOutputStream(file);
-            downloadFileToStreamDecryptWithAES(id, fos);
-        } catch (IOException e) {
-            logger.error("创建文件输出流失败", e);
-            throw new DownloadResourceFromMongoDbError(
-                    String.format("create file output stream error. file path:%s", file.getPath()));
-        }
+    @Override
+    public void downloadToFileDecryptWithAES(String id, File file) throws DownloadResourceFromMongoDbError, CannotFindMongoDbResourceById {
 
     }
 

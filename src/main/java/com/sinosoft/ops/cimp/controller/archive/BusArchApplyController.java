@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.sinosoft.ops.cimp.annotation.ArchiveApiGroup;
+import com.sinosoft.ops.cimp.common.BaseResult;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.entity.archive.BusArchApply;
 import com.sinosoft.ops.cimp.entity.archive.BusArchApplyDetail;
@@ -108,13 +109,25 @@ public class BusArchApplyController  extends BaseController {
 	}
 
 	@ApiOperation("查看档案申请和审批")
-	@ApiImplicitParam(name = "resouceId",value = "11为查看申请，其他为审批", dataType = "String", required = true, paramType = "query")
+
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "pageSize",value = "每页数", dataType = "String", required = true, paramType = "query"),
+			@ApiImplicitParam(name = "pageIndex",value = "当前页数", dataType = "String", required = true, paramType = "query"),
+			@ApiImplicitParam(name = "resouceId",value = "11为查看申请，其他为审批", dataType = "String", required = true, paramType = "query")
+				})
 	@RequestMapping(value = "/getApplyByUser",method = RequestMethod.POST)
 	public ResponseEntity getApplyByUser(HttpServletRequest request, HttpServletResponse response) throws BusinessException {
 		String userid =SecurityUtils.getSubject().getCurrentUser().getId();
 		String resouceId = request.getParameter("resouceId");
-		List<BusArchApply> listba = busArchApplyService.getApplyByUser(userid,resouceId);
-		return  ok(listba);
+		Integer pageIndex = Integer.parseInt(request.getParameter("pageIndex"));
+		Integer pageSize = Integer.parseInt(request.getParameter("pageSize"));
+		Map<String,Object> map=new HashMap<String,Object>();
+		List<BusArchApply> listba = busArchApplyService.getApplyByUser(userid,resouceId,pageIndex,pageSize);
+		map.put("data",listba);
+		map.put("total",busArchApplyService.getBusArchApplyNum(resouceId,userid));
+		map.put("pageIndex",pageIndex);
+		map.put("pageSize",pageSize);
+		return  ok(map);
 	}
 
 	@ApiOperation("根据id 查询申请详情")
