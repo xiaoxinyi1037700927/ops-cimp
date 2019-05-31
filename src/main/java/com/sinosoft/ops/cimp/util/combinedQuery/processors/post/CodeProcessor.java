@@ -84,6 +84,10 @@ public class CodeProcessor implements PostProcessor {
                     break;
                 case BETWEEN_AND:
                     codeSet.getCodesByBetweenAnd(code, ((ValueNode) subNodes.get(2)).getValues().get(0), codes);
+                    if (codes.size() == 0) {
+                        //如果集合为空，交换顺序再查询一次
+                        codeSet.getCodesByBetweenAnd(((ValueNode) subNodes.get(2)).getValues().get(0), code, codes);
+                    }
                     break;
                 case IN:
                     codeSet.getCodesByIn((((ValueNode) subNodes.get(1)).getValues()), codes);

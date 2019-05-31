@@ -1,5 +1,7 @@
 package com.sinosoft.ops.cimp.util.combinedQuery.utils;
 
+import com.sinosoft.ops.cimp.util.IdUtil;
+import com.sinosoft.ops.cimp.util.combinedQuery.beans.Param;
 import com.sinosoft.ops.cimp.util.combinedQuery.enums.Type;
 import com.sinosoft.ops.cimp.util.combinedQuery.processors.nodes.ValueNodeProcessor;
 
@@ -13,6 +15,7 @@ import java.util.regex.Matcher;
 
 public class CombinedQueryUtil {
     public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
+    public static final String EMPTY_PARAM = "''";
 
     /**
      * 获取值的类型
@@ -101,4 +104,12 @@ public class CombinedQueryUtil {
         }
     }
 
+    /**
+     * 获取空的参数
+     *
+     * @return
+     */
+    public static Param getEmptyParam() {
+        return new Param(IdUtil.uuid(), EMPTY_PARAM);
+    }
 }

@@ -320,10 +320,11 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
      *
      * @param appendModel
      * @return
+     * @throws BusinessException
      */
     @SuppressWarnings("unchecked")
     @Override
-    public ExprModel appendExpr(ExprAppendModel appendModel) {
+    public ExprModel appendExpr(ExprAppendModel appendModel) throws BusinessException {
         String userId = SecurityUtils.getSubject().getCurrentUser().getId();
         String combinedQueryId = appendModel.getCombinedQueryId();
         if (StringUtils.isEmpty(combinedQueryId)) {
@@ -351,8 +352,24 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
             newExpr.setSubExprs(new ArrayList<>());
         } else {
             newExpr.setOperator(appendModel.getOperator());
-            newExpr.setParams(appendModel.getParams().stream()
-                    .map(text -> new Param(IdUtil.uuid(), text)).collect(Collectors.toList()));
+
+            Operator op = null;
+            try {
+                op = Operator.getByName(newExpr.getOperator());
+            } catch (CombinedQueryParseException e) {
+                throw new BusinessException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE, e.getMessage());
+            }
+
+            List<Param> newParams = appendModel.getParams().stream()
+                    .map(text -> new Param(IdUtil.uuid(), StringUtils.isNotEmpty(text) ? text : CombinedQueryUtil.EMPTY_PARAM)).collect(Collectors.toList());
+
+            for (int i = newParams.size(); i < op.getParamsNum(); i++) {
+                //如果缺少参数，补全
+                newParams.add(CombinedQueryUtil.getEmptyParam());
+            }
+            newExpr.setParams(newParams);
+
+
             processParams(newExpr.getParams(), appendModel.getOperator());
         }
         newExpr.setText(parser.parseExprStr(Collections.singletonList(newExpr), false));
@@ -448,7 +465,7 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
         List<Expr> exprs = getCache(userId, combinedQueryId);
 
         if (!doDeleteExpr(exprs, deleteModel.getExprId())) {
-            throw new BusinessException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE, "删除失败");
+            throw new BusinessException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE, "没有找到指定的表达式对象！");
         }
 
         putCache(userId, combinedQueryId, exprs);
@@ -600,7 +617,7 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
             if (paramNum > 0) {
                 newParams.add(target);
                 for (int i = 1; i < paramNum; i++) {
-                    newParams.add(new Param(IdUtil.uuid(), "''"));
+                    newParams.add(CombinedQueryUtil.getEmptyParam());
                 }
             }
 
@@ -675,7 +692,7 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
             int index = params.indexOf(target);
             params.remove(target);
 
-            params.add(index, target.getParams().size() > 0 ? target.getParams().get(0) : new Param(IdUtil.uuid(), "''"));
+            params.add(index, target.getParams().size() > 0 ? target.getParams().get(0) : CombinedQueryUtil.getEmptyParam());
             return true;
         }
 
@@ -759,7 +776,7 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
             }
         } else if (oldParams.size() < paramsNum) {
             while (oldParams.size() < paramsNum) {
-                oldParams.add(new Param(IdUtil.uuid(), "''"));
+                oldParams.add(CombinedQueryUtil.getEmptyParam());
             }
         }
 
@@ -801,7 +818,7 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
                         }
                     } else if (oldParams.size() < paramsNum) {
                         while (oldParams.size() < paramsNum) {
-                            oldParams.add(new Param(IdUtil.uuid(), "''"));
+                            oldParams.add(CombinedQueryUtil.getEmptyParam());
                         }
                     }
                 }
