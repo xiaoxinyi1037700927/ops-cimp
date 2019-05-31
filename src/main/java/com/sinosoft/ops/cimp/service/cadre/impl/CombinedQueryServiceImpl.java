@@ -10,7 +10,6 @@ import com.sinosoft.ops.cimp.dao.domain.sys.table.SysTableInfo;
 import com.sinosoft.ops.cimp.dao.domain.sys.table.SysTableModelInfo;
 import com.sinosoft.ops.cimp.entity.combinedQuery.CombinedQuery;
 import com.sinosoft.ops.cimp.entity.combinedQuery.QCombinedQuery;
-import com.sinosoft.ops.cimp.entity.user.UserRole;
 import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.repository.combinedQuery.CombinedQueryRepository;
 import com.sinosoft.ops.cimp.service.cadre.CombinedQueryService;
@@ -51,6 +50,7 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
     }
 
     private void putCache(String userId, String combinedQueryId, List<Expr> expr) {
+        removeCache(userId);
         CacheManager.getInstance().put(Constants.COMBINED_QUERY_CACHE, userId + "/" + combinedQueryId, expr, 86400);
     }
 
@@ -71,6 +71,22 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
         }
 
         return o != null ? (List<Expr>) o : new ArrayList<>();
+    }
+
+    /**
+     * 删除用户的组合查询操作信息
+     *
+     * @param userId
+     */
+    private void removeCache(String userId) {
+        Map map = CacheManager.getInstance().getAll(Constants.COMBINED_QUERY_CACHE);
+        if (map != null) {
+            for (Object key : map.keySet()) {
+                if (key.toString().startsWith(userId)) {
+                    CacheManager.getInstance().remove(Constants.COMBINED_QUERY_CACHE, key);
+                }
+            }
+        }
     }
 
     /**
@@ -269,6 +285,7 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
 
         CombinedQueryModel model = new CombinedQueryModel();
         model.setCombinedQueryId(id);
+        model.setName(combinedQuery.getName());
         model.setExprstr(parser.parseExprStr(exprs, true));
         model.setExpr(exprs);
 
@@ -283,9 +300,6 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
      */
     @Override
     public List<CombinedQueryModel> findAll() {
-        String userId = SecurityUtils.getSubject().getCurrentUser().getId();
-        List<String> roleIds = SecurityUtils.getSubject().getCurrentUserRole().stream().map(UserRole::getRoleId).collect(Collectors.toList());
-
         QCombinedQuery qCombinedQuery = QCombinedQuery.combinedQuery;
         Iterable<CombinedQuery> iterable = combinedQueryRepository.findAll();
 
@@ -861,26 +875,18 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
     @Override
     public void saveCombinedQuery(ExprSaveModel saveModel) throws BusinessException {
         String userId = SecurityUtils.getSubject().getCurrentUser().getId();
-        Optional<CombinedQuery> optional = combinedQueryRepository.findById(saveModel.getCombinedQueryId());
+        removeCache(userId);
+
+        String combinedQueryId = StringUtils.isNotEmpty(saveModel.getCombinedQueryId()) ? saveModel.getCombinedQueryId() : IdUtil.uuid();
+
+        Optional<CombinedQuery> optional = combinedQueryRepository.findById(combinedQueryId);
 
         CombinedQuery combinedQuery = null;
         if (optional.isPresent()) {
             combinedQuery = optional.get();
         } else {
             combinedQuery = new CombinedQuery();
-            combinedQuery.setId(saveModel.getCombinedQueryId());
-            combinedQuery.setUserId(userId);
-
-            combinedQuery.setCreateId(userId);
-            combinedQuery.setCreateTime(new Date());
-        }
-
-        if (StringUtils.isNotEmpty(combinedQuery.getRoleId())) {
-            //如果是查询模板,创建新的副本
-            combinedQuery = new CombinedQuery();
-            combinedQuery.setId(IdUtil.uuid());
-            combinedQuery.setUserId(userId);
-
+            combinedQuery.setId(combinedQueryId);
             combinedQuery.setCreateId(userId);
             combinedQuery.setCreateTime(new Date());
         }
