@@ -127,7 +127,7 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
                         //新增函数
 
                         //参数为空字符串时，可以加任意函数，不为空时，根据参数类型过滤
-                        if (StringUtils.isNotEmpty(param.getText()) && (function.getParamsNum() == 0 || (function.getParamsType().get(0).getCode() & param.getReturnType()) == 0)) {
+                        if (!StringUtils.equals(param.getText(), "''") && (function.getParamsNum() == 0 || (function.getParamsType().get(0).getCode() & param.getReturnType()) == 0)) {
                             iterator.remove();
                             continue;
                         }
@@ -694,7 +694,7 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
             }
         } else {
             //修改参数
-            doModifyParam(expr.getParams(), modifyModel);
+            doModifyParam(expr.getParams(), modifyModel, expr);
         }
 
 
@@ -753,9 +753,10 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
      *
      * @param params
      * @param modifyModel
+     * @param expr
      * @throws BusinessException
      */
-    private boolean doModifyParam(List<Param> params, ExprModifyModel modifyModel) throws BusinessException {
+    private boolean doModifyParam(List<Param> params, ExprModifyModel modifyModel, Expr expr) throws BusinessException {
         for (Param param : params) {
             if (param.getId().equals(modifyModel.getParamId())) {
                 if (param.getIsFunction() == 0) {
@@ -787,11 +788,11 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
                     }
                 }
 
-                processParams(params, null);
+                processParams(params, expr != null ? expr.getOperator() : null);
                 return true;
             }
 
-            if (param.getIsFunction() == 1 && doModifyParam(param.getParams(), modifyModel)) {
+            if (param.getIsFunction() == 1 && doModifyParam(param.getParams(), modifyModel, null)) {
                 return true;
             }
         }
@@ -897,6 +898,16 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
         combinedQuery.setModifyTime(new Date());
 
         combinedQueryRepository.save(combinedQuery);
+    }
+
+    /**
+     * 删除组合查询
+     *
+     * @param combinedQueryId
+     */
+    @Override
+    public void deleteCombinedQuery(String combinedQueryId) {
+        combinedQueryRepository.deleteById(combinedQueryId);
     }
 
     /**

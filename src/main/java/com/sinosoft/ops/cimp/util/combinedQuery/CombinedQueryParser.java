@@ -353,7 +353,7 @@ public class CombinedQueryParser {
             }
         }
 
-        if(parent == null && stack.size() == 0){
+        if (parent == null && stack.size() == 0) {
             return operatorNodeProcessor.getDefaultNode();
         }
 
@@ -449,17 +449,33 @@ public class CombinedQueryParser {
                 break;
             case '\'':
                 //value
-                while (stream.hasNext()) {
-                    char c = stream.next();
-                    sb.append(c);
-                    if (c == '\'') {
-                        break;
-                    }
-                }
+                sb.append(stream.getUtilNextSingleQuotes());
                 break;
             case '[':
                 //数组格式的value
                 sb.append(stream.getUtilRightBrackets('[', ']'));
+                break;
+            case '介':
+                //处理介于..和..之间
+                while (stream.hasNext()) {
+                    char c = stream.next();
+                    if (c == ' ') {
+                        //取到空格为止
+                        break;
+                    }
+                    sb.append(c);
+
+                    if (c == '\'') {
+                        //处理值
+                        sb.append(stream.getUtilNextSingleQuotes());
+                    }
+
+                    if (c == '(') {
+                        //处理函数
+                        sb.append(stream.getUtilRightBrackets('(', ')'));
+                    }
+                }
+                break;
             default:
                 while (stream.hasNext()) {
                     char c = stream.next();
