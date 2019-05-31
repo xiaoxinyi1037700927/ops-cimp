@@ -10,6 +10,7 @@ import com.sinosoft.ops.cimp.repository.archive.busarch.BusArchApplyRepository;
 import com.sinosoft.ops.cimp.service.archive.BusArchApplyService;
 import com.sinosoft.ops.cimp.service.archive.BusinessService;
 import com.sinosoft.ops.cimp.service.user.UserRoleService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
@@ -17,16 +18,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository("busArchApplyService")
 public class BusArchApplyServiceImpl implements BusArchApplyService {
 
 	@Autowired
 	private BusArchApplyRepository busArchApplyRepository;
-	
+
 	@Autowired
 	private BusArchApplyPersonRepository busArchApplyPersonRepository;
-	
+
 	@Autowired
 	private BusArchApplyDetailRepository busArchApplyDetailRepository;
 
@@ -125,39 +127,31 @@ public class BusArchApplyServiceImpl implements BusArchApplyService {
 			for(BusArchApply busArchApply:listBus)
 			{
 				List<BusArchApplyPerson> ListBusArchApplyPerson =busArchApplyPersonRepository.findAllByApplyId(busArchApply.getId());
-				String strPerson ="";
-				for(BusArchApplyPerson busArchApplyPerson : ListBusArchApplyPerson)
-				{
-					strPerson+= busArchApplyPerson.getName() + ",";
-				}	
-				strPerson=strPerson.substring(0, strPerson.length()-1);
-				busArchApply.setPersonName(strPerson);
+
+				String persoNames = ListBusArchApplyPerson.stream().filter(b -> StringUtils.isNotEmpty(b.getName())).map(BusArchApplyPerson::getName).collect(Collectors.joining(","));
+
+				busArchApply.setPersonName(persoNames);
 			}
 			return listBus;
 		}
 		else
 		{
 			List<Role> roles =  userRoleService.getRolesByUserId(userid);
-			if (roles.size()>0 && roles.stream().filter(temp -> temp.getCode().equals("13")).count() > 0) {
+			if (roles.size()>0 && roles.stream().anyMatch(temp -> temp.getCode().equals("13"))) {
 				listBus = busArchApplyRepository.findAllByVerifyType(PageRequest.of(pageIndex,pageSize));
 				for(BusArchApply busArchApply:listBus)
 				{
 					List<BusArchApplyPerson> ListBusArchApplyPerson =busArchApplyPersonRepository.findAllByApplyId(busArchApply.getId());
-					System.out.println(ListBusArchApplyPerson);
-					String strPerson ="";
-					for(BusArchApplyPerson busArchApplyPerson : ListBusArchApplyPerson)
-					{
-						strPerson+= busArchApplyPerson.getName() + ",";
-					}	
-					strPerson=strPerson.substring(0, strPerson.length()-1);
-					busArchApply.setPersonName(strPerson);
+                    String persoNames = ListBusArchApplyPerson.stream().filter(b -> StringUtils.isNotEmpty(b.getName())).map(BusArchApplyPerson::getName).collect(Collectors.joining(","));
+
+                    busArchApply.setPersonName(persoNames);
 				}
 				return listBus;
-				
+
 			} else {
 				return listBus;
 			}
-		}		
+		}
 	}
 
 	/**
@@ -191,10 +185,10 @@ public class BusArchApplyServiceImpl implements BusArchApplyService {
 			}
 			listpm.add(map);
 		}
-		
+
 		return listpm;
 	}
-	
+
 	private List<HashMap<String, Object>> getDetailArray(String personid)
 	{
 		List<BusArchApplyDetail> listbad = busArchApplyDetailRepository.findAllByPersonid(personid);
@@ -223,7 +217,7 @@ public class BusArchApplyServiceImpl implements BusArchApplyService {
 		List<HashMap<String, Object>> listpm = businessService.getPersonMaterial(empid);
 		System.out.println(listpm);
 		List<BusArchApplyPerson> listbap =  busArchApplyPersonRepository.findAllByApplyId(applyid);
-		
+
 		String strPersonId=null;
 		for(BusArchApplyPerson bap : listbap){
 			if(empid.equals(bap.getEmpid()))
@@ -238,7 +232,7 @@ public class BusArchApplyServiceImpl implements BusArchApplyService {
 		}
 		return listpm;
 	}
-	
+
 	@Override
 	@Transactional
 	public List<HashMap<String, Object>> getDetailByPersonId(String personid,String empid)
