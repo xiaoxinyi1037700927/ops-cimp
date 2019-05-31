@@ -7,25 +7,24 @@
     <link rel=stylesheet type=text/css href=./static/ifIE/css/loading.css>
     <link rel=stylesheet type=text/css href=./static/style/font/iconfont.css>
     <link rel="shortcut icon" href=./static/img/favicon.png>
-    <link href=./static/css/app.d87f1be9a51f71f80b2ab36f29ddd508.css rel=stylesheet>
+    <link href=./static/css/app.029bf6ca2eb213e84184f3c5c42ce4e3.css rel=stylesheet>
 </head>
 <body>
 <div id=app></div>
 <script th:inline="javascript">
     var appInfo = {
-        appName:[[${appName}]],
-        appIcon:[[${appIcon}]]
+        appName: [[${appName}]],
+        appIcon: [[${appIcon}]]
     };
     localStorage.appInfo = JSON.stringify(appInfo);
 </script>
 <script src=./static/ifIE/js/loading.js></script>
 <script>if (localStorage.appInfo) {
-    var appInfo = JSON.parse(localStorage.appInfo);
+    let appInfo = JSON.parse(localStorage.appInfo);
     document.title = appInfo.appName;
 }</script>
 <script type=text/javascript src=./static/js/manifest.3ad1d5771e9b13dbdad2.js></script>
 <script type=text/javascript src=./static/js/vendor.416e0c5b45c913a34108.js></script>
-<script type=text/javascript src=./static/js/app.f0a8245daf75c8fbb743.js></script>
+<script type=text/javascript src=./static/js/app.23b0bdddd2780e21854b.js></script>
 </body>
 </html>
-

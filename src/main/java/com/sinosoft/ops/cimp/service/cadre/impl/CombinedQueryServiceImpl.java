@@ -310,6 +310,7 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
             CombinedQueryModel model = new CombinedQueryModel();
             model.setCombinedQueryId(combinedQuery.getId());
             model.setName(combinedQuery.getName());
+            model.setExprstr(combinedQuery.getExpression());
             return model;
         }).collect(Collectors.toList());
     }
