@@ -454,6 +454,16 @@ public class SysTableModelInfoServiceImpl implements SysTableModelInfoService {
                         columnName = "TAG";
                         sql = "SELECT TAG FROM SYS_TAG WHERE ID = ?";
                     }
+                    if (StringUtils.equals(codeSetName, "TAG_TYPE")) {
+                        String field_value = String.valueOf(fieldValue);
+                        if (StringUtils.equals("0", field_value)) {
+                            translateField.setFieldTranslateValue("系统标签");
+                        }
+                        if (StringUtils.equals("1", field_value)) {
+                            translateField.setFieldTranslateValue("用户标签");
+                        }
+                        return translateField;
+                    }
                     List<Map<String, Object>> maps = jdbcTemplate.queryForList(sql, String.valueOf(fieldValue));
                     if (maps.size() > 0) {
                         Object valueName = maps.get(0).get(columnName);
