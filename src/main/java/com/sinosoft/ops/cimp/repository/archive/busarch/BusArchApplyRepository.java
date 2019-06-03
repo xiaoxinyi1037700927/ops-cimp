@@ -1,7 +1,7 @@
 package com.sinosoft.ops.cimp.repository.archive.busarch;
 
 import com.sinosoft.ops.cimp.entity.archive.BusArchApply;
-import com.sinosoft.ops.cimp.service.archive.bean.bean.PersonAndPost;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -22,8 +22,8 @@ public interface BusArchApplyRepository extends JpaRepository<BusArchApply, Stri
      * @param pageable
      * @return
      */
-    @Query("select a from BusArchApply a where a.userid=?1 and a.verifyType>=0")
-    public List<BusArchApply> findAllByUseridAndVerifyType(String userid, Pageable pageable);
+    @Query("select a from BusArchApply a where a.userid=?1 and a.verifyType>=0 order by a.createdTime")
+    public Page<BusArchApply> findAllByUseridAndVerifyType(String userid, Pageable pageable);
 
     /**
      * 分页查询查看申请的总数
@@ -62,7 +62,7 @@ public interface BusArchApplyRepository extends JpaRepository<BusArchApply, Stri
      * @return
      */
     @Query("select a from BusArchApply a where  a.verifyType>0 and a.verifyType<99 order by a.createdTime")
-    public List<BusArchApply> findAllByVerifyType(Pageable pageable);
+    public Page<BusArchApply> findAllByVerifyType(Pageable pageable);
 
 
 

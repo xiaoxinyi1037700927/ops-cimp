@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.sinosoft.ops.cimp.annotation.ArchiveApiGroup;
-import com.sinosoft.ops.cimp.common.BaseResult;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.entity.archive.BusArchApply;
 import com.sinosoft.ops.cimp.entity.archive.BusArchApplyDetail;
@@ -119,14 +118,20 @@ public class BusArchApplyController  extends BaseController {
 	public ResponseEntity getApplyByUser(HttpServletRequest request, HttpServletResponse response) throws BusinessException {
 		String userid =SecurityUtils.getSubject().getCurrentUser().getId();
 		String resouceId = request.getParameter("resouceId");
-		Integer pageIndex = Integer.parseInt(request.getParameter("pageIndex"));
-		Integer pageSize = Integer.parseInt(request.getParameter("pageSize"));
-		Map<String,Object> map=new HashMap<String,Object>();
-		List<BusArchApply> listba = busArchApplyService.getApplyByUser(userid,resouceId,pageIndex,pageSize);
-		map.put("data",listba);
-		map.put("total",busArchApplyService.getBusArchApplyNum(resouceId,userid));
-		map.put("pageIndex",pageIndex);
-		map.put("pageSize",pageSize);
+		Integer pageIndex;
+		Integer pageSize;
+		try{
+			pageIndex = Integer.parseInt(request.getParameter("pageIndex"));
+			pageSize = Integer.parseInt(request.getParameter("pageSize"));
+		}catch(NumberFormatException e)
+		{
+			 pageIndex=1;
+			 pageSize=10;
+		}
+
+
+		Map<String, Object> map = busArchApplyService.getApplyByUser(userid, resouceId, pageIndex, pageSize);
+
 		return  ok(map);
 	}
 

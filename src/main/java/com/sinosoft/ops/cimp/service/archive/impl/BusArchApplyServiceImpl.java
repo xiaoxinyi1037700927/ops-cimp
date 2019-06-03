@@ -11,6 +11,7 @@ import com.sinosoft.ops.cimp.service.archive.BusArchApplyService;
 import com.sinosoft.ops.cimp.service.archive.BusinessService;
 import com.sinosoft.ops.cimp.service.user.UserRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -114,14 +115,18 @@ public class BusArchApplyServiceImpl implements BusArchApplyService {
 	 */
 	@Override
 	@Transactional
-	public List<BusArchApply> getApplyByUser(String userid,String resouceId,Integer pageIndex,Integer pageSize)
+	public Map<String, Object> getApplyByUser(String userid,String resouceId,Integer pageIndex,Integer pageSize)
 	{
-
+		Map<String, Object> map=new HashMap<String, Object>();
 		List<BusArchApply> listBus =new ArrayList<BusArchApply>();
 		if(resouceId.equals("11"))
 		{
-			listBus=busArchApplyRepository.findAllByUseridAndVerifyType(userid, PageRequest.of(pageIndex,pageSize));
-//
+			Page<BusArchApply> pagelist = busArchApplyRepository.findAllByUseridAndVerifyType(userid, PageRequest.of((pageIndex-1), pageSize));
+			listBus=pagelist.getContent();
+			map.put("total",pagelist.getTotalElements());
+			map.put("pages",pagelist.getTotalPages());
+			map.put("pageIndex",pageIndex);
+			map.put("pageSize",pageSize);
 			for(BusArchApply busArchApply:listBus)
 			{
 				List<BusArchApplyPerson> ListBusArchApplyPerson =busArchApplyPersonRepository.findAllByApplyId(busArchApply.getId());
@@ -133,13 +138,19 @@ public class BusArchApplyServiceImpl implements BusArchApplyService {
 				strPerson=strPerson.substring(0, strPerson.length()-1);
 				busArchApply.setPersonName(strPerson);
 			}
-			return listBus;
+			map.put("data",listBus);
+			return map;
 		}
 		else
 		{
 			List<Role> roles =  userRoleService.getRolesByUserId(userid);
 			if (roles.size()>0 && roles.stream().filter(temp -> temp.getCode().equals("13")).count() > 0) {
-				listBus = busArchApplyRepository.findAllByVerifyType(PageRequest.of(pageIndex,pageSize));
+				Page<BusArchApply> pagelist = busArchApplyRepository.findAllByVerifyType(PageRequest.of((pageIndex-1),pageSize));
+				listBus=pagelist.getContent();
+				map.put("total",pagelist.getTotalElements());
+				map.put("pages",pagelist.getTotalPages());
+				map.put("pageIndex",pageIndex+1);
+				map.put("pageSize",pageSize);
 				for(BusArchApply busArchApply:listBus)
 				{
 					List<BusArchApplyPerson> ListBusArchApplyPerson =busArchApplyPersonRepository.findAllByApplyId(busArchApply.getId());
@@ -152,10 +163,11 @@ public class BusArchApplyServiceImpl implements BusArchApplyService {
 					strPerson=strPerson.substring(0, strPerson.length()-1);
 					busArchApply.setPersonName(strPerson);
 				}
-				return listBus;
+				map.put("data",listBus);
+				return map;
 				
 			} else {
-				return listBus;
+				return map;
 			}
 		}		
 	}
@@ -253,21 +265,7 @@ public class BusArchApplyServiceImpl implements BusArchApplyService {
 		return listpm;
 	}
 
-	/**
-	 * 分页查看申请或审批的总数
-	 * @param resourceid
-	 * @return
-	 */
-	@Override
-	public Integer getBusArchApplyNum(String resourceid,String userid) {
-		Integer total;
-		if (resourceid.equals("11")) {
-			total = busArchApplyRepository.getBusArchApplyByVerifyTypeAAndUserid(userid);
-		}else {
-			total = busArchApplyRepository.getBusArchApplyByVerifyType();
-		}
-		return total;
-	}
+
 
 	private List<HashMap<String, Object>> getChildCate(List<HashMap<String, Object>> listpm, String archiveMaterialId) {
 		for (HashMap<String, Object> pm : listpm) {

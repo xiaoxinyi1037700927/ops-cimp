@@ -6,6 +6,7 @@ import com.sinosoft.ops.cimp.entity.archive.BusArchApplyPerson;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public interface BusArchApplyService {
 	public void update(BusArchApply entity);
@@ -35,7 +36,16 @@ public interface BusArchApplyService {
 	 * @throws Exception
 	 */
 	public void updateflg(String id, Integer type) throws Exception;
-	public List<BusArchApply> getApplyByUser(String userid, String resourceid,Integer pageIndex,Integer pageSize);
+
+	/**
+	 * 查看申请和审批
+	 * @param userid
+	 * @param resourceid
+	 * @param pageIndex
+	 * @param pageSize
+	 * @return
+	 */
+	public Map<String,Object> getApplyByUser(String userid, String resourceid, Integer pageIndex, Integer pageSize);
 
 	/**
 	 * 申请和审批档案树
@@ -53,10 +63,4 @@ public interface BusArchApplyService {
 	public List<HashMap<String, Object>> getPersonByApplyId(String applyid);
 	public List<HashMap<String, Object>> getDetailByPersonId(String personid, String empid);
 
-	/**
-	 * 查看审批或申请的总数
-	 * @param resourceid
-	 * @return
-	 */
-	public Integer getBusArchApplyNum (String resourceid,String userid);
 }
