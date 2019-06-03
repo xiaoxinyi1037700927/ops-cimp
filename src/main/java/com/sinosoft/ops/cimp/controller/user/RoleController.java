@@ -18,7 +18,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
 import java.util.List;
 
 @SystemUserApiGroup
@@ -33,14 +32,13 @@ public class RoleController extends BaseController {
     @ApiOperation(value = "查询角色列表")
     @PostMapping("/findData")
     @RequiresAuthentication
-    public ResponseEntity<List<RoleViewModel>> findData() throws BusinessException {
-        List<RoleViewModel> data = roleService.findData();
+    public ResponseEntity<List<RoleViewModel>> findData(@RequestParam(required = false) String orgId) throws BusinessException {
+        List<RoleViewModel> data = roleService.findData(orgId);
         return ok(data);
     }
 
 
-
-    @ApiOperation(value ="根据id查询角色")
+    @ApiOperation(value = "根据id查询角色")
     @ApiImplicitParam(name = "roleId", paramType = "query", value = "角色ID", required = true)
     @PostMapping("/getById")
     @RequiresAuthentication
@@ -99,7 +97,7 @@ public class RoleController extends BaseController {
     @RequiresAuthentication
     @RequiresRoles(UserRoleConstants.ADMIN_ROLE)
     public ResponseEntity<RoleViewModel> addRelation(@RequestParam String roleId,
-                                             @RequestParam String permissionId) {
+                                                     @RequestParam String permissionId) {
         return null;
     }
 }

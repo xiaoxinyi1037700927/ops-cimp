@@ -41,9 +41,12 @@ public class OrganizationServiceImpl implements OrganizationService {
         boolean isMultiOrg = false;
         OrganizationViewModel viewModel = null;
         String organizationId = organizationSearchViewModel.getOrganizationId();
+        String dataOrgId = organizationSearchViewModel.getDataOrganizationId();
         if (StringUtils.isNotBlank(organizationId)) {
             //如果传递的
-            Organization root = this.getRoot();
+            Organization root = StringUtils.isNotEmpty(dataOrgId) ?
+                    OrganizationCacheManager.getSubject().getOrganizationById(dataOrgId) : this.getRoot();
+
             viewModel = OrganizationViewMapper.INSTANCE.organizationToViewModel(root);
             List<Organization> allOrgList = OrganizationCacheManager.getSubject().getAllList();
 
@@ -62,7 +65,10 @@ public class OrganizationServiceImpl implements OrganizationService {
             if (organizationSearchViewModel.isNoPermission()) {
                 User currentUser = SecurityUtils.getSubject().getCurrentUser();
                 String loginDataOrganId;
-                if (currentUser == null) {
+
+                if (StringUtils.isNotEmpty(dataOrgId)) {
+                    loginDataOrganId = dataOrgId;
+                } else if (currentUser == null) {
                     loginDataOrganId = "";
                 } else {
                     loginDataOrganId = currentUser.getDataOrganizationId();
@@ -79,7 +85,9 @@ public class OrganizationServiceImpl implements OrganizationService {
                     organization = OrganizationCacheManager.getSubject().getOrganizationById(loginDataOrganId);
                 }
             } else {
-                organization = this.findRoot("ROOT");
+                organization = StringUtils.isNotEmpty(dataOrgId) ?
+                        OrganizationCacheManager.getSubject().getOrganizationById(dataOrgId) : this.getRoot();
+
             }
             if (organization != null) {
                 viewModel = OrganizationViewMapper.INSTANCE.organizationToViewModel(organization);

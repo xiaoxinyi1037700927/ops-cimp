@@ -1,18 +1,21 @@
 package com.sinosoft.ops.cimp.service.user.impl;
 
 
-import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.sinosoft.ops.cimp.entity.oraganization.QOrganization;
 import com.sinosoft.ops.cimp.entity.user.QRole;
-import com.sinosoft.ops.cimp.entity.user.QRolePermissionPageSql;
 import com.sinosoft.ops.cimp.entity.user.Role;
-import com.sinosoft.ops.cimp.entity.user.subSelects.*;
+import com.sinosoft.ops.cimp.entity.user.subSelects.QRHPCountCount;
+import com.sinosoft.ops.cimp.entity.user.subSelects.QRMGroupCount;
+import com.sinosoft.ops.cimp.entity.user.subSelects.QRPPSqlCount;
+import com.sinosoft.ops.cimp.entity.user.subSelects.QRPTableCount;
 import com.sinosoft.ops.cimp.repository.user.RoleRepository;
 import com.sinosoft.ops.cimp.service.user.RoleService;
 import com.sinosoft.ops.cimp.util.SecurityUtils;
 import com.sinosoft.ops.cimp.vo.from.sys.role.RoleModel;
 import com.sinosoft.ops.cimp.vo.to.sys.role.RoleViewModel;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,6 +29,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class RoleServiceImpl implements RoleService {
@@ -43,14 +47,15 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public List<RoleViewModel> findData() {
+    public List<RoleViewModel> findData(String orgId) {
         QRole qRole = QRole.role;
         QRMGroupCount qrmGroupCount = QRMGroupCount.rMGroupCount;
         QRHPCountCount qrhpCountCount = QRHPCountCount.rHPCountCount;
         QRPTableCount qrpTableCount = QRPTableCount.rPTableCount;
         QRPPSqlCount rPPSqlCount = QRPPSqlCount.rPPSqlCount;
+        QOrganization qOrganization = QOrganization.organization;
 
-        QueryResults<RoleViewModel> queryResult = queryFactory.select(
+        List<RoleViewModel> results = queryFactory.select(
                 Projections.bean(
                         RoleViewModel.class,
                         qRole.id,
@@ -69,20 +74,19 @@ public class RoleServiceImpl implements RoleService {
                 .leftJoin(qrpTableCount).on(qRole.id.eq(qrpTableCount.roleId))
                 .leftJoin(rPPSqlCount).on(qRole.id.eq(rPPSqlCount.roleId))
                 .orderBy(qRole.createTime.desc())
-                .fetchResults();
+                .fetch();
 
-        List<RoleViewModel> results = queryResult.getResults();
-//        BooleanExpression condition = qRole.id.isNotNull().and(qRole.systemType.eq(roleModel.getSystemType()));
-//        if (!StringUtils.isEmpty(roleModel.getName())) {
-//            condition = condition.and(qRole.name.like("%" + roleModel.getName() + "%"));
-//        }
-//        if (!StringUtils.isEmpty(roleModel.getDescription())) {
-//            condition = condition.and(qRole.description.like("%" + roleModel.getDescription() + "%"));
-//        }
-//        Iterable<Role> roleLst = roleRepository.findAll();
+        if (StringUtils.isNotEmpty(orgId)) {
+            //账号配置中，如果单位是毕节市区县，排除"管理员"
+            String code = queryFactory.select(qOrganization.code).from(qOrganization).where(qOrganization.id.eq(orgId)).fetchOne();
+            if (code != null && code.startsWith("001.019")) {
+                results = results.stream().filter(model -> !"管理员".equals(model.getName())).collect(Collectors.toList());
+            }
+        }
+
+
         return results;
     }
-
 
 
     @Override

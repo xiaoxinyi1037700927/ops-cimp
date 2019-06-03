@@ -10,7 +10,7 @@ import java.util.List;
 public interface RoleService {
 
    // Iterable<Role> findData(RoleModel roleModel);
-    List<RoleViewModel> findData();
+    List<RoleViewModel> findData(String orgId);
 
     Role getById(String roleId);
 
