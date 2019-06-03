@@ -83,16 +83,17 @@ public abstract class OperatorProcessor {
         }
 
         Node first = subNodes.get(0);
+        int[] paramsType = node.getProcessor().getOperator().getParamsType();
 
         //判断参数的类型是否匹配
         for (int i = 1; i < subNodes.size(); i++) {
             Node next = subNodes.get(i);
-            if (first.getReturnType() == Type.STRING.getCode() && next instanceof ValueNode && next.getReturnType() == Type.NUMBER.getCode()) {
-                //处理string类型和number类型的值节点的情况
+            if (first.getReturnType() == Type.STRING.getCode() && next instanceof ValueNode) {
+                //处理需要string类型，而添加的是其它类型的值节点的情况
                 ((ValueNode) next).setReturnType(Type.STRING.getCode());
             }
 
-            if (first.getReturnType() != next.getReturnType()) {
+            if (paramsType[i] != next.getReturnType() && first.getReturnType() != next.getReturnType()) {
                 throw new CombinedQueryParseException("运算符[" + node.getProcessor().getOperator().getName() + "]参数类型不匹配");
             }
         }

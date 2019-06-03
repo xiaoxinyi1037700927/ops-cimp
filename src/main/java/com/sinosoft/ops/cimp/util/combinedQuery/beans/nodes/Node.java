@@ -118,7 +118,7 @@ public abstract class Node {
             ((ValueNode) node).setReturnType(Type.STRING.getCode());
         }
         if ((subType & node.getReturnType()) == 0) {
-            throw new CombinedQueryParseException("错误的类型：" + node.getExpr());
+            throw new CombinedQueryParseException("类型错误！");
         }
 
         subNodes.add(node);

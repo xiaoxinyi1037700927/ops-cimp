@@ -6,17 +6,6 @@ import io.swagger.annotations.ApiModelProperty;
 
 @ApiModel(description = "干部列表搜索模型")
 public class CadreSearchModel extends RePagination {
-    public CadreSearchModel() {
-    }
-
-    public CadreSearchModel(String deptId, String includeSubNode, String combinedQueryId, String cadreTagIds, String tableConditions, String name) {
-        this.deptId = deptId;
-        this.includeSubNode = includeSubNode;
-        this.combinedQueryId = combinedQueryId;
-        this.cadreTagIds = cadreTagIds;
-        this.tableConditions = tableConditions;
-        this.name = name;
-    }
 
     /**
      * 单位id
@@ -34,6 +23,11 @@ public class CadreSearchModel extends RePagination {
     @ApiModelProperty(value = "组合查询id")
     private String combinedQueryId;
     /**
+     * 组合查询表达式
+     */
+    @ApiModelProperty(value = "组合查询表达式")
+    private String exprStr;
+    /**
      * 干部标签id
      */
     @ApiModelProperty(value = "干部标签id")
@@ -44,7 +38,7 @@ public class CadreSearchModel extends RePagination {
     @ApiModelProperty(value = "查询条件")
     private String tableConditions;
     /**
-     * 姓名
+     * 查询条件
      */
     @ApiModelProperty(value = "姓名")
     private String name;
@@ -73,6 +67,22 @@ public class CadreSearchModel extends RePagination {
         this.combinedQueryId = combinedQueryId;
     }
 
+    public String getExprStr() {
+        return exprStr;
+    }
+
+    public void setExprStr(String exprStr) {
+        this.exprStr = exprStr;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getCadreTagIds() {
         return cadreTagIds;
     }
@@ -89,12 +99,5 @@ public class CadreSearchModel extends RePagination {
         this.tableConditions = tableConditions;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 }
 

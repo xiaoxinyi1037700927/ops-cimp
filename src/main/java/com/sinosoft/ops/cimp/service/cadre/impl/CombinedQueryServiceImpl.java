@@ -10,7 +10,6 @@ import com.sinosoft.ops.cimp.dao.domain.sys.table.SysTableInfo;
 import com.sinosoft.ops.cimp.dao.domain.sys.table.SysTableModelInfo;
 import com.sinosoft.ops.cimp.entity.combinedQuery.CombinedQuery;
 import com.sinosoft.ops.cimp.entity.combinedQuery.QCombinedQuery;
-import com.sinosoft.ops.cimp.entity.user.UserRole;
 import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.repository.combinedQuery.CombinedQueryRepository;
 import com.sinosoft.ops.cimp.service.cadre.CombinedQueryService;
@@ -32,10 +31,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
 public class CombinedQueryServiceImpl implements CombinedQueryService {
+
+    private static final Pattern PATTERN_EMPTY_STRING = Pattern.compile("^'\\s*'$");
 
     private final CombinedQueryParser parser;
     private final CombinedQueryRepository combinedQueryRepository;
@@ -51,6 +53,7 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
     }
 
     private void putCache(String userId, String combinedQueryId, List<Expr> expr) {
+        removeCache(userId);
         CacheManager.getInstance().put(Constants.COMBINED_QUERY_CACHE, userId + "/" + combinedQueryId, expr, 86400);
     }
 
@@ -71,6 +74,22 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
         }
 
         return o != null ? (List<Expr>) o : new ArrayList<>();
+    }
+
+    /**
+     * 删除用户的组合查询操作信息
+     *
+     * @param userId
+     */
+    private void removeCache(String userId) {
+        Map map = CacheManager.getInstance().getAll(Constants.COMBINED_QUERY_CACHE);
+        if (map != null) {
+            for (Object key : map.keySet()) {
+                if (key.toString().startsWith(userId)) {
+                    CacheManager.getInstance().remove(Constants.COMBINED_QUERY_CACHE, key);
+                }
+            }
+        }
     }
 
     /**
@@ -127,7 +146,7 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
                         //新增函数
 
                         //参数为空字符串时，可以加任意函数，不为空时，根据参数类型过滤
-                        if (!StringUtils.equals(param.getText(), "''") && (function.getParamsNum() == 0 || (function.getParamsType().get(0).getCode() & param.getReturnType()) == 0)) {
+                        if (!PATTERN_EMPTY_STRING.matcher(param.getText()).matches() && (function.getParamsNum() == 0 || (function.getParamsType().get(0).getCode() & param.getReturnType()) == 0)) {
                             iterator.remove();
                             continue;
                         }
@@ -269,6 +288,7 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
 
         CombinedQueryModel model = new CombinedQueryModel();
         model.setCombinedQueryId(id);
+        model.setName(combinedQuery.getName());
         model.setExprstr(parser.parseExprStr(exprs, true));
         model.setExpr(exprs);
 
@@ -283,9 +303,6 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
      */
     @Override
     public List<CombinedQueryModel> findAll() {
-        String userId = SecurityUtils.getSubject().getCurrentUser().getId();
-        List<String> roleIds = SecurityUtils.getSubject().getCurrentUserRole().stream().map(UserRole::getRoleId).collect(Collectors.toList());
-
         QCombinedQuery qCombinedQuery = QCombinedQuery.combinedQuery;
         Iterable<CombinedQuery> iterable = combinedQueryRepository.findAll();
 
@@ -293,6 +310,7 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
             CombinedQueryModel model = new CombinedQueryModel();
             model.setCombinedQueryId(combinedQuery.getId());
             model.setName(combinedQuery.getName());
+            model.setExprstr(combinedQuery.getExpression());
             return model;
         }).collect(Collectors.toList());
     }
@@ -302,10 +320,11 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
      *
      * @param appendModel
      * @return
+     * @throws BusinessException
      */
     @SuppressWarnings("unchecked")
     @Override
-    public ExprModel appendExpr(ExprAppendModel appendModel) {
+    public ExprModel appendExpr(ExprAppendModel appendModel) throws BusinessException {
         String userId = SecurityUtils.getSubject().getCurrentUser().getId();
         String combinedQueryId = appendModel.getCombinedQueryId();
         if (StringUtils.isEmpty(combinedQueryId)) {
@@ -333,8 +352,24 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
             newExpr.setSubExprs(new ArrayList<>());
         } else {
             newExpr.setOperator(appendModel.getOperator());
-            newExpr.setParams(appendModel.getParams().stream()
-                    .map(text -> new Param(IdUtil.uuid(), text)).collect(Collectors.toList()));
+
+            Operator op = null;
+            try {
+                op = Operator.getByName(newExpr.getOperator());
+            } catch (CombinedQueryParseException e) {
+                throw new BusinessException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE, e.getMessage());
+            }
+
+            List<Param> newParams = appendModel.getParams().stream()
+                    .map(text -> new Param(IdUtil.uuid(), StringUtils.isNotEmpty(text) ? text : CombinedQueryUtil.EMPTY_PARAM)).collect(Collectors.toList());
+
+            for (int i = newParams.size(); i < op.getParamsNum(); i++) {
+                //如果缺少参数，补全
+                newParams.add(CombinedQueryUtil.getEmptyParam());
+            }
+            newExpr.setParams(newParams);
+
+
             processParams(newExpr.getParams(), appendModel.getOperator());
         }
         newExpr.setText(parser.parseExprStr(Collections.singletonList(newExpr), false));
@@ -430,7 +465,7 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
         List<Expr> exprs = getCache(userId, combinedQueryId);
 
         if (!doDeleteExpr(exprs, deleteModel.getExprId())) {
-            throw new BusinessException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE, "删除失败");
+            throw new BusinessException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE, "没有找到指定的表达式对象！");
         }
 
         putCache(userId, combinedQueryId, exprs);
@@ -582,7 +617,7 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
             if (paramNum > 0) {
                 newParams.add(target);
                 for (int i = 1; i < paramNum; i++) {
-                    newParams.add(new Param(IdUtil.uuid(), "''"));
+                    newParams.add(CombinedQueryUtil.getEmptyParam());
                 }
             }
 
@@ -657,7 +692,7 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
             int index = params.indexOf(target);
             params.remove(target);
 
-            params.add(index, target.getParams().size() > 0 ? target.getParams().get(0) : new Param(IdUtil.uuid(), "''"));
+            params.add(index, target.getParams().size() > 0 ? target.getParams().get(0) : CombinedQueryUtil.getEmptyParam());
             return true;
         }
 
@@ -741,7 +776,7 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
             }
         } else if (oldParams.size() < paramsNum) {
             while (oldParams.size() < paramsNum) {
-                oldParams.add(new Param(IdUtil.uuid(), "''"));
+                oldParams.add(CombinedQueryUtil.getEmptyParam());
             }
         }
 
@@ -783,7 +818,7 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
                         }
                     } else if (oldParams.size() < paramsNum) {
                         while (oldParams.size() < paramsNum) {
-                            oldParams.add(new Param(IdUtil.uuid(), "''"));
+                            oldParams.add(CombinedQueryUtil.getEmptyParam());
                         }
                     }
                 }
@@ -861,26 +896,18 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
     @Override
     public void saveCombinedQuery(ExprSaveModel saveModel) throws BusinessException {
         String userId = SecurityUtils.getSubject().getCurrentUser().getId();
-        Optional<CombinedQuery> optional = combinedQueryRepository.findById(saveModel.getCombinedQueryId());
+        removeCache(userId);
+
+        String combinedQueryId = StringUtils.isNotEmpty(saveModel.getCombinedQueryId()) ? saveModel.getCombinedQueryId() : IdUtil.uuid();
+
+        Optional<CombinedQuery> optional = combinedQueryRepository.findById(combinedQueryId);
 
         CombinedQuery combinedQuery = null;
         if (optional.isPresent()) {
             combinedQuery = optional.get();
         } else {
             combinedQuery = new CombinedQuery();
-            combinedQuery.setId(saveModel.getCombinedQueryId());
-            combinedQuery.setUserId(userId);
-
-            combinedQuery.setCreateId(userId);
-            combinedQuery.setCreateTime(new Date());
-        }
-
-        if (StringUtils.isNotEmpty(combinedQuery.getRoleId())) {
-            //如果是查询模板,创建新的副本
-            combinedQuery = new CombinedQuery();
-            combinedQuery.setId(IdUtil.uuid());
-            combinedQuery.setUserId(userId);
-
+            combinedQuery.setId(combinedQueryId);
             combinedQuery.setCreateId(userId);
             combinedQuery.setCreateTime(new Date());
         }

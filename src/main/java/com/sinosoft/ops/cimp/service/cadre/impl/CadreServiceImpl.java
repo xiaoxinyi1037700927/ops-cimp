@@ -108,14 +108,20 @@ public class CadreServiceImpl implements CadreService {
             }
 
             //组合查询
-            if (StringUtils.isNotEmpty(searchModel.getCombinedQueryId())) {
-                Optional<CombinedQuery> optional = combinedQueryRepository.findById(searchModel.getCombinedQueryId());
-                if (optional.isPresent()) {
-                    try {
-                        additionalSql += parser.parseSql(optional.get().getExpression());
-                    } catch (CombinedQueryParseException e) {
-                        throw new BusinessException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE, "组合查询解析失败，请核对组合查询信息!");
+            if (StringUtils.isNotEmpty(searchModel.getExprStr()) || StringUtils.isNotEmpty(searchModel.getCombinedQueryId())) {
+                String exprStr = searchModel.getExprStr();
+
+                if (StringUtils.isEmpty(searchModel.getExprStr())) {
+                    Optional<CombinedQuery> optional = combinedQueryRepository.findById(searchModel.getCombinedQueryId());
+                    if (optional.isPresent()) {
+                        exprStr = optional.get().getExpression();
                     }
+                }
+
+                try {
+                    additionalSql += parser.parseSql(exprStr);
+                } catch (CombinedQueryParseException e) {
+                    throw new BusinessException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE, "组合查询解析失败，请核对组合查询信息!");
                 }
             }
 
