@@ -28,10 +28,7 @@ import com.sinosoft.ops.cimp.service.sys.oplog.SysOperationLogService;
 import com.sinosoft.ops.cimp.service.sys.systable.SysTableFieldService;
 import com.sinosoft.ops.cimp.service.tabledata.SysTableModelInfoService;
 import com.sinosoft.ops.cimp.util.CachePackage.OrganizationCacheManager;
-import com.sinosoft.ops.cimp.util.HttpUtils;
-import com.sinosoft.ops.cimp.util.IdUtil;
-import com.sinosoft.ops.cimp.util.JsonUtil;
-import com.sinosoft.ops.cimp.util.SecurityUtils;
+import com.sinosoft.ops.cimp.util.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -53,15 +50,17 @@ public class SysTableModelInfoServiceImpl implements SysTableModelInfoService {
     private final com.sinosoft.ops.cimp.service.sys.systable.SysTableFieldService sysTableFieldService;
     private final SysOperationLogService sysOperationLogService;
     private final JdbcTemplate jdbcTemplate;
+    private final OrganizationUtil organizationUtil;
     private ExecutorService executorService = Executors.newFixedThreadPool(2);
 
     @Autowired
-    public SysTableModelInfoServiceImpl(SysTableInfoDao sysTableInfoDao, SysTableDao sysTableDao, SysTableFieldService sysTableFieldService, SysOperationLogService sysOperationLogService, JdbcTemplate jdbcTemplate) {
+    public SysTableModelInfoServiceImpl(SysTableInfoDao sysTableInfoDao, SysTableDao sysTableDao, SysTableFieldService sysTableFieldService, SysOperationLogService sysOperationLogService, JdbcTemplate jdbcTemplate, OrganizationUtil organizationUtil) {
         this.sysTableInfoDao = sysTableInfoDao;
         this.sysTableDao = sysTableDao;
         this.sysTableFieldService = sysTableFieldService;
         this.sysOperationLogService = sysOperationLogService;
         this.jdbcTemplate = jdbcTemplate;
+        this.organizationUtil = organizationUtil;
     }
 
     @Override
@@ -376,9 +375,10 @@ public class SysTableModelInfoServiceImpl implements SysTableModelInfoService {
         }
 
 
+        List<String> idList;
         if (DeleteTypeEnum.物理删除.getCode().equals(deleteType)) {
             DaoParam daoParam = new DaoParam();
-            List<String> idList = (List<String>) saveOrUpdateFormData.get(tableNameEnPK);
+            idList = (List<String>) saveOrUpdateFormData.get(tableNameEnPK);
             String idJoinString = idList.stream().collect(Collectors.joining("','", "'", "'"));
             daoParam.addTableTypeNameEn(tableTypeNameEn)
                     .addTableNameEn(tableNameEn)
@@ -394,7 +394,7 @@ public class SysTableModelInfoServiceImpl implements SysTableModelInfoService {
 
             DaoParam daoParam = new DaoParam();
 
-            List<String> idList = (List<String>) saveOrUpdateFormData.get(tableNameEnPK);
+            idList = (List<String>) saveOrUpdateFormData.get(tableNameEnPK);
             String idJoinString = idList.stream().collect(Collectors.joining("','", "'", "'"));
 
             daoParam.addTableTypeNameEn(tableTypeNameEn)
@@ -403,6 +403,14 @@ public class SysTableModelInfoServiceImpl implements SysTableModelInfoService {
                     .addCondition(tableNameEnPK, Conditions.ConditionsEnum.IN, idJoinString);
             sysTableDao.updateData(daoParam);
         }
+
+        //删除单位时，删除organization表中对应的记录
+        if (StringUtils.equals(tableNameEn, "DepB001")) {
+            for (String id : idList) {
+                organizationUtil.delDepB001(id);
+            }
+        }
+
         return queryDataParam;
     }
 
