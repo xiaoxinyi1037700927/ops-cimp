@@ -20,10 +20,7 @@ import com.sinosoft.ops.cimp.util.JsonUtil;
 import com.sinosoft.ops.cimp.util.SecurityUtils;
 import com.sinosoft.ops.cimp.util.combinedQuery.CombinedQueryParser;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.CombinedQueryParseException;
-import com.sinosoft.ops.cimp.vo.from.cadre.CadreOrgModifyModel;
-import com.sinosoft.ops.cimp.vo.from.cadre.CadreSearchModel;
-import com.sinosoft.ops.cimp.vo.from.cadre.CadreSortInDepModifyModel;
-import com.sinosoft.ops.cimp.vo.from.cadre.CadreStatusModifyModel;
+import com.sinosoft.ops.cimp.vo.from.cadre.*;
 import com.sinosoft.ops.cimp.vo.from.user.rolePermissionPageSql.RPPageSqlSearchModel;
 import com.sinosoft.ops.cimp.vo.to.cadre.*;
 import com.sinosoft.ops.cimp.vo.to.user.rolePermissionPageSql.RPPageSqlViewModel;
@@ -100,11 +97,11 @@ public class CadreServiceImpl implements CadreService {
             String execCadreCountSql = execCountSql.replaceAll("\\$\\{deptId}", searchModel.getDeptId());
 
             //额外的查询条件
-            String additionalSql = "";
+            StringBuilder additionalSql = new StringBuilder();
 
             //姓名搜索
             if (StringUtils.isNotEmpty(searchModel.getName())) {
-                additionalSql += " AND a001.A01001 LIKE '%" + searchModel.getName() + "%' ";
+                additionalSql.append(" AND a001.A01001 LIKE '%").append(searchModel.getName()).append("%' ");
             }
 
             //组合查询
@@ -119,7 +116,7 @@ public class CadreServiceImpl implements CadreService {
                 }
 
                 try {
-                    additionalSql += parser.parseSql(exprStr);
+                    additionalSql.append(parser.parseSql(exprStr));
                 } catch (CombinedQueryParseException e) {
                     throw new BusinessException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE, "组合查询解析失败，请核对组合查询信息!");
                 }
@@ -128,7 +125,7 @@ public class CadreServiceImpl implements CadreService {
             //标签查询
             if (StringUtils.isNotEmpty(searchModel.getCadreTagIds())) {
                 String tagIds = Arrays.stream(searchModel.getCadreTagIds().split(",")).collect(Collectors.joining("','", "('", "')"));
-                additionalSql += " AND a001.EMP_ID IN (SELECT DISTINCT EMP_ID FROM CADRE_TAG WHERE TAG_ID IN " + tagIds + ") ";
+                additionalSql.append(" AND a001.EMP_ID IN (SELECT DISTINCT EMP_ID FROM CADRE_TAG WHERE TAG_ID IN ").append(tagIds).append(") ");
             }
 
             //高级查询
@@ -170,13 +167,22 @@ public class CadreServiceImpl implements CadreService {
 
                 conditionSql.append(" WHERE 1=1 ").append(whereSql).append(") ");
 
-                additionalSql += conditionSql;
+                additionalSql.append(conditionSql);
             }
 
-            if (StringUtils.isNotEmpty(additionalSql)) {
-                //将查询条件拼接到列表查询sql中
-                execCadreListSql = execCadreListSql.replaceAll("(?i)order by", additionalSql + " ORDER BY");
-                execCadreCountSql += additionalSql;
+            //自定义排序
+            StringBuilder orderBySql = new StringBuilder(" ");
+            if (searchModel.getSorts() != null && searchModel.getSorts().size() > 0) {
+                for (SortModel sortModel : searchModel.getSorts()) {
+                    orderBySql.append(sortModel.getName()).append(" ").append(sortModel.getIsDesc() == 0 ? "asc," : "desc,");
+                }
+            }
+
+
+            if (additionalSql.length() > 0 || orderBySql.length() > 0) {
+                //将自定义条件拼接到列表查询sql中
+                execCadreListSql = execCadreListSql.replaceAll("(?i)order by", additionalSql.toString() + " ORDER BY " + orderBySql.toString());
+                execCadreCountSql += additionalSql.toString();
             }
 
             List<Map<String, Object>> mapList = jdbcTemplate.queryForList(execCadreListSql);

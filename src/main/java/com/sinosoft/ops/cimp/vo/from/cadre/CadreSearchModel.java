@@ -4,6 +4,8 @@ import com.sinosoft.ops.cimp.dto.RePagination;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import java.util.List;
+
 @ApiModel(description = "干部列表搜索模型")
 public class CadreSearchModel extends RePagination {
 
@@ -42,6 +44,11 @@ public class CadreSearchModel extends RePagination {
      */
     @ApiModelProperty(value = "姓名")
     private String name;
+    /**
+     * 排序
+     */
+    @ApiModelProperty(value = "排序")
+    private List<SortModel> sorts;
 
     public String getDeptId() {
         return deptId;
@@ -99,5 +106,12 @@ public class CadreSearchModel extends RePagination {
         this.tableConditions = tableConditions;
     }
 
+    public List<SortModel> getSorts() {
+        return sorts;
+    }
+
+    public void setSorts(List<SortModel> sorts) {
+        this.sorts = sorts;
+    }
 }
 
