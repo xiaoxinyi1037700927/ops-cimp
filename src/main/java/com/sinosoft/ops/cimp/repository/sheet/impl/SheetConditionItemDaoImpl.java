@@ -4,12 +4,18 @@ import com.sinosoft.ops.cimp.common.dao.BaseEntityDaoImpl;
 import com.sinosoft.ops.cimp.entity.sheet.SheetConditionItem;
 import com.sinosoft.ops.cimp.repository.sheet.SheetConditionItemDao;
 import org.hibernate.Query;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.EntityManagerFactory;
 import java.util.List;
 
 @Repository("sheetConditionItemDao")
 public class SheetConditionItemDaoImpl extends BaseEntityDaoImpl<SheetConditionItem> implements SheetConditionItemDao {
+
+    public SheetConditionItemDaoImpl(EntityManagerFactory factory) {
+        super(factory);
+    }
 
     @Override
     public List<SheetConditionItem> findAll() {

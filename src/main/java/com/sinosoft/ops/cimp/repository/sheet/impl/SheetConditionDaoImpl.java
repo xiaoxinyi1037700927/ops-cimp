@@ -9,13 +9,19 @@ import com.sinosoft.ops.cimp.repository.sheet.SheetConditionDao;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.query.Query;
 import org.hibernate.transform.Transformers;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.EntityManagerFactory;
 import java.math.BigDecimal;
 import java.util.*;
 
 @Repository("sheetConditionDao")
 public class SheetConditionDaoImpl extends BaseEntityDaoImpl<SheetCondition> implements SheetConditionDao {
+
+    public SheetConditionDaoImpl(EntityManagerFactory factory) {
+        super(factory);
+    }
 
     @SuppressWarnings("unchecked")
     @Override

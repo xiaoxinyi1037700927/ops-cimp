@@ -33,9 +33,6 @@ public class BaseDaoImpl implements BaseDao {
 
     protected SessionFactory sessionFactory;
 
-    public BaseDaoImpl() {
-    }
-
     @Autowired
     public BaseDaoImpl(EntityManagerFactory factory) {
         if (factory.unwrap(SessionFactory.class) == null) {

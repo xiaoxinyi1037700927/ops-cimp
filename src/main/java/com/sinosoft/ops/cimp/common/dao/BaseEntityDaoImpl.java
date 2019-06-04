@@ -7,13 +7,16 @@ package com.sinosoft.ops.cimp.common.dao;
 
 import com.sinosoft.ops.cimp.common.model.PageableQueryParameter;
 import com.sinosoft.ops.cimp.common.model.PageableQueryResult;
+import com.sinosoft.ops.cimp.util.SpringContextUtils;
 import org.hibernate.LockOptions;
 import org.hibernate.criterion.Example;
 import org.hibernate.criterion.Example.NotNullOrZeroPropertySelector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.io.Serializable;
@@ -35,8 +38,8 @@ public class BaseEntityDaoImpl<T extends Serializable> extends BaseDaoImpl imple
     /*** 泛型实体类 */
     protected Class<T> entityClass;
 
-    @SuppressWarnings("unchecked")
-    public BaseEntityDaoImpl() {
+    public BaseEntityDaoImpl(EntityManagerFactory factory) {
+        super(factory);
         String typeName = this.getClass().getGenericSuperclass().toString();
         if (typeName.endsWith(">")) {
             try {
@@ -45,9 +48,21 @@ public class BaseEntityDaoImpl<T extends Serializable> extends BaseDaoImpl imple
                 logger.error("解析实体对象类名失败！" + typeName, e);
             }
         }
-        //ParameterizedType pt=(ParameterizedType)this.getClass().getGenericSuperclass();
-        //this.clazz=(Class<T>)pt.getActualTypeArguments()[0];
     }
+
+//    @SuppressWarnings("unchecked")
+//    public BaseEntityDaoImpl() {
+//        String typeName = this.getClass().getGenericSuperclass().toString();
+//        if (typeName.endsWith(">")) {
+//            try {
+//                this.entityClass = (Class<T>) Class.forName(typeName.split("[<>]")[1]);
+//            } catch (ClassNotFoundException e) {
+//                logger.error("解析实体对象类名失败！" + typeName, e);
+//            }
+//        }
+//        //ParameterizedType pt=(ParameterizedType)this.getClass().getGenericSuperclass();
+//        //this.clazz=(Class<T>)pt.getActualTypeArguments()[0];
+//    }
 
     @Override
     public Serializable save(T entity) {

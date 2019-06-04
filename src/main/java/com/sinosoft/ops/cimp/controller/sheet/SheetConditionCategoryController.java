@@ -150,7 +150,6 @@ public class SheetConditionCategoryController extends BaseController {
         }
         if (entity.getCreatedTime() == null) {
             entity.setCreatedTime(new Timestamp(System.currentTimeMillis()));
-            ;
         }
         if (entity.getCreatedBy() == null) {
             entity.setCreatedBy(SecurityUtils.getSubject().getCurrentUser().getId());

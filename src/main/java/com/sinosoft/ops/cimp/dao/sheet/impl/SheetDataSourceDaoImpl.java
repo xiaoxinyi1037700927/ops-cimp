@@ -4,8 +4,10 @@ import com.sinosoft.ops.cimp.common.dao.BaseEntityDaoImpl;
 import com.sinosoft.ops.cimp.entity.sheet.SheetDataSource;
 import com.sinosoft.ops.cimp.dao.sheet.SheetDataSourceDao;
 import org.hibernate.criterion.CriteriaSpecification;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.EntityManagerFactory;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +23,10 @@ import java.util.UUID;
  */
 @Repository("SheetDataSourceDao")
 public class SheetDataSourceDaoImpl extends BaseEntityDaoImpl<SheetDataSource> implements SheetDataSourceDao {
+
+	public SheetDataSourceDaoImpl(EntityManagerFactory factory) {
+		super(factory);
+	}
 
 	@Override
 	public SheetDataSource getById(UUID id) {

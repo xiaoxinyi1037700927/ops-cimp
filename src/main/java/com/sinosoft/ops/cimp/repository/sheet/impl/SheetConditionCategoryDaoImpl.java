@@ -3,8 +3,10 @@ package com.sinosoft.ops.cimp.repository.sheet.impl;
 import com.sinosoft.ops.cimp.common.dao.BaseEntityDaoImpl;
 import com.sinosoft.ops.cimp.entity.sheet.SheetConditionCategory;
 import com.sinosoft.ops.cimp.repository.sheet.SheetConditionCategoryDao;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.EntityManagerFactory;
 import java.util.Collection;
 import java.util.List;
 
@@ -13,6 +15,10 @@ import java.util.List;
  */
 @Repository("sheetConditionCategoryDao")
 public class SheetConditionCategoryDaoImpl extends BaseEntityDaoImpl<SheetConditionCategory> implements SheetConditionCategoryDao {
+
+    public SheetConditionCategoryDaoImpl(EntityManagerFactory factory) {
+        super(factory);
+    }
 
     @Override
     @SuppressWarnings("unchecked")
