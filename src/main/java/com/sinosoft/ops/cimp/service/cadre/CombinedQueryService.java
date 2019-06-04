@@ -128,11 +128,4 @@ public interface CombinedQueryService {
      * @param combinedQueryId
      */
     void deleteCombinedQuery(String combinedQueryId);
-
-    /**
-     * 组合查询统计
-     *
-     * @return
-     */
-    CombinedQueryStatisticsModel statisticsCombinedQuery();
 }

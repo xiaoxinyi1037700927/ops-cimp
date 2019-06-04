@@ -317,19 +317,19 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
         QCombinedQuery qCombinedQuery = QCombinedQuery.combinedQuery;
         BooleanBuilder builder = new BooleanBuilder();
         if (StringUtils.isNotEmpty(searchModel.getName())) {
-            builder = builder.and(qCombinedQuery.name.eq(searchModel.getName()));
+            builder = builder.and(qCombinedQuery.name.contains(searchModel.getName()));
         }
 
         List<CombinedQuery> combinedQueries = null;
         long total = 0;
-        Sort sort = new Sort(Sort.Direction.DESC, qCombinedQuery.lastUsedTime.getMetadata().getName());
+        Sort sort = new Sort(Sort.Direction.DESC, qCombinedQuery.createTime.getMetadata().getName());
         if (isPaging) {
             PageRequest pageRequest = PageRequest.of(pageIndex - 1, pageSize, sort);
             Page<CombinedQuery> page = combinedQueryRepository.findAll(builder, pageRequest);
             combinedQueries = page.getContent();
             total = page.getTotalElements();
         } else {
-            Iterable<CombinedQuery> iterable = combinedQueryRepository.findAll(builder);
+            Iterable<CombinedQuery> iterable = combinedQueryRepository.findAll(builder, sort);
             combinedQueries = Lists.newArrayList(iterable);
             total = combinedQueries.size();
         }
@@ -344,8 +344,6 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
                     model.setCombinedQueryId(combinedQuery.getId());
                     model.setName(combinedQuery.getName());
                     model.setExprstr(combinedQuery.getExpression());
-                    model.setUsedTimes(combinedQuery.getUsedTimes());
-                    model.setLastUsedTime(CombinedQueryUtil.getTimeDesc(combinedQuery.getLastUsedTime()));
                     model.setCreateTime(combinedQuery.getCreateTime());
                     model.setLastModifyTime(combinedQuery.getModifyTime());
 
@@ -956,7 +954,6 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
         } else {
             combinedQuery = new CombinedQuery();
             combinedQuery.setId(combinedQueryId);
-            combinedQuery.setUsedTimes(0);
             combinedQuery.setCreateId(userId);
             combinedQuery.setCreateTime(new Date());
         }
@@ -984,33 +981,6 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
     @Override
     public void deleteCombinedQuery(String combinedQueryId) {
         combinedQueryRepository.deleteById(combinedQueryId);
-    }
-
-    /**
-     * 组合查询统计
-     *
-     * @return
-     */
-    @Override
-    public CombinedQueryStatisticsModel statisticsCombinedQuery() {
-        CombinedQueryStatisticsModel result = new CombinedQueryStatisticsModel();
-        List<CombinedQuery> all = combinedQueryRepository.findAll();
-
-        for (CombinedQuery combinedQuery : all) {
-            Date time = combinedQuery.getLastUsedTime() != null ? combinedQuery.getLastUsedTime() : combinedQuery.getCreateTime();
-
-            int days = CombinedQueryUtil.getDaysUntilNow(time);
-            if (days > 180) {
-                result.incrUnusedInSixMonthsUsed();
-            }
-
-            if (combinedQuery.getUsedTimes() > 10 && days < 30) {
-                result.incrCommonlyUsed();
-            }
-        }
-
-        result.setTotal(all.size());
-        return result;
     }
 
     /**

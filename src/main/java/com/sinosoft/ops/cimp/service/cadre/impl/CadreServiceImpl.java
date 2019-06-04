@@ -123,13 +123,6 @@ public class CadreServiceImpl implements CadreService {
                 } catch (CombinedQueryParseException e) {
                     throw new BusinessException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE, "组合查询解析失败，请核对组合查询信息!");
                 }
-
-                //组合查询使用记录
-                if (optional.isPresent()) {
-                    CombinedQuery combinedQuery = optional.get();
-                    combinedQuery.setLastUsedTime(new Date());
-                    combinedQuery.setUsedTimes(combinedQuery.getUsedTimes() + 1);
-                }
             }
 
             //标签查询
@@ -218,7 +211,7 @@ public class CadreServiceImpl implements CadreService {
                 List<CadreFieldVO> fieldVOS = Lists.newArrayList();
                 selectFields.forEach((k, v) -> {
                     CadreFieldVO fieldVO = new CadreFieldVO();
-                    Object o = map.get(k);
+                    Object o = map.get(k.toString());
                     fieldVO.setFieldNameEn(k);
                     fieldVO.setFieldNameCn(v);
                     fieldVO.setFieldValue(o);
@@ -360,7 +353,7 @@ public class CadreServiceImpl implements CadreService {
      */
     @Transactional
     @Override
-    public boolean modifySortInDep(CadreSortInDepModifyModel modifyModel) throws BusinessException {
+    public boolean modifySortInDep(CadreSortInDepModifyModel modifyModel) {
 
         //待移动单位
         String orgId = modifyModel.getOrgId();

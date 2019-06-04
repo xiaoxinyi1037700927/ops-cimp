@@ -130,10 +130,4 @@ public class CombinedQueryController extends BaseController {
         return ok("删除成功");
     }
 
-    @ApiOperation(value = "统计组合查询模板数量")
-    @PostMapping("/combinedQuery/statistics")
-    @RequiresAuthentication
-    public ResponseEntity statisticsCombinedQuery() throws BusinessException {
-        return ok(combinedQueryService.statisticsCombinedQuery());
-    }
 }
