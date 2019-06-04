@@ -6,7 +6,6 @@ import com.sinosoft.ops.cimp.annotation.OrganizationApiGroup;
 import com.sinosoft.ops.cimp.annotation.RequiresAuthentication;
 import com.sinosoft.ops.cimp.constant.OpsErrorMessage;
 import com.sinosoft.ops.cimp.constant.RolePermissionPageSqlEnum;
-import com.sinosoft.ops.cimp.context.ExecuteContext;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.entity.oraganization.Organization;
 import com.sinosoft.ops.cimp.entity.user.User;
@@ -123,7 +122,7 @@ public class OrganizationController extends BaseController {
         rpPageSqlSearchModel.setRoleIds(roleIds);
 
         List<RPPageSqlViewModel> pageSqlByRoleList = rolePermissionPageSqlService.findRPPageSqlListByRoleIds(rpPageSqlSearchModel);
-        Optional<RPPageSqlViewModel> sqlViewModel = pageSqlByRoleList.stream().filter(s -> StringUtils.equals(s.getSqlNameEn(), RolePermissionPageSqlEnum.NAME_EN.单位集合.value)).filter(s -> StringUtils.equals(s.getIncludeSubNode(), includeSubNode)).findFirst();
+        Optional<RPPageSqlViewModel> sqlViewModel = pageSqlByRoleList.stream().filter(s -> StringUtils.equals(s.getSqlNameEn(), RolePermissionPageSqlEnum.NAME_EN.单位集合.value)).findFirst();
         if (sqlViewModel.isPresent()) {
             RPPageSqlViewModel rpPageSqlViewModel = sqlViewModel.get();
             String execListSql = rpPageSqlViewModel.getExecListSql();
@@ -131,11 +130,13 @@ public class OrganizationController extends BaseController {
             String selectCountFieldEn = rpPageSqlViewModel.getSelectCountFieldEn();
             String selectListFieldsEn = rpPageSqlViewModel.getSelectListFieldsEn();
 
-            String execDepListSql = execListSql.replaceAll("\\$\\{deptId\\}", deptId)
-                    .replaceAll("\\$\\{startIndex\\}", startIndex)
-                    .replaceAll("\\$\\{endIndex\\}", endIndex);
+            String execDepListSql = execListSql.replaceAll("\\$\\{deptId}", deptId)
+                    .replaceAll("\\$\\{startIndex}", startIndex)
+                    .replaceAll("\\$\\{endIndex}", endIndex)
+                    .replaceAll("\\$\\{includeSubNode}", includeSubNode);
 
-            String execDepCountSql = execCountSql.replaceAll("\\$\\{deptId\\}", deptId);
+            String execDepCountSql = execCountSql.replaceAll("\\$\\{deptId}", deptId)
+                    .replaceAll("\\$\\{includeSubNode}", includeSubNode);
 
             List<Map<String, Object>> mapList = jdbcTemplate.queryForList(execDepListSql);
             Map<String, Object> countMap = jdbcTemplate.queryForMap(execDepCountSql);

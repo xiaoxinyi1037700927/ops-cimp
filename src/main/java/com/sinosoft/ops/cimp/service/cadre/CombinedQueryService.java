@@ -1,5 +1,6 @@
 package com.sinosoft.ops.cimp.service.cadre;
 
+import com.sinosoft.ops.cimp.dto.PaginationViewModel;
 import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.vo.from.cadre.combinedQuery.*;
 import com.sinosoft.ops.cimp.vo.to.cadre.combinedQuery.*;
@@ -43,9 +44,10 @@ public interface CombinedQueryService {
     /**
      * 获取当前用户所有的组合查询信息
      *
+     * @param searchModel
      * @return
      */
-    List<CombinedQueryModel> findAll();
+    PaginationViewModel<CombinedQueryModel> findAll(CombinedQuerySearchModel searchModel);
 
     /**
      * 添加表达式
@@ -122,7 +124,15 @@ public interface CombinedQueryService {
 
     /**
      * 删除组合查询
+     *
      * @param combinedQueryId
      */
     void deleteCombinedQuery(String combinedQueryId);
+
+    /**
+     * 组合查询统计
+     *
+     * @return
+     */
+    CombinedQueryStatisticsModel statisticsCombinedQuery();
 }

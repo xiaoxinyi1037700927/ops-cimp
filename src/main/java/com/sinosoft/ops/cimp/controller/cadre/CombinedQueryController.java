@@ -48,8 +48,8 @@ public class CombinedQueryController extends BaseController {
     @ApiOperation(value = "获取所有组合查询信息")
     @PostMapping("/all")
     @RequiresAuthentication
-    public ResponseEntity findAll() throws BusinessException {
-        return ok(combinedQueryService.findAll());
+    public ResponseEntity findAll(@RequestBody CombinedQuerySearchModel searchModel) throws BusinessException {
+        return ok(combinedQueryService.findAll(searchModel));
     }
 
 
@@ -130,4 +130,10 @@ public class CombinedQueryController extends BaseController {
         return ok("删除成功");
     }
 
+    @ApiOperation(value = "统计组合查询模板数量")
+    @PostMapping("/combinedQuery/statistics")
+    @RequiresAuthentication
+    public ResponseEntity statisticsCombinedQuery() throws BusinessException {
+        return ok(combinedQueryService.statisticsCombinedQuery());
+    }
 }

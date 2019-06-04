@@ -7,15 +7,21 @@ import com.sinosoft.ops.cimp.util.combinedQuery.processors.nodes.ValueNodeProces
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Period;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class CombinedQueryUtil {
     public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
     public static final String EMPTY_PARAM = "''";
+    public static final Pattern PATTERN_EMPTY_STRING = Pattern.compile("^'\\s*'$");
 
     /**
      * 获取值的类型
@@ -112,4 +118,49 @@ public class CombinedQueryUtil {
     public static Param getEmptyParam() {
         return new Param(IdUtil.uuid(), EMPTY_PARAM);
     }
+
+    /**
+     * 获取时间距当前时间的跨度
+     *
+     * @param time
+     * @return
+     */
+    public static String getTimeDesc(Date time) {
+        int days = getDaysUntilNow(time);
+
+        if (days < 0) {
+            return "";
+        } else if (days == 0) {
+            return "今天";
+        } else if (days == 1) {
+            return "昨天";
+        } else if (days < 7) {
+            return "一周内";
+        } else if (days < 30) {
+            return "一个月内";
+        } else if (days < 180) {
+            return "超过一个月";
+        } else if (days < 360) {
+            return "超过六个月";
+        } else {
+            return "超过一年";
+        }
+    }
+
+    /**
+     * 获取日期至今的天数差
+     *
+     * @param time
+     * @return
+     */
+    public static int getDaysUntilNow(Date time) {
+        if (time == null) {
+            return -1;
+        }
+
+        LocalDate ldt = LocalDateTime.ofInstant(time.toInstant(), ZoneId.systemDefault()).toLocalDate();
+        Period period = ldt.until(LocalDate.now());
+        return period.getDays();
+    }
+
 }
