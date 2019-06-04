@@ -22,9 +22,6 @@ public class OrganizationSearchViewModel extends RePagination {
     @ApiModelProperty(value = "树权限，true带权限，false不带权限。默认带权限")
     private boolean noPermission = true;
 
-    @ApiModelProperty(value = "数据权限id")
-    private String dataOrganizationId;
-
     public String getName() {
         return name;
     }
@@ -63,13 +60,5 @@ public class OrganizationSearchViewModel extends RePagination {
 
     public void setNoPermission(boolean noPermission) {
         this.noPermission = noPermission;
-    }
-
-    public String getDataOrganizationId() {
-        return dataOrganizationId;
-    }
-
-    public void setDataOrganizationId(String dataOrganizationId) {
-        this.dataOrganizationId = dataOrganizationId;
     }
 }
