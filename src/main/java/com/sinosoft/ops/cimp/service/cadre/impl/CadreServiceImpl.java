@@ -82,26 +82,29 @@ public class CadreServiceImpl implements CadreService {
         rpPageSqlSearchModel.setRoleIds(roleIds);
 
         List<RPPageSqlViewModel> pageSqlByRoleList = rolePermissionPageSqlService.findRPPageSqlListByRoleIds(rpPageSqlSearchModel);
-        Optional<RPPageSqlViewModel> sqlViewModel = pageSqlByRoleList.stream().filter(s -> StringUtils.equals(s.getSqlNameEn(), RolePermissionPageSqlEnum.NAME_EN.干部集合.value)).filter(s -> StringUtils.equals(s.getIncludeSubNode(), searchModel.getIncludeSubNode())).findFirst();
+        Optional<RPPageSqlViewModel> sqlViewModel = pageSqlByRoleList.stream().filter(s -> StringUtils.equals(s.getSqlNameEn(), RolePermissionPageSqlEnum.NAME_EN.干部集合.value)).findFirst();
         if (sqlViewModel.isPresent()) {
             RPPageSqlViewModel rpPageSqlViewModel = sqlViewModel.get();
             String execListSql = rpPageSqlViewModel.getExecListSql();
             String execCountSql = rpPageSqlViewModel.getExecCountSql();
             String selectCountFieldEn = rpPageSqlViewModel.getSelectCountFieldEn();
             String selectListFieldsEn = rpPageSqlViewModel.getSelectListFieldsEn();
+            String defaultSortFields = "1".equals(searchModel.getIncludeSubNode()) ? rpPageSqlViewModel.getDefaultSortIncludeSub() : rpPageSqlViewModel.getDefaultSortExcludeSub();
 
             String execCadreListSql = execListSql.replaceAll("\\$\\{deptId}", searchModel.getDeptId())
                     .replaceAll("\\$\\{startIndex}", String.valueOf(startIndex))
-                    .replaceAll("\\$\\{endIndex}", String.valueOf(endIndex));
+                    .replaceAll("\\$\\{endIndex}", String.valueOf(endIndex))
+                    .replaceAll("\\$\\{includeSubNode}", searchModel.getIncludeSubNode());
 
-            String execCadreCountSql = execCountSql.replaceAll("\\$\\{deptId}", searchModel.getDeptId());
+            String execCadreCountSql = execCountSql.replaceAll("\\$\\{deptId}", searchModel.getDeptId())
+                    .replaceAll("\\$\\{includeSubNode}", searchModel.getIncludeSubNode());
 
-            //额外的查询条件
-            StringBuilder additionalSql = new StringBuilder();
+            //自定义查询条件
+            StringBuilder conditionSql = new StringBuilder(" ");
 
             //姓名搜索
             if (StringUtils.isNotEmpty(searchModel.getName())) {
-                additionalSql.append(" AND a001.A01001 LIKE '%").append(searchModel.getName()).append("%' ");
+                conditionSql.append(" AND a001.A01001 LIKE '%").append(searchModel.getName()).append("%' ");
             }
 
             //组合查询
@@ -116,7 +119,7 @@ public class CadreServiceImpl implements CadreService {
                 }
 
                 try {
-                    additionalSql.append(parser.parseSql(exprStr));
+                    conditionSql.append(parser.parseSql(exprStr));
                 } catch (CombinedQueryParseException e) {
                     throw new BusinessException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE, "组合查询解析失败，请核对组合查询信息!");
                 }
@@ -125,7 +128,7 @@ public class CadreServiceImpl implements CadreService {
             //标签查询
             if (StringUtils.isNotEmpty(searchModel.getCadreTagIds())) {
                 String tagIds = Arrays.stream(searchModel.getCadreTagIds().split(",")).collect(Collectors.joining("','", "('", "')"));
-                additionalSql.append(" AND a001.EMP_ID IN (SELECT DISTINCT EMP_ID FROM CADRE_TAG WHERE TAG_ID IN ").append(tagIds).append(") ");
+                conditionSql.append(" AND a001.EMP_ID IN (SELECT DISTINCT EMP_ID FROM CADRE_TAG WHERE TAG_ID IN ").append(tagIds).append(") ");
             }
 
             //高级查询
@@ -155,35 +158,38 @@ public class CadreServiceImpl implements CadreService {
                 }
 
                 String firstTable = tableNames.get(0);
-                StringBuilder conditionSql = new StringBuilder();
-                conditionSql.append(" AND a001.EMP_ID IN(SELECT DISTINCT ")
+                StringBuilder sb = new StringBuilder();
+                sb.append(" AND a001.EMP_ID IN(SELECT DISTINCT ")
                         .append(firstTable).append(".EMP_ID ")
                         .append(" FROM ").append(firstTable);
                 for (int i = 1; i < tableNames.size(); i++) {
                     String tableName = tableNames.get(i);
-                    conditionSql.append(" INNER JOIN ").append(tableName).append(" ON ")
+                    sb.append(" INNER JOIN ").append(tableName).append(" ON ")
                             .append(firstTable).append(".EMP_ID = ").append(tableName).append(".EMP_ID ");
                 }
 
-                conditionSql.append(" WHERE 1=1 ").append(whereSql).append(") ");
+                sb.append(" WHERE 1=1 ").append(whereSql).append(") ");
 
-                additionalSql.append(conditionSql);
+                sb.append(sb);
             }
 
             //自定义排序
             StringBuilder orderBySql = new StringBuilder(" ");
             if (searchModel.getSorts() != null && searchModel.getSorts().size() > 0) {
+                orderBySql.append(" ORDER BY ");
                 for (SortModel sortModel : searchModel.getSorts()) {
-                    orderBySql.append(sortModel.getName()).append(" ").append(sortModel.getIsDesc() == 0 ? "asc," : "desc,");
+                    String[] names = sortModel.getName().split(",");
+                    String order = sortModel.getIsDesc() == 0 ? " asc " : " desc ";
+                    for (String name : names) {
+                        orderBySql.append(name).append(order).append(", ");
+                    }
                 }
+                orderBySql.delete(orderBySql.length() - 1, orderBySql.length() - 1);
             }
 
-
-            if (additionalSql.length() > 0 || orderBySql.length() > 0) {
-                //将自定义条件拼接到列表查询sql中
-                execCadreListSql = execCadreListSql.replaceAll("(?i)order by", additionalSql.toString() + " ORDER BY " + orderBySql.toString());
-                execCadreCountSql += additionalSql.toString();
-            }
+            //将自定义条件拼接到列表查询sql中
+            execCadreListSql = execCadreListSql.replaceAll("\\$\\{custom}", conditionSql.toString() + orderBySql.toString());
+            execCadreCountSql = execCadreCountSql.replaceAll("\\$\\{custom}", conditionSql.toString());
 
             List<Map<String, Object>> mapList = jdbcTemplate.queryForList(execCadreListSql);
             Map<String, Object> countMap = jdbcTemplate.queryForMap(execCadreCountSql);
@@ -216,6 +222,29 @@ public class CadreServiceImpl implements CadreService {
             }
             cadreDataVO.setCadres(cadreVOS);
             cadreDataVO.setTableFields(selectFields);
+
+            //排序字段
+            List<SortFieldModel> sortFields = new ArrayList<>();
+
+            //添加默认排序字段
+            JsonUtil.parseStringToObject(defaultSortFields, LinkedHashMap.class).forEach((k, v) -> {
+                SortFieldModel model = new SortFieldModel();
+                model.setDefault(true);
+                model.setName(k.toString());
+                model.setFieldName(v.toString());
+                sortFields.add(model);
+            });
+            //添加可排序字段
+            selectFields.forEach((k, v) -> {
+                if (!"EMP_ID".equals(k)) {
+                    SortFieldModel model = new SortFieldModel();
+                    model.setName(v.toString());
+                    model.setFieldName(k.toString());
+                    sortFields.add(model);
+                }
+            });
+            cadreDataVO.setSortFields(sortFields);
+
             return cadreDataVO;
         } else {
             throw new BusinessException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE, "请检查角色配置的干部信息数据权限");

@@ -3,7 +3,6 @@ package com.sinosoft.ops.cimp.vo.from.user.rolePermissionPageSql;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-import javax.persistence.Column;
 import javax.validation.constraints.NotEmpty;
 
 @ApiModel(description = "角色权限页面sql 新增类")
@@ -54,6 +53,15 @@ public class RPPageSqlAddModel {
     @NotEmpty(message = "执行count列名不能为空")
     private String selectCountFieldEn;
 
+    //包含下级的默认排序
+    @ApiModelProperty(value = "包含下级的默认排序", required = true)
+    @NotEmpty(message = "包含下级的默认排序")
+    private String defaultSortIncludeSub;
+
+    //不包含下级的默认排序
+    @ApiModelProperty(value = "不包含下级的默认排序", required = true)
+    @NotEmpty(message = "不包含下级的默认排序")
+    private String defaultSortExcludeSub;
 
     public String getRoleId() {
         return roleId;
@@ -125,5 +133,21 @@ public class RPPageSqlAddModel {
 
     public void setSelectCountFieldEn(String selectCountFieldEn) {
         this.selectCountFieldEn = selectCountFieldEn;
+    }
+
+    public String getDefaultSortIncludeSub() {
+        return defaultSortIncludeSub;
+    }
+
+    public void setDefaultSortIncludeSub(String defaultSortIncludeSub) {
+        this.defaultSortIncludeSub = defaultSortIncludeSub;
+    }
+
+    public String getDefaultSortExcludeSub() {
+        return defaultSortExcludeSub;
+    }
+
+    public void setDefaultSortExcludeSub(String defaultSortExcludeSub) {
+        this.defaultSortExcludeSub = defaultSortExcludeSub;
     }
 }
