@@ -35,19 +35,20 @@ public class SheetDataSourceCategoryController extends BaseController {
     @Autowired
     private SheetDataSourceCategoryService sheetDataSourceCategoryService;
 
+    SecurityUtils securityUtils = new SecurityUtils();
+
     @ApiOperation(value = "新增数据源分类")
     @PostMapping("/create")
     @RequiresAuthentication
     public ResponseEntity<String> create(SheetDataSourceCategory entity) throws BusinessException{
         try{
-            SheetDataSourceCategory sheetDataSourceCategory = new SheetDataSourceCategory();
             Integer id = Integer.parseInt(sheetDataSourceCategoryService.getMaxId());
-            sheetDataSourceCategory.setId(id);
-            sheetDataSourceCategory.setStatus((byte)0);
-            sheetDataSourceCategory.setCreatedTime(new Timestamp(System.currentTimeMillis()));
-            sheetDataSourceCategory.setLastModifiedTime(new Timestamp(System.currentTimeMillis()));
-            sheetDataSourceCategory.setOrdinal(sheetDataSourceCategoryService.getNextOrdinal());
-            sheetDataSourceCategoryService.create(sheetDataSourceCategory);
+            entity.setId(id);
+            entity.setStatus((byte)0);
+            entity.setCreatedTime(new Timestamp(System.currentTimeMillis()));
+            entity.setLastModifiedTime(new Timestamp(System.currentTimeMillis()));
+            entity.setOrdinal(sheetDataSourceCategoryService.getNextOrdinal());
+            sheetDataSourceCategoryService.create(entity);
             return ok("操作成功");
         }catch(Exception e){
             return fail("创建失败!");
@@ -135,7 +136,6 @@ public class SheetDataSourceCategoryController extends BaseController {
     @RequiresAuthentication
     public ResponseEntity<String> moveUp(HttpServletRequest request, HttpServletResponse response, SheetDataSourceCategory entity) throws BusinessException{
         try{
-            SecurityUtils securityUtils = new SecurityUtils();
             String userid = securityUtils.getCurrentUser().getId();
             entity.setLastModifiedBy(UUID.fromString(userid));
             boolean success = sheetDataSourceCategoryService.moveUp(entity);
@@ -154,7 +154,6 @@ public class SheetDataSourceCategoryController extends BaseController {
     @RequiresAuthentication
     public ResponseEntity<String> moveDown(HttpServletRequest request, HttpServletResponse response, SheetDataSourceCategory entity) throws BusinessException{
         try{
-            SecurityUtils securityUtils = new SecurityUtils();
             String userid = securityUtils.getCurrentUser().getId();
             entity.setLastModifiedBy(UUID.fromString(userid));
             boolean success = sheetDataSourceCategoryService.moveDown(entity);
