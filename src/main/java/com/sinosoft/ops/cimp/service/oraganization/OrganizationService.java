@@ -6,6 +6,7 @@ import com.sinosoft.ops.cimp.vo.to.organization.OrganizationSearchViewModel;
 import com.sinosoft.ops.cimp.vo.to.organization.OrganizationViewModel;
 
 import java.util.List;
+import java.util.Set;
 
 public interface OrganizationService {
 
@@ -16,7 +17,7 @@ public interface OrganizationService {
      * @param organizationSearchViewModel
      * @return
      */
-    OrganizationViewModel lstTreeNode(OrganizationSearchViewModel organizationSearchViewModel);
+    Set<OrganizationViewModel> lstTreeNode(OrganizationSearchViewModel organizationSearchViewModel);
 
     /**
      * 根据父ID查询子节点

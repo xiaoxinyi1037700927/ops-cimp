@@ -57,12 +57,7 @@ public class OrganizationController extends BaseController {
     @PostMapping("/lstTreeNode")
     @RequiresAuthentication
     public ResponseEntity lstTreeNode(@RequestBody OrganizationSearchViewModel searchViewModel) throws BusinessException {
-        OrganizationViewModel viewModel = organizationService.lstTreeNode(searchViewModel);
-        Object organizationViewModelList = ExecuteContext.getVariable("organizationViewModelList");
-        if (organizationViewModelList != null) {
-            return ok(organizationViewModelList);
-        }
-        return ok(viewModel);
+        return ok(organizationService.lstTreeNode(searchViewModel));
     }
 
     @ApiOperation(value = "根据父节点查询下级组织")
