@@ -53,15 +53,10 @@ public class RPPageSqlAddModel {
     @NotEmpty(message = "执行count列名不能为空")
     private String selectCountFieldEn;
 
-    //包含下级的默认排序
-    @ApiModelProperty(value = "包含下级的默认排序", required = true)
-    @NotEmpty(message = "包含下级的默认排序")
-    private String defaultSortIncludeSub;
-
-    //不包含下级的默认排序
-    @ApiModelProperty(value = "不包含下级的默认排序", required = true)
-    @NotEmpty(message = "不包含下级的默认排序")
-    private String defaultSortExcludeSub;
+    //默认排序
+    @ApiModelProperty(value = "默认排序", required = true)
+    @NotEmpty(message = "默认排序")
+    private String defaultSort;
 
     public String getRoleId() {
         return roleId;
@@ -135,19 +130,11 @@ public class RPPageSqlAddModel {
         this.selectCountFieldEn = selectCountFieldEn;
     }
 
-    public String getDefaultSortIncludeSub() {
-        return defaultSortIncludeSub;
+    public String getDefaultSort() {
+        return defaultSort;
     }
 
-    public void setDefaultSortIncludeSub(String defaultSortIncludeSub) {
-        this.defaultSortIncludeSub = defaultSortIncludeSub;
-    }
-
-    public String getDefaultSortExcludeSub() {
-        return defaultSortExcludeSub;
-    }
-
-    public void setDefaultSortExcludeSub(String defaultSortExcludeSub) {
-        this.defaultSortExcludeSub = defaultSortExcludeSub;
+    public void setDefaultSort(String defaultSort) {
+        this.defaultSort = defaultSort;
     }
 }

@@ -89,9 +89,8 @@ public class CadreServiceImpl implements CadreService {
             String execCountSql = rpPageSqlViewModel.getExecCountSql();
             String selectCountFieldEn = rpPageSqlViewModel.getSelectCountFieldEn();
             String selectListFieldsEn = rpPageSqlViewModel.getSelectListFieldsEn();
-            String defaultSortFields = "1".equals(searchModel.getIncludeSubNode()) ? rpPageSqlViewModel.getDefaultSortIncludeSub() : rpPageSqlViewModel.getDefaultSortExcludeSub();
+            String defaultSortFields = rpPageSqlViewModel.getDefaultSort();
             Map defaultFieldsMap = JsonUtil.parseStringToObject(defaultSortFields, LinkedHashMap.class);
-
 
             String execCadreListSql = execListSql.replaceAll("\\$\\{deptId}", searchModel.getDeptId())
                     .replaceAll("\\$\\{startIndex}", String.valueOf(startIndex))

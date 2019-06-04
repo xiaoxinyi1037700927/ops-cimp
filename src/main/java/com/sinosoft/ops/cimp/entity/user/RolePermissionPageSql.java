@@ -54,11 +54,7 @@ public class RolePermissionPageSql implements Serializable {
 
     //包含下级时的默认排序
     @Column(length = 1000)
-    private String defaultSortIncludeSub;
-
-    //不包含下级时的默认排序
-    @Column(length = 1000)
-    private String defaultSortExcludeSub;
+    private String defaultSort;
 
     public String getId() {
         return id;
@@ -140,19 +136,11 @@ public class RolePermissionPageSql implements Serializable {
         this.selectCountFieldEn = selectCountFieldEn;
     }
 
-    public String getDefaultSortIncludeSub() {
-        return defaultSortIncludeSub;
+    public String getDefaultSort() {
+        return defaultSort;
     }
 
-    public void setDefaultSortIncludeSub(String defaultSortIncludeSub) {
-        this.defaultSortIncludeSub = defaultSortIncludeSub;
-    }
-
-    public String getDefaultSortExcludeSub() {
-        return defaultSortExcludeSub;
-    }
-
-    public void setDefaultSortExcludeSub(String defaultSortExcludeSub) {
-        this.defaultSortExcludeSub = defaultSortExcludeSub;
+    public void setDefaultSort(String defaultSort) {
+        this.defaultSort = defaultSort;
     }
 }
