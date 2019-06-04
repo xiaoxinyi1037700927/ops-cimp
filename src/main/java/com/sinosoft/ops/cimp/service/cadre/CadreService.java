@@ -30,12 +30,6 @@ public interface CadreService {
     byte[] getPhoto(String empId);
 
     /**
-     * 查询干部，根据干部标签和信息项选择进行查询
-     */
-    Map<String, Object> searchCadres(CadreSearchVO searchVO) throws BusinessException;
-
-
-    /**
      * 上传干部照片
      */
     boolean uploadPhoto(String empId, MultipartFile photo);

@@ -1,6 +1,7 @@
 package com.sinosoft.ops.cimp.service.cadre.impl;
 
 import com.google.common.collect.Lists;
+import com.querydsl.core.BooleanBuilder;
 import com.sinosoft.ops.cimp.cache.CacheManager;
 import com.sinosoft.ops.cimp.constant.Constants;
 import com.sinosoft.ops.cimp.constant.OpsErrorMessage;
@@ -8,10 +9,13 @@ import com.sinosoft.ops.cimp.dao.SysTableInfoDao;
 import com.sinosoft.ops.cimp.dao.domain.sys.table.SysTableFieldInfo;
 import com.sinosoft.ops.cimp.dao.domain.sys.table.SysTableInfo;
 import com.sinosoft.ops.cimp.dao.domain.sys.table.SysTableModelInfo;
+import com.sinosoft.ops.cimp.dto.PaginationViewModel;
 import com.sinosoft.ops.cimp.entity.combinedQuery.CombinedQuery;
 import com.sinosoft.ops.cimp.entity.combinedQuery.QCombinedQuery;
+import com.sinosoft.ops.cimp.entity.user.User;
 import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.repository.combinedQuery.CombinedQueryRepository;
+import com.sinosoft.ops.cimp.repository.user.UserRepository;
 import com.sinosoft.ops.cimp.service.cadre.CombinedQueryService;
 import com.sinosoft.ops.cimp.util.IdUtil;
 import com.sinosoft.ops.cimp.util.SecurityUtils;
@@ -28,28 +32,29 @@ import com.sinosoft.ops.cimp.util.combinedQuery.utils.CombinedQueryUtil;
 import com.sinosoft.ops.cimp.vo.from.cadre.combinedQuery.*;
 import com.sinosoft.ops.cimp.vo.to.cadre.combinedQuery.*;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
 public class CombinedQueryServiceImpl implements CombinedQueryService {
-
-    private static final Pattern PATTERN_EMPTY_STRING = Pattern.compile("^'\\s*'$");
-
     private final CombinedQueryParser parser;
     private final CombinedQueryRepository combinedQueryRepository;
     private final SysTableInfoDao sysTableInfoDao;
     private final FieldNodeProcessor fieldNodeProcessor;
+    private final UserRepository userRepository;
 
 
-    public CombinedQueryServiceImpl(CombinedQueryParser parser, CombinedQueryRepository combinedQueryRepository, SysTableInfoDao sysTableInfoDao, FieldNodeProcessor fieldNodeProcessor) {
+    public CombinedQueryServiceImpl(CombinedQueryParser parser, CombinedQueryRepository combinedQueryRepository, SysTableInfoDao sysTableInfoDao, FieldNodeProcessor fieldNodeProcessor, UserRepository userRepository) {
         this.parser = parser;
         this.combinedQueryRepository = combinedQueryRepository;
         this.sysTableInfoDao = sysTableInfoDao;
         this.fieldNodeProcessor = fieldNodeProcessor;
+        this.userRepository = userRepository;
     }
 
     private void putCache(String userId, String combinedQueryId, List<Expr> expr) {
@@ -146,7 +151,7 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
                         //新增函数
 
                         //参数为空字符串时，可以加任意函数，不为空时，根据参数类型过滤
-                        if (!PATTERN_EMPTY_STRING.matcher(param.getText()).matches() && (function.getParamsNum() == 0 || (function.getParamsType().get(0).getCode() & param.getReturnType()) == 0)) {
+                        if (!CombinedQueryUtil.PATTERN_EMPTY_STRING.matcher(param.getText()).matches() && (function.getParamsNum() == 0 || (function.getParamsType().get(0).getCode() & param.getReturnType()) == 0)) {
                             iterator.remove();
                             continue;
                         }
@@ -299,20 +304,63 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
     /**
      * 获取当前用户所有的组合查询信息
      *
+     * @param searchModel
      * @return
      */
     @Override
-    public List<CombinedQueryModel> findAll() {
-        QCombinedQuery qCombinedQuery = QCombinedQuery.combinedQuery;
-        Iterable<CombinedQuery> iterable = combinedQueryRepository.findAll();
+    public PaginationViewModel<CombinedQueryModel> findAll(CombinedQuerySearchModel searchModel) {
+        int pageSize = searchModel.getPageSize();
+        int pageIndex = searchModel.getPageIndex();
+        //是否分页
+        boolean isPaging = pageSize > 0 && pageIndex > 0;
 
-        return Lists.newArrayList(iterable).stream().map(combinedQuery -> {
-            CombinedQueryModel model = new CombinedQueryModel();
-            model.setCombinedQueryId(combinedQuery.getId());
-            model.setName(combinedQuery.getName());
-            model.setExprstr(combinedQuery.getExpression());
-            return model;
-        }).collect(Collectors.toList());
+        QCombinedQuery qCombinedQuery = QCombinedQuery.combinedQuery;
+        BooleanBuilder builder = new BooleanBuilder();
+        if (StringUtils.isNotEmpty(searchModel.getName())) {
+            builder = builder.and(qCombinedQuery.name.eq(searchModel.getName()));
+        }
+
+        List<CombinedQuery> combinedQueries = null;
+        long total = 0;
+        Sort sort = new Sort(Sort.Direction.DESC, qCombinedQuery.lastUsedTime.getMetadata().getName());
+        if (isPaging) {
+            PageRequest pageRequest = PageRequest.of(pageIndex - 1, pageSize, sort);
+            Page<CombinedQuery> page = combinedQueryRepository.findAll(builder, pageRequest);
+            combinedQueries = page.getContent();
+            total = page.getTotalElements();
+        } else {
+            Iterable<CombinedQuery> iterable = combinedQueryRepository.findAll(builder);
+            combinedQueries = Lists.newArrayList(iterable);
+            total = combinedQueries.size();
+        }
+
+        return new PaginationViewModel
+                .Builder<CombinedQueryModel>()
+                .pageIndex(pageIndex)
+                .pageSize(pageSize)
+                .totalCount(total)
+                .data(combinedQueries.stream().map(combinedQuery -> {
+                    CombinedQueryModel model = new CombinedQueryModel();
+                    model.setCombinedQueryId(combinedQuery.getId());
+                    model.setName(combinedQuery.getName());
+                    model.setExprstr(combinedQuery.getExpression());
+                    model.setUsedTimes(combinedQuery.getUsedTimes());
+                    model.setLastUsedTime(CombinedQueryUtil.getTimeDesc(combinedQuery.getLastUsedTime()));
+                    model.setCreateTime(combinedQuery.getCreateTime());
+                    model.setLastModifyTime(combinedQuery.getModifyTime());
+
+                    if (combinedQuery.getCreateId() != null) {
+                        Optional<User> createUser = userRepository.findById(combinedQuery.getCreateId());
+                        model.setCreateUser(createUser.isPresent() ? createUser.get().getName() : "");
+                    }
+                    if (combinedQuery.getModifyId() != null) {
+                        Optional<User> modifyUser = userRepository.findById(combinedQuery.getModifyId());
+                        model.setLastModifyUser(modifyUser.isPresent() ? modifyUser.get().getName() : "");
+                    }
+
+                    return model;
+                }).collect(Collectors.toList()))
+                .build();
     }
 
     /**
@@ -908,6 +956,7 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
         } else {
             combinedQuery = new CombinedQuery();
             combinedQuery.setId(combinedQueryId);
+            combinedQuery.setUsedTimes(0);
             combinedQuery.setCreateId(userId);
             combinedQuery.setCreateTime(new Date());
         }
@@ -935,6 +984,33 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
     @Override
     public void deleteCombinedQuery(String combinedQueryId) {
         combinedQueryRepository.deleteById(combinedQueryId);
+    }
+
+    /**
+     * 组合查询统计
+     *
+     * @return
+     */
+    @Override
+    public CombinedQueryStatisticsModel statisticsCombinedQuery() {
+        CombinedQueryStatisticsModel result = new CombinedQueryStatisticsModel();
+        List<CombinedQuery> all = combinedQueryRepository.findAll();
+
+        for (CombinedQuery combinedQuery : all) {
+            Date time = combinedQuery.getLastUsedTime() != null ? combinedQuery.getLastUsedTime() : combinedQuery.getCreateTime();
+
+            int days = CombinedQueryUtil.getDaysUntilNow(time);
+            if (days > 180) {
+                result.incrUnusedInSixMonthsUsed();
+            }
+
+            if (combinedQuery.getUsedTimes() > 10 && days < 30) {
+                result.incrCommonlyUsed();
+            }
+        }
+
+        result.setTotal(all.size());
+        return result;
     }
 
     /**

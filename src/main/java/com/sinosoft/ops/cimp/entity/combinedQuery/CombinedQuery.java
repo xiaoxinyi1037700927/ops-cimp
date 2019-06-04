@@ -1,7 +1,5 @@
 package com.sinosoft.ops.cimp.entity.combinedQuery;
 
-import org.hibernate.annotations.GenericGenerator;
-
 import javax.persistence.*;
 import java.util.Date;
 
@@ -39,6 +37,17 @@ public class CombinedQuery implements java.io.Serializable {
      */
     @Column(name = "EXPRESSION", length = 2000)
     private String expression;
+    /**
+     * 使用次数
+     */
+    @Column(name = "USED_TIMES", length = 10)
+    private int usedTimes;
+    /**
+     * 最后使用时间
+     */
+    @Column(name = "LAST_USED_TIME")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date lastUsedTime;
     /**
      * 创建人
      */
@@ -132,5 +141,21 @@ public class CombinedQuery implements java.io.Serializable {
 
     public void setModifyTime(Date modifyTime) {
         this.modifyTime = modifyTime;
+    }
+
+    public int getUsedTimes() {
+        return usedTimes;
+    }
+
+    public void setUsedTimes(int usedTimes) {
+        this.usedTimes = usedTimes;
+    }
+
+    public Date getLastUsedTime() {
+        return lastUsedTime;
+    }
+
+    public void setLastUsedTime(Date lastUsedTime) {
+        this.lastUsedTime = lastUsedTime;
     }
 }

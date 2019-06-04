@@ -630,13 +630,15 @@ public class SysTableDataController extends BaseController {
         RPPageSqlSearchModel searchModel = new RPPageSqlSearchModel();
         searchModel.setRoleIds(roleIds);
         List<RPPageSqlViewModel> pageSqlListByRoleIds = rolePermissionPageSqlService.findRPPageSqlListByRoleIds(searchModel);
-        Optional<RPPageSqlViewModel> pageSqlViewModel = pageSqlListByRoleIds.stream().filter(s -> StringUtils.equals(s.getIncludeSubNode(), "1")).filter(s -> StringUtils.equals(s.getSqlNameEn(), RolePermissionPageSqlEnum.NAME_EN.干部集合.value)).findFirst();
+        Optional<RPPageSqlViewModel> pageSqlViewModel = pageSqlListByRoleIds.stream().filter(s -> StringUtils.equals(s.getSqlNameEn(), RolePermissionPageSqlEnum.NAME_EN.干部集合.value)).findFirst();
 
         if (pageSqlViewModel.isPresent()) {
             RPPageSqlViewModel viewModel = pageSqlViewModel.get();
             String execCountSql = viewModel.getExecCountSql();
             String selectCountFieldEn = viewModel.getSelectCountFieldEn();
-            String execCadreCountSql = execCountSql.replaceAll("\\$\\{deptId\\}", dataOrganizationId);
+            String execCadreCountSql = execCountSql.replaceAll("\\$\\{deptId}", dataOrganizationId)
+                    .replaceAll("\\$\\{includeSubNode}", "1")
+                    .replaceAll("\\$\\{custom}", "");
 
             Map<String, Object> countMap = jdbcTemplate.queryForMap(execCadreCountSql);
             Object cadreCount = countMap.get(selectCountFieldEn);
