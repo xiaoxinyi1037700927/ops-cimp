@@ -20,6 +20,31 @@ public abstract class BaseController {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(BaseController.class);
 
+    /**
+     * 映射路径--创建
+     */
+    public static final String MAPPING_PATH_CREATE = "/create";
+    /**
+     * 映射路径--修改
+     */
+    public static final String MAPPING_PATH_UPDATE = "/update";
+    /**
+     * 映射路径--删除
+     */
+    public static final String MAPPING_PATH_DELETE = "/delete";
+    /**
+     * 映射路径--根据Id修改
+     */
+    public static final String MAPPING_PATH_DELETE_BY_ID = "/deleteById";
+    /**
+     * 映射路径--根据Id获取
+     */
+    public static final String MAPPING_PATH_GET_BY_ID = "/getById";
+    /**
+     * 映射路径--分页查询
+     */
+    public static final String MAPPING_PATH_FIND_BY_PAGE = "/findByPage";
+
     public ResponseEntity ok(Object data, BaseResult.Page page) throws BusinessException, SystemException {
         return ResponseEntity.ok(BaseResult.ok(data, page));
     }
@@ -73,7 +98,7 @@ public abstract class BaseController {
     protected void writeJson(HttpServletResponse response, Object data) {
         try (PrintWriter writer = response.getWriter()) {
             String json = JSON.toJSONString(data, SerializerFeature.WriteDateUseDateFormat);
-            System.out.println("json="+json);
+            System.out.println("json=" + json);
             // 设置信息类型、编码格式和禁用缓存
             response.setContentType("application/json;charset=utf-8");
             response.setHeader("cache-Control", "no-cache");
