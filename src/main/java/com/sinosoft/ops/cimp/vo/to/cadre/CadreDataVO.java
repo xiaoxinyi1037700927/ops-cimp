@@ -22,6 +22,8 @@ public class CadreDataVO implements Serializable {
     private List<CadreVO> cadres = Lists.newArrayList();
     //干部列表表头
     private Map tableFields = Maps.newHashMap();
+    //排序字段
+    private List<SortFieldModel> sortFields;
 
     public int getPageIndex() {
         return pageIndex;
@@ -61,5 +63,13 @@ public class CadreDataVO implements Serializable {
 
     public void setTableFields(Map tableFields) {
         this.tableFields = tableFields;
+    }
+
+    public List<SortFieldModel> getSortFields() {
+        return sortFields;
+    }
+
+    public void setSortFields(List<SortFieldModel> sortFields) {
+        this.sortFields = sortFields;
     }
 }
