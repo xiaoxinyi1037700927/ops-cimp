@@ -5,6 +5,15 @@ import io.swagger.annotations.ApiModelProperty;
 
 @ApiModel(description = "排序模型")
 public class SortModel {
+
+    public SortModel() {
+    }
+
+    public SortModel(String name, int isDesc) {
+        this.name = name;
+        this.isDesc = isDesc;
+    }
+
     /**
      * 排序字段名
      */

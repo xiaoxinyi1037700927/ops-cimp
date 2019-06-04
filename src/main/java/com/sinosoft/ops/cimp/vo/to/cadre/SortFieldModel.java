@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 
 @ApiModel(description = "排序字段模型")
 public class SortFieldModel {
+
     /**
      * 排序名称
      */

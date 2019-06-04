@@ -49,6 +49,11 @@ public class CadreSearchModel extends RePagination {
      */
     @ApiModelProperty(value = "排序")
     private List<SortModel> sorts;
+    /**
+     * 是否是初始化
+     */
+    @ApiModelProperty(value = "1：初始化，0：非初始化")
+    private String isInit;
 
     public String getDeptId() {
         return deptId;
@@ -112,6 +117,14 @@ public class CadreSearchModel extends RePagination {
 
     public void setSorts(List<SortModel> sorts) {
         this.sorts = sorts;
+    }
+
+    public String getIsInit() {
+        return isInit;
+    }
+
+    public void setIsInit(String isInit) {
+        this.isInit = isInit;
     }
 }
 

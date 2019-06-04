@@ -90,6 +90,8 @@ public class CadreServiceImpl implements CadreService {
             String selectCountFieldEn = rpPageSqlViewModel.getSelectCountFieldEn();
             String selectListFieldsEn = rpPageSqlViewModel.getSelectListFieldsEn();
             String defaultSortFields = "1".equals(searchModel.getIncludeSubNode()) ? rpPageSqlViewModel.getDefaultSortIncludeSub() : rpPageSqlViewModel.getDefaultSortExcludeSub();
+            Map defaultFieldsMap = JsonUtil.parseStringToObject(defaultSortFields, LinkedHashMap.class);
+
 
             String execCadreListSql = execListSql.replaceAll("\\$\\{deptId}", searchModel.getDeptId())
                     .replaceAll("\\$\\{startIndex}", String.valueOf(startIndex))
@@ -175,6 +177,13 @@ public class CadreServiceImpl implements CadreService {
 
             //自定义排序
             StringBuilder orderBySql = new StringBuilder(" ");
+            if ("1".equals(searchModel.getIsInit())) {
+                //初始化时添加默认排序
+                List<SortModel> sorts = new ArrayList<>();
+                defaultFieldsMap.forEach((k, v) -> sorts.add(new SortModel(v.toString(), 0)));
+                searchModel.setSorts(sorts);
+            }
+
             if (searchModel.getSorts() != null && searchModel.getSorts().size() > 0) {
                 orderBySql.append(" ORDER BY ");
                 for (SortModel sortModel : searchModel.getSorts()) {
@@ -184,7 +193,7 @@ public class CadreServiceImpl implements CadreService {
                         orderBySql.append(name).append(order).append(", ");
                     }
                 }
-                orderBySql.delete(orderBySql.length() - 1, orderBySql.length() - 1);
+                orderBySql.delete(orderBySql.length() - 2, orderBySql.length() - 1);
             }
 
             //将自定义条件拼接到列表查询sql中
@@ -227,7 +236,7 @@ public class CadreServiceImpl implements CadreService {
             List<SortFieldModel> sortFields = new ArrayList<>();
 
             //添加默认排序字段
-            JsonUtil.parseStringToObject(defaultSortFields, LinkedHashMap.class).forEach((k, v) -> {
+            defaultFieldsMap.forEach((k, v) -> {
                 SortFieldModel model = new SortFieldModel();
                 model.setDefault(true);
                 model.setName(k.toString());
