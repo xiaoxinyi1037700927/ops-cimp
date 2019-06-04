@@ -1,9 +1,11 @@
 package com.sinosoft.ops.cimp.vo.to.cadre.combinedQuery;
 
+import com.sinosoft.ops.cimp.util.combinedQuery.beans.Expr;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.util.Date;
+import java.util.List;
 
 
 @ApiModel(description = "组合查询模型")
@@ -24,10 +26,10 @@ public class CombinedQueryModel {
     @ApiModelProperty(value = "表达式字符串")
     private String exprstr;
     /**
-     * 最后使用时间
+     * 表达式
      */
-    @ApiModelProperty(value = "最后使用时间")
-    private String lastUsedTime;
+    @ApiModelProperty(value = "表达式")
+    private List<Expr> expr;
     /**
      * 创建人
      */
@@ -73,13 +75,14 @@ public class CombinedQueryModel {
         this.exprstr = exprstr;
     }
 
-    public String getLastUsedTime() {
-        return lastUsedTime;
+    public List<Expr> getExpr() {
+        return expr;
     }
 
-    public void setLastUsedTime(String lastUsedTime) {
-        this.lastUsedTime = lastUsedTime;
+    public void setExpr(List<Expr> expr) {
+        this.expr = expr;
     }
+
 
     public String getCreateUser() {
         return createUser;
