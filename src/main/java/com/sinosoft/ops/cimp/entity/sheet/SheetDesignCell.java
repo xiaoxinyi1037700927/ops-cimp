@@ -1,5 +1,7 @@
 package com.sinosoft.ops.cimp.entity.sheet;
 
+import com.sinosoft.ops.cimp.common.model.Trackable;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
