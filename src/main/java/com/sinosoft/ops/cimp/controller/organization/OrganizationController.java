@@ -94,6 +94,13 @@ public class OrganizationController extends BaseController {
         return ok(organizationByName);
     }
 
+    @ApiOperation(value = "根据名字查询组织")
+    @PostMapping("/findOrganizationByFullName")
+    @RequiresAuthentication
+    public ResponseEntity findOrganizationByFullName(@RequestParam("name") String name) throws BusinessException {
+        return ok(organizationService.findOrganizationByFullName(name));
+    }
+
     @ApiOperation(value = "查询单位列表")
     @GetMapping(value = "/list")
     @RequiresAuthentication

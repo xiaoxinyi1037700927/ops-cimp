@@ -242,7 +242,7 @@ public class OrganizationServiceImpl implements OrganizationService {
                 Organization DataOrg = OrganizationCacheManager.getSubject().getOrganizationById(currentUser.getDataOrganizationId());
                 List<OrganizationViewModel> collect = allOrgList.stream().filter(x -> x.getCode().startsWith(DataOrg.getCode())
                         && x.getName().contains(name))
-                        .map(y -> OrganizationViewMapper.INSTANCE.organizationToViewModel(y))
+                        .map(OrganizationViewMapper.INSTANCE::organizationToViewModel)
                         .collect(Collectors.toList());
                 return collect;
             }
@@ -250,6 +250,27 @@ public class OrganizationServiceImpl implements OrganizationService {
             List<OrganizationViewModel> collect = allOrgList.stream().filter(x -> x.getName().contains(name)).map(y -> OrganizationViewMapper.INSTANCE.organizationToViewModel(y)).collect(Collectors.toList());
             return collect;
         }
+    }
+
+    @Override
+    public OrganizationViewModel findOrganizationByFullName(String name) {
+        List<Organization> allOrgList = OrganizationCacheManager.getSubject().getAllList();
+
+        String dataOrganizationId = SecurityUtils.getSubject().getCurrentUser().getDataOrganizationId();
+        List<String> codes = Arrays.stream(dataOrganizationId.split(",")).map(id -> OrganizationCacheManager.getSubject().getOrganizationById(id).getCode()).collect(Collectors.toList());
+
+        List<OrganizationViewModel> orgs = allOrgList.stream().filter(org -> {
+            if (org.getName().equalsIgnoreCase(name)) {
+                for (String code : codes) {
+                    if (org.getCode().startsWith(code)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }).map(OrganizationViewMapper.INSTANCE::organizationToViewModel).collect(Collectors.toList());
+
+        return orgs != null && orgs.size() > 0 ? orgs.get(0) : null;
     }
 
 }

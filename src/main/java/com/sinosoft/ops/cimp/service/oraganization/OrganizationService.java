@@ -59,4 +59,5 @@ public interface OrganizationService {
      */
     List<OrganizationViewModel> findOrganizationByName(String name, String permission);
 
+    OrganizationViewModel findOrganizationByFullName(String name);
 }
