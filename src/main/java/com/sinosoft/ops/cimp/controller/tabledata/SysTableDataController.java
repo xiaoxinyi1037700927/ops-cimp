@@ -342,7 +342,7 @@ public class SysTableDataController extends BaseController {
             return fail("修改信息集必须指定信息集主键字段的值");
         }
 
-        Map formMap = JsonUtil.parseStringToObject(form.replaceAll("\"null\"", ""), HashMap.class);
+        Map formMap = JsonUtil.parseStringToObject(form.replaceAll("\"null\"", "\"\""), HashMap.class);
         if (formMap == null || formMap.size() == 0) {
             return ok("修改成功");
         }
