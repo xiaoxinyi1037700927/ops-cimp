@@ -89,11 +89,14 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
     private void removeCache(String userId) {
         Map map = CacheManager.getInstance().getAll(Constants.COMBINED_QUERY_CACHE);
         if (map != null) {
-            for (Object key : map.keySet()) {
-                if (key.toString().startsWith(userId)) {
+            Iterator iterator = map.keySet().iterator();
+            while (iterator.hasNext()) {
+                String key = iterator.next().toString();
+                if (key.startsWith(userId)) {
                     CacheManager.getInstance().remove(Constants.COMBINED_QUERY_CACHE, key);
                 }
             }
+
         }
     }
 
