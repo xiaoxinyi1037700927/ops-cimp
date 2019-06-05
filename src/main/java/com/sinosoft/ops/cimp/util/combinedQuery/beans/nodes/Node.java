@@ -113,8 +113,8 @@ public abstract class Node {
         //判断下一个子节点是否支持添加的节点的返回类型
         int subType = supportSubTypes[subNodes.size()];
 
-        if (subType == Type.STRING.getCode() && node instanceof ValueNode) {
-            //处理需要string类型，而添加的是其它类型的值节点的情况
+        if (subType == Type.STRING.getCode() && node instanceof ValueNode && node.getReturnType() != Type.CODE.getCode()) {
+            //处理需要string类型，而添加的是其它非code类型的值节点的情况
             ((ValueNode) node).setReturnType(Type.STRING.getCode());
         }
         if ((subType & node.getReturnType()) == 0) {

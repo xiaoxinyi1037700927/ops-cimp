@@ -88,7 +88,7 @@ public abstract class OperatorProcessor {
         //判断参数的类型是否匹配
         for (int i = 1; i < subNodes.size(); i++) {
             Node next = subNodes.get(i);
-            if (first.getReturnType() == Type.STRING.getCode() && next instanceof ValueNode) {
+            if (first.getReturnType() == Type.STRING.getCode() && next instanceof ValueNode && next.getReturnType() != Type.CODE.getCode()) {
                 //处理需要string类型，而添加的是其它类型的值节点的情况
                 ((ValueNode) next).setReturnType(Type.STRING.getCode());
             }
