@@ -1,10 +1,9 @@
-package com.sinosoft.ops.cimp.dao.sheet.impl;
+package com.sinosoft.ops.cimp.repository.sheet.impl;
 
 import com.sinosoft.ops.cimp.common.dao.BaseEntityDaoImpl;
 import com.sinosoft.ops.cimp.entity.sheet.SheetDataSource;
-import com.sinosoft.ops.cimp.dao.sheet.SheetDataSourceDao;
+import com.sinosoft.ops.cimp.repository.sheet.SheetDataSourceDao;
 import org.hibernate.criterion.CriteriaSpecification;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManagerFactory;

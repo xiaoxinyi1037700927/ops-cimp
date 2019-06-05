@@ -1,8 +1,8 @@
 package com.sinosoft.ops.cimp.service.sheet.impl;
 
 import com.sinosoft.ops.cimp.common.service.BaseEntityServiceImpl;
-import com.sinosoft.ops.cimp.dao.sheet.SheetDataSourceCategoryDao;
-import com.sinosoft.ops.cimp.dao.sheet.SheetDataSourceDao;
+import com.sinosoft.ops.cimp.repository.sheet.SheetDataSourceCategoryDao;
+import com.sinosoft.ops.cimp.repository.sheet.SheetDataSourceDao;
 import com.sinosoft.ops.cimp.entity.sheet.SheetDataSource;
 import com.sinosoft.ops.cimp.entity.sheet.SheetDataSourceCategory;
 import com.sinosoft.ops.cimp.service.sheet.SheetDataSourceCategoryService;

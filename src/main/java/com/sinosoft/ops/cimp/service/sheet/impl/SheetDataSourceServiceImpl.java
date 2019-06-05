@@ -1,7 +1,7 @@
 package com.sinosoft.ops.cimp.service.sheet.impl;
 
 import com.sinosoft.ops.cimp.common.service.BaseEntityServiceImpl;
-import com.sinosoft.ops.cimp.dao.sheet.SheetDataSourceDao;
+import com.sinosoft.ops.cimp.repository.sheet.SheetDataSourceDao;
 import com.sinosoft.ops.cimp.entity.sheet.SheetDataSource;
 import com.sinosoft.ops.cimp.service.sheet.SheetDataSourceService;
 import org.slf4j.Logger;
