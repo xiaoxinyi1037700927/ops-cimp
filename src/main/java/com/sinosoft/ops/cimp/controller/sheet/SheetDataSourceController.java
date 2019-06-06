@@ -1,6 +1,5 @@
 package com.sinosoft.ops.cimp.controller.sheet;
 
-import com.sinosoft.ops.cimp.annotation.RequiresAuthentication;
 import com.sinosoft.ops.cimp.annotation.SheetApiGroup;
 import com.sinosoft.ops.cimp.common.model.DataStatus;
 import com.sinosoft.ops.cimp.controller.BaseController;
@@ -38,12 +37,13 @@ public class SheetDataSourceController extends BaseController {
 
     @ApiOperation(value = "新增数据源")
     @PostMapping("/create")
-    @RequiresAuthentication
+
     public ResponseEntity<String> create(SheetDataSource entity) throws BusinessException {
         try{
             if (entity.getCreatedBy() == null) {
-                String userid = securityUtils.getCurrentUser().getId();
-                entity.setCreatedBy(UUID.fromString(userid));
+//                String userid = securityUtils.getCurrentUser().getId();
+//                entity.setCreatedBy(UUID.fromString(userid));
+                entity.setCreatedBy(UUID.randomUUID());
             }
             entity.setStatus(DataStatus.NORMAL.getValue());
             entity.setOrdinal(sheetDataSourceService.getNextOrdinal());
@@ -60,8 +60,8 @@ public class SheetDataSourceController extends BaseController {
 
     @ApiOperation(value = "删除数据源")
     @PostMapping("/deleteById")
-    @RequiresAuthentication
-    public ResponseEntity<String> create(@RequestParam("id") String id) throws BusinessException {
+
+    public ResponseEntity<String> deleteById(@RequestParam("id") String id) throws BusinessException {
         try {
             sheetDataSourceService.deleteById(UUID.fromString(id));
             return ok("根据id删除成功");
@@ -72,7 +72,7 @@ public class SheetDataSourceController extends BaseController {
 
     @ApiOperation(value = "根据id获取数据源")
     @PostMapping("/getById")
-    @RequiresAuthentication
+
     public ResponseEntity<String> getById(@RequestParam("id") String id) throws BusinessException {
         try {
             UUID uuid = UUID.fromString(id);
@@ -85,8 +85,8 @@ public class SheetDataSourceController extends BaseController {
 
     @ApiOperation(value = "根据分类获取数据源")
     @PostMapping("/getByCategoryId")
-    @RequiresAuthentication
-    public ResponseEntity<String> getById(@RequestParam("categoryid") Integer categoryid) throws BusinessException {
+
+    public ResponseEntity<String> getByCategoryId(@RequestParam("categoryid") Integer categoryid) throws BusinessException {
         try {
             Collection<SheetDataSource> result = sheetDataSourceService.getByCategoryId(categoryid);
             return ok(result);
@@ -97,7 +97,7 @@ public class SheetDataSourceController extends BaseController {
 
     @ApiOperation(value = "取得引用情况")
     @PostMapping("/getRefSituation")
-    @RequiresAuthentication
+
     public ResponseEntity<String> getRefSituation(@RequestParam("id") String id) throws BusinessException {
         try {
             List<Map> list = sheetDataSourceService.getRefSituation(id);
@@ -109,7 +109,7 @@ public class SheetDataSourceController extends BaseController {
 
     @ApiOperation(value = "删除数据源")
     @PostMapping("/delete")
-    @RequiresAuthentication
+
     public ResponseEntity<String> delete(SheetDataSource entity) throws BusinessException {
         try {
             sheetDataSourceService.delete(entity);
@@ -121,17 +121,21 @@ public class SheetDataSourceController extends BaseController {
 
     @ApiOperation(value = "修改数据源")
     @PostMapping("/update")
-    @RequiresAuthentication
+
     public ResponseEntity<String> update(SheetDataSource entity) throws BusinessException {
         try {
+            SheetDataSource updateentity=sheetDataSourceService.getById(entity.getId());
             if (securityUtils.getCurrentUser() != null) {
-                String userid = securityUtils.getCurrentUser().getId();
-                entity.setLastModifiedBy(UUID.fromString(userid));
+//                String userid = securityUtils.getCurrentUser().getId();
+//                entity.setLastModifiedBy(UUID.fromString(userid));
+                updateentity.setLastModifiedBy(UUID.randomUUID());
             }
             // 最后修改时间
-            entity.setLastModifiedTime(new Timestamp(System.currentTimeMillis()));
-            sheetDataSourceService.analyzeSqlExpress(entity);
-            sheetDataSourceService.update(entity);
+            updateentity.setLastModifiedTime(new Timestamp(System.currentTimeMillis()));
+            updateentity.setName(entity.getName());
+            updateentity.setSql(entity.getSql());
+            sheetDataSourceService.analyzeSqlExpress(updateentity);
+            sheetDataSourceService.update(updateentity);
             return ok("修改成功");
         } catch (Exception e) {
             return fail("修改失败");

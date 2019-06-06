@@ -83,7 +83,7 @@ public class SheetDataSourceServiceImpl extends BaseEntityServiceImpl<SheetDataS
 
 
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
 	public Collection<SheetDataSource> getByCategoryId(int categoryid)
 	{
 		Collection<SheetDataSource> lst = sheetDataSourceDao.getByCategoryId(categoryid);
@@ -101,7 +101,7 @@ public class SheetDataSourceServiceImpl extends BaseEntityServiceImpl<SheetDataS
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
 	public List<Map> getRefSituation(String id)
 	{
 		return sheetDataSourceDao.getRefSituation(id);
