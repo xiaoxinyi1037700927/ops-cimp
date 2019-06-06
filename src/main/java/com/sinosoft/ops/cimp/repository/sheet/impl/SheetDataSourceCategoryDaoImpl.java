@@ -3,6 +3,8 @@ package com.sinosoft.ops.cimp.repository.sheet.impl;
 import com.sinosoft.ops.cimp.common.dao.BaseEntityDaoImpl;
 import com.sinosoft.ops.cimp.entity.sheet.SheetDataSourceCategory;
 import com.sinosoft.ops.cimp.repository.sheet.SheetDataSourceCategoryDao;
+import org.hibernate.FlushMode;
+import org.hibernate.Session;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManagerFactory;
@@ -68,11 +70,16 @@ public class SheetDataSourceCategoryDaoImpl extends BaseEntityDaoImpl<SheetDataS
 	@Override
 	public int updateOrdinal(Integer preId, int ordinal, UUID userName) {
 		String hql = "UPDATE SheetDataSourceCategory SET ordinal=:newOrdinal, lastModifiedBy=:userName, lastModifiedTime=SYSDATE WHERE id=:id";
-        int cnt = sessionFactory.getCurrentSession().createQuery(hql)
+		Session session = sessionFactory.getCurrentSession();
+		session.beginTransaction();
+		session.setFlushMode(FlushMode.MANUAL);
+		int cnt = session.createQuery(hql)
                 .setParameter("id", preId)
                 .setParameter("userName", userName)
                 .setParameter("newOrdinal", ordinal)
                 .executeUpdate();
+		session.flush();
+		session.getTransaction().commit();
 		return cnt;
 	}
 

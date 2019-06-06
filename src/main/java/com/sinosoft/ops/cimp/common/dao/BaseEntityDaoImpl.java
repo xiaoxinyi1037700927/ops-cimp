@@ -7,6 +7,7 @@ package com.sinosoft.ops.cimp.common.dao;
 
 import com.sinosoft.ops.cimp.common.model.PageableQueryParameter;
 import com.sinosoft.ops.cimp.common.model.PageableQueryResult;
+import org.hibernate.FlushMode;
 import org.hibernate.LockOptions;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -66,51 +67,49 @@ public class BaseEntityDaoImpl<T extends Serializable> extends BaseDaoImpl imple
 
     @Override
     public Serializable save(T entity) {
-        Session session = sessionFactory.openSession();
+        Session session = sessionFactory.getCurrentSession();
         session.beginTransaction();
-
+        session.setFlushMode(FlushMode.MANUAL);
         Serializable id = session.save(entity);
-
+        session.flush();
         session.getTransaction().commit();
-        session.close();
         return id;
     }
 
     @Override
     public void saveOrUpdate(T entity) {
-        Session session = sessionFactory.openSession();
+        Session session = sessionFactory.getCurrentSession();
         session.beginTransaction();
+        session.setFlushMode(FlushMode.MANUAL);
         session.saveOrUpdate(entity);
+        session.flush();
         session.getTransaction().commit();
-        session.close();
     }
 
     @Override
     public void update(T entity) {
-        Session session = sessionFactory.openSession();
+        Session session = sessionFactory.getCurrentSession();
         session.beginTransaction();
+        session.setFlushMode(FlushMode.MANUAL);
         session.update(entity);
+        session.flush();
         session.getTransaction().commit();
-        session.close();
     }
 
     @Override
     public void delete(T entity) {
-        Session session = sessionFactory.openSession();
+        Session session = sessionFactory.getCurrentSession();
         session.beginTransaction();
+        session.setFlushMode(FlushMode.MANUAL);
         session.delete(entity);
+        session.flush();
         session.getTransaction().commit();
-        session.close();
     }
 
     @Override
     public void deleteById(Serializable id) {
         T deletedEntity = this.getById(id);
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
-        session.delete(deletedEntity);
-        session.getTransaction().commit();
-        session.close();
+        delete(deletedEntity);
     }
 
     @Override

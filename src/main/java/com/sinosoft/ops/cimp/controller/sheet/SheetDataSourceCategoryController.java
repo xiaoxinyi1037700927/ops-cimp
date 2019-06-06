@@ -1,6 +1,5 @@
 package com.sinosoft.ops.cimp.controller.sheet;
 
-import com.sinosoft.ops.cimp.annotation.RequiresAuthentication;
 import com.sinosoft.ops.cimp.annotation.SheetApiGroup;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.entity.sheet.SheetDataSourceCategory;
@@ -39,7 +38,7 @@ public class SheetDataSourceCategoryController extends BaseController {
 
     @ApiOperation(value = "新增数据源分类")
     @PostMapping("/create")
-    @RequiresAuthentication
+
     public ResponseEntity<String> create(SheetDataSourceCategory entity) throws BusinessException{
         try{
             Integer id = Integer.parseInt(sheetDataSourceCategoryService.getMaxId());
@@ -51,13 +50,14 @@ public class SheetDataSourceCategoryController extends BaseController {
             sheetDataSourceCategoryService.create(entity);
             return ok("操作成功");
         }catch(Exception e){
+            e.printStackTrace();
             return fail("创建失败!");
         }
     }
 
     @ApiOperation(value = "修改数据源分类")
     @PostMapping("/update")
-    @RequiresAuthentication
+
     public ResponseEntity<String> update(SheetDataSourceCategory entity) throws BusinessException{
         try{
             SheetDataSourceCategory updateentity = sheetDataSourceCategoryService.getById(entity.getId());
@@ -73,7 +73,7 @@ public class SheetDataSourceCategoryController extends BaseController {
 
     @ApiOperation(value = "删除数据源分类")
     @PostMapping("/delete")
-    @RequiresAuthentication
+
     public ResponseEntity<String> delete(SheetDataSourceCategory entity) throws BusinessException{
         try{
             sheetDataSourceCategoryService.update(entity);
@@ -85,7 +85,7 @@ public class SheetDataSourceCategoryController extends BaseController {
 
     @ApiOperation(value = "删除数据源分类")
     @PostMapping("/deleteById")
-    @RequiresAuthentication
+
     public ResponseEntity<String> deleteById(@RequestParam("id") Integer id) throws BusinessException{
         try{
             sheetDataSourceCategoryService.deleteById(id);
@@ -97,7 +97,7 @@ public class SheetDataSourceCategoryController extends BaseController {
 
     @ApiOperation(value = "获取数据源分类")
     @PostMapping("/getById")
-    @RequiresAuthentication
+
     public ResponseEntity<String> getById(@RequestParam("id") Integer id) throws BusinessException{
         try{
             SheetDataSourceCategory sheetDataSourceCategory = sheetDataSourceCategoryService.getById(id);
@@ -109,7 +109,7 @@ public class SheetDataSourceCategoryController extends BaseController {
 
     @ApiOperation(value = "获取数据源分类树形结构")
     @PostMapping("/getCategoryTree")
-    @RequiresAuthentication
+
     public ResponseEntity<String> getCategoryTree(HttpServletRequest request, HttpServletResponse response) throws BusinessException{
         try{
             List<HashMap<String, Object>> root = sheetDataSourceCategoryService.GetCategoryTree();
@@ -121,7 +121,7 @@ public class SheetDataSourceCategoryController extends BaseController {
 
     @ApiOperation(value = "获取数据源分类子节点")
     @PostMapping("/findAllChildren")
-    @RequiresAuthentication
+
     public ResponseEntity<String> findAll(HttpServletRequest request, HttpServletResponse response) throws BusinessException{
         try{
             Collection<SheetDataSourceCategory> collection = sheetDataSourceCategoryService.findAllChildren();
@@ -133,11 +133,12 @@ public class SheetDataSourceCategoryController extends BaseController {
 
     @ApiOperation(value = "上移节点")
     @PostMapping("/moveUp")
-    @RequiresAuthentication
+
     public ResponseEntity<String> moveUp(HttpServletRequest request, HttpServletResponse response, SheetDataSourceCategory entity) throws BusinessException{
         try{
-            String userid = securityUtils.getCurrentUser().getId();
-            entity.setLastModifiedBy(UUID.fromString(userid));
+//            String userid = securityUtils.getCurrentUser().getId();
+//            entity.setLastModifiedBy(UUID.fromString(userid));
+            entity.setLastModifiedBy(UUID.randomUUID());
             boolean success = sheetDataSourceCategoryService.moveUp(entity);
             if (success) {
                 return ok("上移成功!");
@@ -151,11 +152,12 @@ public class SheetDataSourceCategoryController extends BaseController {
 
     @ApiOperation(value = "下移节点")
     @PostMapping("/moveDown")
-    @RequiresAuthentication
+
     public ResponseEntity<String> moveDown(HttpServletRequest request, HttpServletResponse response, SheetDataSourceCategory entity) throws BusinessException{
         try{
-            String userid = securityUtils.getCurrentUser().getId();
-            entity.setLastModifiedBy(UUID.fromString(userid));
+//            String userid = securityUtils.getCurrentUser().getId();
+//            entity.setLastModifiedBy(UUID.fromString(userid));
+            entity.setLastModifiedBy(UUID.randomUUID());
             boolean success = sheetDataSourceCategoryService.moveDown(entity);
             if (success) {
                 return ok("下移成功!");
