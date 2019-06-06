@@ -78,12 +78,12 @@ public class SysAppTableFieldSetController extends BaseController {
     }
 
     /**
-     * 交换排序
+     * 修改排序
      */
     @ApiOperation(value = "交换排序")
-    @PostMapping("/sort/swap")
-    public ResponseEntity swapSort(@RequestBody SysAppTableFieldSetSortModel sortModel) throws BusinessException {
+    @PostMapping("/sort/modify")
+    public ResponseEntity modifySort(@RequestBody SysAppTableFieldSetSortModel sortModel) throws BusinessException {
         SysTableModelInfoManager.removeAllCache();
-        return fieldSetService.swapSort(sortModel.getIds()) ? ok("修改成功！") : fail("修改失败！");
+        return fieldSetService.modifySort(sortModel) ? ok("修改成功！") : fail("修改失败！");
     }
 }

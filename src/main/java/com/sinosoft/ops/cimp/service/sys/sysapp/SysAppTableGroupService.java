@@ -4,6 +4,7 @@ import com.sinosoft.ops.cimp.dto.PaginationViewModel;
 import com.sinosoft.ops.cimp.vo.from.sys.sysapp.sysAppTableGroup.SysAppTableGroupAddModel;
 import com.sinosoft.ops.cimp.vo.from.sys.sysapp.sysAppTableGroup.SysAppTableGroupModifyModel;
 import com.sinosoft.ops.cimp.vo.from.sys.sysapp.sysAppTableGroup.SysAppTableGroupSearchModel;
+import com.sinosoft.ops.cimp.vo.from.sys.sysapp.sysAppTableGroup.SysAppTableGroupSortModel;
 import com.sinosoft.ops.cimp.vo.to.sys.sysapp.sysAppTableGroup.SysAppTableGroupModel;
 
 import java.util.List;
@@ -35,7 +36,9 @@ public interface SysAppTableGroupService {
     void deleteBySysAppIds(List<String> sysAppIds);
 
     /**
-     * 交换排序
+     * 修改排序
+     * @param sortModel
+     * @return
      */
-    boolean swapSort(List<String> ids);
+    boolean modifySort(SysAppTableGroupSortModel sortModel);
 }

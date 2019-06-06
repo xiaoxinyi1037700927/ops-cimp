@@ -12,6 +12,7 @@ import com.sinosoft.ops.cimp.service.sys.sysapp.SysAppTableFieldSetService;
 import com.sinosoft.ops.cimp.vo.from.sys.sysapp.sysAppTableFieldGroup.SysAppTableFieldGroupAddModel;
 import com.sinosoft.ops.cimp.vo.from.sys.sysapp.sysAppTableFieldGroup.SysAppTableFieldGroupModifyModel;
 import com.sinosoft.ops.cimp.vo.from.sys.sysapp.sysAppTableFieldGroup.SysAppTableFieldGroupSearchModel;
+import com.sinosoft.ops.cimp.vo.from.sys.sysapp.sysAppTableFieldGroup.SysAppTableFieldGroupSortModel;
 import com.sinosoft.ops.cimp.vo.to.sys.sysapp.sysAppTableFieldGroup.SysAppTableFieldGroupModel;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -144,32 +146,79 @@ public class SysAppTableFieldGroupServiceImpl implements SysAppTableFieldGroupSe
     }
 
     /**
-     * 交换排序
+     * 修改排序
+     *
+     * @param sortModel
+     * @return
      */
-    @Transactional
     @Override
-    public boolean swapSort(List<String> ids) {
-        if (ids == null || ids.size() != 2) {
+    public boolean modifySort(SysAppTableFieldGroupSortModel sortModel) {
+        String sourceId = sortModel.getSourceId();
+        String targetId = sortModel.getTargetId();
+        String type = sortModel.getType();
+
+        if (sourceId.equals(targetId)) {
+            //如果源和目标相同，不移动
+            return true;
+        }
+
+
+        //筛选出排序介于源和目标之间的数据
+        List<SysAppTableFieldGroup> fieldGroups = new ArrayList<>();
+        QSysAppTableFieldGroup qFieldGroup = QSysAppTableFieldGroup.sysAppTableFieldGroup;
+        int flag = 0;
+        for (SysAppTableFieldGroup fieldGroup : fieldGroupRepository.findAll(qFieldGroup.sort.asc())) {
+            if (fieldGroup.getId().equals(sourceId) || fieldGroup.getId().equals(targetId)) {
+                fieldGroups.add(fieldGroup);
+                if (flag == 0) {
+                    flag = 1;
+                } else {
+                    flag = 2;
+                    break;
+                }
+            } else if (flag == 1) {
+                fieldGroups.add(fieldGroup);
+            }
+        }
+
+        if (flag != 2) {
             return false;
         }
 
-        Optional<SysAppTableFieldGroup> optional1 = fieldGroupRepository.findById(ids.get(0));
-        Optional<SysAppTableFieldGroup> optional2 = fieldGroupRepository.findById(ids.get(1));
+        //获取这组数据中最小的排序
+        int minSort = fieldGroups.get(0).getSort();
 
-        if (!optional1.isPresent() || !optional2.isPresent()) {
-            return false;
+        //获取源和目标的位置
+        int sourceIndex = fieldGroups.get(0).getId().equals(sourceId) ? 0 : fieldGroups.size() - 1;
+        int targetIndex = fieldGroups.get(0).getId().equals(targetId) ? 0 : fieldGroups.size() - 1;
+
+        //根据移动方式调整数据顺序
+        if (fieldGroups.get(0).getId().equals(sourceId)) {
+            //源数据在第一个
+            SysAppTableFieldGroup source = fieldGroups.remove(0);
+            if ("0".equals(type)) {
+                fieldGroups.add(fieldGroups.size() - 1, source);
+            } else {
+                fieldGroups.add(source);
+            }
+        } else {
+            //源数据在最后一个
+            SysAppTableFieldGroup source = fieldGroups.remove(fieldGroups.size() - 1);
+            if ("0".equals(type)) {
+                fieldGroups.add(0, source);
+            } else {
+                fieldGroups.add(1, source);
+            }
         }
 
-        SysAppTableFieldGroup fieldGroup1 = optional1.get();
-        SysAppTableFieldGroup fieldGroup2 = optional2.get();
+        //重新调整排序号
+        for (SysAppTableFieldGroup fieldGroup : fieldGroups) {
+            fieldGroup.setSort(minSort++);
+        }
 
-        Integer sort = fieldGroup1.getSort();
-        fieldGroup1.setSort(fieldGroup2.getSort());
-        fieldGroup2.setSort(sort);
-
-        fieldGroupRepository.save(fieldGroup1);
-        fieldGroupRepository.save(fieldGroup2);
+        fieldGroupRepository.saveAll(fieldGroups);
 
         return true;
     }
+
 }

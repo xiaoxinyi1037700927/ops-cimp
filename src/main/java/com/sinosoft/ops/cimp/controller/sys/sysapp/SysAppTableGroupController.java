@@ -70,12 +70,12 @@ public class SysAppTableGroupController extends BaseController {
     }
 
     /**
-     * 交换排序
+     * 修改排序
      */
-    @ApiOperation(value = "交换排序")
-    @PostMapping("/sort/swap")
-    public ResponseEntity swapSort(@RequestBody SysAppTableGroupSortModel sortModel) throws BusinessException {
+    @ApiOperation(value = "修改排序")
+    @PostMapping("/sort/modify")
+    public ResponseEntity modifySort(@RequestBody SysAppTableGroupSortModel sortModel) throws BusinessException {
         SysTableModelInfoManager.removeAllCache();
-        return tableGroupService.swapSort(sortModel.getIds()) ? ok("修改成功！") : fail("修改失败！");
+        return tableGroupService.modifySort(sortModel) ? ok("修改成功！") : fail("修改失败！");
     }
 }
