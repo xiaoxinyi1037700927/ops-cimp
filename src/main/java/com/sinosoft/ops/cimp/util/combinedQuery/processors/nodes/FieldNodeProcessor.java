@@ -7,6 +7,7 @@ import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.CombinedQueryParseException;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.FieldNode;
 import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.Node;
+import com.sinosoft.ops.cimp.util.combinedQuery.beans.nodes.OperatorNode;
 import com.sinosoft.ops.cimp.util.combinedQuery.enums.Type;
 import com.sinosoft.ops.cimp.util.combinedQuery.utils.CodeUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -157,9 +158,17 @@ public class FieldNodeProcessor extends NodeProcessor {
      *
      * @param stack
      * @param node
+     * @throws CombinedQueryParseException
      */
     @Override
-    public Node pushNode(Deque<Node> stack, Node node) {
+    public Node pushNode(Deque<Node> stack, Node node) throws CombinedQueryParseException {
+        if (stack.size() > 0 && stack.peek() instanceof OperatorNode && !stack.peek().isComplete()) {
+            //如果前面是一个不完整的运算符节点，合并
+            Node first = stack.pop();
+            first.addSubNode(node);
+            return first;
+        }
+
         stack.push(node);
         return null;
     }
