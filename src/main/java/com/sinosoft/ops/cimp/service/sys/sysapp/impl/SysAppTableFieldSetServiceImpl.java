@@ -270,6 +270,7 @@ public class SysAppTableFieldSetServiceImpl implements SysAppTableFieldSetServic
         String sourceId = sortModel.getSourceId();
         String targetId = sortModel.getTargetId();
         String type = sortModel.getType();
+        String fieldGroupId = fieldSetRepository.getOne(sourceId).getSysAppTableFieldGroupId();
 
         if (sourceId.equals(targetId)) {
             //如果源和目标相同，不移动
@@ -281,7 +282,7 @@ public class SysAppTableFieldSetServiceImpl implements SysAppTableFieldSetServic
         List<SysAppTableFieldSet> fieldSets = new ArrayList<>();
         QSysAppTableFieldSet qFieldSet = QSysAppTableFieldSet.sysAppTableFieldSet;
         int flag = 0;
-        for (SysAppTableFieldSet fieldSet : fieldSetRepository.findAll(qFieldSet.sort.asc())) {
+        for (SysAppTableFieldSet fieldSet : fieldSetRepository.findAll(qFieldSet.sysAppTableFieldGroupId.eq(fieldGroupId), qFieldSet.sort.asc())) {
             if (fieldSet.getId().equals(sourceId) || fieldSet.getId().equals(targetId)) {
                 fieldSets.add(fieldSet);
                 if (flag == 0) {

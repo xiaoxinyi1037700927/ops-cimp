@@ -156,6 +156,7 @@ public class SysAppTableFieldGroupServiceImpl implements SysAppTableFieldGroupSe
         String sourceId = sortModel.getSourceId();
         String targetId = sortModel.getTargetId();
         String type = sortModel.getType();
+        String tableSetId = fieldGroupRepository.getOne(sourceId).getSysAppTableSetId();
 
         if (sourceId.equals(targetId)) {
             //如果源和目标相同，不移动
@@ -167,7 +168,7 @@ public class SysAppTableFieldGroupServiceImpl implements SysAppTableFieldGroupSe
         List<SysAppTableFieldGroup> fieldGroups = new ArrayList<>();
         QSysAppTableFieldGroup qFieldGroup = QSysAppTableFieldGroup.sysAppTableFieldGroup;
         int flag = 0;
-        for (SysAppTableFieldGroup fieldGroup : fieldGroupRepository.findAll(qFieldGroup.sort.asc())) {
+        for (SysAppTableFieldGroup fieldGroup : fieldGroupRepository.findAll(qFieldGroup.sysAppTableSetId.eq(tableSetId), qFieldGroup.sort.asc())) {
             if (fieldGroup.getId().equals(sourceId) || fieldGroup.getId().equals(targetId)) {
                 fieldGroups.add(fieldGroup);
                 if (flag == 0) {

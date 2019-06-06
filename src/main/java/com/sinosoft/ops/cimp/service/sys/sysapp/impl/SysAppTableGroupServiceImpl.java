@@ -154,6 +154,7 @@ public class SysAppTableGroupServiceImpl implements SysAppTableGroupService {
         String sourceId = sortModel.getSourceId();
         String targetId = sortModel.getTargetId();
         String type = sortModel.getType();
+        String sysAppId = tableGroupRepository.getOne(sourceId).getSysAppId();
 
         if (sourceId.equals(targetId)) {
             //如果源和目标相同，不移动
@@ -165,7 +166,7 @@ public class SysAppTableGroupServiceImpl implements SysAppTableGroupService {
         List<SysAppTableGroup> tableGroups = new ArrayList<>();
         QSysAppTableGroup qTableGroup = QSysAppTableGroup.sysAppTableGroup;
         int flag = 0;
-        for (SysAppTableGroup tableGroup : tableGroupRepository.findAll(qTableGroup.sort.asc())) {
+        for (SysAppTableGroup tableGroup : tableGroupRepository.findAll(qTableGroup.sysAppId.eq(sysAppId), qTableGroup.sort.asc())) {
             if (tableGroup.getId().equals(sourceId) || tableGroup.getId().equals(targetId)) {
                 tableGroups.add(tableGroup);
                 if (flag == 0) {

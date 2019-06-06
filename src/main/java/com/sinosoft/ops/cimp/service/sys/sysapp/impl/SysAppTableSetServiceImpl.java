@@ -266,6 +266,7 @@ public class SysAppTableSetServiceImpl implements SysAppTableSetService {
         String sourceId = sortModel.getSourceId();
         String targetId = sortModel.getTargetId();
         String type = sortModel.getType();
+        String tableGroupId = tableSetRepository.getOne(sourceId).getSysAppTableGroupId();
 
         if (sourceId.equals(targetId)) {
             //如果源和目标相同，不移动
@@ -277,7 +278,7 @@ public class SysAppTableSetServiceImpl implements SysAppTableSetService {
         List<SysAppTableSet> tableSets = new ArrayList<>();
         QSysAppTableSet qTableSet = QSysAppTableSet.sysAppTableSet;
         int flag = 0;
-        for (SysAppTableSet tableSet : tableSetRepository.findAll(qTableSet.sort.asc())) {
+        for (SysAppTableSet tableSet : tableSetRepository.findAll(qTableSet.sysAppTableGroupId.eq(tableGroupId), qTableSet.sort.asc())) {
             if (tableSet.getId().equals(sourceId) || tableSet.getId().equals(targetId)) {
                 tableSets.add(tableSet);
                 if (flag == 0) {
