@@ -40,6 +40,7 @@ public class ExportConstant {
     /**
      * 导出文件模板
      */
+    public static final String TEMPLATE_DWLDZS = "template/excel/lingdaoshezhi_Templet.xlsx";
     public static final String TEMPLATE_GBHMC = "template/excel/hmc-1.1.xlsx";
     public static final String TEMPLATE_WORD_GBRMB_BJ = "template/word/gbrmb_template_bj.docx";
 
@@ -52,6 +53,7 @@ public class ExportConstant {
     public static final String EXPORT_LRMX = "lrmx/";
     public static final String EXPORT_LRMX_ZIP = "lrmx/zip/";
     public static final String EXPORT_GBHMC_EXCEL = "download/gbhmc/excel/";
+    public static final String EXPORT_DWLDZS_EXCEL = "download/dwldzs/excel/";
     /**
      * 导出文件后缀名
      */
