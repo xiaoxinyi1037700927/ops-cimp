@@ -72,46 +72,45 @@ public class BaseEntityDaoImpl<T extends Serializable> extends BaseDaoImpl imple
         Serializable id = session.save(entity);
 
         session.getTransaction().commit();
+        session.close();
         return id;
     }
 
     @Override
     public void saveOrUpdate(T entity) {
-        Session currentSession = sessionFactory.getCurrentSession();
-        currentSession.beginTransaction();
-
-        currentSession.saveOrUpdate(entity);
-
-        currentSession.getTransaction().commit();
+        Session session = sessionFactory.openSession();
+        session.beginTransaction();
+        session.saveOrUpdate(entity);
+        session.getTransaction().commit();
+        session.close();
     }
 
     @Override
     public void update(T entity) {
-        Session session = sessionFactory.getCurrentSession();
+        Session session = sessionFactory.openSession();
         session.beginTransaction();
         session.update(entity);
         session.getTransaction().commit();
+        session.close();
     }
 
     @Override
     public void delete(T entity) {
-        Session session = sessionFactory.getCurrentSession();
-
-        Transaction transaction = session.getTransaction();
-
+        Session session = sessionFactory.openSession();
+        session.beginTransaction();
         session.delete(entity);
-        transaction.commit();
+        session.getTransaction().commit();
+        session.close();
     }
 
     @Override
     public void deleteById(Serializable id) {
         T deletedEntity = this.getById(id);
-
-        Session session = sessionFactory.getCurrentSession();
+        Session session = sessionFactory.openSession();
         session.beginTransaction();
-
         session.delete(deletedEntity);
         session.getTransaction().commit();
+        session.close();
     }
 
     @Override
