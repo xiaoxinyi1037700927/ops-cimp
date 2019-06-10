@@ -1,21 +1,11 @@
 package com.sinosoft.ops.cimp.util;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import javax.crypto.*;
+import javax.crypto.spec.SecretKeySpec;
+import java.io.*;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.CipherOutputStream;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.spec.SecretKeySpec;
 
 /**
  * @ClassName:  CryptoUtil
@@ -26,7 +16,7 @@ import javax.crypto.spec.SecretKeySpec;
  * @Version        1.0.0
  */
 public class CryptoUtil {
-
+    public static final int BUFFER_SIZE = 4096*4;
     private static char[] hexChar;
     static {
         hexChar = new char[]{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
@@ -65,7 +55,55 @@ public class CryptoUtil {
         cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(password,"AES"));
         return cipher.doFinal(ciphertext);
     }
-    
+
+    /**
+     * 使用AES加密流
+     * @param is 输入流
+     * @param os 输出流
+     * @param password 密码
+     * @throws FileNotFoundException
+     * @throws IOException
+     * @throws NoSuchAlgorithmException
+     * @throws NoSuchPaddingException
+     * @throws InvalidKeyException
+     */
+    public static void encryptStreamAes(final InputStream is,final OutputStream os,final byte[] password) throws FileNotFoundException, IOException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException{
+        int length=0;
+        byte[] buffer=new byte[BUFFER_SIZE];
+        Cipher cipher=Cipher.getInstance("AES/ECB/PKCS5Padding");
+        cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(password,"AES"));
+        try(CipherOutputStream cos=new CipherOutputStream(os,cipher)){
+            while((length=is.read(buffer))>0){
+                cos.write(buffer,0,length);
+            }
+            cos.flush();
+        }
+    }
+
+    /**
+     * 使用AES解密流
+     * @param is 输入流
+     * @param os 输出流
+     * @param password 密码
+     * @throws FileNotFoundException
+     * @throws IOException
+     * @throws NoSuchAlgorithmException
+     * @throws NoSuchPaddingException
+     * @throws InvalidKeyException
+     */
+    public static void decryptStreamAes(final InputStream is,final OutputStream os,final byte[] password) throws FileNotFoundException, IOException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException{
+        int length=0;
+        byte[] buffer=new byte[BUFFER_SIZE];
+        Cipher cipher=Cipher.getInstance("AES/ECB/PKCS5Padding");
+        cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(password,"AES"));
+        try(CipherOutputStream cos=new CipherOutputStream(os,cipher)){
+            while((length=is.read(buffer))>0){
+                cos.write(buffer,0,length);
+            }
+            cos.flush();
+        }
+    }
+
     /**
      * 使用AES加密文件
      * @param plainFile 明文文件

@@ -7,6 +7,7 @@ import com.sinosoft.ops.cimp.entity.sheet.SheetConditionCategory;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * @ClassName: SheetConditionCategoryService
@@ -16,7 +17,7 @@ public interface SheetConditionCategoryService extends BaseEntityService<SheetCo
 
     List<Map<String, Object>> getCategoryTree();
 
-    List<Map<String, Object>> getCategoryTreeByIds(List<String> ids);
+    List<Map<String, Object>> getCategoryTreeByIds(List<UUID> ids);
 
     Collection<SheetConditionCategory> findAllChildren();
 
