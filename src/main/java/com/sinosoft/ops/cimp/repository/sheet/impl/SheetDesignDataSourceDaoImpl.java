@@ -3,6 +3,8 @@ package com.sinosoft.ops.cimp.repository.sheet.impl;
 import com.sinosoft.ops.cimp.common.dao.BaseEntityDaoImpl;
 import com.sinosoft.ops.cimp.entity.sheet.SheetDesignDataSource;
 import com.sinosoft.ops.cimp.repository.sheet.SheetDesignDataSourceDao;
+import org.hibernate.FlushMode;
+import org.hibernate.Session;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManagerFactory;
@@ -89,17 +91,29 @@ public class SheetDesignDataSourceDaoImpl extends BaseEntityDaoImpl<SheetDesignD
 
 	@Override
 	public int deleteByDesignIdAndDataSourceId(UUID designId,UUID datasourceId) {
-		return sessionFactory.getCurrentSession().createQuery("delete from SheetDesignDataSource where designId=:designId and datasourceId=:datasourceId")
-			.setParameter("datasourceId", datasourceId)
-			.setParameter("designId", designId)
-			.executeUpdate();
+		Session session = sessionFactory.getCurrentSession();
+		session.beginTransaction();
+		session.setFlushMode(FlushMode.MANUAL);
+		int result = session.createQuery("delete from SheetDesignDataSource where designId=:designId and datasourceId=:datasourceId")
+				.setParameter("datasourceId", datasourceId)
+				.setParameter("designId", designId)
+				.executeUpdate();
+		session.flush();
+		session.getTransaction().commit();
+		return result;
 	}
 	
 	@Override
 	public int deleteByDesignId(UUID designId) {
-		return sessionFactory.getCurrentSession().createQuery("delete from SheetDesignDataSource where designId=:designId")
-			.setParameter("designId", designId)
-			.executeUpdate();
+		Session session = sessionFactory.getCurrentSession();
+		session.beginTransaction();
+		session.setFlushMode(FlushMode.MANUAL);
+		int result = session.createQuery("delete from SheetDesignDataSource where designId=:designId")
+				.setParameter("designId", designId)
+				.executeUpdate();
+		session.flush();
+		session.getTransaction().commit();
+		return result;
 	}
 		
 }

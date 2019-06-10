@@ -6,10 +6,11 @@ import com.sinosoft.ops.cimp.common.model.PageableQueryResult;
 import com.sinosoft.ops.cimp.entity.sheet.SheetCondition;
 import com.sinosoft.ops.cimp.entity.sheet.SheetConditionCategory;
 import com.sinosoft.ops.cimp.repository.sheet.SheetConditionDao;
+import org.hibernate.FlushMode;
+import org.hibernate.Session;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.query.Query;
 import org.hibernate.transform.Transformers;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManagerFactory;
@@ -113,12 +114,17 @@ public class SheetConditionDaoImpl extends BaseEntityDaoImpl<SheetCondition> imp
 
     @Override
     public int updateOrdinal(String nextId, int ordinal, String userName) {
+        Session session = sessionFactory.getCurrentSession();
+        session.beginTransaction();
+        session.setFlushMode(FlushMode.MANUAL);
         String hql = "UPDATE SheetCondition SET ordinal=:newOrdinal, lastModifiedBy=:userName, lastModifiedTime=SYSDATE WHERE id=:id";
-        int cnt = sessionFactory.getCurrentSession().createQuery(hql)
+        int cnt = session.createQuery(hql)
                 .setParameter("id", nextId)
                 .setParameter("userName", userName)
                 .setParameter("newOrdinal", ordinal)
                 .executeUpdate();
+        session.flush();
+        session.getTransaction().commit();
         return cnt;
     }
 
