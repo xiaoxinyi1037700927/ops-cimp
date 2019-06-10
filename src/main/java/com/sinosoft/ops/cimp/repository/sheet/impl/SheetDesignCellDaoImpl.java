@@ -8,6 +8,8 @@ package com.sinosoft.ops.cimp.repository.sheet.impl;
 import com.sinosoft.ops.cimp.common.dao.BaseEntityDaoImpl;
 import com.sinosoft.ops.cimp.entity.sheet.SheetDesignCell;
 import com.sinosoft.ops.cimp.repository.sheet.SheetDesignCellDao;
+import org.hibernate.FlushMode;
+import org.hibernate.Session;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManagerFactory;
@@ -29,36 +31,42 @@ public class SheetDesignCellDaoImpl  extends BaseEntityDaoImpl<SheetDesignCell> 
 		super(factory);
 	}
 
-    @SuppressWarnings("unchecked")//方法不建议使用
-    @Override
-    public Collection<SheetDesignCell> getByDesignId(UUID designId) {
-        return sessionFactory.getCurrentSession().createQuery("from SheetDesignCell where designId = :designId")
-                .setParameter("designId", designId)
-                .list();
-    }
+	@SuppressWarnings("unchecked")//方法不建议使用
+	@Override
+	public Collection<SheetDesignCell> getByDesignId(UUID designId) {
+		return sessionFactory.getCurrentSession().createQuery("from SheetDesignCell where designId = :designId")
+				.setParameter("designId", designId)
+				.list();
+	}
 
-    @Override
-    public int deleteById(UUID Id) {
-        return sessionFactory.getCurrentSession().createQuery("delete from SheetDesignCell where designId=:designId")
-                .setParameter("designId", Id)
-                .executeUpdate();
-    }
+	@Override
+	public int deleteById(UUID Id) {
+		Session session = sessionFactory.getCurrentSession();
+		session.beginTransaction();
+		session.setFlushMode(FlushMode.MANUAL);
+		int result = session.createQuery("delete from SheetDesignCell where designId=:designId")
+				.setParameter("designId", Id)
+				.executeUpdate();
+		session.flush();
+		session.getTransaction().commit();
+		return result;
+	}
 
 	@Override
 	public UUID saveDesignCell(SheetDesignCell sheetDesignCell) {
-		
+
 		return (UUID)save(sheetDesignCell);//直接强转
 	}
 
 	@Override
 	public void updateDesignCell(SheetDesignCell sheetDesignCell) {
-		
+
 		update(sheetDesignCell);
 	}
 
 	@Override
 	public SheetDesignCell getById(UUID Id) {
-		
+
 		return super.getById(Id);
 	}
 

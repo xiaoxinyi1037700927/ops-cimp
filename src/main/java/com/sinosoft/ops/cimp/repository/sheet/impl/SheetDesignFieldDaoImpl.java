@@ -4,6 +4,8 @@ package com.sinosoft.ops.cimp.repository.sheet.impl;
 import com.sinosoft.ops.cimp.common.dao.BaseEntityDaoImpl;
 import com.sinosoft.ops.cimp.entity.sheet.SheetDesignField;
 import com.sinosoft.ops.cimp.repository.sheet.SheetDesignFieldDao;
+import org.hibernate.FlushMode;
+import org.hibernate.Session;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManagerFactory;
@@ -81,12 +83,17 @@ public class SheetDesignFieldDaoImpl extends BaseEntityDaoImpl<SheetDesignField>
 
 	@Override
 	public int updateOrdinal(UUID preId, int ordinal, UUID userName) {
+		Session session = sessionFactory.getCurrentSession();
+		session.beginTransaction();
+		session.setFlushMode(FlushMode.MANUAL);
 		String hql = "UPDATE SheetDesignField SET ordinal=:newOrdinal, lastModifiedBy=:userName, lastModifiedTime=SYSDATE WHERE id=:id";
-        int cnt = sessionFactory.getCurrentSession().createQuery(hql)
+        int cnt = session.createQuery(hql)
                 .setParameter("id", preId)
                 .setParameter("userName", userName)
                 .setParameter("newOrdinal", ordinal)
                 .executeUpdate();
+		session.flush();
+		session.getTransaction().commit();
 		return cnt;
 	}
 
@@ -111,24 +118,39 @@ public class SheetDesignFieldDaoImpl extends BaseEntityDaoImpl<SheetDesignField>
 
 	@Override
 	public void deleteByDesignId(UUID designId) {
-		sessionFactory.getCurrentSession().createQuery("delete from SheetDesignField where designId=:designId")
+		Session session = sessionFactory.getCurrentSession();
+		session.beginTransaction();
+		session.setFlushMode(FlushMode.MANUAL);
+		session.createQuery("delete from SheetDesignField where designId=:designId")
 			.setParameter("designId", designId)
 			.executeUpdate();
+		session.flush();
+		session.getTransaction().commit();
 	}
 	
 	@SuppressWarnings("deprecation")
 	@Override
 	public void deleteFieldBindingByFieldId(UUID fieldId) {
-		sessionFactory.getCurrentSession().createSQLQuery("delete from sheet_design_field_binding where field_id=:fieldId")
+		Session session = sessionFactory.getCurrentSession();
+		session.beginTransaction();
+		session.setFlushMode(FlushMode.MANUAL);
+		session.createSQLQuery("delete from sheet_design_field_binding where field_id=:fieldId")
 			.setParameter("fieldId", fieldId)
 			.executeUpdate();
+		session.flush();
+		session.getTransaction().commit();
 	}
 
 	@SuppressWarnings("deprecation")
 	@Override
 	public void deleteFieldBindingByDesignId(UUID designId) {
-		sessionFactory.getCurrentSession().createSQLQuery("delete from sheet_design_field_binding where design_id=:designId")
+		Session session = sessionFactory.getCurrentSession();
+		session.beginTransaction();
+		session.setFlushMode(FlushMode.MANUAL);
+		session.createSQLQuery("delete from sheet_design_field_binding where design_id=:designId")
 			.setParameter("designId", designId)
 			.executeUpdate();
+		session.flush();
+		session.getTransaction().commit();
 	}
 }

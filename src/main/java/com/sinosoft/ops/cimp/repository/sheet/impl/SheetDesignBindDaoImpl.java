@@ -2,6 +2,8 @@ package com.sinosoft.ops.cimp.repository.sheet.impl;
 
 import com.sinosoft.ops.cimp.common.dao.BaseDaoImpl;
 import com.sinosoft.ops.cimp.repository.sheet.SheetDesignBindDao;
+import org.hibernate.FlushMode;
+import org.hibernate.Session;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,7 +22,13 @@ public class SheetDesignBindDaoImpl extends BaseDaoImpl implements SheetDesignBi
     @SuppressWarnings({ "deprecation" })
     @Override
 	public int updateDesignBind(String sql) {
-        return sessionFactory.getCurrentSession().createSQLQuery(sql).executeUpdate();
+		Session session = sessionFactory.getCurrentSession();
+		session.beginTransaction();
+		session.setFlushMode(FlushMode.MANUAL);
+		int result = session.createSQLQuery(sql).executeUpdate();
+		session.flush();
+		session.getTransaction().commit();
+        return result;
 	}
 
 	@Override

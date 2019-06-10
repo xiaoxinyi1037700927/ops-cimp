@@ -12,6 +12,8 @@ import com.sinosoft.ops.cimp.common.model.PageableQueryResult;
 import com.sinosoft.ops.cimp.entity.sheet.SheetDesign;
 import com.sinosoft.ops.cimp.repository.sheet.SheetDesignDao;
 import com.sinosoft.ops.cimp.util.toSqlUtils;
+import org.hibernate.FlushMode;
+import org.hibernate.Session;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
@@ -265,13 +267,18 @@ public class SheetDesignDaoImpl extends BaseEntityDaoImpl<SheetDesign> implement
 
 	@Override
 	public boolean addOrdinals(int upOrdinal, UUID categoryId, UUID userName) {
+		Session session = sessionFactory.getCurrentSession();
+		session.beginTransaction();
+		session.setFlushMode(FlushMode.MANUAL);
 		String hql = "UPDATE SheetDesign SET ordinal=ordinal+1, lastModifiedBy=:userName, lastModifiedTime=SYSDATE " + 
 				"WHERE id IN (SELECT designId from SheetDesignDesignCategory WHERE categoryId=:categoryId) AND ordinal IS NOT NULL AND ordinal>:upOrdinal";
-		int cnt = sessionFactory.getCurrentSession().createQuery(hql)
+		int cnt = session.createQuery(hql)
                 .setParameter("categoryId", categoryId)
                 .setParameter("upOrdinal", upOrdinal)
                 .setParameter("userName", userName)
                 .executeUpdate();
+		session.flush();
+		session.getTransaction().commit();
 		return cnt > 0 ? true : false;
 	}
 
@@ -340,13 +347,18 @@ public class SheetDesignDaoImpl extends BaseEntityDaoImpl<SheetDesign> implement
 
 	@Override
 	public int minusOrdinals(int thisOrdinal, UUID categoryId, UUID userName) {
+		Session session = sessionFactory.getCurrentSession();
+		session.beginTransaction();
+		session.setFlushMode(FlushMode.MANUAL);
 		String hql = "UPDATE SheetDesign SET ordinal=ordinal-1, lastModifiedBy=:userName, lastModifiedTime=SYSDATE " + 
 				"WHERE id IN (SELECT designId from SheetDesignDesignCategory WHERE categoryId=:categoryId) AND ordinal IS NOT NULL AND ordinal>:thisOrdinal";
-		int cnt = sessionFactory.getCurrentSession().createQuery(hql)
+		int cnt = session.createQuery(hql)
                 .setParameter("categoryId", categoryId)
                 .setParameter("thisOrdinal", thisOrdinal)
                 .setParameter("userName", userName)
                 .executeUpdate();
+		session.flush();
+		session.getTransaction().commit();
 		return cnt;
 	}
 
@@ -371,12 +383,17 @@ public class SheetDesignDaoImpl extends BaseEntityDaoImpl<SheetDesign> implement
 
 	@Override
 	public int updateOrdinal(UUID id, int newOrdinal, UUID userName) {
+		Session session = sessionFactory.getCurrentSession();
+		session.beginTransaction();
+		session.setFlushMode(FlushMode.MANUAL);
 		String hql = "UPDATE SheetDesign SET ordinal=:newOrdinal, lastModifiedBy=:userName, lastModifiedTime=SYSDATE WHERE id=:id";
-        int cnt = sessionFactory.getCurrentSession().createQuery(hql)
+        int cnt = session.createQuery(hql)
                 .setParameter("id", id)
                 .setParameter("userName", userName)
                 .setParameter("newOrdinal", newOrdinal)
                 .executeUpdate();
+		session.flush();
+		session.getTransaction().commit();
 		return cnt;
 	}
 
