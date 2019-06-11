@@ -54,6 +54,11 @@ public class CadreSearchModel extends RePagination {
      */
     @ApiModelProperty(value = "1：初始化，0：非初始化")
     private String isInit;
+    /**
+     * 人员管理状态
+     */
+    @ApiModelProperty(value = "1：现职人员(默认) 2:离退人员 3:调出人员 4:已去世 9:其他人员")
+    private String cadreStatus = "1";
 
     public String getDeptId() {
         return deptId;
@@ -125,6 +130,14 @@ public class CadreSearchModel extends RePagination {
 
     public void setIsInit(String isInit) {
         this.isInit = isInit;
+    }
+
+    public String getCadreStatus() {
+        return cadreStatus;
+    }
+
+    public void setCadreStatus(String cadreStatus) {
+        this.cadreStatus = cadreStatus;
     }
 }
 

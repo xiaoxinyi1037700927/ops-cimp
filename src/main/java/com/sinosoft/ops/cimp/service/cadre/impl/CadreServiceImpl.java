@@ -14,6 +14,7 @@ import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.repository.combinedQuery.CombinedQueryRepository;
 import com.sinosoft.ops.cimp.repository.emp.EmpPhotoRepository;
 import com.sinosoft.ops.cimp.service.cadre.CadreService;
+import com.sinosoft.ops.cimp.service.sys.datapermission.RoleDataPermissionService;
 import com.sinosoft.ops.cimp.service.user.RolePermissionPageSqlService;
 import com.sinosoft.ops.cimp.util.IdUtil;
 import com.sinosoft.ops.cimp.util.JsonUtil;
@@ -23,6 +24,7 @@ import com.sinosoft.ops.cimp.util.combinedQuery.beans.CombinedQueryParseExceptio
 import com.sinosoft.ops.cimp.vo.from.cadre.*;
 import com.sinosoft.ops.cimp.vo.from.user.rolePermissionPageSql.RPPageSqlSearchModel;
 import com.sinosoft.ops.cimp.vo.to.cadre.*;
+import com.sinosoft.ops.cimp.vo.to.sys.datapermission.RoleDataPerSqlType;
 import com.sinosoft.ops.cimp.vo.to.user.rolePermissionPageSql.RPPageSqlViewModel;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -45,14 +47,16 @@ public class CadreServiceImpl implements CadreService {
     private final CombinedQueryParser parser;
     private final CombinedQueryRepository combinedQueryRepository;
     private final RolePermissionPageSqlService rolePermissionPageSqlService;
+    private final RoleDataPermissionService roleDataPermissionService;
 
-    public CadreServiceImpl(JdbcTemplate jdbcTemplate, EmpPhotoRepository empPhotoRepository, SysTableInfoDao sysTableInfoDao, CombinedQueryParser parser, CombinedQueryRepository combinedQueryRepository, RolePermissionPageSqlService rolePermissionPageSqlService) {
+    public CadreServiceImpl(JdbcTemplate jdbcTemplate, EmpPhotoRepository empPhotoRepository, SysTableInfoDao sysTableInfoDao, CombinedQueryParser parser, CombinedQueryRepository combinedQueryRepository, RolePermissionPageSqlService rolePermissionPageSqlService, RoleDataPermissionService roleDataPermissionService) {
         this.jdbcTemplate = jdbcTemplate;
         this.empPhotoRepository = empPhotoRepository;
         this.sysTableInfoDao = sysTableInfoDao;
         this.parser = parser;
         this.combinedQueryRepository = combinedQueryRepository;
         this.rolePermissionPageSqlService = rolePermissionPageSqlService;
+        this.roleDataPermissionService = roleDataPermissionService;
     }
 
 
@@ -95,10 +99,12 @@ public class CadreServiceImpl implements CadreService {
             String execCadreListSql = execListSql.replaceAll("\\$\\{deptId}", searchModel.getDeptId())
                     .replaceAll("\\$\\{startIndex}", String.valueOf(startIndex))
                     .replaceAll("\\$\\{endIndex}", String.valueOf(endIndex))
-                    .replaceAll("\\$\\{includeSubNode}", searchModel.getIncludeSubNode());
+                    .replaceAll("\\$\\{includeSubNode}", searchModel.getIncludeSubNode())
+                    .replaceAll("\\$\\{cadreStatus}", searchModel.getCadreStatus());
 
             String execCadreCountSql = execCountSql.replaceAll("\\$\\{deptId}", searchModel.getDeptId())
-                    .replaceAll("\\$\\{includeSubNode}", searchModel.getIncludeSubNode());
+                    .replaceAll("\\$\\{includeSubNode}", searchModel.getIncludeSubNode())
+                    .replaceAll("\\$\\{cadreStatus}", searchModel.getCadreStatus());
 
             //自定义查询条件
             StringBuilder conditionSql = new StringBuilder(" ");
@@ -107,6 +113,33 @@ public class CadreServiceImpl implements CadreService {
             if (StringUtils.isNotEmpty(searchModel.getName())) {
                 conditionSql.append(" AND a001.A01001 LIKE '%").append(searchModel.getName()).append("%' ");
             }
+
+            //标签查询
+            if (StringUtils.isNotEmpty(searchModel.getCadreTagIds())) {
+                String tagIds = Arrays.stream(searchModel.getCadreTagIds().split(",")).collect(Collectors.joining("','", "('", "')"));
+                conditionSql.append(" AND a001.EMP_ID IN (SELECT DISTINCT EMP_ID FROM CADRE_TAG WHERE TAG_ID IN ").append(tagIds).append(") ");
+            }
+
+
+            //将数据权限，组合查询，高级查询进行合并
+            Set<String> tableNames = new HashSet<>();
+            StringBuilder whereSql = new StringBuilder();
+
+            //角色数据权限过滤
+            List<String> sqls = roleDataPermissionService.getSqls(roleIds, RoleDataPerSqlType.INJECTION_SQL.getType());
+            if (sqls.size() > 0) {
+                try {
+                    whereSql.append(" and ( ");
+                    for (int i = 0; i < sqls.size(); i++) {
+                        Object[] arr = parser.parseSql(sqls.get(i));
+                        whereSql.append(i > 0 ? " or ( " : " ( ").append(arr[0]).append(") ");
+                        tableNames.addAll((Set<String>) arr[1]);
+                    }
+                } catch (CombinedQueryParseException e) {
+                    throw new BusinessException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE, "角色数据权限配置错误!");
+                }
+            }
+
 
             //组合查询
             if (StringUtils.isNotEmpty(searchModel.getExprStr()) || StringUtils.isNotEmpty(searchModel.getCombinedQueryId())) {
@@ -120,23 +153,17 @@ public class CadreServiceImpl implements CadreService {
                 }
 
                 try {
-                    conditionSql.append(parser.parseSql(exprStr));
+                    Object[] arr = parser.parseSql(exprStr);
+                    whereSql.append(" and ").append(arr[0]).append(" ");
+                    tableNames.addAll((Set<String>) arr[1]);
                 } catch (CombinedQueryParseException e) {
                     throw new BusinessException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE, "组合查询解析失败，请核对组合查询信息!");
                 }
             }
 
-            //标签查询
-            if (StringUtils.isNotEmpty(searchModel.getCadreTagIds())) {
-                String tagIds = Arrays.stream(searchModel.getCadreTagIds().split(",")).collect(Collectors.joining("','", "('", "')"));
-                conditionSql.append(" AND a001.EMP_ID IN (SELECT DISTINCT EMP_ID FROM CADRE_TAG WHERE TAG_ID IN ").append(tagIds).append(") ");
-            }
-
             //高级查询
             if (StringUtils.isNotEmpty(searchModel.getTableConditions())) {
                 SysTableModelInfo cadreInfo = sysTableInfoDao.getTableInfo("CadreInfo");
-                List<String> tableNames = new ArrayList<>();
-                StringBuilder whereSql = new StringBuilder();
 
                 //解析查询条件
                 Map<String, Object> conditions = JsonUtil.parseStringToObject(searchModel.getTableConditions(), HashMap.class);
@@ -157,21 +184,27 @@ public class CadreServiceImpl implements CadreService {
                                 .append(op).append(" '").append(conditionValue).append("' ");
                     }
                 }
+            }
 
-                String firstTable = tableNames.get(0);
-                StringBuilder sb = new StringBuilder();
-                sb.append(" AND a001.EMP_ID IN(SELECT DISTINCT ")
-                        .append(firstTable).append(".EMP_ID ")
-                        .append(" FROM ").append(firstTable);
-                for (int i = 1; i < tableNames.size(); i++) {
-                    String tableName = tableNames.get(i);
-                    sb.append(" INNER JOIN ").append(tableName).append(" ON ")
-                            .append(firstTable).append(".EMP_ID = ").append(tableName).append(".EMP_ID ");
+            List<String> tables = new ArrayList<>(tableNames);
+            tables.sort(String::compareTo);
+            if (tables.size() == 0) {
+                //不涉及表
+                conditionSql.append(whereSql);
+            } else {
+                String firstTable = tables.get(0);
+                StringBuilder sql = new StringBuilder();
+                sql.append(" AND A001.EMP_ID IN(SELECT DISTINCT ")
+                        .append(firstTable)
+                        .append(".EMP_ID FROM ")
+                        .append(firstTable);
+                for (int i = 1; i < tables.size(); i++) {
+                    String tableName = tables.get(i);
+                    sql.append(" INNER JOIN ").append(tableName).append(" ON ")
+                            .append(tableName).append(".EMP_ID = ").append(tableName).append(".EMP_ID ");
                 }
-
-                sb.append(" WHERE 1=1 ").append(whereSql).append(") ");
-
-                sb.append(sb);
+                sql.append(" WHERE 1=1 ").append(whereSql).append(" )");
+                conditionSql.append(sql.toString());
             }
 
             //自定义排序

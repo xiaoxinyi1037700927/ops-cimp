@@ -219,38 +219,24 @@ public class CombinedQueryParser {
 
     /**
      * 将表达式解析为sql
+     *
+     * @return result[0]:查询的where条件，result[1]:查询涉及的表名
      */
-    public String parseSql(String exprStr) throws CombinedQueryParseException {
+    public Object[] parseSql(String exprStr) throws CombinedQueryParseException {
         Node root = parseGramTree(exprStr, null);
 
         //调用码值处理器
         invokePostProcessorBoforeGetSql(root);
 
         //获取表达式所需的表名，并排序
-        Set<String> set = new HashSet<>();
-        getTableNames(root, set);
-        List<String> tables = new ArrayList<>(set);
-        tables.sort(String::compareTo);
+        Set<String> tableNames = new HashSet<>();
+        getTableNames(root, tableNames);
 
-        if (tables.size() == 0) {
-            return " AND " + root.getSql();
-        }
+        Object[] result = new Object[2];
+        result[0] = root.getSql();
+        result[1] = tableNames;
 
-
-        String tmp = tables.get(0);
-        StringBuilder sql = new StringBuilder();
-        sql.append(" AND A001.EMP_ID IN(SELECT DISTINCT ")
-                .append(tmp)
-                .append(".EMP_ID FROM ")
-                .append(tmp);
-        for (int i = 1; i < tables.size(); i++) {
-            String tmp2 = tables.get(i);
-            sql.append(" INNER JOIN ").append(tmp2).append(" ON ")
-                    .append(tmp).append(".EMP_ID = ").append(tmp2).append(".EMP_ID ");
-        }
-        sql.append(" WHERE ").append(root.getSql()).append(" )");
-
-        return sql.toString();
+        return result;
     }
 
     /**
@@ -297,8 +283,7 @@ public class CombinedQueryParser {
      */
     public String compile(String exprStr) {
         try {
-            String sql = parseSql(exprStr);
-            System.out.println(sql);
+            parseSql(exprStr);
         } catch (CombinedQueryParseException e) {
             return e.getMessage();
         }

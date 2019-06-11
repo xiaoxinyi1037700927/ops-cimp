@@ -907,7 +907,6 @@ public class CombinedQueryServiceImpl implements CombinedQueryService {
             result.setCompilePass(true);
 
             putCache(userId, combinedQueryId, result.getExprs());
-            System.out.println(parser.parseSql(result.getExprstr()));
         } catch (CombinedQueryParseException e) {
             e.printStackTrace();
             result.setCompilePass(false);
