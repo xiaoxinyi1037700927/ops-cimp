@@ -4,27 +4,46 @@
     <meta charset=utf-8>
     <meta name=viewport content="width=device-width,initial-scale=1">
     <title>干部信息管理</title>
+    <link rel=stylesheet href=./static/spreadjs/css/gc.spread.sheets.excel2013white.11.0.0.css title=spread-theme>
+    <link rel=stylesheet href=./static/spreadjs/css/inspector.css>
+    <link rel=stylesheet href=./static/spreadjs/css/insp-table-format.css>
+    <link rel=stylesheet href=./static/spreadjs/css/insp-slicer-format.css>
+    <link rel=stylesheet href=./static/spreadjs/css/insp-conditional-formatting.css>
+    <link rel=stylesheet href=./static/spreadjs/css/colorpicker.css>
+    <link rel=stylesheet href=./static/spreadjs/css/borderpicker.css>
+    <link rel=stylesheet href=./static/spreadjs/css/insp-spread.css>
+    <link rel=stylesheet href=./static/spreadjs/css/sample.css>
     <link rel=stylesheet type=text/css href=./static/ifIE/css/loading.css>
     <link rel=stylesheet type=text/css href=./static/style/font/iconfont.css>
     <link rel="shortcut icon" href=./static/img/favicon.png>
-    <link href=./static/css/app.029bf6ca2eb213e84184f3c5c42ce4e3.css rel=stylesheet>
+    <link href=./static/css/app.442768952e3f169cf22bb2e1b071cf85.css rel=stylesheet>
+
+    <script th:inline="javascript">
+        var appInfo = {
+            appName: [[${appName}]],
+            appIcon: [[${appIcon}]]
+        };
+        localStorage.appInfo = JSON.stringify(appInfo);
+    </script>
+
 </head>
 <body>
 <div id=app></div>
-<script th:inline="javascript">
-    var appInfo = {
-        appName: [[${appName}]],
-        appIcon: [[${appIcon}]]
-    };
-    localStorage.appInfo = JSON.stringify(appInfo);
-</script>
 <script src=./static/ifIE/js/loading.js></script>
-<script>if (localStorage.appInfo) {
-    let appInfo = JSON.parse(localStorage.appInfo);
+<script type=text/javascript src=./static/spreadjs/js/gc.spread.sheets.all.11.0.0.min.js></script>
+<script type=text/javascript src=./static/spreadjs/js/gc.spread.sheets.charts.11.0.0.min.js></script>
+<script type=text/javascript src=./static/spreadjs/js/gc.spread.sheets.print.11.0.0.min.js></script>
+<script type=text/javascript src=./static/spreadjs/js/gc.spread.excelio.11.0.0.min.js></script>
+<script type=text/javascript src=./static/spreadjs/js/gc.spread.sheets.resources.zh.11.0.0.min.js></script>
+<script type=text/javascript src=./static/spreadjs/js/license.js></script>
+<script type=text/javascript src=./static/spreadjs/js/FileSaver.min.js></script>
+<script type=text/javascript src=./static/spreadjs/js/resources.js></script>
+<script type=text/javascript>if (localStorage.appInfo) {
+    var appInfo = JSON.parse(localStorage.appInfo);
     document.title = appInfo.appName;
 }</script>
 <script type=text/javascript src=./static/js/manifest.3ad1d5771e9b13dbdad2.js></script>
-<script type=text/javascript src=./static/js/vendor.416e0c5b45c913a34108.js></script>
-<script type=text/javascript src=./static/js/app.23b0bdddd2780e21854b.js></script>
+<script type=text/javascript src=./static/js/vendor.c4cc3165188e2929257c.js></script>
+<script type=text/javascript src=./static/js/app.56be97a89b7ecf3ea255.js></script>
 </body>
 </html>
