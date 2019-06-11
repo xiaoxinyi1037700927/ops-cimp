@@ -8,6 +8,8 @@ package com.sinosoft.ops.cimp.repository.sheet.impl;
 import com.sinosoft.ops.cimp.common.dao.BaseEntityDaoImpl;
 import com.sinosoft.ops.cimp.entity.sheet.SheetDesignCarrier;
 import com.sinosoft.ops.cimp.repository.sheet.SheetDesignCarrierDao;
+import org.hibernate.FlushMode;
+import org.hibernate.Session;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManagerFactory;
@@ -37,9 +39,15 @@ public class SheetDesignCarrierDaoImpl extends BaseEntityDaoImpl<SheetDesignCarr
 
 	@Override
 	public int deleteByDesignId(UUID designId) {
-        return sessionFactory.getCurrentSession().createQuery("delete SheetDesignCarrier s where s.designId = :designId")
+        Session session = sessionFactory.getCurrentSession();
+        session.beginTransaction();
+        session.setFlushMode(FlushMode.MANUAL);
+        int result = session.createQuery("delete SheetDesignCarrier s where s.designId = :designId")
                 .setParameter("designId", designId)
                 .executeUpdate();
+        session.flush();
+        session.getTransaction().commit();
+        return result;
 	}
 
     @Override

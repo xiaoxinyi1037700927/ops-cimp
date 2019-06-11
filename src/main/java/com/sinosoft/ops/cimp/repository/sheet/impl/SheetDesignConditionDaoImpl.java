@@ -3,6 +3,8 @@ package com.sinosoft.ops.cimp.repository.sheet.impl;
 import com.sinosoft.ops.cimp.common.dao.BaseEntityDaoImpl;
 import com.sinosoft.ops.cimp.entity.sheet.SheetDesignCondition;
 import com.sinosoft.ops.cimp.repository.sheet.SheetDesignConditionDao;
+import org.hibernate.FlushMode;
+import org.hibernate.Session;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManagerFactory;
@@ -89,12 +91,17 @@ public class SheetDesignConditionDaoImpl  extends BaseEntityDaoImpl<SheetDesignC
 
 	@Override
 	public int updateOrdinal(UUID preId, int ordinal, UUID userName) {
+		Session session = sessionFactory.getCurrentSession();
+		session.beginTransaction();
+		session.setFlushMode(FlushMode.MANUAL);
 		String hql = "UPDATE SheetDesignCondition SET ordinal=:newOrdinal, lastModifiedBy=:userName, lastModifiedTime=SYSDATE WHERE id=:id";
-        int cnt = sessionFactory.getCurrentSession().createQuery(hql)
+        int cnt = session.createQuery(hql)
                 .setParameter("id", preId)
                 .setParameter("userName", userName)
                 .setParameter("newOrdinal", ordinal)
                 .executeUpdate();
+		session.flush();
+		session.getTransaction().commit();
 		return cnt;
 	}
 
@@ -108,17 +115,28 @@ public class SheetDesignConditionDaoImpl  extends BaseEntityDaoImpl<SheetDesignC
 
 	@Override
 	public int deleteByDesignIdAndConditionId(UUID designId, UUID conditionId) {
-		return sessionFactory.getCurrentSession().createQuery("delete from SheetDesignCondition where designId=:designId and conditionId=:conditionId")
+		Session session = sessionFactory.getCurrentSession();
+		session.beginTransaction();
+		session.setFlushMode(FlushMode.MANUAL);
+		int result = session.createQuery("delete from SheetDesignCondition where designId=:designId and conditionId=:conditionId")
 				.setParameter("designId", designId)
 				.setParameter("conditionId", conditionId)
 				.executeUpdate();
+		session.flush();
+		session.getTransaction().commit();
+		return result;
 	}
 
 	@Override
 	public void deleteByDesignId(UUID designId) {
-		sessionFactory.getCurrentSession().createQuery("delete from SheetDesignCondition where designId=:designId")
+		Session session = sessionFactory.getCurrentSession();
+		session.beginTransaction();
+		session.setFlushMode(FlushMode.MANUAL);
+		session.createQuery("delete from SheetDesignCondition where designId=:designId")
 			.setParameter("designId", designId)
 			.executeUpdate();
+		session.flush();
+		session.getTransaction().commit();
 	}
 
 

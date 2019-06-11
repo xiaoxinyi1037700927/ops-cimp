@@ -35,8 +35,7 @@ public interface SysAppTableFieldGroupMapper {
 
     @Named("getCurrentId")
     default String getCurrentId(String id) {
-//        return SecurityUtils.getSubject().getCurrentUser().getId();
-        return "0";
+        return SecurityUtils.getSubject().getCurrentUser().getId();
     }
 
     @Named("getTime")

@@ -73,6 +73,7 @@ public class RoleDataPermissionServiceImpl implements RoleDataPermissionService 
                 .totalCount(total)
                 .data(perList.stream().map(per -> {
                     RoleDataPerModel model = RoleDataPermissionMapper.INSTANCE.roleDataPermissionToModel(per);
+
                     model.setTypeName(RoleDataPerSqlType.getName(model.getType()));
                     return model;
                 }).collect(Collectors.toList()))

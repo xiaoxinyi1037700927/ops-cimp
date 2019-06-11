@@ -8,6 +8,8 @@ package com.sinosoft.ops.cimp.repository.sheet.impl;
 import com.sinosoft.ops.cimp.common.dao.BaseEntityDaoImpl;
 import com.sinosoft.ops.cimp.entity.sheet.SheetDesignExpression;
 import com.sinosoft.ops.cimp.repository.sheet.SheetDesignExpressionDao;
+import org.hibernate.FlushMode;
+import org.hibernate.Session;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManagerFactory;
@@ -64,9 +66,15 @@ public class SheetDesignExpressionDaoImpl  extends BaseEntityDaoImpl<SheetDesign
 	
     @Override
     public int deleteByDesignId(UUID designId) {
-        return sessionFactory.getCurrentSession().createQuery("delete from SheetDesignExpression where designId=:designId")
+		Session session = sessionFactory.getCurrentSession();
+		session.beginTransaction();
+		session.setFlushMode(FlushMode.MANUAL);
+        int result = session.createQuery("delete from SheetDesignExpression where designId=:designId")
                 .setParameter("designId", designId)
                 .executeUpdate();
+		session.flush();
+		session.getTransaction().commit();
+		return result;
     }
     
 
@@ -103,12 +111,17 @@ public class SheetDesignExpressionDaoImpl  extends BaseEntityDaoImpl<SheetDesign
 
 	@Override
 	public int updateOrdinal(UUID nextId, int ordinal, UUID userName) {
+		Session session = sessionFactory.getCurrentSession();
+		session.beginTransaction();
+		session.setFlushMode(FlushMode.MANUAL);
 		String hql = "UPDATE SheetDesignExpression SET ordinal=:newOrdinal, lastModifiedBy=:userName, lastModifiedTime=SYSDATE WHERE id=:id";
-        int cnt = sessionFactory.getCurrentSession().createQuery(hql)
+        int cnt = session.createQuery(hql)
                 .setParameter("id", nextId)
                 .setParameter("userName", userName)
                 .setParameter("newOrdinal", ordinal)
                 .executeUpdate();
+		session.flush();
+		session.getTransaction().commit();
 		return cnt;
 	}
 
