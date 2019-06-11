@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>预览干部任免表</title>
+    <script src="/js/jquery-3.4.1.min.js"></script>
+    <script>
+
+        $(function () {
+            function getPar(par){
+                //获取当前URL
+                var local_url = document.location.href;
+                //获取要取得的get参数位置
+                var get = local_url.indexOf(par +"=");
+                if(get == -1){
+                    return false;
+                }
+                //截取字符串
+                var get_par = local_url.slice(par.length + get + 1);
+                //判断截取后的字符串是否还有其他get参数
+                var nextPar = get_par.indexOf("&");
+                if(nextPar != -1){
+                    get_par = get_par.slice(0, nextPar);
+                }
+                return get_par;
+            }
+
+            var empId=getPar("empid");
+
+           var generate=function(){
+               $.ajax({
+                   type: "POST",
+                   url: "/export/gbrmb/bj/html/generate",
+                   data: {empId: empId, forceGenerate:true},
+                   dataType: "json",
+                   success: function (data) {
+                      if(data.code==200) {
+                          var reg = RegExp(/任免表正在生成中/);
+                          if(data.data.match(reg)){
+                              setTimeout(function(){
+                                  generate()
+                              }, 500);
+                          }
+                          else{
+                              $("#loading").hide();
+                              $("#rmb").show();
+                              $("#rmb").html(data.data);
+                          }
+                      }
+                   },
+                   error: function (data) {
+                       if(data.responseJSON){
+                           $("#error").text(data.responseJSON.message);
+                       }
+                       else{
+                           $("#error").text("网络通讯异常！");
+                       }
+
+                       $("#loading").hide();
+                       $("#rmb").hide();
+                       $("#error").show();
+
+                   }
+               });
+           };
+            generate();
+        });
+    </script>
+</head>
+<body>
+<div id="loading">
+任免表生成中...
+</div>
+<div id="error">
+</div>
+<div style="width: 100%;height: 100%;display: none" id="rmb">
+</div>
+</body>
+</html>
