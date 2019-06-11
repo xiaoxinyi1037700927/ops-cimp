@@ -1,5 +1,6 @@
 package com.sinosoft.ops.cimp.config;
 
+import com.sinosoft.ops.cimp.util.CachePackage.OrganizationCacheManager;
 import com.sinosoft.ops.cimp.util.CachePackage.SysTableModelInfoManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +26,7 @@ public class InitCache {
     CommandLineRunner initSysCache() {
         long startTime1 = System.currentTimeMillis();
         LOGGER.debug("开始缓存单位...");
-       // OrganizationCacheManager.getSubject().getAllListByDB();
+        OrganizationCacheManager.getSubject().getAllListByDB();
         long endTime1 = System.currentTimeMillis();
         LOGGER.debug("缓存单位结束...耗时：" + new BigDecimal((endTime1 - startTime1) / 1000).setScale(2, RoundingMode.HALF_UP).doubleValue() + "秒");
 
