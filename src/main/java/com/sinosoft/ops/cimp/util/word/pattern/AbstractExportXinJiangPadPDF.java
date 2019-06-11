@@ -6,7 +6,7 @@ import com.aspose.words.PdfSaveOptions;
 import com.sinosoft.ops.cimp.util.StringUtil;
 import com.sinosoft.ops.cimp.util.word.pattern.processor.*;
 import com.sinosoft.ops.cimp.util.word.pattern.xinjiang.*;
-import com.sinosoft.ops.cimp.service.export.ExportService;
+import com.sinosoft.ops.cimp.service.word.ExportService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 

@@ -1,24 +1,15 @@
 package com.sinosoft.ops.cimp.repository.mongodb.impl;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import javax.crypto.NoSuchPaddingException;
-
+import com.mongodb.client.MongoCursor;
+import com.mongodb.client.gridfs.GridFSBucket;
+import com.mongodb.client.gridfs.GridFSBuckets;
+import com.mongodb.client.gridfs.GridFSFindIterable;
+import com.mongodb.client.gridfs.model.GridFSFile;
+import com.mongodb.client.gridfs.model.GridFSUploadOptions;
+import com.sinosoft.ops.cimp.util.CryptoUtil;
+import com.sinosoft.ops.cimp.util.MongoDbUtils;
+import com.sinosoft.ops.cimp.repository.mongodb.MongoDbDao;
+import com.sinosoft.ops.cimp.repository.mongodb.ex.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.bson.BsonString;
@@ -31,15 +22,15 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.stereotype.Repository;
 
-import com.mongodb.client.MongoCursor;
-import com.mongodb.client.gridfs.GridFSBucket;
-import com.mongodb.client.gridfs.GridFSBuckets;
-import com.mongodb.client.gridfs.GridFSFindIterable;
-import com.mongodb.client.gridfs.model.GridFSFile;
-import com.mongodb.client.gridfs.model.GridFSUploadOptions;
-import com.newskysoft.iimp.mongodb.MongoDbUtils;
-import com.newskysoft.iimp.mongodb.dao.ex.CannotFindMongoDbResourceById;
-import com.newskysoft.util.CryptoUtil;
+import javax.crypto.NoSuchPaddingException;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.util.*;
+
 
 @Repository("mongoDbDao")
 public class MongoDbDaoImpl implements MongoDbDao {

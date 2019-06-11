@@ -3,6 +3,8 @@ package com.sinosoft.ops.cimp.repository.export.impl;
 
 import com.sinosoft.ops.cimp.common.dao.BaseDaoImpl;
 import com.sinosoft.ops.cimp.repository.export.ExportDao;
+import org.hibernate.FlushMode;
+import org.hibernate.Session;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.springframework.stereotype.Repository;
 
@@ -33,10 +35,15 @@ public class ExportDaoImpl extends BaseDaoImpl implements ExportDao {
 
     @Override
     public boolean saveResumeByEmpId(String empId, String resume) {
-        return sessionFactory.getCurrentSession()
-                .createNativeQuery("update EMP_A001 set resume = :resumeValue where emp_id = :empId")
+        Session session = sessionFactory.getCurrentSession();
+        session.beginTransaction();
+        session.setFlushMode(FlushMode.MANUAL);
+        boolean result = session.createNativeQuery("update EMP_A001 set resume = :resumeValue where emp_id = :empId")
                 .setParameter("resumeValue", resume)
                 .setParameter("empId", empId).executeUpdate() > 0;
+        session.flush();
+        session.getTransaction().commit();
+        return result;
     }
 
 	@SuppressWarnings("unchecked")

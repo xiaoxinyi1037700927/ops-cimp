@@ -8,6 +8,7 @@ package com.sinosoft.ops.cimp.service.sheet.impl;
 import com.aspose.words.Document;
 import com.aspose.words.License;
 import com.sinosoft.ops.cimp.common.model.DataStatus;
+import com.sinosoft.ops.cimp.common.model.TreeNode;
 import com.sinosoft.ops.cimp.common.service.BaseEntityServiceImpl;
 import com.sinosoft.ops.cimp.entity.sheet.SheetDesignCarrier;
 import com.sinosoft.ops.cimp.entity.sheet.SheetDesignSection;
@@ -16,8 +17,6 @@ import com.sinosoft.ops.cimp.repository.sheet.SheetDesignSectionDao;
 import com.sinosoft.ops.cimp.service.sheet.SheetDesignCarrierService;
 import com.sinosoft.ops.cimp.util.word.WordUtil;
 import com.sinosoft.ops.cimp.util.word.analyzeWordFieldService.AnalyzeWordFieldTree;
-import com.sinosoft.ops.cimp.common.model.TreeNode;
-import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -100,17 +99,19 @@ public class SheetDesignCarrierServiceImpl extends BaseEntityServiceImpl<SheetDe
 			section.setOrdinal(analyzeWordFieldTree.getOrdinal());
 			section.setParentId((UUID)analyzeWordFieldTree.getParentId());
 			section.setStatus(DataStatus.NORMAL.getValue());
-			section.setCreatedBy(((SysUser) SecurityUtils.getSubject().getPrincipal()).getId());
+//			section.setCreatedBy(((SysUser) SecurityUtils.getSubject().getPrincipal()).getId());
+			section.setCreatedBy(UUID.randomUUID());
 			section.setCreatedTime(new Timestamp(System.currentTimeMillis()));
-			section.setLastModifiedBy(((SysUser) SecurityUtils.getSubject().getPrincipal()).getId());
+//			section.setLastModifiedBy(((SysUser) SecurityUtils.getSubject().getPrincipal()).getId());
+			section.setLastModifiedBy(UUID.randomUUID());
 			section.setLastModifiedTime(new Timestamp(System.currentTimeMillis()));
-			
+
 			if(CollectionUtils.isEmpty(analyzeWordFieldTree.getChildren())){
 				sheetDesignSectionDao.save(section);
 			}else{
 				sheetDesignSectionDao.save(section);
 				saveTreeNode(analyzeWordFieldTree.getChildren(), designId);
-				
+
 			}
 		}
 	}
