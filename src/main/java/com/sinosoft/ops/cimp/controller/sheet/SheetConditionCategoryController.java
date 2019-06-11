@@ -107,7 +107,7 @@ public class SheetConditionCategoryController extends BaseController {
     @RequestMapping("/moveUp")
     public ResponseEntity moveUp(SheetConditionCategory entity) throws BusinessException {
         try {
-            entity.setLastModifiedBy(SecurityUtils.getSubject().getCurrentUser().getId());
+            entity.setLastModifiedBy(UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId()));
             boolean success = sheetConditionCategoryService.moveUp(entity);
             if (success) {
                 return ok(entity);
@@ -127,7 +127,7 @@ public class SheetConditionCategoryController extends BaseController {
     @RequestMapping("/moveDown")
     public ResponseEntity moveDown(SheetConditionCategory entity) throws BusinessException {
         try {
-            entity.setLastModifiedBy(SecurityUtils.getSubject().getCurrentUser().getId());
+            entity.setLastModifiedBy(UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId()));
             boolean success = sheetConditionCategoryService.moveDown(entity);
             if (success) {
                 return ok(entity);
@@ -143,7 +143,7 @@ public class SheetConditionCategoryController extends BaseController {
     private void addTrackData(SheetConditionCategory entity) {
         UUID id = UUID.randomUUID();
         if (entity.getId() == null) {
-            entity.setId(id.toString());
+            entity.setId(id);
         }
         if (entity.getStatus() == null) {
             entity.setStatus(DataStatus.NORMAL.getValue());
@@ -152,13 +152,13 @@ public class SheetConditionCategoryController extends BaseController {
             entity.setCreatedTime(new Timestamp(System.currentTimeMillis()));
         }
         if (entity.getCreatedBy() == null) {
-            entity.setCreatedBy(SecurityUtils.getSubject().getCurrentUser().getId());
+            entity.setCreatedBy(UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId()));
         }
         if (entity.getLastModifiedTime() == null) {
             entity.setLastModifiedTime(new Timestamp(System.currentTimeMillis()));
         }
         if (entity.getLastModifiedBy() == null) {
-            entity.setLastModifiedBy(id.toString());
+            entity.setLastModifiedBy(UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId()));
         }
     }
 }

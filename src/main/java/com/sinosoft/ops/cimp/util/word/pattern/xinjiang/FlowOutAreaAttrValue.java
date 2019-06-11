@@ -1,15 +1,14 @@
 package com.sinosoft.ops.cimp.util.word.pattern.xinjiang;
 
-import java.util.Date;
+import com.sinosoft.ops.cimp.service.word.ExportService;
+import com.sinosoft.ops.cimp.util.CodeTranslateUtil;
+import com.sinosoft.ops.cimp.util.StringUtil;
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
 
-import com.newskysoft.iimp.word.service.ExportService;
-import com.newskysoft.iimp.word.util.CodeTranslateUtil;
-import com.newskysoft.iimp.word.util.StringUtil;
 
 /**
  * 

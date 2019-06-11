@@ -5,6 +5,7 @@ import com.sinosoft.ops.cimp.entity.sheet.SheetConditionCategory;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 
 public interface SheetConditionCategoryDao extends BaseEntityDao<SheetConditionCategory> {
@@ -14,15 +15,15 @@ public interface SheetConditionCategoryDao extends BaseEntityDao<SheetConditionC
      */
     Collection<SheetConditionCategory> getCategory();
 
-    Collection<SheetConditionCategory> findByParentId(String uuid);
+    Collection<SheetConditionCategory> findByParentId(UUID uuid);
 
-    Collection<SheetConditionCategory> findByParentIdAndIds(String parentid, List<String> ids);
+    Collection<SheetConditionCategory> findByParentIdAndIds(UUID parentid, List<UUID> ids);
 
     Collection<SheetConditionCategory> findAllChildren();
 
     Collection<SheetConditionCategory> getRootData();
 
-    Collection<SheetConditionCategory> getRootDataByIds(List<String> ids);
+    Collection<SheetConditionCategory> getRootDataByIds(List<UUID> ids);
 
     /**
      * 根据条件分类将数据存入表
@@ -30,7 +31,7 @@ public interface SheetConditionCategoryDao extends BaseEntityDao<SheetConditionC
     String save(SheetConditionCategory sheetConditionCategory);
 
     //取得第一个ID
-    String getFisrtId();
+    UUID getFisrtId();
 
     /**
      * 根据条件分类修改
@@ -40,16 +41,16 @@ public interface SheetConditionCategoryDao extends BaseEntityDao<SheetConditionC
     /**
      * 根据Id查询一条分类对象
      */
-    SheetConditionCategory getById(String id);
+    SheetConditionCategory getById(UUID id);
 
     /**
      * 根据分组id删除分组
      */
-    void deleteId(String Id);
+    void deleteId(UUID Id);
 
-    SheetConditionCategory findNext(String id);
+    SheetConditionCategory findNext(UUID id);
 
-    int updateOrdinal(String nextId, int ordinal, String userName);
+    int updateOrdinal(UUID nextId, int ordinal, UUID userName);
 
-    SheetConditionCategory findPrevious(String id);
+    SheetConditionCategory findPrevious(UUID id);
 }

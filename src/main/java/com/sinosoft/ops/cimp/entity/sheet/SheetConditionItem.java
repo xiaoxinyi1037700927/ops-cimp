@@ -2,6 +2,7 @@ package com.sinosoft.ops.cimp.entity.sheet;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.UUID;
 
 @Entity
 @Table(name = "SHEET_CONDITION_ITEM", uniqueConstraints = @UniqueConstraint(columnNames = "ID"))
@@ -9,8 +10,8 @@ public class SheetConditionItem implements java.io.Serializable {
 
     // Fields
     private static final long serialVersionUID = -2495831922163024560L;
-    private String id;
-    private String conditionid;
+    private UUID id;
+    private UUID conditionid;
     private Integer conditionnum;
     private String jsondata;
     private String sql;
@@ -18,9 +19,9 @@ public class SheetConditionItem implements java.io.Serializable {
     private Integer ordinal;
     private Byte status;
     private Timestamp createdTime;
-    private String createdBy;
+    private UUID createdBy;
     private Timestamp lastModifiedTime;
-    private String lastModifiedBy;
+    private UUID lastModifiedBy;
 
     // Constructors
 
@@ -33,7 +34,7 @@ public class SheetConditionItem implements java.io.Serializable {
     /**
      * minimal constructor
      */
-    public SheetConditionItem(String id, String conditionid, String jsondata, Integer conditionnum) {
+    public SheetConditionItem(UUID id, UUID conditionid, String jsondata, Integer conditionnum) {
         this.id = id;
         this.conditionid = conditionid;
         this.conditionnum = conditionnum;
@@ -42,20 +43,20 @@ public class SheetConditionItem implements java.io.Serializable {
 
     @Id
     @Column(name = "ID", unique = true, nullable = false)
-    public String getId() {
+    public UUID getId() {
         return this.id;
     }
 
-    public void setId(String id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
     @Column(name = "CONDITION_ID")
-    public String getConditionId() {
+    public UUID getConditionId() {
         return this.conditionid;
     }
 
-    public void setConditionId(String conditionid) {
+    public void setConditionId(UUID conditionid) {
         this.conditionid = conditionid;
     }
 
@@ -128,11 +129,11 @@ public class SheetConditionItem implements java.io.Serializable {
 
     @Column(name = "CREATED_BY")
 
-    public String getCreatedBy() {
+    public UUID getCreatedBy() {
         return this.createdBy;
     }
 
-    public void setCreatedBy(String createdBy) {
+    public void setCreatedBy(UUID createdBy) {
         this.createdBy = createdBy;
     }
 
@@ -148,11 +149,11 @@ public class SheetConditionItem implements java.io.Serializable {
 
     @Column(name = "LAST_MODIFIED_BY")
 
-    public String getLastModifiedBy() {
+    public UUID getLastModifiedBy() {
         return this.lastModifiedBy;
     }
 
-    public void setLastModifiedBy(String lastModifiedBy) {
+    public void setLastModifiedBy(UUID lastModifiedBy) {
         this.lastModifiedBy = lastModifiedBy;
     }
 

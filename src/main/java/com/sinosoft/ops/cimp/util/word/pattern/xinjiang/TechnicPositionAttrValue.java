@@ -1,19 +1,14 @@
 package com.sinosoft.ops.cimp.util.word.pattern.xinjiang;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
+import com.sinosoft.ops.cimp.entity.sys.syscode.SysCodeItem;
+import com.sinosoft.ops.cimp.service.word.ExportService;
+import com.sinosoft.ops.cimp.util.StringUtil;
 import org.apache.commons.lang3.math.NumberUtils;
 
-import com.newskysoft.iimp.system.model.SysCodeItem;
-import com.newskysoft.iimp.word.service.ExportService;
-import com.newskysoft.iimp.word.util.StringUtil;
+import java.util.*;
+import java.util.Map.Entry;
+
+
 
 /**
  * Created by rain chen on 2017/10/9.

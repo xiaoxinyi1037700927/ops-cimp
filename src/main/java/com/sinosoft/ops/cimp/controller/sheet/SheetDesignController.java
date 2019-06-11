@@ -6,9 +6,6 @@
 package com.sinosoft.ops.cimp.controller.sheet;
 
 import com.google.common.base.Throwables;
-import com.sinosoft.ops.cimp.common.model.Constants;
-import com.sinosoft.ops.cimp.common.model.PageableQueryParameter;
-import com.sinosoft.ops.cimp.common.model.PageableQueryResult;
 import com.sinosoft.ops.cimp.common.model.ResponseResult;
 import com.sinosoft.ops.cimp.controller.BaseEntityController;
 import com.sinosoft.ops.cimp.entity.sheet.SheetDesign;
@@ -57,8 +54,8 @@ public class SheetDesignController extends BaseEntityController<SheetDesign> {
     private SheetDesignSectionService sheetDesignSectionService;
     @Autowired
     private SheetDesignDesignCategoryService sheetDesignDesignCategoryService;
-    @Autowired
-    private SystemUserService systemUserService;
+//    @Autowired
+//    private SystemUserService systemUserService;
 
     @ResponseBody
     @RequestMapping(value = MAPPING_PATH_CREATE)
@@ -400,78 +397,78 @@ public class SheetDesignController extends BaseEntityController<SheetDesign> {
 //        }
 //    }
 
-    @ResponseBody
-    
-    @RequestMapping(value = MAPPING_PATH_FIND_BY_PAGE)
-    public ResponseResult findByPage(HttpServletRequest request) {
-        try {
-            String includeDown = (String) request.getParameter("includeDown");
-            Collection<UUID> collIds = null;
-            PageableQueryParameter queryParameter = new PageableQueryParameter();
-            queryParameter.setPageNo(getIntegerParam(request, "page", 1));    //1
-            queryParameter.setPageSize(getIntegerParam(request, "limit", Constants.DEFAULT_PAGE_SIZE));    //Constants.DEFAULT_PAGE_SIZE
-            Enumeration<String> keys = request.getParameterNames();
-            if (keys != null) {
-                while (keys.hasMoreElements()) {
-                    String name = (String) keys.nextElement();
-                    if ("categoryId".equals(name)) {
-                        if ("1".equals(includeDown)) {
-                            //包含子目录
-                            collIds = sheetDesignService.getDownCatigories(this.getUUIDParam(request, name, UUID.randomUUID()));
-                            queryParameter.getParameters().put(name, collIds);
-                        } else {
-                            //不包含子目录
-                            queryParameter.getParameters().put(name, this.getUUIDParam(request, name, UUID.randomUUID()));
-                        }
-                    } else if ("type".equals(name)) {
-                        String[] typeArray = request.getParameterValues(name);
-                        Collection<Byte> typeCol = new HashSet<Byte>();
-                        if (typeArray != null && typeArray.length > 0) {
-                            for (String aType : typeArray) {
-                            	if (aType != null && !"".equals(aType)) {
-                            		typeCol.add(Byte.parseByte(aType));
-                            	}
-                            }
-                        }
-                        if (typeCol.size() > 0) {
-                        	queryParameter.getParameters().put(name, typeCol);
-                        }
-                    } else if ("status".equals(name)) {
-                        queryParameter.getParameters().put(name, this.getByteParam(request, name, (byte) -1));
-                    } else if ("output".equals(name)) {
-                        queryParameter.getParameters().put(name, request.getParameter(name));
-                    } else if ("dataFillType".equals(name)) {
-                        queryParameter.getParameters().put(name, this.getByteParam(request, name, (byte) -1));
-                    } else if ("includeDown".equals(name)) {
-                    } else if ("page".equals(name)) {
-                    } else if ("start".equals(name)) {
-                    } else if ("limit".equals(name)) {
-                    } else if ("_dc".equals(name)) {
-                    } else if("sheetCategoryId".equals(name)){
-                        queryParameter.getParameters().put(name, UUID.fromString(request.getParameter(name)));
-                    } else {
-                        queryParameter.getParameters().put(name, (String) request.getParameter(name));
-                    }
-                }
-            }
-            if(!"sa".equals(SecurityUtils.getSubject().getCurrentUser().getLoginName())){
-            	Collection<String> organizationIds = systemUserService.getTreeOrganizationIds(UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId()), "DepTree");
-            	//Collection<String> depIds = sheetDesignService.getAllOrganizationByParent(organizationIds);
-            	queryParameter.getParameters().put("depIds", organizationIds);
-            }
-            Map<String, String> orderMap = new HashMap<String, String>();
-            orderMap.put("c.categoryId", "ASC");
-            orderMap.put("d.ordinal", "ASC");
-            queryParameter.setOrderBys(orderMap);
-            //PageableQueryResult queryResult = sheetDesignService.findByPage(queryParameter, collIds);
-            PageableQueryResult queryResult = sheetDesignService.findByPage(queryParameter);
-            sheetDesignService.setRefNum(queryResult.getData());
-            return ResponseResult.success(queryResult.getData(), queryResult.getTotalCount());
-        } catch (Exception e) {
-            logger.error("查询数据失败！", e);
-            return ResponseResult.failure("查询数据失败！");
-        }
-    }
+//    @ResponseBody
+//
+//    @RequestMapping(value = MAPPING_PATH_FIND_BY_PAGE)
+//    public ResponseResult findByPage(HttpServletRequest request) {
+//        try {
+//            String includeDown = (String) request.getParameter("includeDown");
+//            Collection<UUID> collIds = null;
+//            PageableQueryParameter queryParameter = new PageableQueryParameter();
+//            queryParameter.setPageNo(getIntegerParam(request, "page", 1));    //1
+//            queryParameter.setPageSize(getIntegerParam(request, "limit", Constants.DEFAULT_PAGE_SIZE));    //Constants.DEFAULT_PAGE_SIZE
+//            Enumeration<String> keys = request.getParameterNames();
+//            if (keys != null) {
+//                while (keys.hasMoreElements()) {
+//                    String name = (String) keys.nextElement();
+//                    if ("categoryId".equals(name)) {
+//                        if ("1".equals(includeDown)) {
+//                            //包含子目录
+//                            collIds = sheetDesignService.getDownCatigories(this.getUUIDParam(request, name, UUID.randomUUID()));
+//                            queryParameter.getParameters().put(name, collIds);
+//                        } else {
+//                            //不包含子目录
+//                            queryParameter.getParameters().put(name, this.getUUIDParam(request, name, UUID.randomUUID()));
+//                        }
+//                    } else if ("type".equals(name)) {
+//                        String[] typeArray = request.getParameterValues(name);
+//                        Collection<Byte> typeCol = new HashSet<Byte>();
+//                        if (typeArray != null && typeArray.length > 0) {
+//                            for (String aType : typeArray) {
+//                            	if (aType != null && !"".equals(aType)) {
+//                            		typeCol.add(Byte.parseByte(aType));
+//                            	}
+//                            }
+//                        }
+//                        if (typeCol.size() > 0) {
+//                        	queryParameter.getParameters().put(name, typeCol);
+//                        }
+//                    } else if ("status".equals(name)) {
+//                        queryParameter.getParameters().put(name, this.getByteParam(request, name, (byte) -1));
+//                    } else if ("output".equals(name)) {
+//                        queryParameter.getParameters().put(name, request.getParameter(name));
+//                    } else if ("dataFillType".equals(name)) {
+//                        queryParameter.getParameters().put(name, this.getByteParam(request, name, (byte) -1));
+//                    } else if ("includeDown".equals(name)) {
+//                    } else if ("page".equals(name)) {
+//                    } else if ("start".equals(name)) {
+//                    } else if ("limit".equals(name)) {
+//                    } else if ("_dc".equals(name)) {
+//                    } else if("sheetCategoryId".equals(name)){
+//                        queryParameter.getParameters().put(name, UUID.fromString(request.getParameter(name)));
+//                    } else {
+//                        queryParameter.getParameters().put(name, (String) request.getParameter(name));
+//                    }
+//                }
+//            }
+//            if(!"sa".equals(SecurityUtils.getSubject().getCurrentUser().getLoginName())){
+//            	Collection<String> organizationIds = systemUserService.getTreeOrganizationIds(UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId()), "DepTree");
+//            	//Collection<String> depIds = sheetDesignService.getAllOrganizationByParent(organizationIds);
+//            	queryParameter.getParameters().put("depIds", organizationIds);
+//            }
+//            Map<String, String> orderMap = new HashMap<String, String>();
+//            orderMap.put("c.categoryId", "ASC");
+//            orderMap.put("d.ordinal", "ASC");
+//            queryParameter.setOrderBys(orderMap);
+//            //PageableQueryResult queryResult = sheetDesignService.findByPage(queryParameter, collIds);
+//            PageableQueryResult queryResult = sheetDesignService.findByPage(queryParameter);
+//            sheetDesignService.setRefNum(queryResult.getData());
+//            return ResponseResult.success(queryResult.getData(), queryResult.getTotalCount());
+//        } catch (Exception e) {
+//            logger.error("查询数据失败！", e);
+//            return ResponseResult.failure("查询数据失败！");
+//        }
+//    }
 
     @ResponseBody
     @RequestMapping("/copy")

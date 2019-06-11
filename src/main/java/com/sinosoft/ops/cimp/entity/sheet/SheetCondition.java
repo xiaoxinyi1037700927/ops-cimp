@@ -189,6 +189,14 @@ public class SheetCondition implements java.io.Serializable {
         this.conditionRelation = conditionRelation;
     }
 
+    public SheetCondition(UUID id, String conditionName,UUID designId,
+                          String conditionRelation) {
+        this.id = id;
+        this.designId = designId;
+        this.conditionName = conditionName;
+        this.conditionRelation = conditionRelation;
+    }
+
     public SheetCondition() {
     }
 

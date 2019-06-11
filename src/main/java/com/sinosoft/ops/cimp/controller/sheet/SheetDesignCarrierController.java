@@ -40,39 +40,39 @@ public class SheetDesignCarrierController extends BaseEntityController<SheetDesi
     @Resource
     private SheetDesignCarrierService sheetDesignCarrierService = null;
 
-    @ResponseBody
-    
-    @RequestMapping(value = MAPPING_PATH_CREATE)
-    public ResponseResult create(SheetDesignCarrier entity) {
-        try {
-        	addTrackData(entity);
-        	UUID id = UUID.randomUUID();
-        	entity.setId(id);
-        	byte type = 0;
-        	entity.setType(type);
-            sheetDesignCarrierService.create(entity);
-            return ResponseResult.success(entity,1,"保存成功！");
-        } catch (Exception e) {
-            logger.error("创建失败！", e);
-            return ResponseResult.failure("保存失败！");
-        }
-    }
-
-    @ResponseBody
-    
-    @RequestMapping(value = MAPPING_PATH_UPDATE)
-    public ResponseResult update(SheetDesignCarrier entity) {
-        try {
-        	addTrackData(entity);
-        	byte type = 0;
-        	entity.setType(type);
-            sheetDesignCarrierService.update(entity);
-            return ResponseResult.success("保存成功！");
-        } catch (Exception e) {
-            logger.error("更新失败！", e);
-            return ResponseResult.failure("保存失败！");
-        }
-    }
+//    @ResponseBody
+//
+//    @RequestMapping(value = MAPPING_PATH_CREATE)
+//    public ResponseResult create(SheetDesignCarrier entity) {
+//        try {
+//        	addTrackData(entity);
+//        	UUID id = UUID.randomUUID();
+//        	entity.setId(id);
+//        	byte type = 0;
+//        	entity.setType(type);
+//            sheetDesignCarrierService.create(entity);
+//            return ResponseResult.success(entity,1,"保存成功！");
+//        } catch (Exception e) {
+//            logger.error("创建失败！", e);
+//            return ResponseResult.failure("保存失败！");
+//        }
+//    }
+//
+//    @ResponseBody
+//
+//    @RequestMapping(value = MAPPING_PATH_UPDATE)
+//    public ResponseResult update(SheetDesignCarrier entity) {
+//        try {
+//        	addTrackData(entity);
+//        	byte type = 0;
+//        	entity.setType(type);
+//            sheetDesignCarrierService.update(entity);
+//            return ResponseResult.success("保存成功！");
+//        } catch (Exception e) {
+//            logger.error("更新失败！", e);
+//            return ResponseResult.failure("保存失败！");
+//        }
+//    }
 
     @ResponseBody
     

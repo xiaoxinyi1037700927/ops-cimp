@@ -68,6 +68,16 @@ public class SysCodeItem implements Serializable {
     //是否只读
     private Integer readonly;
 
+    private String nameEx;
+
+    public String getNameEx() {
+        return nameEx;
+    }
+
+    public void setNameEx(String nameEx) {
+        this.nameEx = nameEx;
+    }
+
     public Integer getId() {
         return id;
     }

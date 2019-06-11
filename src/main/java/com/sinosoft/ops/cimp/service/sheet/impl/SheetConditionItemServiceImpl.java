@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 
 /**
@@ -34,7 +35,7 @@ public class SheetConditionItemServiceImpl extends BaseEntityServiceImpl<SheetCo
 
     @Transactional
     @Override
-    public List<SheetConditionItem> GetDataByConditionID(String conditionid) {
+    public List<SheetConditionItem> GetDataByConditionID(UUID conditionid) {
         return sheetConditionItemDao.GetDataByConditionID(conditionid);
     }
 

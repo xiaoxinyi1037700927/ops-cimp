@@ -45,7 +45,7 @@ public interface SheetConditionService extends BaseEntityService<SheetCondition>
 
     List<SheetCondition> getConditionByCategoryId(String categoryId);
 
-    boolean moveDown(SheetCondition entity, String categoryId);
+    boolean moveDown(SheetCondition entity, UUID categoryId);
 
-    boolean moveUp(SheetCondition entity, String categoryId);
+    boolean moveUp(SheetCondition entity, UUID categoryId);
 }

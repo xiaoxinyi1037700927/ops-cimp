@@ -4,6 +4,7 @@ import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.UUID;
 
 /**
  * @description: 条件信息分类
@@ -16,11 +17,11 @@ public class SheetConditionCategory implements java.io.Serializable {
     private static final long serialVersionUID = 2894701656113820490L;
     // Fields
     /*** 标识 */
-    private String id;
+    private UUID id;
     /*** 名称 */
     private String name;
     /*** 代码源 */
-    private String parentId;
+    private UUID parentId;
     /*** 内容*/
     private String description;
     /*** 次序 */
@@ -30,11 +31,11 @@ public class SheetConditionCategory implements java.io.Serializable {
     /*** 创建时间 */
     private Timestamp createdTime;
     /*** 创建人 */
-    private String createdBy;
+    private UUID createdBy;
     /*** 最后修改时间 */
     private Timestamp lastModifiedTime;
     /*** 最后修改人 */
-    private String lastModifiedBy;
+    private UUID lastModifiedBy;
 
     private boolean isLeaf;
     private Collection<SheetCondition> children = new ArrayList<SheetCondition>();
@@ -42,11 +43,11 @@ public class SheetConditionCategory implements java.io.Serializable {
     // Property accessors
     @Id
     @Column(name = "ID", unique = true, nullable = false)
-    public String getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
@@ -96,11 +97,11 @@ public class SheetConditionCategory implements java.io.Serializable {
     }
 
     @Column(name = "CREATED_BY")
-    public String getCreatedBy() {
+    public UUID getCreatedBy() {
         return this.createdBy;
     }
 
-    public void setCreatedBy(String createdBy) {
+    public void setCreatedBy(UUID createdBy) {
         this.createdBy = createdBy;
     }
 
@@ -114,26 +115,26 @@ public class SheetConditionCategory implements java.io.Serializable {
     }
 
     @Column(name = "LAST_MODIFIED_BY")
-    public String getLastModifiedBy() {
+    public UUID getLastModifiedBy() {
         return this.lastModifiedBy;
     }
 
-    public void setLastModifiedBy(String lastModifiedBy) {
+    public void setLastModifiedBy(UUID lastModifiedBy) {
         this.lastModifiedBy = lastModifiedBy;
     }
 
     @Column(name = "PARENT_ID")
-    public String getParentId() {
+    public UUID getParentId() {
         return parentId;
     }
 
-    public void setParentId(String parentId) {
+    public void setParentId(UUID parentId) {
         this.parentId = parentId;
     }
 
-    public SheetConditionCategory(String id, String name, String parentId,
-                                  String description, Integer ordinal, Byte status, Timestamp createdTime, String createdBy,
-                                  Timestamp lastModifiedTime, String lastModifiedBy) {
+    public SheetConditionCategory(UUID id, String name, UUID parentId,
+                                  String description, Integer ordinal, Byte status, Timestamp createdTime, UUID createdBy,
+                                  Timestamp lastModifiedTime, UUID lastModifiedBy) {
         super();
         this.id = id;
         this.name = name;

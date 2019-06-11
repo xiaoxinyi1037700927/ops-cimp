@@ -1,6 +1,6 @@
 package com.sinosoft.ops.cimp.export.common;
 
-import com.sinosoft.ops.cimp.service.export.ExportService;
+import com.sinosoft.ops.cimp.service.word.ExportService;
 import com.sinosoft.ops.cimp.service.sys.syscode.SysCodeItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

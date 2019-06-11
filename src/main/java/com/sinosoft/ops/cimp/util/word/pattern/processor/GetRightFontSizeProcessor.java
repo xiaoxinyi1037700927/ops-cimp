@@ -3,7 +3,7 @@ package com.sinosoft.ops.cimp.util.word.pattern.processor;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.newskysoft.iimp.word.pattern.processor.FontSizeAndLines;
+
 
 /**
  * Created by rain chen on 2017/10/24.

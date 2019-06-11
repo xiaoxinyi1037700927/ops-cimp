@@ -2,10 +2,7 @@ package com.sinosoft.ops.cimp.util.word.pattern.processor;
 
 import com.aspose.words.Cell;
 import com.aspose.words.Document;
-import com.newskysoft.iimp.word.pattern.processor.AbstractAttrValueProcessor;
-import com.newskysoft.iimp.word.pattern.processor.AttrValueProcessor;
-import com.newskysoft.iimp.word.util.StringUtil;
-
+import com.sinosoft.ops.cimp.util.StringUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;

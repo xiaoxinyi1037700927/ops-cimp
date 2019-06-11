@@ -26,7 +26,7 @@ public interface SheetConditionCategoryService extends BaseEntityService<SheetCo
      */
     String save(SheetConditionCategory sheetConditionCategory);
 
-    String getFisrtId();
+    UUID getFisrtId();
 
     /**
      * 根据条件分类修改

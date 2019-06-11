@@ -6,6 +6,7 @@ import com.sinosoft.ops.cimp.dto.PaginationViewModel;
 import com.sinosoft.ops.cimp.entity.sys.syscode.QSysCodeSet;
 import com.sinosoft.ops.cimp.entity.sys.syscode.SysCodeItem;
 import com.sinosoft.ops.cimp.entity.sys.syscode.SysCodeSet;
+import com.sinosoft.ops.cimp.entity.system.CodeSetType;
 import com.sinosoft.ops.cimp.mapper.sys.syscode.SysCodeItemModelMapper;
 import com.sinosoft.ops.cimp.mapper.sys.syscode.SysCodeSetModelMapper;
 import com.sinosoft.ops.cimp.repository.sys.syscode.SysCodeItemRepository;
@@ -27,10 +28,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.io.Serializable;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -158,5 +157,88 @@ public class SysCodeSetServiceImpl implements SysCodeSetService {
         List<SysCodeSetModel> sysCodeSetModifyModels = sysCodeSets.stream().map(SysCodeSetModelMapper.INSTANCE::codeSetToModel).collect(Collectors.toList());
         sysCodeSetModifyModels.sort(Comparator.comparing(SysCodeSetModel::getOrdinal));
         return sysCodeSetModifyModels;
+    }
+
+    @Override
+    @Transactional(readOnly=true)
+    public SysCodeSet getByName(String name) {
+        Integer id = getIdByName(name);
+        if(id!=null) {
+            return getById(id);
+        }
+        return null;
+    }
+
+    @Override
+    @Transactional(readOnly=true)
+    public Collection<SysCodeSet> getByType(CodeSetType type) {
+//        return sysCodeSetDao.getByType(type.getValue());
+        return null;
+    }
+
+    @Override
+    @Transactional(readOnly=true)
+    public Collection<SysCodeSet> getAll() {
+//        return sysCodeSetDao.getAll();
+        return null;
+    }
+
+    @Override
+    @Transactional(readOnly=true)
+    public int getVersion(int id) {
+        SysCodeSet o = getById(id);
+        return (o!=null)?o.getVersion():-1;
+    }
+
+    @Override
+    @Transactional(readOnly=true)
+    public int getVersion(String name) {
+        SysCodeSet o = getByName(name);
+        return (o!=null)?o.getVersion():-1;
+    }
+
+    @Override
+    public void sort(List<? extends SysCodeSet> list) {
+        Collections.sort(list,new Comparator<SysCodeSet>(){
+            @Override
+            public int compare(SysCodeSet b1, SysCodeSet b2) {
+                return (b1.getOrdinal()==null)?-1:b1.getOrdinal().compareTo(b2.getOrdinal());
+            }
+        });
+    }
+
+    @Transactional(readOnly=true)
+    public SysCodeSet getById(Serializable id){
+        SysCodeSet o = null;
+//        ValueWrapper v = cache.get(id);
+//        if(v!=null) {
+//            o = (SysCodeSet)v.get();
+//            if(o!=null) {
+//                return o;
+//            }
+//        }
+//        o = sysCodeSetDao.getById(id);
+//        if(o!=null) {
+//            cache.put(id, o);
+//        }
+        return o;
+    }
+
+    @Transactional(readOnly=true)
+    @Override
+    public Integer getIdByName(String name) {
+        Integer o = null;
+//        ValueWrapper v = cache.get(name);
+//        if(v!=null) {
+//            o = (Integer)v.get();
+//            if(o!=null) {
+//                return o;
+//            }
+//        }
+//        o = sysCodeSetDao.getIdByName(name);
+//        if(o!=null) {
+//            cache.put(name, o);
+//        }
+        return o;
     }
 }

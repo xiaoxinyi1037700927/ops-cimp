@@ -11,6 +11,7 @@ import com.sinosoft.ops.cimp.mapper.sys.syscode.SysCodeItemModelMapper;
 import com.sinosoft.ops.cimp.repository.sys.syscode.SysCodeItemRepository;
 import com.sinosoft.ops.cimp.repository.sys.syscode.SysCodeSetRepository;
 import com.sinosoft.ops.cimp.service.sys.syscode.SysCodeItemService;
+import com.sinosoft.ops.cimp.service.sys.syscode.SysCodeSetService;
 import com.sinosoft.ops.cimp.vo.from.sys.syscode.SysCodeItemAddModel;
 import com.sinosoft.ops.cimp.vo.from.sys.syscode.SysCodeItemModifyModel;
 import com.sinosoft.ops.cimp.vo.from.sys.syscode.SysCodeItemPageModel;
@@ -20,14 +21,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.transaction.Transactional;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.io.Serializable;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,6 +39,8 @@ public class SysCodeItemServiceImpl implements SysCodeItemService {
     @Autowired
     private SysCodeItemRepository sysCodeItemDao;
 
+    @Autowired
+    private SysCodeSetService sysCodeSetService;
     @PersistenceContext
     private final EntityManager entityManager;
     private JPAQueryFactory queryFactory;
@@ -168,5 +170,214 @@ public class SysCodeItemServiceImpl implements SysCodeItemService {
             return sysCodeItemDao.findByCodeSetId(sysCodeSet.getId());
         }
         return null;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public String getNameEx(int setId, String code) {
+        SysCodeItem o = getByCode(setId, code);
+        return (o == null) ? "" : ((o.getNameEx() == null) ? "" : o.getNameEx());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public String getNameEx(String setName, String code) {
+        if (isOrganizationNameCodeSet(setName)) {
+            return getOrganizationName(setName, code);
+        }
+        Integer setId = sysCodeSetService.getIdByName(setName);
+        if (setId == null) {
+            return "";
+        } else {
+            return getNameEx(setId, code);
+        }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public String getDescription(int setId, String code) {
+        SysCodeItem o = getByCode(setId, code);
+        return (o == null) ? "" : ((o.getDescription() == null) ? "" : o.getDescription());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public String getDescription(String setName, String code) {
+        if (isOrganizationNameCodeSet(setName)) {
+            return getOrganizationName(setName, code);
+        }
+        Integer setId = sysCodeSetService.getIdByName(setName);
+        if (setId == null) {
+            return "";
+        } else {
+            return getDescription(setId, code);
+        }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public SysCodeItem getByCode(int setId, String code) {
+        if (code != null) {
+            Integer id = getCode2IdsBySetId(setId).get(code);
+            if (id != null) {
+                return getById(id);
+            }
+        }
+        return null;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public SysCodeItem getByCode(String setName, String code) {
+        Integer setId = sysCodeSetService.getIdByName(setName);
+        if (setId == null) {
+            return null;
+        } else {
+            return getByCode(setId, code);
+        }
+    }
+
+
+    @Override
+    @Transactional(readOnly = true)
+    public SysCodeItem getById(Serializable id) {
+        SysCodeItem o = null;
+//        ValueWrapper v = cache.get(id);
+//        if (v != null) {
+//            o = (SysCodeItem) v.get();
+//            if (o != null) {
+//                return o;
+//            }
+//        }
+//        o = sysCodeItemDao.getById(id);
+//        if (o != null) {
+//            cache.put(id, o);
+//        }
+        return o;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public SysCodeItem getById(Serializable id, boolean lock ) {
+//        return baseEntityDao.getById(id,lock);
+        return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    @Transactional(readOnly = true)
+    public Collection<Integer> getIdsBySetId(int setId) {
+        Collection<Integer> l = null;
+//        String key = new StringBuilder("SI_").append(setId).toString();
+//        ValueWrapper o = cache.get(key);
+//        if (o != null) {
+//            l = (Collection<Integer>) o.get();
+//            if (l != null) {
+//                return l;
+//            }
+//        }
+//        l = sysCodeItemDao.getIdsBySetId(setId);
+//        cache.put(key, l);
+        return l;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Collection<Integer> getIdsBySetName(String setName) {
+        Integer setId = sysCodeSetService.getIdByName(setName);
+        if (setId == null) {
+            return Collections.emptyList();
+        } else {
+            return getIdsBySetId(setId);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    @Transactional(readOnly = true)
+    public Map<String, Integer> getCode2IdsBySetId(int setId) {
+        Map<String, Integer> m = null;
+//        String key = new StringBuilder("SM_").append(setId).toString();
+//        ValueWrapper o = cache.get(key);
+//        if (o != null) {
+//            m = (Map<String, Integer>) o.get();
+//            if (m != null) {
+//                return m;
+//            }
+//        }
+//        m = new HashMap<String, Integer>();
+//        for (Integer id : getIdsBySetId(setId)) {
+//            SysCodeItem e = getById(id);
+//            if (e != null) {
+//                m.put(e.getCode(), e.getId());
+//            }
+//        }
+//        cache.put(key, m);
+        return m;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Map<String, Integer> getCode2IdsBySetName(String setName) {
+        Integer setId = sysCodeSetService.getIdByName(setName);
+        if (setId == null) {
+            return Collections.emptyMap();
+        } else {
+            return getCode2IdsBySetId(setId);
+        }
+    }
+
+    /**
+     * 判断是否机构名称（代码）
+     * @param setName 代码集名称
+     * @return
+     * @author Ni
+     * @since JDK 1.7
+     */
+    private boolean isOrganizationNameCodeSet(String setName) {
+        if ("UN".equals(setName) || "UP".equals(setName) || "UN_UNLIMITED".equals(setName)
+                || "UP_UNLIMITED".equals(setName)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 获取机构名称（代码）
+     * @param setName 代码集名称
+     * @param code 代码
+     * @return 机构名称
+     * @author Ni
+     * @since JDK 1.7
+     */
+    private String getOrganizationName(String setName, String code) {
+//        if ("UN".equals(setName)) {
+//            if (code == null || "".equals(code)) {
+//                return "";
+//            } else {
+//                return infoMaintainService.getOrganizationName(Arrays.asList(code.split(",")), OrganizationType.UNIT);
+//            }
+//        } else if ("UN_UNLIMITED".equals(setName)) {
+//            if (code == null || "".equals(code)) {
+//                return "";
+//            } else {
+//                return infoMaintainService.getOrganizationName(Arrays.asList(code.split(",")),
+//                        OrganizationType.UNIT_UNLIMITED);
+//            }
+//        } else if ("UP".equals(setName)) {
+//            if (code == null || "".equals(code)) {
+//                return "";
+//            } else {
+//                return infoMaintainService.getOrganizationName(Arrays.asList(code.split(",")), OrganizationType.PARTY);
+//            }
+//        } else if ("UP_UNLIMITED".equals(setName)) {
+//            if (code == null || "".equals(code)) {
+//                return "";
+//            } else {
+//                return infoMaintainService.getOrganizationName(Arrays.asList(code.split(",")),
+//                        OrganizationType.PARTY_UNLIMITED);
+//            }
+//        }
+        return "";
     }
 }

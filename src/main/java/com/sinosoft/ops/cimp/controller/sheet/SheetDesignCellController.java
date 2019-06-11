@@ -33,20 +33,20 @@ public class SheetDesignCellController extends BaseEntityController<SheetDesignC
 	private SheetDesignCellService sheetDesignCellService;
 	  
 	  
-	@ResponseBody
-	@RequestMapping(value = MAPPING_PATH_CREATE)//SpringMVC这个类的前段请求路径
-	
-	public ResponseResult create(SheetDesignCell entity) {
-		try {
-			entity.setId(UUID.randomUUID());
-			addTrackData(entity);
-			sheetDesignCellService.create(entity);
-			return ResponseResult.success(entity, 1, "保存成功！");
-		} catch (Exception e) {
-			logger.error("sheetDesignCellController create error:{}", Throwables.getStackTraceAsString(e));
-			return ResponseResult.failure(0, "保存失败！");
-		}
-	}
+//	@ResponseBody
+//	@RequestMapping(value = MAPPING_PATH_CREATE)//SpringMVC这个类的前段请求路径
+//
+//	public ResponseResult create(SheetDesignCell entity) {
+//		try {
+//			entity.setId(UUID.randomUUID());
+//			addTrackData(entity);
+//			sheetDesignCellService.create(entity);
+//			return ResponseResult.success(entity, 1, "保存成功！");
+//		} catch (Exception e) {
+//			logger.error("sheetDesignCellController create error:{}", Throwables.getStackTraceAsString(e));
+//			return ResponseResult.failure(0, "保存失败！");
+//		}
+//	}
 	
 	@ResponseBody
     @RequestMapping("/getById")
@@ -79,18 +79,18 @@ public class SheetDesignCellController extends BaseEntityController<SheetDesignC
 	}
 	
 	
-	@ResponseBody
-    @RequestMapping(value = MAPPING_PATH_UPDATE)
-	public ResponseResult update(SheetDesignCell entity) {
-		try {
-			addTrackData(entity);
-			sheetDesignCellService.update(entity);
-            return ResponseResult.success(entity, 1, "修改成功！");
-        }catch(Exception e){
-            logger.error("sheetDesignCellController update error:{}", Throwables.getStackTraceAsString(e)); 
-            return ResponseResult.failure(0, "保存失败！");
-        }
-	}
+//	@ResponseBody
+//    @RequestMapping(value = MAPPING_PATH_UPDATE)
+//	public ResponseResult update(SheetDesignCell entity) {
+//		try {
+//			addTrackData(entity);
+//			sheetDesignCellService.update(entity);
+//            return ResponseResult.success(entity, 1, "修改成功！");
+//        }catch(Exception e){
+//            logger.error("sheetDesignCellController update error:{}", Throwables.getStackTraceAsString(e));
+//            return ResponseResult.failure(0, "保存失败！");
+//        }
+//	}
 
 	
 	public ResponseResult delete(SheetDesignCell entity) {

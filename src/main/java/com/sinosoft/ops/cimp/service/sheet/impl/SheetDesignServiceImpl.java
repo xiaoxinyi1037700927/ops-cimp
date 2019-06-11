@@ -608,7 +608,7 @@ public class SheetDesignServiceImpl extends BaseEntityServiceImpl<SheetDesign> i
 			sheetDesignMap.put(String.format("SheetDesignCondition-%s",i++),sheetDesignConditionService.getById(temp.getId()));
 			SheetCondition sheetCondition =sheetConditionService.getById(temp.getConditionId());
 			sheetDesignMap.put(String.format("SheetCondition-%s",i++),sheetCondition);
-			for(SheetConditionItem sheetConditionItem:sheetConditionItemService.GetDataByConditionID(temp.getConditionId().toString()))
+			for(SheetConditionItem sheetConditionItem:sheetConditionItemService.GetDataByConditionID(temp.getConditionId()))
 			{
 				sheetDesignMap.put(String.format("SheetConditionItem-%s",i++),sheetConditionItem);
 			}

@@ -80,7 +80,7 @@ public class SheetDesignConditionServiceImpl extends BaseEntityServiceImpl<Sheet
 	private List<UUID> RecursionUp(SheetConditionCategory sheetConditionCategory,List<UUID> ids)
 	{
 		if(!ids.contains(sheetConditionCategory.getId()))
-			ids.add(UUID.fromString(sheetConditionCategory.getId()));
+			ids.add(sheetConditionCategory.getId());
 		if(sheetConditionCategory.getParentId()==null)
 		{
 			return ids;

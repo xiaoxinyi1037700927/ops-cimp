@@ -2,10 +2,9 @@ package com.sinosoft.ops.cimp.service.word.impl;
 
 import com.sinosoft.ops.cimp.common.service.BaseServiceImpl;
 import com.sinosoft.ops.cimp.entity.sys.syscode.SysCodeItem;
+import com.sinosoft.ops.cimp.exception.BusinessException;
+import com.sinosoft.ops.cimp.repository.archive.MongoDbDao;
 import com.sinosoft.ops.cimp.repository.export.ExportDao;
-import com.sinosoft.ops.cimp.repository.mongodb.MongoDbDao;
-import com.sinosoft.ops.cimp.repository.mongodb.ex.CannotFindMongoDbResourceById;
-import com.sinosoft.ops.cimp.repository.mongodb.ex.DownloadResourceFromMongoDbError;
 import com.sinosoft.ops.cimp.service.archive.MongoDbService;
 import com.sinosoft.ops.cimp.service.sys.syscode.SysCodeItemService;
 import com.sinosoft.ops.cimp.service.word.ExportService;
@@ -59,8 +58,8 @@ public class ExportServiceImpl extends BaseServiceImpl implements ExportService 
 
 	@Autowired
 	private MongoDbService mongoDbService=null;
-	@Autowired
-	private ResumeService resumeService=null;
+//	@Autowired
+//	private ResumeService resumeService=null;
     @Autowired
     private SysCodeItemService sysCodeItemService;
     @Autowired
@@ -97,7 +96,7 @@ public class ExportServiceImpl extends BaseServiceImpl implements ExportService 
 	@Override
 	@Transactional
 	public void downLoadPhotoFile(String id, File file)
-			throws DownloadResourceFromMongoDbError, CannotFindMongoDbResourceById {
+			throws BusinessException {
 
 		try(FileOutputStream fos=new FileOutputStream(file)){
 			mongoDbService.downloadFileToStreamDecryptWithAES(id);
@@ -114,14 +113,14 @@ public class ExportServiceImpl extends BaseServiceImpl implements ExportService 
 	@Override
 	@Transactional
 	public void downloadFileToStreamDecryptWithAES(String id, OutputStream os)
-			throws DownloadResourceFromMongoDbError, CannotFindMongoDbResourceById {
+			throws BusinessException {
 
 		ByteArrayOutputStream baos = null;
 
 		try {
 
 			baos = new ByteArrayOutputStream();
-			mongoDbDao.downloadFileToStream(id, baos);
+//			mongoDbDao.downloadFileToStream(id, baos);
 			byte[] unDecryptBytes = baos.toByteArray();
 			byte[] decryptedBytes = CryptoUtil.decryptAes(unDecryptBytes, pwdBytes);
 			IOUtils.write(decryptedBytes, os);
@@ -130,7 +129,7 @@ public class ExportServiceImpl extends BaseServiceImpl implements ExportService 
 		} catch (IOException | InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException
 				| IllegalBlockSizeException | BadPaddingException e) {
 			logger.error("下载文件解密失败", e);
-			throw new DownloadResourceFromMongoDbError();
+//			throw new DownloadResourceFromMongoDbError();
 		} finally {
 			IOUtils.closeQuietly(os);
 			IOUtils.closeQuietly(baos);
@@ -297,13 +296,15 @@ public class ExportServiceImpl extends BaseServiceImpl implements ExportService 
     @Override
     @Transactional
     public String updateResume() {
-        return ResumeTask.startAll("公务员", this.getAllEmpIds(), resumeService, mainTaskExecutor);
+//        return ResumeTask.startAll("公务员", this.getAllEmpIds(), resumeService, mainTaskExecutor);
+        return null;
     }
 
     @Override
     @Transactional
     public String updateLWResume() {
-        return ResumeTask.startAll("“两委”", this.getLWEmpIds(), resumeService, mainTaskExecutor);
+//        return ResumeTask.startAll("“两委”", this.getLWEmpIds(), resumeService, mainTaskExecutor);
+		return null;
     }
 
     @Override

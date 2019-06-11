@@ -5,34 +5,29 @@
  */
 package com.sinosoft.ops.cimp.service.sheet.impl;
 
-import com.newskysoft.iimp.common.Constants;
-import com.newskysoft.iimp.common.DataStatus;
-import com.newskysoft.iimp.framework.spring.datasource.DynamicDataSource;
-import com.newskysoft.iimp.framework.spring.datasource.DynamicDataSourceContextHolder;
-import com.newskysoft.iimp.infomaintain.service.InfoMaintainService;
-import com.newskysoft.iimp.infostruct.service.SysInfoItemService;
-import com.newskysoft.iimp.infostruct.service.SysInfoSetService;
+
+import com.sinosoft.ops.cimp.common.model.Constants;
+import com.sinosoft.ops.cimp.common.model.DataStatus;
 import com.sinosoft.ops.cimp.common.model.PageableQueryParameter;
-import com.sinosoft.ops.cimp.common.model.PageableQueryResult;
 import com.sinosoft.ops.cimp.common.service.BaseServiceImpl;
 import com.sinosoft.ops.cimp.entity.infostruct.SysInfoItem;
 import com.sinosoft.ops.cimp.entity.infostruct.SysInfoSet;
+import com.sinosoft.ops.cimp.entity.sheet.Sheet;
 import com.sinosoft.ops.cimp.entity.sheet.SheetData;
+import com.sinosoft.ops.cimp.framework.spring.datasource.DynamicDataSource;
+import com.sinosoft.ops.cimp.framework.spring.datasource.DynamicDataSourceContextHolder;
+import com.sinosoft.ops.cimp.service.infostruct.SysInfoItemService;
+import com.sinosoft.ops.cimp.service.infostruct.SysInfoSetService;
 import com.sinosoft.ops.cimp.service.sheet.ConcurrentTestService;
-import org.apache.activemq.command.ActiveMQTopic;
+import com.sinosoft.ops.cimp.service.sheet.SheetService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jms.annotation.JmsListener;
-import org.springframework.jms.core.JmsTemplate;
-import org.springframework.jms.core.MessageCreator;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
 import javax.jms.JMSException;
 import javax.jms.MapMessage;
-import javax.jms.Message;
-import javax.jms.Session;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.concurrent.Callable;
@@ -60,12 +55,12 @@ public class ConcurrentTestServiceImpl  extends BaseServiceImpl implements Concu
     private SysInfoSetService sysInfoSetService = null;
     @Autowired
     private SysInfoItemService sysInfoItemService = null;
-    @Autowired
-    private InfoMaintainService infoMaintainService = null;
+//    @Autowired
+//    private InfoMaintainService infoMaintainService = null;
     @Autowired
     private SheetService sheetService;
-	@Autowired
-    private JmsTemplate jmsTemplate;    
+//	@Autowired
+//    private JmsTemplate jmsTemplate;
     
     private static ConcurrentHashMap<UUID, MyReport> reportMap = new ConcurrentHashMap<UUID,MyReport>();//待计算
     private static ConcurrentLinkedQueue<MyReport> instantReports = new ConcurrentLinkedQueue<MyReport>();//即时报表（如试算）
@@ -210,77 +205,77 @@ public class ConcurrentTestServiceImpl  extends BaseServiceImpl implements Concu
         }
         @Override
         public String call() throws Exception {
-            if(this.sql!=null) {
-                this.sql.calculateStartTimeMillis=System.currentTimeMillis();//计算开始时间
-                try {
-                    DynamicDataSourceContextHolder.setDataSource("slave");//使用slave数据源进行计算
-                    PageableQueryResult queryResult = infoMaintainService.findByPage(this.sql.appId,this.sql.dataSourceId,this.sql.infoSet,this.sql.infoSetData,this.sql.queryParameter);
-                    this.sql.result=String.valueOf(queryResult.getTotalCount());
-                    this.sql.successed=true;
-                }catch(Exception e) {
-                    logger.error("计算SQL失败",e);
-                    this.sql.successed=false;
-                    this.sql.errorMessage=e.getMessage();
-                }finally {
-                    this.sql.calculated=true;
-                    toDoSqlTaskNum.decrementAndGet();
-                    this.sql.calculateEndTimeMillis=System.currentTimeMillis();//计算结束时间
-                    subTaskExecutor.execute(new MyStorer(this.report));//发起存储任务
-                }
-                //sb.append(new java.text.DecimalFormat("#.00").format(((double)(System.currentTimeMillis() - startTime))/1000.0));
-            }
-            
-            if(toDoSqlTaskNum.get()<Math.max(64,mainTaskExecutor.getCorePoolSize()*2)) {
-            	if(submitting.compareAndSet(false, true)) {
-	                boolean hasSql=!instantReports.isEmpty();
-	                int i=0,j=0;
-	                while(hasSql) {//优先计算即时队列里的
-	                    hasSql=false;
-	                    Iterator<MyReport> it=instantReports.iterator();
-	                    while(it.hasNext()) {
-	                        MyReport rpt=it.next();
-	                        if((j++)<currentInstantIndex) {
-	                            continue;
-	                        }else {
-	                            currentInstantIndex=j;
-	                        }
-	                        int index=rpt.runningSqlIndex.incrementAndGet();
-	                        if(index>=rpt.sqls.size()) {
-	                            it.remove();
-	                        }else {
-	                            hasSql=true;
-	                            mainTaskExecutor.submit(new MyCalculator(rpt,rpt.sqls.get(index)));
-	                            toDoSqlTaskNum.incrementAndGet();
-	                            if((++i)>=maxInstantSqlTaskNum) break;
-	                        }
-	                    }
-	                }
-	                hasSql=!noninstantReports.isEmpty();
-	                i=0;j=0;
-	                while(hasSql) {
-	                    hasSql=false;
-	                    Iterator<MyReport> it=noninstantReports.iterator();
-	                    while(it.hasNext()) {
-	                        MyReport rpt=it.next();
-	                        if((j++)<currentNoninstantIndex) {
-                                continue;
-                            }else {
-                                currentNoninstantIndex=j;
-                            }
-	                        int index=rpt.runningSqlIndex.incrementAndGet();
-	                        if(index>=rpt.sqls.size()) {
-	                            it.remove();
-	                        }else {
-	                            hasSql=true;
-	                            mainTaskExecutor.submit(new MyCalculator(rpt,rpt.sqls.get(index)));
-	                            toDoSqlTaskNum.incrementAndGet();
-	                            if((++i)>=maxNoninstantSqlTaskNum) break;
-	                        }
-	                    }
-	                }
-	                submitting.set(false);
-            	}
-            }
+//            if(this.sql!=null) {
+//                this.sql.calculateStartTimeMillis=System.currentTimeMillis();//计算开始时间
+//                try {
+//                    DynamicDataSourceContextHolder.setDataSource("slave");//使用slave数据源进行计算
+//                    PageableQueryResult queryResult = infoMaintainService.findByPage(this.sql.appId,this.sql.dataSourceId,this.sql.infoSet,this.sql.infoSetData,this.sql.queryParameter);
+//                    this.sql.result=String.valueOf(queryResult.getTotalCount());
+//                    this.sql.successed=true;
+//                }catch(Exception e) {
+//                    logger.error("计算SQL失败",e);
+//                    this.sql.successed=false;
+//                    this.sql.errorMessage=e.getMessage();
+//                }finally {
+//                    this.sql.calculated=true;
+//                    toDoSqlTaskNum.decrementAndGet();
+//                    this.sql.calculateEndTimeMillis=System.currentTimeMillis();//计算结束时间
+//                    subTaskExecutor.execute(new MyStorer(this.report));//发起存储任务
+//                }
+//                //sb.append(new java.text.DecimalFormat("#.00").format(((double)(System.currentTimeMillis() - startTime))/1000.0));
+//            }
+//
+//            if(toDoSqlTaskNum.get()<Math.max(64,mainTaskExecutor.getCorePoolSize()*2)) {
+//            	if(submitting.compareAndSet(false, true)) {
+//	                boolean hasSql=!instantReports.isEmpty();
+//	                int i=0,j=0;
+//	                while(hasSql) {//优先计算即时队列里的
+//	                    hasSql=false;
+//	                    Iterator<MyReport> it=instantReports.iterator();
+//	                    while(it.hasNext()) {
+//	                        MyReport rpt=it.next();
+//	                        if((j++)<currentInstantIndex) {
+//	                            continue;
+//	                        }else {
+//	                            currentInstantIndex=j;
+//	                        }
+//	                        int index=rpt.runningSqlIndex.incrementAndGet();
+//	                        if(index>=rpt.sqls.size()) {
+//	                            it.remove();
+//	                        }else {
+//	                            hasSql=true;
+//	                            mainTaskExecutor.submit(new MyCalculator(rpt,rpt.sqls.get(index)));
+//	                            toDoSqlTaskNum.incrementAndGet();
+//	                            if((++i)>=maxInstantSqlTaskNum) break;
+//	                        }
+//	                    }
+//	                }
+//	                hasSql=!noninstantReports.isEmpty();
+//	                i=0;j=0;
+//	                while(hasSql) {
+//	                    hasSql=false;
+//	                    Iterator<MyReport> it=noninstantReports.iterator();
+//	                    while(it.hasNext()) {
+//	                        MyReport rpt=it.next();
+//	                        if((j++)<currentNoninstantIndex) {
+//                                continue;
+//                            }else {
+//                                currentNoninstantIndex=j;
+//                            }
+//	                        int index=rpt.runningSqlIndex.incrementAndGet();
+//	                        if(index>=rpt.sqls.size()) {
+//	                            it.remove();
+//	                        }else {
+//	                            hasSql=true;
+//	                            mainTaskExecutor.submit(new MyCalculator(rpt,rpt.sqls.get(index)));
+//	                            toDoSqlTaskNum.incrementAndGet();
+//	                            if((++i)>=maxNoninstantSqlTaskNum) break;
+//	                        }
+//	                    }
+//	                }
+//	                submitting.set(false);
+//            	}
+//            }
             
             return "";
         }
@@ -393,22 +388,22 @@ public class ConcurrentTestServiceImpl  extends BaseServiceImpl implements Concu
     
 	@Override
 	public void startConcurrentTask(int reportNum, int rowNum, int columnNum) {
-		jmsTemplate.send(new ActiveMQTopic(MQ_TOPIC_NAME), new MessageCreator() {
-            @Override
-            public Message createMessage(Session session) throws JMSException {
-                MapMessage message = session.createMapMessage();
-                message.setInt("reportNum", reportNum);
-                message.setInt("rowNum", rowNum);
-                message.setInt("columnNum", columnNum);
-                return message;
-            }
-        });
+//		jmsTemplate.send(new ActiveMQTopic(MQ_TOPIC_NAME), new MessageCreator() {
+//            @Override
+//            public Message createMessage(Session session) throws JMSException {
+//                MapMessage message = session.createMapMessage();
+//                message.setInt("reportNum", reportNum);
+//                message.setInt("rowNum", rowNum);
+//                message.setInt("columnNum", columnNum);
+//                return message;
+//            }
+//        });
 	}
 
 	@Override
-    @JmsListener(destination=MQ_TOPIC_NAME, containerFactory="jmsTopicListenerContainerFactory")
+//    @JmsListener(destination=MQ_TOPIC_NAME, containerFactory="jmsTopicListenerContainerFactory")
     public void onTopicMessage(MapMessage message) throws JMSException {
-    	startTask(message.getInt("reportNum"),message.getInt("rowNum"),message.getInt("columnNum"));
+//    	startTask(message.getInt("reportNum"),message.getInt("rowNum"),message.getInt("columnNum"));
     }
     
     @Override

@@ -1,12 +1,13 @@
 package com.sinosoft.ops.cimp.util.word.pattern.xinjiang;
 
+import com.sinosoft.ops.cimp.service.word.ExportService;
+import org.springframework.util.StringUtils;
+
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import org.joda.time.DateTime;
-import org.springframework.util.StringUtils;
 
-import com.newskysoft.iimp.word.service.ExportService;
+
 /**
  * 
  * @classname:  IsFlowPartyAttrValue

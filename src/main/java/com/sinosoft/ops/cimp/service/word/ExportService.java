@@ -2,7 +2,7 @@ package com.sinosoft.ops.cimp.service.word;
 
 import com.sinosoft.ops.cimp.common.service.BaseService;
 import com.sinosoft.ops.cimp.entity.sys.syscode.SysCodeItem;
-import com.sinosoft.ops.cimp.repository.mongodb.ex.*;
+import com.sinosoft.ops.cimp.exception.BusinessException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -24,8 +24,8 @@ import java.util.Map;
 public interface ExportService extends BaseService {
 
 	public List<Map<String, Object>> findBySQL(String sql);
-	public void downLoadPhotoFile(String id, File file) throws DownloadResourceFromMongoDbError, CannotFindMongoDbResourceById;
-	public void downloadFileToStreamDecryptWithAES(String id, OutputStream os) throws DownloadResourceFromMongoDbError, CannotFindMongoDbResourceById;
+	public void downLoadPhotoFile(String id, File file) throws BusinessException;
+	public void downloadFileToStreamDecryptWithAES(String id, OutputStream os) throws BusinessException;
 	public List<String> getAllEmpIds();
 	public boolean saveResumeByEmpId(String empId, String resume);
 	public void generatorAndExportLiangWeiPDF(HttpServletRequest request, HttpServletResponse response) throws Exception;

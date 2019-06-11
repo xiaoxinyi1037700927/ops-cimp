@@ -164,8 +164,8 @@ public class SheetComServiceImpl extends BaseServiceImpl implements SheetComServ
     @Autowired
     private SheetSheetCategoryService sheetSheetCategoryService;
     
-    @Value("${mainTaskExecutor.corePoolSize}")
-    private Integer maxPoolSize;
+//    @Value("${mainTaskExecutor.corePoolSize}")
+//    private Integer maxPoolSize;
     
     @Autowired
     private ThreadPoolTaskExecutor controlTaskExecutor;
@@ -230,7 +230,7 @@ public class SheetComServiceImpl extends BaseServiceImpl implements SheetComServ
         treeModel.setCode(sysCodeItem.getCode());
         treeModel.setParentId(sysCodeItem.getParentCode());
         treeModel.setExpanded(false);
-        treeModel.setLeaf(sysCodeItem.getLeaf());
+//        treeModel.setLeaf(sysCodeItem.getLeaf());
         treeModel.setText(sysCodeItem.getName());
         return treeModel;
     }
@@ -1263,7 +1263,7 @@ public class SheetComServiceImpl extends BaseServiceImpl implements SheetComServ
     				}
     			} else {
     				SheetDesign sheetDesign = sheetDesignService.getById(UUID.fromString(designId));
-    				com.newskysoft.iimp.sheet.model.Sheet sheet = sheetService.getById(UUID.fromString(sheetId));
+    				com.sinosoft.ops.cimp.entity.sheet.Sheet sheet = sheetService.getById(UUID.fromString(sheetId));
     				for (SheetData sheetData : sheetDatas) {
     					Map<String, Object> data = (Map<String, Object>) JSON.toJSON(sheetData);
     					data.put("sheetNo", sheetDesign.getSheetNo());
@@ -1346,7 +1346,7 @@ public class SheetComServiceImpl extends BaseServiceImpl implements SheetComServ
 			} else {
 				Collection<SheetData> datas = sheetDataService.getBySheetId(sheetId);
 				SheetDesign sheetDesign = sheetDesignService.getById(UUID.fromString(designId));
-				com.newskysoft.iimp.sheet.model.Sheet sheet = sheetService.getById(UUID.fromString(sheetId));
+                com.sinosoft.ops.cimp.entity.sheet.Sheet sheet = sheetService.getById(UUID.fromString(sheetId));
 				for (SheetData sheetData : datas) {
 					Map<String, Object> data = (Map<String, Object>) JSON.toJSON(sheetData);
 					data.put("sheetNo", sheetDesign.getSheetNo());
@@ -1541,7 +1541,7 @@ public class SheetComServiceImpl extends BaseServiceImpl implements SheetComServ
     					
     			} else {
     				SheetDesign sheetDesign = sheetDesignService.getById(UUID.fromString(designId));
-    				com.newskysoft.iimp.sheet.model.Sheet sheet = sheetService.getById(UUID.fromString(sheetId));
+                    com.sinosoft.ops.cimp.entity.sheet.Sheet sheet = sheetService.getById(UUID.fromString(sheetId));
     				for (Map<String, Object> sheetData : sheetDatas) {
     					Map<String, Object> data = (Map<String, Object>) JSON.toJSON(sheetData);
     					data.put("sheetNo", sheetDesign.getSheetNo());
@@ -1596,7 +1596,7 @@ public class SheetComServiceImpl extends BaseServiceImpl implements SheetComServ
     			                String r = matcher1.group(3);
     			                String c = matcher1.group(4);
     			                Map<String, Object> sheetData = dataMap.get(t + "-" + r + "-" + c);
-    			                com.newskysoft.iimp.sheet.model.Sheet sheet = sheetService.getById(UUID.fromString((String) sheetData.get("sheetId")));
+                                com.sinosoft.ops.cimp.entity.sheet.Sheet sheet = sheetService.getById(UUID.fromString((String) sheetData.get("sheetId")));
     			                sheetData.put("sheetName", sheet.getName());
     			                datas1.add(sheetData);
     			            }
@@ -1636,7 +1636,7 @@ public class SheetComServiceImpl extends BaseServiceImpl implements SheetComServ
 				    			                	}
 				    			                }
 				    			                Map<String, Object> sheetData = dataMap.get(t + "-" + r + "-" + c);
-				    			                com.newskysoft.iimp.sheet.model.Sheet sheet = sheetService.getById(UUID.fromString((String) sheetData.get("sheetId")));
+                                                com.sinosoft.ops.cimp.entity.sheet.Sheet sheet = sheetService.getById(UUID.fromString((String) sheetData.get("sheetId")));
 				    			                sheetData.put("sheetName", sheet.getName());
 				    			                datas2.add(sheetData);
 											}
@@ -1696,7 +1696,7 @@ public class SheetComServiceImpl extends BaseServiceImpl implements SheetComServ
                 String r = matcher.group(3);
                 String c = matcher.group(4);
                 Map<String, Object> sheetData = dataMap.get(t + "-" + r + "-" + c);
-                com.newskysoft.iimp.sheet.model.Sheet sheet = sheetService.getById(UUID.fromString((String) sheetData.get("sheetId")));
+                com.sinosoft.ops.cimp.entity.sheet.Sheet sheet = sheetService.getById(UUID.fromString((String) sheetData.get("sheetId")));
                 sheetData.put("sheetName", sheet.getName());
                 datas.add(sheetData);
             }
@@ -2639,7 +2639,7 @@ public class SheetComServiceImpl extends BaseServiceImpl implements SheetComServ
 				logger.debug(Thread.currentThread().getName()+"查询耗时："+(jj-ii));
 				synchronized (priorityQueue) {
 					int activeCount = statisticsTaskExecutor.getActiveCount();
-					logger.debug("统计线程池当前活跃数："+activeCount+" 最大数："+maxPoolSize);
+//					logger.debug("统计线程池当前活跃数："+activeCount+" 最大数："+maxPoolSize);
 					logger.debug("统计线程池队列数："+statisticsTaskExecutor.getThreadPoolExecutor().getQueue().size());
 					logger.debug(Thread.currentThread().getName()+"唤醒提交任务线程");
 					priorityQueue.notifyAll();

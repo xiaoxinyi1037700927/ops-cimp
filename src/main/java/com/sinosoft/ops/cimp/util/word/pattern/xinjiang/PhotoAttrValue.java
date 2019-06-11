@@ -1,7 +1,8 @@
 package com.sinosoft.ops.cimp.util.word.pattern.xinjiang;
 
-import com.newskysoft.iimp.word.service.ExportService;
-import com.newskysoft.iimp.word.util.StringUtil;
+
+import com.sinosoft.ops.cimp.service.word.ExportService;
+import com.sinosoft.ops.cimp.util.StringUtil;
 import org.hibernate.type.descriptor.java.UUIDTypeDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

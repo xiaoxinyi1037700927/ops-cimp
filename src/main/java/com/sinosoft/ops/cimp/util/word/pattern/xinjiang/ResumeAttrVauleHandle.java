@@ -1,11 +1,10 @@
 package com.sinosoft.ops.cimp.util.word.pattern.xinjiang;
 
+import com.sinosoft.ops.cimp.util.StringUtil;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.newskysoft.iimp.word.util.StringUtil;
 
 import java.io.IOException;
 import java.util.*;

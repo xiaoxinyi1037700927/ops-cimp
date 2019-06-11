@@ -61,7 +61,7 @@ public class SheetConditionCategoryServiceImpl extends BaseEntityServiceImpl<She
 
     @Override
     @Transactional(readOnly = true)
-    public List<Map<String, Object>> getCategoryTreeByIds(List<String> ids) {
+    public List<Map<String, Object>> getCategoryTreeByIds(List<UUID> ids) {
         Collection<SheetConditionCategory> collection = sheetConditionCategoryDao.getRootDataByIds(ids);
         List<Map<String, Object>> root = new ArrayList<Map<String, Object>>();
         //遍历root集合将RecursionCategory(sdsc)返回的集合放到root里面
@@ -71,7 +71,7 @@ public class SheetConditionCategoryServiceImpl extends BaseEntityServiceImpl<She
         return root;
     }
 
-    public Map<String, Object> RecursionCategory(SheetConditionCategory sheetConditionCategory, List<String> ids) {
+    public Map<String, Object> RecursionCategory(SheetConditionCategory sheetConditionCategory, List<UUID> ids) {
 
         Map map = new HashMap<String, Object>();
         map.put("id", sheetConditionCategory.getId());
@@ -101,7 +101,7 @@ public class SheetConditionCategoryServiceImpl extends BaseEntityServiceImpl<She
         Map<Integer, SheetConditionCategory> map = new HashMap<Integer, SheetConditionCategory>();
         for (SheetConditionCategory sheetConditionCategory : sheetConditionCategoryCollection) {
             sheetConditionCategory.setLeaf(false);
-            map.put(Integer.parseInt(sheetConditionCategory.getId()), sheetConditionCategory);
+            map.put(sheetConditionCategory.getId().variant(), sheetConditionCategory);
         }
         for (Integer key : map.keySet()) {
             collection.add(map.get(key));
@@ -118,7 +118,7 @@ public class SheetConditionCategoryServiceImpl extends BaseEntityServiceImpl<She
 
     @Override
     @Transactional
-    public String getFisrtId() {
+    public UUID getFisrtId() {
 
         return sheetConditionCategoryDao.getFisrtId();
     }
@@ -146,20 +146,20 @@ public class SheetConditionCategoryServiceImpl extends BaseEntityServiceImpl<She
     @Override
     @Transactional
     public void deleteId(String Id) {
-        sheetConditionCategoryDao.deleteId(Id);
+        sheetConditionCategoryDao.deleteId(UUID.fromString(Id));
 
     }
 
     @Override
     @Transactional
     public boolean moveUp(SheetConditionCategory entity) {
-        String id = entity.getId();
+        UUID id = entity.getId();
         SheetConditionCategory curr = sheetConditionCategoryDao.getById(entity.getId());
         int ordinal = curr.getOrdinal();
-        String userName = entity.getLastModifiedBy();
+        UUID userName = entity.getLastModifiedBy();
         SheetConditionCategory previous = sheetConditionCategoryDao.findPrevious(id);
         if (previous != null) {
-            String preId = previous.getId();
+            UUID preId = previous.getId();
             int preOrdinal = previous.getOrdinal();
             int cnt = sheetConditionCategoryDao.updateOrdinal(preId, ordinal, userName);
             if (cnt > 0) {
@@ -175,13 +175,13 @@ public class SheetConditionCategoryServiceImpl extends BaseEntityServiceImpl<She
     @Override
     @Transactional
     public boolean moveDown(SheetConditionCategory entity) {
-        String id = entity.getId();
+        UUID id = entity.getId();
         SheetConditionCategory curr = sheetConditionCategoryDao.getById(entity.getId());
         int ordinal = curr.getOrdinal();
-        String userName = entity.getLastModifiedBy();
+        UUID userName = entity.getLastModifiedBy();
         SheetConditionCategory nextvious = sheetConditionCategoryDao.findNext(id);
         if (nextvious != null) {
-            String nextId = nextvious.getId();
+            UUID nextId = nextvious.getId();
             int nextOrdinal = nextvious.getOrdinal();
             int cnt = sheetConditionCategoryDao.updateOrdinal(nextId, ordinal, userName);
             if (cnt > 0) {

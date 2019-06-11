@@ -1,6 +1,5 @@
 package com.sinosoft.ops.cimp.util.word.pattern.xinjiang;
 
-import com.sinosoft.ops.cimp.common.dao.BaseDaoImpl;
 import com.sinosoft.ops.cimp.service.word.ExportService;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -20,7 +19,8 @@ import java.util.Map;
  * @since 1.0
  * Copyright (C) 2017. SinSoft All Rights Received
  */
-public class BirthdayAttrValue extends BaseDaoImpl implements AttrValue{
+public class BirthdayAttrValue implements AttrValue{
+
     private static final Logger logger = LoggerFactory.getLogger(BirthdayAttrValue.class);
     private final int order = 2;
 

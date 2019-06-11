@@ -6,13 +6,13 @@
 package com.sinosoft.ops.cimp.service.sheet.impl;
 
 
+import com.sinosoft.ops.cimp.common.model.TreeNode;
 import com.sinosoft.ops.cimp.common.service.BaseEntityServiceImpl;
 import com.sinosoft.ops.cimp.entity.sheet.SheetCategory;
 import com.sinosoft.ops.cimp.entity.sheet.SheetSheetCategory;
 import com.sinosoft.ops.cimp.exception.CloneException;
 import com.sinosoft.ops.cimp.repository.sheet.SheetCategoryDao;
 import com.sinosoft.ops.cimp.service.sheet.SheetCategoryService;
-import com.sinosoft.ops.cimp.common.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
-import javax.annotation.Resource;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -42,8 +41,8 @@ public class SheetCategoryServiceImpl extends BaseEntityServiceImpl<SheetCategor
 	@Autowired
 	private SheetCategoryDao sheetCategoryDao;
 	
-	@Resource
-    private SysInfoCategoryService sysInfoCategoryService = null;
+//	@Resource
+//    private SysInfoCategoryService sysInfoCategoryService = null;
 
 	@Override
 	@Transactional(readOnly=true)
@@ -217,32 +216,32 @@ public class SheetCategoryServiceImpl extends BaseEntityServiceImpl<SheetCategor
     @Transactional(readOnly=true)
     public Collection<TreeNode> getAllWithClassByType(Byte type) throws CloneException {
         Collection<TreeNode> collection = new LinkedList<TreeNode>();
-        
-        Map<String,SysInfoCategory> map = new HashMap<String,SysInfoCategory>();
-//        Collection<SysInfoCategory> categorys = sysInfoCategoryService.getAll();
-//        for(SysInfoCategory c:categorys){
-//            c.setNodeType("0");
-//            map.put(c.getId(), c);
+
+//        Map<String,SysInfoCategory> map = new HashMap<String,SysInfoCategory>();
+////        Collection<SysInfoCategory> categorys = sysInfoCategoryService.getAll();
+////        for(SysInfoCategory c:categorys){
+////            c.setNodeType("0");
+////            map.put(c.getId(), c);
+////        }
+////        collection.addAll((Collection<? extends TreeModel>) sysInfoCategoryService.constructTree(categorys));
+////
+//        Collection<SheetCategory> l = sheetCategoryDao.getByType(type);
+//        for(SheetCategory o:l){
+//            o.setNodeType("1");
+//            o.setText(o.getName());
 //        }
-//        collection.addAll((Collection<? extends TreeModel>) sysInfoCategoryService.constructTree(categorys));
-//        
-        Collection<SheetCategory> l = sheetCategoryDao.getByType(type);
-        for(SheetCategory o:l){
-            o.setNodeType("1");
-            o.setText(o.getName());
-        }
-        for(SheetCategory o:(Collection<SheetCategory>)this.constructTree(l)){
-            if(o.getInfoCategoryId()==null||"".equals(o.getInfoCategoryId())){
-                collection.add(o);
-            }else{
-                SysInfoCategory c = map.get(o.getInfoCategoryId());
-                if(c!=null){
-                    c.getChildren().add(o);
-                }else{
-                    collection.add(o);
-                }
-            }
-        }
+//        for(SheetCategory o:(Collection<SheetCategory>)this.constructTree(l)){
+//            if(o.getInfoCategoryId()==null||"".equals(o.getInfoCategoryId())){
+//                collection.add(o);
+//            }else{
+//                SysInfoCategory c = map.get(o.getInfoCategoryId());
+//                if(c!=null){
+//                    c.getChildren().add(o);
+//                }else{
+//                    collection.add(o);
+//                }
+//            }
+//        }
         return collection;
     }
 

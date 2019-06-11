@@ -1,19 +1,12 @@
 package com.sinosoft.ops.cimp.util.word.pattern.xinjiang;
 
-import com.newskysoft.iimp.word.pattern.EnumType;
-import com.newskysoft.iimp.word.pattern.data.xinjiang.AttrValue;
-import com.newskysoft.iimp.word.service.ExportService;
-import com.newskysoft.iimp.word.util.CodeTranslateUtil;
-import com.newskysoft.iimp.word.util.StringUtil;
 
+import com.sinosoft.ops.cimp.service.word.ExportService;
+import com.sinosoft.ops.cimp.util.CodeTranslateUtil;
+import com.sinosoft.ops.cimp.util.StringUtil;
 import org.apache.commons.lang.StringUtils;
-import org.joda.time.DateTime;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

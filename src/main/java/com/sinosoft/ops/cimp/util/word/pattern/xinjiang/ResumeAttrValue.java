@@ -1,14 +1,10 @@
 package com.sinosoft.ops.cimp.util.word.pattern.xinjiang;
 
-import com.newskysoft.iimp.word.pattern.IntervalImpl;
-import com.newskysoft.iimp.word.pattern.SetList;
-import com.newskysoft.iimp.word.pattern.data.xinjiang.AttrValue;
-import com.newskysoft.iimp.word.pattern.data.xinjiang.NameAttrValue;
-import com.newskysoft.iimp.word.pattern.data.xinjiang.ResumeAttrVauleHandle;
-import com.newskysoft.iimp.word.service.ExportService;
-import com.newskysoft.iimp.word.util.CodeTranslateUtil;
-import com.newskysoft.iimp.word.util.StringUtil;
 
+import com.sinosoft.ops.cimp.service.word.ExportService;
+import com.sinosoft.ops.cimp.util.CodeTranslateUtil;
+import com.sinosoft.ops.cimp.util.StringUtil;
+import com.sinosoft.ops.cimp.util.word.pattern.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.codehaus.jettison.json.JSONArray;
@@ -28,7 +24,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Created by rain chen on 2017/10/10.

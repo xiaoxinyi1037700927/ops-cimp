@@ -8,6 +8,7 @@ import com.sinosoft.ops.cimp.entity.sheet.SheetCondition;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 
 public interface SheetConditionDao extends BaseEntityDao<SheetCondition> {
@@ -24,11 +25,11 @@ public interface SheetConditionDao extends BaseEntityDao<SheetCondition> {
 
     List<SheetCondition> getConditionByDesignId(String designId);
 
-    SheetCondition findNext(String id, String categoryId);
+    SheetCondition findNext(UUID id, UUID categoryId);
 
-    int updateOrdinal(String nextId, int ordinal, String userName);
+    int updateOrdinal(UUID nextId, int ordinal, UUID userName);
 
-    SheetCondition findPrevious(String id, String categoryId);
+    SheetCondition findPrevious(UUID id, UUID categoryId);
 
     PageableQueryResult findByPage(PageableQueryParameter queryParameter);
 

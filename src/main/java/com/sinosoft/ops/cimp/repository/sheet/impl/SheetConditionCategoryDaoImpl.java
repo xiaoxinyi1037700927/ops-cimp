@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManagerFactory;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @description: 条件分类数据层实现
@@ -30,12 +31,12 @@ public class SheetConditionCategoryDaoImpl extends BaseEntityDaoImpl<SheetCondit
     }
 
     @Override
-    public Collection<SheetConditionCategory> findByParentId(String parentid) {
+    public Collection<SheetConditionCategory> findByParentId(UUID parentid) {
         return sessionFactory.getCurrentSession().createQuery(" from SheetConditionCategory where parentId =:parentid order by ordinal").setParameter("parentid", parentid).list();
     }
 
     @Override
-    public Collection<SheetConditionCategory> findByParentIdAndIds(String parentid, List<String> ids) {
+    public Collection<SheetConditionCategory> findByParentIdAndIds(UUID parentid, List<UUID> ids) {
         return sessionFactory.getCurrentSession().createQuery(" from SheetConditionCategory where parentId =:parentid and id in :ids order by ordinal").setParameter("parentid", parentid).setParameterList("ids", ids).list();
     }
 
@@ -45,7 +46,7 @@ public class SheetConditionCategoryDaoImpl extends BaseEntityDaoImpl<SheetCondit
     }
 
     @Override
-    public Collection<SheetConditionCategory> getRootDataByIds(List<String> ids) {
+    public Collection<SheetConditionCategory> getRootDataByIds(List<UUID> ids) {
         return sessionFactory.getCurrentSession().createQuery(" from SheetConditionCategory where parentId is null and id in :ids order by ordinal").setParameterList("ids", ids).list();
     }
 
@@ -56,8 +57,8 @@ public class SheetConditionCategoryDaoImpl extends BaseEntityDaoImpl<SheetCondit
     }
 
     @Override
-    public String getFisrtId() {
-        return sessionFactory.getCurrentSession().createQuery("select id from SheetConditionCategory order by ordinal").setMaxResults(1).uniqueResult().toString();
+    public UUID getFisrtId() {
+        return (UUID)sessionFactory.getCurrentSession().createQuery("select id from SheetConditionCategory order by ordinal").setMaxResults(1).uniqueResult();
     }
 
     @Override
@@ -68,13 +69,13 @@ public class SheetConditionCategoryDaoImpl extends BaseEntityDaoImpl<SheetCondit
     }
 
     @Override
-    public SheetConditionCategory getById(String id) {
+    public SheetConditionCategory getById(UUID id) {
 
         return super.getById(id);
     }
 
     @Override
-    public void deleteId(String Id) {
+    public void deleteId(UUID Id) {
         sessionFactory.getCurrentSession().createQuery("delete from SheetConditionCategory where Id = :Id")
                 .setParameter("Id", Id).executeUpdate();
 
@@ -87,7 +88,7 @@ public class SheetConditionCategoryDaoImpl extends BaseEntityDaoImpl<SheetCondit
 
     @SuppressWarnings("unchecked")
     @Override
-    public SheetConditionCategory findNext(String id) {
+    public SheetConditionCategory findNext(UUID id) {
         String hql = "FROM SheetConditionCategory T1 WHERE T1.status=0 AND T1.ordinal IS NOT NULL AND T1.id IN (SELECT MIN(T3.id) FROM SheetConditionCategory T3 " +
                 "WHERE T3.status=0 AND ((T3.parentId IN (SELECT T4.parentId FROM SheetConditionCategory T4 WHERE T4.id=:id)) " +
                 "OR (T3.parentId IS NULL AND EXISTS (SELECT 1 FROM SheetConditionCategory T9 WHERE T9.id=:id AND T9.parentId IS NULL))) " +
@@ -108,7 +109,7 @@ public class SheetConditionCategoryDaoImpl extends BaseEntityDaoImpl<SheetCondit
     }
 
     @Override
-    public int updateOrdinal(String nextId, int ordinal, String userName) {
+    public int updateOrdinal(UUID nextId, int ordinal, UUID userName) {
         Session session = sessionFactory.getCurrentSession();
         session.beginTransaction();
         session.setFlushMode(FlushMode.MANUAL);
@@ -125,7 +126,7 @@ public class SheetConditionCategoryDaoImpl extends BaseEntityDaoImpl<SheetCondit
 
     @SuppressWarnings("unchecked")
     @Override
-    public SheetConditionCategory findPrevious(String id) {
+    public SheetConditionCategory findPrevious(UUID id) {
         String hql = "FROM SheetConditionCategory T1 WHERE T1.status=0 AND T1.ordinal IS NOT NULL AND T1.id IN (SELECT MIN(T3.id) FROM SheetConditionCategory T3 " +
                 "WHERE T3.status=0 AND ((T3.parentId IN (SELECT T4.parentId FROM SheetConditionCategory T4 WHERE T4.id=:id)) " +
                 "OR (T3.parentId IS NULL AND EXISTS (SELECT 1 FROM SheetConditionCategory T9 WHERE T9.id=:id AND T9.parentId IS NULL))) " +

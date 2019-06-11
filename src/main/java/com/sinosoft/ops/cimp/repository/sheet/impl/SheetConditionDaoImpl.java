@@ -94,7 +94,7 @@ public class SheetConditionDaoImpl extends BaseEntityDaoImpl<SheetCondition> imp
 
     @SuppressWarnings("unchecked")
     @Override
-    public SheetCondition findNext(String id, String categoryId) {
+    public SheetCondition findNext(UUID id, UUID categoryId) {
         String hql = "FROM SheetCondition T1 WHERE T1.status=0 AND T1.ordinal IS NOT NULL AND T1.id IN (SELECT MIN(T3.id) FROM SheetCondition T3 " +
                 "WHERE T3.status=0 AND T3.id IN (SELECT T4.id FROM SheetCondition T4 WHERE T4.categoryId=:categoryId) AND T3.ordinal IS NOT NULL AND " +
                 "T3.ordinal IN (SELECT MIN(T5.ordinal) FROM SheetCondition T5 WHERE T5.status=0 AND T5.id IN " +
@@ -113,7 +113,7 @@ public class SheetConditionDaoImpl extends BaseEntityDaoImpl<SheetCondition> imp
 
 
     @Override
-    public int updateOrdinal(String nextId, int ordinal, String userName) {
+    public int updateOrdinal(UUID nextId, int ordinal, UUID userName) {
         Session session = sessionFactory.getCurrentSession();
         session.beginTransaction();
         session.setFlushMode(FlushMode.MANUAL);
@@ -131,7 +131,7 @@ public class SheetConditionDaoImpl extends BaseEntityDaoImpl<SheetCondition> imp
 
     @SuppressWarnings("unchecked")
     @Override
-    public SheetCondition findPrevious(String id, String categoryId) {
+    public SheetCondition findPrevious(UUID id, UUID categoryId) {
         String hql = "FROM SheetCondition T1 WHERE T1.status=0 AND T1.ordinal IS NOT NULL AND T1.id IN (SELECT MIN(T3.id) FROM SheetCondition T3 " +
                 "WHERE T3.status=0 AND T3.id IN (SELECT T4.id FROM SheetCondition T4 WHERE T4.categoryId=:categoryId) AND T3.ordinal IS NOT NULL AND " +
                 "T3.ordinal IN (SELECT MAX(T5.ordinal) FROM SheetCondition T5 WHERE T5.status=0 AND T5.id IN " +
@@ -213,9 +213,9 @@ public class SheetConditionDaoImpl extends BaseEntityDaoImpl<SheetCondition> imp
         for (Object aKey : pramsKeys) {
             if ("categoryId".equals(aKey.toString())) {
                 if ("1".equals(includeDown)) {
-                    Collection<String> coll = new HashSet<>();
-                    coll.add(UUID.fromString(pramsMap.get(aKey.toString()).toString()).toString());
-                    coll = getChildCatigories(coll, UUID.fromString(pramsMap.get(aKey.toString()).toString()).toString());
+                    Collection<UUID> coll = new HashSet<>();
+                    coll.add(UUID.fromString(pramsMap.get(aKey.toString()).toString()));
+                    coll = getChildCatigories(coll, UUID.fromString(pramsMap.get(aKey.toString()).toString()));
                     query.setParameterList("category_Id", coll);
                 } else {
                     query.setParameter("category_Id", UUID.fromString(pramsMap.get(aKey.toString()).toString()));
@@ -231,14 +231,14 @@ public class SheetConditionDaoImpl extends BaseEntityDaoImpl<SheetCondition> imp
     }
 
     //得到表子目录ID集合
-    private Collection<String> getChildCatigories(Collection<String> coll, String upCatigoryId) {
+    private Collection<UUID> getChildCatigories(Collection<UUID> coll, UUID upCatigoryId) {
         Collection<SheetConditionCategory> catColl = sessionFactory.getCurrentSession().createQuery("FROM SheetConditionCategory where parentId=:parentId")
                 .setParameter("parentId", upCatigoryId)
                 .list();
 
         if (catColl != null && catColl.size() > 0) {
             for (SheetConditionCategory aCat : catColl) {
-                String aId = aCat.getId();
+                UUID aId = aCat.getId();
                 coll.add(aId);
                 coll = getChildCatigories(coll, aId);
             }

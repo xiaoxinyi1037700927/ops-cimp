@@ -4,11 +4,13 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.sinosoft.ops.cimp.common.model.*;
 import com.sinosoft.ops.cimp.common.service.BaseEntityServiceImpl;
+import com.sinosoft.ops.cimp.constant.OpsErrorMessage;
 import com.sinosoft.ops.cimp.entity.infostruct.SysInfoItem;
 import com.sinosoft.ops.cimp.entity.infostruct.SysInfoSet;
 import com.sinosoft.ops.cimp.entity.sheet.SheetCondition;
 import com.sinosoft.ops.cimp.entity.sheet.SheetConditionItem;
 import com.sinosoft.ops.cimp.entity.sheet.SheetDesignCondition;
+import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.repository.sheet.SheetConditionDao;
 import com.sinosoft.ops.cimp.repository.sheet.SheetConditionItemDao;
 import com.sinosoft.ops.cimp.service.infostruct.SysInfoItemService;
@@ -79,7 +81,7 @@ public class SheetConditionServiceImpl extends BaseEntityServiceImpl<SheetCondit
     @Override
     public void deleteById(String id) {
         sheetConditionDao.deleteById(UUID.fromString(id));
-        for (SheetConditionItem sheetConditionItem : sheetConditionItemDao.GetDataByConditionID(UUID.fromString(id).toString())) {
+        for (SheetConditionItem sheetConditionItem : sheetConditionItemDao.GetDataByConditionID(UUID.fromString(id))) {
             sheetConditionItemDao.delete(sheetConditionItem);
         }
         return;
@@ -234,7 +236,7 @@ public class SheetConditionServiceImpl extends BaseEntityServiceImpl<SheetCondit
             List<Map> templist = sqlmap.stream().filter(item -> item.get("num").equals(json.getString("conditionNum"))).collect(Collectors.toList());
 
             if (templist.size() == 0) {
-                throw new SheetException("配置不完整--第" + json.getString("conditionNum") + "行条件未配置,请检查逻辑表达式！");
+                throw new BusinessException(OpsErrorMessage.MODULE_NAME,OpsErrorMessage.ERROR_MESSAGE,"配置不完整--第" + json.getString("conditionNum") + "行条件未配置,请检查逻辑表达式！");
             }
             for (Map temp : templist) {
                 temp.put("sql", strtemp);
@@ -242,7 +244,7 @@ public class SheetConditionServiceImpl extends BaseEntityServiceImpl<SheetCondit
         }
         for (Map temp : sqlmap) {
             if (!temp.get("num").equals("") && temp.get("sql") == null) {
-                throw new SheetException("配置不完整--请检查条件数目是否与逻辑表达式数目不符合");
+                throw new BusinessException(OpsErrorMessage.MODULE_NAME,OpsErrorMessage.ERROR_MESSAGE,"配置不完整--请检查条件数目是否与逻辑表达式数目不符合");
             }
             if (temp.get("sql") != null)
                 strSql += temp.get("sql");
@@ -746,14 +748,14 @@ public class SheetConditionServiceImpl extends BaseEntityServiceImpl<SheetCondit
 
     @Override
     @Transactional
-    public boolean moveDown(SheetCondition entity, String categoryId) {
-        String id = entity.getId();
+    public boolean moveDown(SheetCondition entity, UUID categoryId) {
+        UUID id = entity.getId();
         SheetCondition curr = sheetConditionDao.getById(entity.getId());
         int ordinal = curr.getOrdinal();
-        String userName = entity.getLastModifiedBy();
+        UUID userName = entity.getLastModifiedBy();
         SheetCondition nextvious = sheetConditionDao.findNext(id, categoryId);
         if (nextvious != null) {
-            String nextId = nextvious.getId();
+            UUID nextId = nextvious.getId();
             int nextOrdinal = nextvious.getOrdinal();
             int cnt = sheetConditionDao.updateOrdinal(nextId, ordinal, userName);
             if (cnt > 0) {
@@ -768,14 +770,14 @@ public class SheetConditionServiceImpl extends BaseEntityServiceImpl<SheetCondit
 
     @Override
     @Transactional
-    public boolean moveUp(SheetCondition entity, String categoryId) {
-        String id = entity.getId();
+    public boolean moveUp(SheetCondition entity, UUID categoryId) {
+        UUID id = entity.getId();
         SheetCondition curr = sheetConditionDao.getById(entity.getId());
         int ordinal = curr.getOrdinal();
-        String userName = entity.getLastModifiedBy();
+        UUID userName = entity.getLastModifiedBy();
         SheetCondition previous = sheetConditionDao.findPrevious(id, categoryId);
         if (previous != null) {
-            String preId = previous.getId();
+            UUID preId = previous.getId();
             int preOrdinal = previous.getOrdinal();
             int cnt = sheetConditionDao.updateOrdinal(preId, ordinal, userName);
             if (cnt > 0) {
