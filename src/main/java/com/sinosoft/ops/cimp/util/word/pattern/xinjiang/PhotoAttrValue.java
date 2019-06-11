@@ -1,7 +1,7 @@
 package com.sinosoft.ops.cimp.util.word.pattern.xinjiang;
 
 
-import com.sinosoft.ops.cimp.service.word.ExportService;
+import com.sinosoft.ops.cimp.service.export.ExportService;
 import com.sinosoft.ops.cimp.util.StringUtil;
 import org.hibernate.type.descriptor.java.UUIDTypeDescriptor;
 import org.slf4j.Logger;
@@ -50,7 +50,8 @@ public class PhotoAttrValue implements AttrValue {
 		try {
 			if(!photeFile.exists())
 			{
-				exportWordService.downLoadPhotoFile(photoId.toLowerCase(), photeFile);
+				// TODO: 2019/6/11
+//				exportWordService.downLoadPhotoFile(photoId.toLowerCase(), photeFile);
 			}
 			try(FileInputStream fis = new FileInputStream(photeFile);
     			ByteArrayOutputStream bos = new ByteArrayOutputStream(1000)){

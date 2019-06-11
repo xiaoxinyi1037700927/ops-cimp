@@ -1,27 +1,28 @@
 package com.sinosoft.ops.cimp.controller.export.gbrmb.bijie;
 
 import com.sinosoft.ops.cimp.annotation.BusinessApiGroup;
+import com.sinosoft.ops.cimp.context.ExecuteContext;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.export.ExportManager;
 import com.sinosoft.ops.cimp.export.common.ExportConstant;
+import com.sinosoft.ops.cimp.export.data.*;
 import com.sinosoft.ops.cimp.export.handlers.impl.ExportGbrmbHtmlBiJie;
 import com.sinosoft.ops.cimp.export.handlers.impl.ExportGbrmbLrmx;
 import com.sinosoft.ops.cimp.export.handlers.impl.ExportGbrmbWordBiJie;
 import com.sinosoft.ops.cimp.service.export.ExportService;
 import com.sinosoft.ops.cimp.util.FileUtils;
 import com.sinosoft.ops.cimp.util.MultiZipUtil;
+import com.sinosoft.ops.cimp.vo.from.export.ExportRmbBjModel;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import net.lingala.zip4j.exception.ZipException;
+import oracle.jdbc.proxy.annotation.Post;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.FileInputStream;
@@ -100,6 +101,7 @@ public class ExportGbrmbBiJieController extends BaseController {
         }
     }
 
+
     @ApiOperation(value = "生成并导出干部任免表lrmx文件(毕节)")
     @ApiImplicitParam(name = "empIds", value = "empId列表(以','分隔)", required = true)
     @GetMapping("/lrmx/generateAndExport")
@@ -149,6 +151,7 @@ public class ExportGbrmbBiJieController extends BaseController {
         return zipPath + ".zip";
     }
 
+
     private void writeFileToResponse(HttpServletResponse response, String filePath) throws Exception {
         String fileName = filePath.substring(filePath.lastIndexOf("/") + 1);
         fileName = new String(fileName.getBytes("utf-8"), "utf-8");
@@ -167,6 +170,56 @@ public class ExportGbrmbBiJieController extends BaseController {
                 os.write(b, 0, i);
             }
             os.flush();
+        }
+    }
+
+
+    @ApiOperation(value = "生成干部任免表html文件")
+    @PostMapping("/html/generate2")
+    public ResponseEntity generateAndExportGbrmbHTML2(@RequestBody ExportRmbBjModel model) throws BusinessException {
+
+        ExecuteContext.putVariable(ExportConstant.IS_TMP, true);
+        ExecuteContext.putVariable(ProposedPostAttrValue.KEY, model.getProposedPost());
+        ExecuteContext.putVariable(ProposedRemovalAttrValue.KEY, model.getProposedRemoval());
+        ExecuteContext.putVariable(ReportingUnitAttrValue.KEY, model.getReportingUnit());
+        ExecuteContext.putVariable(ApprovalOptionsAttrValue.KEY, model.getApprovalOptions());
+        ExecuteContext.putVariable(AppointmentOptionsAttrValue.KEY, model.getAppointmentOptions());
+        try {
+            String outFile = ExportManager.generate(new ExportGbrmbHtmlBiJie(model.getEmpId()), true);
+            if (outFile == null) {
+                return ok("任免表正在生成中，请稍后刷新再试");
+            }
+
+            return ok(exportService.analysisHtml(outFile));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return fail("任免表生成失败！");
+        }
+    }
+
+
+    @ApiOperation(value = "生成并导出干部任免表word文件(毕节)")
+    @PostMapping("/word/generateAndExport2")
+    public void generateAndExportGbrmb2(HttpServletResponse response, @RequestBody ExportRmbBjModel model) {
+
+        ExecuteContext.putVariable(ExportConstant.IS_TMP, true);
+        ExecuteContext.putVariable(ProposedPostAttrValue.KEY, model.getProposedPost());
+        ExecuteContext.putVariable(ProposedRemovalAttrValue.KEY, model.getProposedRemoval());
+        ExecuteContext.putVariable(ReportingUnitAttrValue.KEY, model.getReportingUnit());
+        ExecuteContext.putVariable(ApprovalOptionsAttrValue.KEY, model.getApprovalOptions());
+        ExecuteContext.putVariable(AppointmentOptionsAttrValue.KEY, model.getAppointmentOptions());
+        try {
+            //生成干部任免表
+            String outFile = ExportManager.generate(new ExportGbrmbWordBiJie(model.getEmpId()), true);
+            if (outFile == null) {
+                writeJson(response, "文件正在生成中，请稍后再试！");
+                return;
+            }
+
+            writeFileToResponse(response, outFile);
+        } catch (Exception e) {
+            e.printStackTrace();
+            writeJson(response, "任免表导出失败！");
         }
     }
 }

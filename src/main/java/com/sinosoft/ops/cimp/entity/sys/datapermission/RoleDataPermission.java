@@ -20,29 +20,19 @@ public class RoleDataPermission {
     @Column(name = "ID", length = 36)
     private String id;
     /**
-     * 名称
-     */
-    @Column(name = "NAME", length = 200)
-    private String name;
-    /**
      * 角色ID
      */
     @Column(name = "ROLE_ID", length = 36)
     private String roleId;
     /**
-     * 接口url
+     * 接口id
      */
-    @Column(name = "URL", length = 500)
-    private String url;
+    @Column(name = "INTERFACE_ID", length = 36)
+    private String interfaceId;
     /**
-     * sql类型
+     * sql表达式
      */
-    @Column(name = "TYPE", length = 10)
-    private String type;
-    /**
-     * sql
-     */
-    @Column(name = "SQL", length = 1000)
+    @Column(name = "SQL", length = 2000)
     private String sql;
     /**
      * 创建人
@@ -75,14 +65,6 @@ public class RoleDataPermission {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getRoleId() {
         return roleId;
     }
@@ -91,20 +73,12 @@ public class RoleDataPermission {
         this.roleId = roleId;
     }
 
-    public String getUrl() {
-        return url;
+    public String getInterfaceId() {
+        return interfaceId;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
+    public void setInterfaceId(String interfaceId) {
+        this.interfaceId = interfaceId;
     }
 
     public String getSql() {

@@ -22,22 +22,25 @@ import com.sinosoft.ops.cimp.entity.oraganization.Organization;
 import com.sinosoft.ops.cimp.entity.sys.oplog.SysOperationLog;
 import com.sinosoft.ops.cimp.entity.sys.systable.SysTableField;
 import com.sinosoft.ops.cimp.entity.user.User;
+import com.sinosoft.ops.cimp.entity.user.UserRole;
 import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.exception.SystemException;
+import com.sinosoft.ops.cimp.service.sys.datapermission.RoleDataPermissionService;
 import com.sinosoft.ops.cimp.service.sys.oplog.SysOperationLogService;
 import com.sinosoft.ops.cimp.service.sys.systable.SysTableFieldService;
 import com.sinosoft.ops.cimp.service.tabledata.SysTableModelInfoService;
 import com.sinosoft.ops.cimp.util.CachePackage.OrganizationCacheManager;
 import com.sinosoft.ops.cimp.util.*;
+import com.sinosoft.ops.cimp.util.combinedQuery.CombinedQueryParser;
+import com.sinosoft.ops.cimp.util.combinedQuery.beans.CombinedQueryParseException;
+import com.sinosoft.ops.cimp.vo.to.sys.datapermission.ConfigType;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
@@ -51,16 +54,20 @@ public class SysTableModelInfoServiceImpl implements SysTableModelInfoService {
     private final SysOperationLogService sysOperationLogService;
     private final JdbcTemplate jdbcTemplate;
     private final OrganizationUtil organizationUtil;
+    private final RoleDataPermissionService roleDataPermissionService;
+    private final CombinedQueryParser parser;
     private ExecutorService executorService = Executors.newFixedThreadPool(2);
 
     @Autowired
-    public SysTableModelInfoServiceImpl(SysTableInfoDao sysTableInfoDao, SysTableDao sysTableDao, SysTableFieldService sysTableFieldService, SysOperationLogService sysOperationLogService, JdbcTemplate jdbcTemplate, OrganizationUtil organizationUtil) {
+    public SysTableModelInfoServiceImpl(SysTableInfoDao sysTableInfoDao, SysTableDao sysTableDao, SysTableFieldService sysTableFieldService, SysOperationLogService sysOperationLogService, JdbcTemplate jdbcTemplate, OrganizationUtil organizationUtil, RoleDataPermissionService roleDataPermissionService, CombinedQueryParser parser) {
         this.sysTableInfoDao = sysTableInfoDao;
         this.sysTableDao = sysTableDao;
         this.sysTableFieldService = sysTableFieldService;
         this.sysOperationLogService = sysOperationLogService;
         this.jdbcTemplate = jdbcTemplate;
         this.organizationUtil = organizationUtil;
+        this.roleDataPermissionService = roleDataPermissionService;
+        this.parser = parser;
     }
 
     @Override
@@ -611,5 +618,55 @@ public class SysTableModelInfoServiceImpl implements SysTableModelInfoService {
 
             sysOperationLogService.saveLog(sysOperationLog);
         });
+    }
+
+    /**
+     * 判断用户对干部是否有修改的数据权限
+     *
+     * @param empId
+     * @return
+     * @throws
+     */
+    private boolean hasDataPermission(String empId) throws BusinessException {
+//        List<String> roleIds = SecurityUtils.getSubject().getCurrentUserRole().stream().map(UserRole::getRoleId).collect(Collectors.toList());
+//        List<String> sqls = roleDataPermissionService.getSqls(roleIds, ConfigType.PRE_SQL.getType());
+//
+//        Set<String> tableNames = new HashSet<>();
+//        tableNames.add("EMP_A001");
+//        StringBuilder whereSql = new StringBuilder();
+//
+//        if (sqls.size() > 0) {
+//            try {
+//                whereSql.append(" and ( ");
+//                for (int i = 0; i < sqls.size(); i++) {
+//                    Object[] arr = parser.parseSql(sqls.get(i));
+//                    whereSql.append(i > 0 ? " or ( " : " ( ").append(arr[0]).append(") ");
+//                    tableNames.addAll((Set<String>) arr[1]);
+//                }
+//            } catch (CombinedQueryParseException e) {
+//                throw new BusinessException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE, "角色数据权限配置错误!");
+//            }
+//
+//            List<String> tables = new ArrayList<>(tableNames);
+//            tables.sort(String::compareTo);
+//
+//
+//            String firstTable = tables.get(0);
+//            StringBuilder sql = new StringBuilder();
+//            sql.append(" SELECT * FROM ")
+//                    .append(firstTable);
+//            for (int i = 1; i < tables.size(); i++) {
+//                String tableName = tables.get(i);
+//                sql.append(" INNER JOIN ").append(tableName).append(" ON ")
+//                        .append(tableName).append(".EMP_ID = ").append(tableName).append(".EMP_ID ");
+//            }
+//            sql.append(" WHERE EMP_A001.EMP_ID = '").append(empId).append("' ").append(whereSql);
+//
+//            List<Map<String, Object>> list = jdbcTemplate.queryForList(sql.toString());
+//
+//            return list.size() != 0;
+//        }
+
+        return true;
     }
 }

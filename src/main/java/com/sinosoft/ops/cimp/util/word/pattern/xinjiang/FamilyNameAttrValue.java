@@ -1,7 +1,7 @@
 package com.sinosoft.ops.cimp.util.word.pattern.xinjiang;
 
 
-import com.sinosoft.ops.cimp.service.word.ExportService;
+import com.sinosoft.ops.cimp.service.export.ExportService;
 import com.sinosoft.ops.cimp.util.StringUtil;
 
 import java.util.HashMap;

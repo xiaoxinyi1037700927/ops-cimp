@@ -1,4 +1,4 @@
-package com.sinosoft.ops.cimp.util.word.pattern.processor;
+package com.sinosoft.ops.cimp.export.processor;
 
 import com.aspose.words.Cell;
 import com.aspose.words.Document;
@@ -8,14 +8,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by rain chen on 2017/9/28.
+ * Created by rain chen on 2017/10/17.
  *
  * @author rain chen
  * @version 1.0
  * @since 1.0
  * Copyright (C) 2017. SinSoft All Rights Received
  */
-public class HornorAttrValueProcessor extends AbstractAttrValueProcessor implements AttrValueProcessor {
+public class ApprovalOptionsAttrValueProcessor extends AbstractAttrValueProcessor implements AttrValueProcessor {
 
     @Override
     public void processAttr(Document document, Map<String, Object> attrAndValue) throws Exception {
@@ -23,7 +23,8 @@ public class HornorAttrValueProcessor extends AbstractAttrValueProcessor impleme
         String attrValue = StringUtil.obj2Str(attrAndValue.values().toArray()[0]);
         Cell cell = super.getAttrIndexCell(document, attrName);
         if (cell != null) {
-            Map<String, Object> config = new HashMap<String, Object>(1);
+            int len = attrValue.length();
+            Map<String, Object> config = new HashMap<>();
             config.put("fontPos", "LEFT");
             insertTextIntoCell(cell, attrValue, true, false, config);
         }

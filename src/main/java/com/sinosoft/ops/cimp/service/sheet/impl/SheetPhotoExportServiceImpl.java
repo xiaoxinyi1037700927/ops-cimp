@@ -1,8 +1,9 @@
 package com.sinosoft.ops.cimp.service.sheet.impl;
 
 
+import com.google.common.collect.Lists;
 import com.sinosoft.ops.cimp.common.service.BaseServiceImpl;
-import com.sinosoft.ops.cimp.service.word.ExportService;
+import com.sinosoft.ops.cimp.service.export.ExportService;
 import com.sinosoft.ops.cimp.service.sheet.SheetPhotoExportService;
 import com.sinosoft.ops.cimp.util.StringUtil;
 import org.hibernate.type.descriptor.java.UUIDTypeDescriptor;
@@ -27,9 +28,9 @@ import java.util.Map;
  */
 @Service("SheetPhotoExportService")
 public class SheetPhotoExportServiceImpl extends BaseServiceImpl implements SheetPhotoExportService {
-	
+
     private static final Logger logger = LoggerFactory.getLogger(SheetPhotoExportServiceImpl.class);
-    
+
 	@Autowired
 	ExportService exportWordService;
 
@@ -44,7 +45,9 @@ public class SheetPhotoExportServiceImpl extends BaseServiceImpl implements Shee
 			photePathFile.mkdirs();
 		}
 		int cnt = 0;
-		List<String> empIds = exportService.getLWEmpIds();
+        // TODO: 2019/6/11 wordExport修改
+//		List<String> empIds = exportService.getLWEmpIds();
+        List<String> empIds = Lists.newArrayList();
 		if(CollectionUtils.isEmpty(empIds)) return 0;
 
 		//生成对应照片
@@ -70,7 +73,7 @@ public class SheetPhotoExportServiceImpl extends BaseServiceImpl implements Shee
 		}
 		return cnt;
 	}
-	
+
 	private boolean exportPhotoFile(String empId, String photoNewPath) {
 		String A092010 = "04";
 		try {
@@ -84,7 +87,8 @@ public class SheetPhotoExportServiceImpl extends BaseServiceImpl implements Shee
 			File photeFile = new File(photoNewPath + "/" + empId.toLowerCase() + ".jpg");
 			if(!photeFile.exists())
 			{
-				exportWordService.downLoadPhotoFile(photoId.toLowerCase(), photeFile);
+                // TODO: 2019/6/11  
+//				exportWordService.downLoadPhotoFile(photoId.toLowerCase(), photeFile);
 			}
 			return true;
 		} catch (Exception e) {

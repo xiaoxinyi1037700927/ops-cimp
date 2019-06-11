@@ -24,7 +24,7 @@ import com.sinosoft.ops.cimp.util.combinedQuery.beans.CombinedQueryParseExceptio
 import com.sinosoft.ops.cimp.vo.from.cadre.*;
 import com.sinosoft.ops.cimp.vo.from.user.rolePermissionPageSql.RPPageSqlSearchModel;
 import com.sinosoft.ops.cimp.vo.to.cadre.*;
-import com.sinosoft.ops.cimp.vo.to.sys.datapermission.RoleDataPerSqlType;
+import com.sinosoft.ops.cimp.vo.to.sys.datapermission.ConfigType;
 import com.sinosoft.ops.cimp.vo.to.user.rolePermissionPageSql.RPPageSqlViewModel;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -126,19 +126,19 @@ public class CadreServiceImpl implements CadreService {
             StringBuilder whereSql = new StringBuilder();
 
             //角色数据权限过滤
-            List<String> sqls = roleDataPermissionService.getSqls(roleIds, RoleDataPerSqlType.INJECTION_SQL.getType());
-            if (sqls.size() > 0) {
-                try {
-                    whereSql.append(" and ( ");
-                    for (int i = 0; i < sqls.size(); i++) {
-                        Object[] arr = parser.parseSql(sqls.get(i));
-                        whereSql.append(i > 0 ? " or ( " : " ( ").append(arr[0]).append(") ");
-                        tableNames.addAll((Set<String>) arr[1]);
-                    }
-                } catch (CombinedQueryParseException e) {
-                    throw new BusinessException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE, "角色数据权限配置错误!");
-                }
-            }
+//            List<String> sqls = roleDataPermissionService.getSqls(roleIds, ConfigType.INJECTION_SQL.getType());
+//            if (sqls.size() > 0) {
+//                try {
+//                    whereSql.append(" and ( ");
+//                    for (int i = 0; i < sqls.size(); i++) {
+//                        Object[] arr = parser.parseSql(sqls.get(i));
+//                        whereSql.append(i > 0 ? " or ( " : " ( ").append(arr[0]).append(") ");
+//                        tableNames.addAll((Set<String>) arr[1]);
+//                    }
+//                } catch (CombinedQueryParseException e) {
+//                    throw new BusinessException(OpsErrorMessage.MODULE_NAME, OpsErrorMessage.ERROR_MESSAGE, "角色数据权限配置错误!");
+//                }
+//            }
 
 
             //组合查询

@@ -1,10 +1,10 @@
 package com.sinosoft.ops.cimp.mapper.sys.datapermission;
 
-import com.sinosoft.ops.cimp.entity.sys.datapermission.RoleDataPermission;
+import com.sinosoft.ops.cimp.entity.sys.datapermission.InterfaceType;
 import com.sinosoft.ops.cimp.util.SecurityUtils;
-import com.sinosoft.ops.cimp.vo.from.sys.dataPermission.RoleDataPerAddModel;
-import com.sinosoft.ops.cimp.vo.from.sys.dataPermission.RoleDataPerModifyModel;
-import com.sinosoft.ops.cimp.vo.to.sys.datapermission.RoleDataPerModel;
+import com.sinosoft.ops.cimp.vo.from.sys.dataPermission.InterfaceTypeAddModel;
+import com.sinosoft.ops.cimp.vo.from.sys.dataPermission.InterfaceTypeModifyModel;
+import com.sinosoft.ops.cimp.vo.to.sys.datapermission.InterfaceTypeModel;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
@@ -21,22 +21,22 @@ import java.util.Date;
  * Copyright (C) 2017. SinoSoft All Rights Received
  */
 @Mapper
-public interface RoleDataPermissionMapper {
-    RoleDataPermissionMapper INSTANCE = Mappers.getMapper(RoleDataPermissionMapper.class);
+public interface InterfaceTypeMapper {
+    InterfaceTypeMapper INSTANCE = Mappers.getMapper(InterfaceTypeMapper.class);
 
-    RoleDataPerModel roleDataPermissionToModel(RoleDataPermission roleDataPermission);
+    InterfaceTypeModel interfaceTypeToModel(InterfaceType interfaceType);
 
     @Mappings({
             @Mapping(source = "createId", target = "createId", qualifiedByName = "getCurrentId"),
             @Mapping(source = "createTime", target = "createTime", qualifiedByName = "getTime"),
     })
-    RoleDataPermission addModelToRoleDataPermission(RoleDataPerAddModel addModel);
+    InterfaceType addModelToInterfaceType(InterfaceTypeAddModel addModel);
 
     @Mappings({
             @Mapping(source = "modifyId", target = "modifyId", qualifiedByName = "getCurrentId"),
             @Mapping(source = "modifyTime", target = "modifyTime", qualifiedByName = "getTime")
     })
-    void modifyModelToRoleDataPermission(RoleDataPerModifyModel modifyModel, @MappingTarget RoleDataPermission roleDataPermission);
+    void modifyModelToInterfaceType(InterfaceTypeModifyModel modifyModel, @MappingTarget InterfaceType interfaceType);
 
 
     @Named("getCurrentId")

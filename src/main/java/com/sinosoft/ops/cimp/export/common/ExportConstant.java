@@ -1,6 +1,6 @@
 package com.sinosoft.ops.cimp.export.common;
 
-import com.sinosoft.ops.cimp.service.word.ExportService;
+import com.sinosoft.ops.cimp.service.export.ExportService;
 import com.sinosoft.ops.cimp.service.sys.syscode.SysCodeItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,6 +38,11 @@ public class ExportConstant {
     public static String exportXMLElements;
 
     /**
+     * 判断是否生成临时文件
+     */
+    public static final String IS_TMP = "isTmp";
+
+    /**
      * 导出文件模板
      */
     public static final String TEMPLATE_DWLDZS = "template/excel/lingdaoshezhi_Templet.xlsx";
@@ -50,10 +55,11 @@ public class ExportConstant {
     public static final String EXPORT_GBRMB_WORD = "download/gbrmb/word/";
     public static final String EXPORT_GBRMB_HTML = "download/gbrmb/html/";
     public static final String EXPORT_GBRMB_WORD_ZIP = "download/gbrmb/word/zip/";
-    public static final String EXPORT_LRMX = "lrmx/";
-    public static final String EXPORT_LRMX_ZIP = "lrmx/zip/";
+    public static final String EXPORT_LRMX = "download/gbrmb/lrmx/";
+    public static final String EXPORT_LRMX_ZIP = "download/gbrmb/lrmx/zip/";
     public static final String EXPORT_GBHMC_EXCEL = "download/gbhmc/excel/";
     public static final String EXPORT_DWLDZS_EXCEL = "download/dwldzs/excel/";
+    public static final String EXPORT_GBRMB_TMP = "download/gbrmb/tmp/";
     /**
      * 导出文件后缀名
      */

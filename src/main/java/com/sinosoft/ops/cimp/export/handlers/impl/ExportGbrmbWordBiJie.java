@@ -1,6 +1,7 @@
 package com.sinosoft.ops.cimp.export.handlers.impl;
 
 import com.aspose.words.Document;
+import com.sinosoft.ops.cimp.context.ExecuteContext;
 import com.sinosoft.ops.cimp.export.common.ExportConstant;
 import com.sinosoft.ops.cimp.export.handlers.AbstractExportGbrmbBiJie;
 
@@ -38,7 +39,15 @@ public class ExportGbrmbWordBiJie extends AbstractExportGbrmbBiJie {
             String name = map.get("name").toString();
             String cardNo = map.get("cardNo").toString();
 
-            filePath = ExportConstant.EXPORT_BASE_PATH + ExportConstant.EXPORT_GBRMB_WORD + name + cardNo + ExportConstant.RMB_SUFFIX_WORD;
+            String baseDir = "";
+            Object isTmp = ExecuteContext.getVariable(ExportConstant.IS_TMP);
+            if (isTmp == null) {
+                baseDir = ExportConstant.EXPORT_BASE_PATH + ExportConstant.EXPORT_GBRMB_WORD;
+            } else {
+                baseDir = ExportConstant.EXPORT_BASE_PATH + ExportConstant.EXPORT_GBRMB_TMP;
+            }
+
+            filePath = baseDir + name + cardNo + ExportConstant.RMB_SUFFIX_WORD;
         }
 
         return filePath;

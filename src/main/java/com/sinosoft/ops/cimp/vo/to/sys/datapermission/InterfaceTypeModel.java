@@ -3,8 +3,8 @@ package com.sinosoft.ops.cimp.vo.to.sys.datapermission;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-@ApiModel(description = "sql类型模型")
-public class SqlTypeModel {
+@ApiModel(description = "接口类型模型")
+public class InterfaceTypeModel {
     /**
      * id
      */

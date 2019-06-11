@@ -2,6 +2,7 @@ package com.sinosoft.ops.cimp.export.handlers.impl;
 
 import com.aspose.words.Document;
 import com.aspose.words.PdfSaveOptions;
+import com.sinosoft.ops.cimp.context.ExecuteContext;
 import com.sinosoft.ops.cimp.export.common.ExportConstant;
 import com.sinosoft.ops.cimp.export.common.Pdf2htmlUtil;
 import com.sinosoft.ops.cimp.export.handlers.AbstractExportGbrmbBiJie;
@@ -18,9 +19,16 @@ public class ExportGbrmbHtmlBiJie extends AbstractExportGbrmbBiJie {
 
     public ExportGbrmbHtmlBiJie(String empId) {
         super(empId);
-        fileDir = ExportConstant.EXPORT_BASE_PATH + ExportConstant.EXPORT_GBRMB_HTML;
         htmlFileName = empId + ExportConstant.RMB_SUFFIX_HTML;
         pdfFileName = empId + ExportConstant.RMB_SUFFIX_PDF;
+
+        Object isTmp = ExecuteContext.getVariable(ExportConstant.IS_TMP);
+        if (isTmp == null) {
+            fileDir = ExportConstant.EXPORT_BASE_PATH + ExportConstant.EXPORT_GBRMB_HTML;
+        } else {
+            fileDir = ExportConstant.EXPORT_BASE_PATH + ExportConstant.EXPORT_GBRMB_TMP;
+        }
+
     }
 
     @Override

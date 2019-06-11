@@ -3,10 +3,10 @@ package com.sinosoft.ops.cimp.util.word.pattern;
 import com.aspose.words.Document;
 import com.aspose.words.License;
 import com.aspose.words.PdfSaveOptions;
+import com.sinosoft.ops.cimp.service.export.ExportService;
 import com.sinosoft.ops.cimp.util.StringUtil;
 import com.sinosoft.ops.cimp.util.word.pattern.processor.*;
 import com.sinosoft.ops.cimp.util.word.pattern.xinjiang.*;
-import com.sinosoft.ops.cimp.service.word.ExportService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -79,11 +79,11 @@ public class AbstractExportXinJiangPadPDF {
         attrValueProcessorMap.put(new SpecialtyAttrValue().getKey(), new TechnicPositionAttrValueProcessor());
         attrValueProcessorMap.put(new FtDiplomaAndDegreeAttrValue().getKey(), new DiplomaAndDegreeAttrValueProcessor());
         attrValueProcessorMap.put(new PtDiplomaAndDegreeAttrValue().getKey(), new DiplomaAndDegreeAttrValueProcessor());
-        attrValueProcessorMap.put(new PositionAttrValue().getKey(), new PositionAttrValueProcessor());
-        attrValueProcessorMap.put(new ResumeAttrValue().getKey(), new ResumeAttrValueProcessor());
-        attrValueProcessorMap.put(new HornorAttrValue().getKey(), new HornorAttrValueProcessor());
-        attrValueProcessorMap.put(new EvaluationAttrValue().getKey(), new EvaluationAttrValueProcessor());
-        attrValueProcessorMap.put(new FamilyOrgAndJobAttrValue().getKey(), new FamilyOrgAndJobAttrValueProcessor());
+//        attrValueProcessorMap.put(new PositionAttrValue().getKey(), new PositionAttrValueProcessor());
+//        attrValueProcessorMap.put(new ResumeAttrValue().getKey(), new ResumeAttrValueProcessor());
+//        attrValueProcessorMap.put(new HornorAttrValue().getKey(), new HornorAttrValueProcessor());
+//        attrValueProcessorMap.put(new EvaluationAttrValue().getKey(), new EvaluationAttrValueProcessor());
+//        attrValueProcessorMap.put(new FamilyOrgAndJobAttrValue().getKey(), new FamilyOrgAndJobAttrValueProcessor());
         attrValueProcessorMap.put("default", new DefaultAttrValueProcessor());
 
     }
@@ -114,7 +114,7 @@ public class AbstractExportXinJiangPadPDF {
         });
         for (Map.Entry<String, AttrValue> entry : sortedList) {
             AttrValue attrRule = entry.getValue();
-            Object attrValue = attrRule.getAttrValue(attrValueContext, empId,exportWordService);
+            Object attrValue = attrRule.getAttrValue(attrValueContext, empId, exportWordService);
             attrValues.put(entry.getKey(), attrValue);
         }
         return attrValues;
@@ -235,24 +235,26 @@ public class AbstractExportXinJiangPadPDF {
                 }
             }
         }
-		// 清空标记域，防止域没有被填充而输出域
-		document.getMailMerge().deleteFields();
-		//document.save(outputFilePath);
-		PdfSaveOptions saveOption = new PdfSaveOptions();  
-		String pdfPath=outputFilePath.substring(0, outputFilePath.lastIndexOf("."));
-		pdfPath+=".pdf";
-		 
-		//考虑是非windows系统时 PDF多了一个\ 去掉  wangjj 2017-12-18 11:19
-		String os = System.getProperty("os.name");  
-		System.out.println(os+"1218.11:12.pdf路径:"+pdfPath);
-		if(!os.toLowerCase().startsWith("win")){  
-			pdfPath=pdfPath.replaceAll("\\\\","");
-		}  
-		
-		document.save(pdfPath,saveOption);
-		return pdfPath;
+        // 清空标记域，防止域没有被填充而输出域
+        document.getMailMerge().deleteFields();
+        //document.save(outputFilePath);
+        PdfSaveOptions saveOption = new PdfSaveOptions();
+        String pdfPath = outputFilePath.substring(0, outputFilePath.lastIndexOf("."));
+        pdfPath += ".pdf";
+
+        //考虑是非windows系统时 PDF多了一个\ 去掉  wangjj 2017-12-18 11:19
+        String os = System.getProperty("os.name");
+        System.out.println(os + "1218.11:12.pdf路径:" + pdfPath);
+        if (!os.toLowerCase().startsWith("win")) {
+            pdfPath = pdfPath.replaceAll("\\\\", "");
+        }
+
+        document.save(pdfPath, saveOption);
+        return pdfPath;
     }
-    /**给pad用的导出
+
+    /**
+     * 给pad用的导出
      * 执行属性值样式处理器
      *
      * @param templateFilePath 模板文件路径
@@ -367,16 +369,17 @@ public class AbstractExportXinJiangPadPDF {
                 }
             }
         }
-		// 清空标记域，防止域没有被填充而输出域
-		document.getMailMerge().deleteFields();
-		//document.save(outputFilePath);
-		PdfSaveOptions saveOption = new PdfSaveOptions();  
-		String pdfPath=outputFilePath.substring(0, outputFilePath.lastIndexOf("."));
-		pdfPath+=".pdf";
-		 
-		document.save(pdfPath,saveOption);
-		return pdfPath;
+        // 清空标记域，防止域没有被填充而输出域
+        document.getMailMerge().deleteFields();
+        //document.save(outputFilePath);
+        PdfSaveOptions saveOption = new PdfSaveOptions();
+        String pdfPath = outputFilePath.substring(0, outputFilePath.lastIndexOf("."));
+        pdfPath += ".pdf";
+
+        document.save(pdfPath, saveOption);
+        return pdfPath;
     }
+
     private int getRightLine(String resumeContent) {
         Pattern compile = Pattern.compile("[：| ；]\\d{4}\\.");
         Matcher matcher = compile.matcher(resumeContent);

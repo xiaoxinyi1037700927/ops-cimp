@@ -52,6 +52,12 @@ public abstract class AbstractExportGbrmbBiJie extends AbstractExportWithAsposeW
         attrValueMap.put(FamilyPartyAttrValue.KEY, new FamilyPartyAttrValue());
         attrValueMap.put(FamilyImpAttrValue.KEY, new FamilyImpAttrValue());
         attrValueMap.put(FamilyOrgAndJobAttrValue.KEY, new FamilyOrgAndJobAttrValue());
+        attrValueMap.put(ProposedPostAttrValue.KEY, new ProposedPostAttrValue());
+        attrValueMap.put(ProposedRemovalAttrValue.KEY, new ProposedRemovalAttrValue());
+        attrValueMap.put(ReportingUnitAttrValue.KEY, new ReportingUnitAttrValue());
+        attrValueMap.put(ApprovalOptionsAttrValue.KEY, new ApprovalOptionsAttrValue());
+        attrValueMap.put(AppointmentOptionsAttrValue.KEY, new AppointmentOptionsAttrValue());
+        attrValueMap.put(FillerAttrValue.KEY, new FillerAttrValue());
         //放入 属性 - 属性值处理器
         attrValueProcessorMap.put(NameAttrValue.KEY, new NameAttrValueProcessor());
         attrValueProcessorMap.put(PhotoAttrValue.KEY, new PhotoAttrValueProcessor());
@@ -68,6 +74,12 @@ public abstract class AbstractExportGbrmbBiJie extends AbstractExportWithAsposeW
         attrValueProcessorMap.put(EvaluationAttrValue.KEY, new EvaluationAttrValueProcessor());
         attrValueProcessorMap.put(FamilyPartyAttrValue.KEY, new FamilyPartyValueProcessor());
         attrValueProcessorMap.put(FamilyOrgAndJobAttrValue.KEY, new FamilyOrgAndJobAttrValueProcessor());
+        attrValueProcessorMap.put(ProposedPostAttrValue.KEY, new ProposedPostAttrValueProcessor());
+        attrValueProcessorMap.put(ProposedRemovalAttrValue.KEY, new ProposedRemovalAttrValueProcessor());
+        attrValueProcessorMap.put(ReportingUnitAttrValue.KEY, new ReportingUnitAttrValueProcessor());
+        attrValueProcessorMap.put(ApprovalOptionsAttrValue.KEY, new ProposedRemovalAttrValueProcessor());
+        attrValueProcessorMap.put(AppointmentOptionsAttrValue.KEY, new AppointmentOptionsAttrValueProcessor());
+        attrValueProcessorMap.put(FillerAttrValue.KEY, new FillerAttrValueProcessor());
         attrValueProcessorMap.put("default", new DefaultAttrValueProcessor());
     }
 

@@ -5,33 +5,28 @@ import io.swagger.annotations.ApiModelProperty;
 
 import java.util.Date;
 
-@ApiModel(description = "角色数据权限添加模型")
-public class RoleDataPerAddModel {
+@ApiModel(description = "接口添加模型")
+public class InterfacesAddModel {
     /**
-     * 名称
+     * 接口类型id
      */
-    @ApiModelProperty(value = "名称")
+    @ApiModelProperty(value = "接口类型id")
+    private String interfaceTypeId;
+    /**
+     * 接口名称
+     */
+    @ApiModelProperty(value = "接口名称")
     private String name;
-    /**
-     * 角色ID
-     */
-    @ApiModelProperty(value = "角色ID")
-    private String roleId;
     /**
      * 接口url
      */
     @ApiModelProperty(value = "接口url")
     private String url;
     /**
-     * sql类型
+     * 配置类型
      */
-    @ApiModelProperty(value = "sql类型")
-    private String type;
-    /**
-     * sql
-     */
-    @ApiModelProperty(value = "sql")
-    private String sql;
+    @ApiModelProperty(value = "配置类型")
+    private String configType;
     /**
      * 创建人
      */
@@ -43,20 +38,20 @@ public class RoleDataPerAddModel {
     @ApiModelProperty(value = "创建时间")
     private Date createTime;
 
+    public String getInterfaceTypeId() {
+        return interfaceTypeId;
+    }
+
+    public void setInterfaceTypeId(String interfaceTypeId) {
+        this.interfaceTypeId = interfaceTypeId;
+    }
+
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getRoleId() {
-        return roleId;
-    }
-
-    public void setRoleId(String roleId) {
-        this.roleId = roleId;
     }
 
     public String getUrl() {
@@ -67,20 +62,12 @@ public class RoleDataPerAddModel {
         this.url = url;
     }
 
-    public String getType() {
-        return type;
+    public String getConfigType() {
+        return configType;
     }
 
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public String getSql() {
-        return sql;
-    }
-
-    public void setSql(String sql) {
-        this.sql = sql;
+    public void setConfigType(String configType) {
+        this.configType = configType;
     }
 
     public String getCreateId() {

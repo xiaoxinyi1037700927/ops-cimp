@@ -1,9 +1,10 @@
 package com.sinosoft.ops.cimp.util.word.pattern.xinjiang;
 
 import com.sinosoft.ops.cimp.entity.sys.syscode.SysCodeItem;
-import com.sinosoft.ops.cimp.service.word.ExportService;
+import com.sinosoft.ops.cimp.service.export.ExportService;
 import com.sinosoft.ops.cimp.util.StringUtil;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.poi.ss.formula.functions.Today;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -59,7 +60,9 @@ public class TechnicPositionAttrValue implements AttrValue {
                 if(obj==null) {
                     continue;
                 }
-                SysCodeItem sci=exportWordService.getCodeItemByCode("BT0230", obj.toString());
+//                SysCodeItem sci=.getCodeItemByCode("BT0230", obj.toString());
+                // TODO: 2019/6/11 修改获取sysCodeSet
+                SysCodeItem sci=null;
                 String pptr=  sci.getParentCode();
                 if(obj!=null) {
                 	//改为取A105001_A的父代码  黄玉石 20190520  ////专业技术职务代码A105001_A的前两位 --

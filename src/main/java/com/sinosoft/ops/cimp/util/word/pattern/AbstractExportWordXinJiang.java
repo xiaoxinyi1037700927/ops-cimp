@@ -1,10 +1,14 @@
 package com.sinosoft.ops.cimp.util.word.pattern;
 
 import com.aspose.words.*;
+import com.sinosoft.ops.cimp.export.processor.EvaluationAttrValueProcessor;
+import com.sinosoft.ops.cimp.export.processor.FamilyOrgAndJobAttrValueProcessor;
+import com.sinosoft.ops.cimp.export.processor.HornorAttrValueProcessor;
+import com.sinosoft.ops.cimp.export.processor.PositionAttrValueProcessor;
 import com.sinosoft.ops.cimp.util.StringUtil;
 import com.sinosoft.ops.cimp.util.word.pattern.processor.*;
 import com.sinosoft.ops.cimp.util.word.pattern.xinjiang.*;
-import com.sinosoft.ops.cimp.service.word.ExportService;
+import com.sinosoft.ops.cimp.service.export.ExportService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,11 +86,11 @@ public class AbstractExportWordXinJiang {
 					new DiplomaAndDegreeAttrValueProcessor());
 			attrValueProcessorMap.put(new PtDiplomaAndDegreeAttrValue().getKey(),
 					new DiplomaAndDegreeAttrValueProcessor());
-			attrValueProcessorMap.put(new PositionAttrValue().getKey(), new PositionAttrValueProcessor());
-			attrValueProcessorMap.put(new ResumeAttrValue().getKey(), new ResumeAttrValueProcessor());
-			attrValueProcessorMap.put(new HornorAttrValue().getKey(), new HornorAttrValueProcessor());
-			attrValueProcessorMap.put(new EvaluationAttrValue().getKey(), new EvaluationAttrValueProcessor());
-			attrValueProcessorMap.put(new FamilyOrgAndJobAttrValue().getKey(), new FamilyOrgAndJobAttrValueProcessor());
+//			attrValueProcessorMap.put(new PositionAttrValue().getKey(), new PositionAttrValueProcessor());
+//			attrValueProcessorMap.put(new ResumeAttrValue().getKey(), new ResumeAttrValueProcessor());
+//			attrValueProcessorMap.put(new HornorAttrValue().getKey(), new HornorAttrValueProcessor());
+//			attrValueProcessorMap.put(new EvaluationAttrValue().getKey(), new EvaluationAttrValueProcessor());
+//			attrValueProcessorMap.put(new FamilyOrgAndJobAttrValue().getKey(), new FamilyOrgAndJobAttrValueProcessor());
 			attrValueProcessorMap.put("default", new DefaultAttrValueProcessor());
 			break;
 		case "gbrmbfmid":
@@ -131,11 +135,11 @@ public class AbstractExportWordXinJiang {
 					new DiplomaAndDegreeAttrValueProcessor());
 			attrValueProcessorMap.put(new PtDiplomaAndDegreeAttrValue().getKey(),
 					new DiplomaAndDegreeAttrValueProcessor());
-			attrValueProcessorMap.put(new PositionAttrValue().getKey(), new PositionAttrValueProcessor());
-			attrValueProcessorMap.put(new ResumeAttrValue().getKey(), new ResumeAttrValueProcessor());
-			attrValueProcessorMap.put(new HornorAttrValue().getKey(), new HornorAttrValueProcessor());
-			attrValueProcessorMap.put(new EvaluationAttrValue().getKey(), new EvaluationAttrValueProcessor());
-			attrValueProcessorMap.put(new FamilyOrgAndJobAndIdAttrValue().getKey(), new FamilyOrgAndJobAttrValueProcessor());
+//			attrValueProcessorMap.put(new PositionAttrValue().getKey(), new PositionAttrValueProcessor());
+//			attrValueProcessorMap.put(new ResumeAttrValue().getKey(), new ResumeAttrValueProcessor());
+//			attrValueProcessorMap.put(new HornorAttrValue().getKey(), new HornorAttrValueProcessor());
+//			attrValueProcessorMap.put(new EvaluationAttrValue().getKey(), new EvaluationAttrValueProcessor());
+//			attrValueProcessorMap.put(new FamilyOrgAndJobAndIdAttrValue().getKey(), new FamilyOrgAndJobAttrValueProcessor());
 			attrValueProcessorMap.put("default", new DefaultAttrValueProcessor());
 			break;
 		case "xxcjb":
@@ -191,7 +195,7 @@ public class AbstractExportWordXinJiang {
 					new DiplomaAndDegreeAttrValueProcessor());
 //			attrValueProcessorMap.put(new PositionAttrValue().getKey(), new PositionAttrValueProcessor());
 //			attrValueProcessorMap.put(new EvaluationAttrValue().getKey(), new EvaluationAttrValueProcessor());
-			attrValueProcessorMap.put(new FamilyOrgAndJobAttrValue().getKey(), new FamilyOrgAndJobAttrValueProcessor());
+//			attrValueProcessorMap.put(new FamilyOrgAndJobAttrValue().getKey(), new FamilyOrgAndJobAttrValueProcessor());
 			attrValueProcessorMap.put("default", new DefaultAttrValueProcessor());
 			break;
 		case "dwdzzxxcjb":
@@ -277,11 +281,11 @@ public class AbstractExportWordXinJiang {
 					new DiplomaAndDegreeAttrValueProcessor());
 			attrValueProcessorMap.put(new PtDiplomaAndDegreeAttrValue().getKey(),
 					new DiplomaAndDegreeAttrValueProcessor());
-			attrValueProcessorMap.put(new PositionAttrValue().getKey(), new PositionAttrValueProcessor());
-			attrValueProcessorMap.put(new ResumeAttrValue().getKey(), new ResumeAttrValueProcessor());
-			attrValueProcessorMap.put(new HornorAttrValue().getKey(), new HornorAttrValueProcessor());
-			attrValueProcessorMap.put(new EvaluationAttrValue().getKey(), new EvaluationAttrValueProcessor());
-			attrValueProcessorMap.put(new FamilyOrgAndJobAttrValue().getKey(), new FamilyOrgAndJobAttrValueProcessor());
+//			attrValueProcessorMap.put(new PositionAttrValue().getKey(), new PositionAttrValueProcessor());
+//			attrValueProcessorMap.put(new ResumeAttrValue().getKey(), new ResumeAttrValueProcessor());
+//			attrValueProcessorMap.put(new HornorAttrValue().getKey(), new HornorAttrValueProcessor());
+//			attrValueProcessorMap.put(new EvaluationAttrValue().getKey(), new EvaluationAttrValueProcessor());
+//			attrValueProcessorMap.put(new FamilyOrgAndJobAttrValue().getKey(), new FamilyOrgAndJobAttrValueProcessor());
 			attrValueProcessorMap.put("default", new DefaultAttrValueProcessor());
 			break;
 		case "liangweifmid":
@@ -326,11 +330,11 @@ public class AbstractExportWordXinJiang {
 					new DiplomaAndDegreeAttrValueProcessor());
 			attrValueProcessorMap.put(new PtDiplomaAndDegreeAttrValue().getKey(),
 					new DiplomaAndDegreeAttrValueProcessor());
-			attrValueProcessorMap.put(new PositionAttrValue().getKey(), new PositionAttrValueProcessor());
-			attrValueProcessorMap.put(new ResumeAttrValue().getKey(), new ResumeAttrValueProcessor());
-			attrValueProcessorMap.put(new HornorAttrValue().getKey(), new HornorAttrValueProcessor());
-			attrValueProcessorMap.put(new EvaluationAttrValue().getKey(), new EvaluationAttrValueProcessor());
-			attrValueProcessorMap.put(new FamilyOrgAndJobAndIdAttrValue().getKey(), new FamilyOrgAndJobAttrValueProcessor());
+//			attrValueProcessorMap.put(new PositionAttrValue().getKey(), new PositionAttrValueProcessor());
+//			attrValueProcessorMap.put(new ResumeAttrValue().getKey(), new ResumeAttrValueProcessor());
+//			attrValueProcessorMap.put(new HornorAttrValue().getKey(), new HornorAttrValueProcessor());
+//			attrValueProcessorMap.put(new EvaluationAttrValue().getKey(), new EvaluationAttrValueProcessor());
+//			attrValueProcessorMap.put(new FamilyOrgAndJobAndIdAttrValue().getKey(), new FamilyOrgAndJobAttrValueProcessor());
 			attrValueProcessorMap.put("default", new DefaultAttrValueProcessor());
 			break;
 		}

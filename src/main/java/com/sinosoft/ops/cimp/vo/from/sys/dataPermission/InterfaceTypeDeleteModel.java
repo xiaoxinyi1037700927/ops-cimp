@@ -5,12 +5,12 @@ import io.swagger.annotations.ApiModelProperty;
 
 import java.util.List;
 
-@ApiModel(description = "角色数据权限删除模型")
-public class RoleDataPerDeleteModel {
+@ApiModel(description = "接口类型删除模型")
+public class InterfaceTypeDeleteModel {
     /**
-     * 角色数据权限id列表
+     * 接口类型id列表
      */
-    @ApiModelProperty(value = "角色数据权限id列表")
+    @ApiModelProperty(value = "接口类型id列表")
     private List<String> ids;
 
     public List<String> getIds() {

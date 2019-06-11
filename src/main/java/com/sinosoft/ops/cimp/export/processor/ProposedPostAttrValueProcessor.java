@@ -1,4 +1,4 @@
-package com.sinosoft.ops.cimp.util.word.pattern.processor;
+package com.sinosoft.ops.cimp.export.processor;
 
 import com.aspose.words.Cell;
 import com.aspose.words.Document;
@@ -15,7 +15,7 @@ import java.util.Map;
  * @since 1.0
  * Copyright (C) 2017. SinSoft All Rights Received
  */
-public class PositionAttrValueProcessor extends AbstractAttrValueProcessor implements AttrValueProcessor {
+public class ProposedPostAttrValueProcessor extends AbstractAttrValueProcessor implements AttrValueProcessor {
 
     @Override
     public void processAttr(Document document, Map<String, Object> attrAndValue) throws Exception {
@@ -23,7 +23,15 @@ public class PositionAttrValueProcessor extends AbstractAttrValueProcessor imple
         String attrValue = StringUtil.obj2Str(attrAndValue.values().toArray()[0]);
         Cell cell = super.getAttrIndexCell(document, attrName);
         if (cell != null) {
-            Map<String, Object> config = new HashMap<String, Object>(2);
+            int len = attrValue.length();
+            Map<String, Object> config = new HashMap<>(2);
+            if (len > 50 && len < 65) {
+                config.put("fontSize", "10");
+            } else if (len >= 65 && len <= 80) {
+                config.put("fontSize", "9");
+            } else if (len > 80) {
+                config.put("fontSize", "7.5");
+            }
             config.put("fontPos", "LEFT");
             insertTextIntoCell(cell, attrValue, true, false, config);
         }
