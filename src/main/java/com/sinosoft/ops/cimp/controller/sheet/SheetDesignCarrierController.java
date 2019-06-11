@@ -5,13 +5,14 @@
  */
 package com.sinosoft.ops.cimp.controller.sheet;
 
-import com.newskysoft.iimp.common.Constants;
-import com.newskysoft.iimp.common.PageableQueryParameter;
-import com.newskysoft.iimp.common.PageableQueryResult;
-import com.newskysoft.iimp.common.ResponseResult;
-import com.newskysoft.iimp.common.controller.BaseEntityController;
-import com.newskysoft.iimp.sheet.model.SheetDesignCarrier;
-import com.newskysoft.iimp.sheet.service.SheetDesignCarrierService;
+
+import com.sinosoft.ops.cimp.common.model.Constants;
+import com.sinosoft.ops.cimp.common.model.PageableQueryParameter;
+import com.sinosoft.ops.cimp.common.model.PageableQueryResult;
+import com.sinosoft.ops.cimp.common.model.ResponseResult;
+import com.sinosoft.ops.cimp.controller.BaseEntityController;
+import com.sinosoft.ops.cimp.entity.sheet.SheetDesignCarrier;
+import com.sinosoft.ops.cimp.service.sheet.SheetDesignCarrierService;
 import org.codehaus.jettison.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +41,7 @@ public class SheetDesignCarrierController extends BaseEntityController<SheetDesi
     private SheetDesignCarrierService sheetDesignCarrierService = null;
 
     @ResponseBody
-    @Override
+    
     @RequestMapping(value = MAPPING_PATH_CREATE)
     public ResponseResult create(SheetDesignCarrier entity) {
         try {
@@ -58,7 +59,7 @@ public class SheetDesignCarrierController extends BaseEntityController<SheetDesi
     }
 
     @ResponseBody
-    @Override
+    
     @RequestMapping(value = MAPPING_PATH_UPDATE)
     public ResponseResult update(SheetDesignCarrier entity) {
         try {
@@ -74,7 +75,7 @@ public class SheetDesignCarrierController extends BaseEntityController<SheetDesi
     }
 
     @ResponseBody
-    @Override
+    
     @RequestMapping(value = MAPPING_PATH_DELETE)
     public ResponseResult delete(SheetDesignCarrier entity) {
         try {
@@ -87,7 +88,7 @@ public class SheetDesignCarrierController extends BaseEntityController<SheetDesi
     }
 
     @ResponseBody
-    @Override
+    
     @RequestMapping(value = MAPPING_PATH_DELETE_BY_ID)
     public ResponseResult deleteById(HttpServletRequest request) {
         try {
@@ -100,7 +101,7 @@ public class SheetDesignCarrierController extends BaseEntityController<SheetDesi
     }
 
     @ResponseBody
-    @Override
+    
     @RequestMapping(value = MAPPING_PATH_GET_BY_ID)
     public ResponseResult getById(HttpServletRequest request) {
         try {
@@ -117,7 +118,7 @@ public class SheetDesignCarrierController extends BaseEntityController<SheetDesi
     }
 
     @ResponseBody
-    @Override
+    
     @RequestMapping(value = MAPPING_PATH_FIND_BY_PAGE)
     public ResponseResult findByPage(HttpServletRequest request) {
         try {

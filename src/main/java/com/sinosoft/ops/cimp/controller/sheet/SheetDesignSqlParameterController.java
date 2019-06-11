@@ -1,10 +1,10 @@
 package com.sinosoft.ops.cimp.controller.sheet;
 
 import com.google.common.base.Throwables;
-import com.newskysoft.iimp.common.ResponseResult;
-import com.newskysoft.iimp.common.controller.BaseEntityController;
-import com.newskysoft.iimp.sheet.model.SheetDesignSqlParameter;
-import com.newskysoft.iimp.sheet.service.SheetDesignSqlParameterService;
+import com.sinosoft.ops.cimp.common.model.ResponseResult;
+import com.sinosoft.ops.cimp.controller.BaseEntityController;
+import com.sinosoft.ops.cimp.entity.sheet.SheetDesignSqlParameter;
+import com.sinosoft.ops.cimp.service.sheet.SheetDesignSqlParameterService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
-
 import java.util.UUID;
 
 
@@ -27,7 +26,7 @@ import java.util.UUID;
  */
 @Controller("SheetDesignSqlParameterController")
 @RequestMapping("sheet/sheetDesignSqlParameter")
-public class SheetDesignSqlParameterController extends BaseEntityController<SheetDesignSqlParameter>{
+public class SheetDesignSqlParameterController extends BaseEntityController<SheetDesignSqlParameter> {
 	private static final Logger logger = LoggerFactory.getLogger(SheetDesignSqlParameterController.class);
 
     @Autowired
@@ -35,7 +34,7 @@ public class SheetDesignSqlParameterController extends BaseEntityController<Shee
 
     @ResponseBody
     @RequestMapping(value = MAPPING_PATH_CREATE)//SpringMVC这个类的前段请求路径
-    @Override
+    
 	public ResponseResult create(SheetDesignSqlParameter entity) {
     	 try{
          	System.out.println("Id --->" + entity.getId());
@@ -50,7 +49,7 @@ public class SheetDesignSqlParameterController extends BaseEntityController<Shee
 	}
 
 
-	@Override
+	
 	@ResponseBody
 	@RequestMapping(MAPPING_PATH_GET_BY_ID)
 	public ResponseResult getById(HttpServletRequest request) {
@@ -79,7 +78,7 @@ public class SheetDesignSqlParameterController extends BaseEntityController<Shee
         }
 	}
 
-	@Override
+	
 	@ResponseBody
 	@RequestMapping(MAPPING_PATH_DELETE_BY_ID)
 	public ResponseResult deleteById(HttpServletRequest request) {
@@ -94,18 +93,18 @@ public class SheetDesignSqlParameterController extends BaseEntityController<Shee
 	}
 
 
-	@Override
+	
 	public ResponseResult findByPage(HttpServletRequest request) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
+	
 	public ResponseResult delete(SheetDesignSqlParameter entity) {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	@Override
+	
 	public ResponseResult update(SheetDesignSqlParameter entity) {
 		// TODO Auto-generated method stub
 		return null;

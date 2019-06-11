@@ -5,6 +5,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.sql.Timestamp;
+import java.util.UUID;
 
 /**
  * @ClassName: SheetCondition
@@ -18,11 +19,11 @@ public class SheetCondition implements java.io.Serializable {
     private static final long serialVersionUID = -120216642216106828L;
     // Fields
     /*** 标识 */
-    private String id;
+    private UUID id;
     /*** 标识*/
-    private String categoryId;
+    private UUID categoryId;
     /*** 模板ID*/
-    private String designId;
+    private UUID designId;
     /*** 条件名*/
     private String conditionName;
     /*** 条件关系*/
@@ -37,40 +38,40 @@ public class SheetCondition implements java.io.Serializable {
     /*** 创建时间 */
     private Timestamp createdTime;
     /*** 创建人 */
-    private String createdBy;
+    private UUID createdBy;
     /*** 最后修改时间 */
     private Timestamp lastModifiedTime;
     /*** 最后修改人 */
-    private String lastModifiedBy;
+    private UUID lastModifiedBy;
 
     private String sql;
 
     // Property accessors
     @Id
     @Column(name = "ID", unique = true, nullable = false)
-    public String getId() {
+    public UUID getId() {
         return this.id;
     }
 
-    public void setId(String id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
     @Column(name = "CATEGORY_ID", nullable = false)
-    public String getCategoryId() {
+    public UUID getCategoryId() {
         return categoryId;
     }
 
-    public void setCategoryId(String categoryId) {
+    public void setCategoryId(UUID categoryId) {
         this.categoryId = categoryId;
     }
 
     @Column(name = "DESIGN_ID", nullable = false)
-    public String getDesignId() {
+    public UUID getDesignId() {
         return designId;
     }
 
-    public void setDesignId(String designId) {
+    public void setDesignId(UUID designId) {
         this.designId = designId;
     }
 
@@ -111,11 +112,11 @@ public class SheetCondition implements java.io.Serializable {
     }
 
     @Column(name = "CREATED_BY")
-    public String getCreatedBy() {
+    public UUID getCreatedBy() {
         return this.createdBy;
     }
 
-    public void setCreatedBy(String createdBy) {
+    public void setCreatedBy(UUID createdBy) {
         this.createdBy = createdBy;
     }
 
@@ -129,11 +130,11 @@ public class SheetCondition implements java.io.Serializable {
     }
 
     @Column(name = "LAST_MODIFIED_BY")
-    public String getLastModifiedBy() {
+    public UUID getLastModifiedBy() {
         return this.lastModifiedBy;
     }
 
-    public void setLastModifiedBy(String lastModifiedBy) {
+    public void setLastModifiedBy(UUID lastModifiedBy) {
         this.lastModifiedBy = lastModifiedBy;
     }
 
@@ -164,9 +165,9 @@ public class SheetCondition implements java.io.Serializable {
         this.sql = sql;
     }
 
-    public SheetCondition(String id, String categoryId,
+    public SheetCondition(UUID id, UUID categoryId,
                           String conditionName, String conditionRelation, Integer ordinal, Byte status,
-                          Timestamp createdTime, String createdBy, Timestamp lastModifiedTime, String lastModifiedBy, String sql) {
+                          Timestamp createdTime, UUID createdBy, Timestamp lastModifiedTime, UUID lastModifiedBy, String sql) {
         this.id = id;
         this.categoryId = categoryId;
         this.conditionName = conditionName;
@@ -180,7 +181,7 @@ public class SheetCondition implements java.io.Serializable {
         this.sql = sql;
     }
 
-    public SheetCondition(String id, String categoryId,
+    public SheetCondition(UUID id, UUID categoryId,
                           String conditionName, String conditionRelation) {
         this.id = id;
         this.categoryId = categoryId;

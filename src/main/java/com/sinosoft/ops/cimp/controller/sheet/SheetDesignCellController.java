@@ -1,10 +1,10 @@
 package com.sinosoft.ops.cimp.controller.sheet;
 
 import com.google.common.base.Throwables;
-import com.newskysoft.iimp.common.ResponseResult;
-import com.newskysoft.iimp.common.controller.BaseEntityController;
-import com.newskysoft.iimp.sheet.model.SheetDesignCell;
-import com.newskysoft.iimp.sheet.service.SheetDesignCellService;
+import com.sinosoft.ops.cimp.common.model.ResponseResult;
+import com.sinosoft.ops.cimp.controller.BaseEntityController;
+import com.sinosoft.ops.cimp.entity.sheet.SheetDesignCell;
+import com.sinosoft.ops.cimp.service.sheet.SheetDesignCellService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +25,7 @@ import java.util.UUID;
  */
 @Controller("SheetDesignCellController")
 @RequestMapping("sheet/SheetDesignCell")
-public class SheetDesignCellController extends BaseEntityController<SheetDesignCell>{
+public class SheetDesignCellController extends BaseEntityController<SheetDesignCell> {
 	
 	private static final Logger logger = LoggerFactory.getLogger(SheetController.class);
 	
@@ -35,7 +35,7 @@ public class SheetDesignCellController extends BaseEntityController<SheetDesignC
 	  
 	@ResponseBody
 	@RequestMapping(value = MAPPING_PATH_CREATE)//SpringMVC这个类的前段请求路径
-	@Override
+	
 	public ResponseResult create(SheetDesignCell entity) {
 		try {
 			entity.setId(UUID.randomUUID());
@@ -78,7 +78,7 @@ public class SheetDesignCellController extends BaseEntityController<SheetDesignC
 	        }
 	}
 	
-	@Override
+	
 	@ResponseBody
     @RequestMapping(value = MAPPING_PATH_UPDATE)
 	public ResponseResult update(SheetDesignCell entity) {
@@ -92,25 +92,25 @@ public class SheetDesignCellController extends BaseEntityController<SheetDesignC
         }
 	}
 
-	@Override
+	
 	public ResponseResult delete(SheetDesignCell entity) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
+	
 	public ResponseResult deleteById(HttpServletRequest request) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
+	
 	public ResponseResult getById(HttpServletRequest request) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
+	
 	public ResponseResult findByPage(HttpServletRequest request) {
 		// TODO Auto-generated method stub
 		return null;

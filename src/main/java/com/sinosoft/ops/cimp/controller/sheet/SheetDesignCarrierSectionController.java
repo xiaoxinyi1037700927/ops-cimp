@@ -5,21 +5,21 @@
  */
 package com.sinosoft.ops.cimp.controller.sheet;
 
-import java.util.UUID;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-
+import com.sinosoft.ops.cimp.common.model.ResponseResult;
+import com.sinosoft.ops.cimp.controller.BaseEntityController;
+import com.sinosoft.ops.cimp.entity.sheet.SheetDesignCarrierSection;
+import com.sinosoft.ops.cimp.service.sheet.SheetDesignCarrierSectionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.newskysoft.iimp.common.ResponseResult;
-import com.newskysoft.iimp.common.controller.BaseEntityController;
-import com.newskysoft.iimp.sheet.model.SheetDesignCarrierSection;
-import com.newskysoft.iimp.sheet.service.SheetDesignCarrierSectionService;
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import java.util.UUID;
+
+
 
 /**
  * @ClassName: SheetDesignCarrierSectionController
@@ -35,7 +35,7 @@ public class SheetDesignCarrierSectionController extends BaseEntityController<Sh
     private SheetDesignCarrierSectionService sheetDesignCarrierSectionService = null;
 
     @ResponseBody
-    @Override
+    
     @RequestMapping(value = MAPPING_PATH_CREATE)
     public ResponseResult create(SheetDesignCarrierSection entity) {
         try {
@@ -48,7 +48,7 @@ public class SheetDesignCarrierSectionController extends BaseEntityController<Sh
     }
 
     @ResponseBody
-    @Override
+    
     @RequestMapping(value = MAPPING_PATH_UPDATE)
     public ResponseResult update(SheetDesignCarrierSection entity) {
         try {
@@ -62,7 +62,7 @@ public class SheetDesignCarrierSectionController extends BaseEntityController<Sh
 
 
     @ResponseBody
-    @Override
+    
     @RequestMapping(value = MAPPING_PATH_DELETE_BY_ID)
     public ResponseResult deleteById(HttpServletRequest request) {
         try {
@@ -75,7 +75,7 @@ public class SheetDesignCarrierSectionController extends BaseEntityController<Sh
     }
 
     @ResponseBody
-    @Override
+    
     @RequestMapping(value = MAPPING_PATH_GET_BY_ID)
     public ResponseResult getById(HttpServletRequest request) {
         try {
@@ -91,13 +91,13 @@ public class SheetDesignCarrierSectionController extends BaseEntityController<Sh
         }
     }
 
-	@Override
+	
 	public ResponseResult delete(SheetDesignCarrierSection entity) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
+	
 	public ResponseResult findByPage(HttpServletRequest request) {
 		// TODO Auto-generated method stub
 		return null;

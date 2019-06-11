@@ -18,12 +18,14 @@ import com.sinosoft.ops.cimp.entity.infostruct.SysInfoSetCategory;
 import com.sinosoft.ops.cimp.entity.sheet.*;
 import com.sinosoft.ops.cimp.entity.sys.syscode.SysCodeItem;
 import com.sinosoft.ops.cimp.entity.sys.syscode.SysCodeSet;
+import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.service.infostruct.SysInfoItemService;
 import com.sinosoft.ops.cimp.service.infostruct.SysInfoSetCategoryService;
 import com.sinosoft.ops.cimp.service.infostruct.SysInfoSetService;
 import com.sinosoft.ops.cimp.service.sheet.*;
 import com.sinosoft.ops.cimp.service.sys.syscode.SysCodeItemService;
 import com.sinosoft.ops.cimp.service.sys.syscode.SysCodeSetService;
+import com.sinosoft.ops.cimp.util.SecurityUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -467,7 +469,7 @@ public class SheetComController extends BaseController {
 			if (request.getParameter("templetParams") != null) {
 				paramArray = JSON.parseArray(request.getParameter("templetParams"));
 			}
-			UUID userId = getCurrentLoggedInUser().getId();
+			UUID userId = UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId());
 			List<SheetData> sheetDatas = sheetComService.getComputeDatas4Excel(userId,null,UUID.fromString(designId), paramArray,sheetComService,0);
 			
 			// 公式计算
@@ -483,11 +485,11 @@ public class SheetComController extends BaseController {
 			if (e instanceof IllegalArgumentException) {
 				return ResponseResult.failure(e.getMessage());
 			}
-			if (e instanceof SheetException)
+			if (e instanceof BusinessException)
 				return ResponseResult.failure(e.getMessage());
 			// 多线程异常会被包一层,所以暂时先用解析的方式去做
-			if (e.getMessage().contains("SheetException:"))
-				return ResponseResult.failure(e.getMessage().substring(e.getMessage().indexOf("SheetException:") + 15));
+			if (e.getMessage().contains("BusinessException:"))
+				return ResponseResult.failure(e.getMessage().substring(e.getMessage().indexOf("BusinessException:") + 15));
 			return ResponseResult.failure("构建表格数据失败");
 		}
 	}
@@ -511,7 +513,7 @@ public class SheetComController extends BaseController {
 			
 			Collection<SheetDesignExpression> expressions = sheetDesignExpressionService
 					.getCaculationFormulaByDesignId(UUID.fromString(designId));
-			UUID userId = getCurrentLoggedInUser().getId();
+			UUID userId = UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId());
 			List<SheetData> sheetDatas = sheetComService.getComputeDatas4Excel(userId,null,UUID.fromString(designId), paramArray, sheetComService,0);
 
 			// 公式计算
@@ -525,11 +527,11 @@ public class SheetComController extends BaseController {
 			if (e instanceof IllegalArgumentException) {
 				return ResponseResult.failure(e.getMessage());
 			}
-			if (e instanceof SheetException)
+			if (e instanceof BusinessException)
 				return ResponseResult.failure(e.getMessage());
 			// 多线程异常会被包一层,所以暂时先用解析的方式去做
-			if (e.getMessage().contains("SheetException:"))
-				return ResponseResult.failure(e.getMessage().substring(e.getMessage().indexOf("SheetException:") + 15));
+			if (e.getMessage().contains("BusinessException:"))
+				return ResponseResult.failure(e.getMessage().substring(e.getMessage().indexOf("BusinessException:") + 15));
 			return ResponseResult.failure("构建表格数据失败");
 		}
 	}
@@ -552,7 +554,7 @@ public class SheetComController extends BaseController {
 			
 			Collection<SheetDesignExpression> expressions = sheetDesignExpressionService
 					.getCaculationFormulaByDesignId(sheet.getDesignId());
-			UUID userId = getCurrentLoggedInUser().getId();
+			UUID userId = UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId());
 			List<SheetData> sheetDatas = sheetComService.getComputeDatas4Excel(userId,UUID.fromString(sheetId),sheet.getDesignId(), paramArray, sheetComService,0);
 
 			// 公式计算
@@ -566,11 +568,11 @@ public class SheetComController extends BaseController {
 			if (e instanceof IllegalArgumentException) {
 				return ResponseResult.failure(e.getMessage());
 			}
-			if (e instanceof SheetException)
+			if (e instanceof BusinessException)
 				return ResponseResult.failure(e.getMessage());
 			// 多线程异常会被包一层,所以暂时先用解析的方式去做
-			if (e.getMessage().contains("SheetException:"))
-				return ResponseResult.failure(e.getMessage().substring(e.getMessage().indexOf("SheetException:") + 15));
+			if (e.getMessage().contains("BusinessException:"))
+				return ResponseResult.failure(e.getMessage().substring(e.getMessage().indexOf("BusinessException:") + 15));
 			return ResponseResult.failure("构建表格数据失败");
 		}
 	}
@@ -588,7 +590,7 @@ public class SheetComController extends BaseController {
 		
 			Collection<SheetDesignExpression> expressions = sheetDesignExpressionService
 					.getCaculationFormulaByDesignId(sheet.getDesignId());
-			UUID userId = getCurrentLoggedInUser().getId();
+			UUID userId = UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId());
 			List<SheetData> sheetDatas = sheetComService.getComputeDatas4Excel(userId,sheet.getId(),sheet.getDesignId(), jsonArray, sheetComService,0);
 
 			// 公式计算
@@ -602,11 +604,11 @@ public class SheetComController extends BaseController {
 			if (e instanceof IllegalArgumentException) {
 				return ResponseResult.failure(e.getMessage());
 			}
-			if (e instanceof SheetException)
+			if (e instanceof BusinessException)
 				return ResponseResult.failure(e.getMessage());
 			// 多线程异常会被包一层,所以暂时先用解析的方式去做
-			if (e.getMessage().contains("SheetException:"))
-				return ResponseResult.failure(e.getMessage().substring(e.getMessage().indexOf("SheetException:") + 15));
+			if (e.getMessage().contains("BusinessException:"))
+				return ResponseResult.failure(e.getMessage().substring(e.getMessage().indexOf("BusinessException:") + 15));
 			return ResponseResult.failure("构建表格数据失败");
 		}
 	}
@@ -624,7 +626,7 @@ public class SheetComController extends BaseController {
 	public ResponseResult batchDirectStatistic(HttpServletRequest request, HttpServletResponse response,
 			String sheetId) {
 		try {
-			UUID userId = this.getCurrentLoggedInUser().getId();
+			UUID userId = this.UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId());
 			Sheet sheet = sheetService.getById(UUID.fromString(sheetId));
 			//获取json格式的报表参数
 			JSONArray jsonArray = getSheetParameter2Json(UUID.fromString(sheetId));
@@ -638,11 +640,11 @@ public class SheetComController extends BaseController {
 			if (e instanceof IllegalArgumentException) {
 				return ResponseResult.failure(e.getMessage());
 			}
-			if (e instanceof SheetException)
+			if (e instanceof BusinessException)
 				return ResponseResult.failure(e.getMessage());
 			// 多线程异常会被包一层,所以暂时先用解析的方式去做
-			if (e.getMessage() != null && e.getMessage().contains("SheetException:"))
-				return ResponseResult.failure(e.getMessage().substring(e.getMessage().indexOf("SheetException:") + 15));
+			if (e.getMessage() != null && e.getMessage().contains("BusinessException:"))
+				return ResponseResult.failure(e.getMessage().substring(e.getMessage().indexOf("BusinessException:") + 15));
 			return ResponseResult.failure("构建表格数据失败");
 		}
 
@@ -679,7 +681,7 @@ public class SheetComController extends BaseController {
 			}
 			//Integer statisticType = getIntegerParam(request, "priority", 0);
 			Integer statisticType = getIntegerParam(request, "statisticType", 0);
-			UUID userId = getCurrentLoggedInUser().getId();
+			UUID userId = UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId());
 			sheetComService.getComputeDatas4Excel(userId,sheetID, UUID.fromString(designId), jsonArray, sheetComService,statisticType);
 			
 			return ResponseResult.success("批量直统成功");
@@ -689,11 +691,11 @@ public class SheetComController extends BaseController {
 			if (e instanceof IllegalArgumentException) {
 				return ResponseResult.failure(e.getMessage());
 			}
-			if (e instanceof SheetException)
+			if (e instanceof BusinessException)
 				return ResponseResult.failure(e.getMessage());
 			// 多线程异常会被包一层,所以暂时先用解析的方式去做
-			if (e.getMessage() != null && e.getMessage().contains("SheetException:"))
-				return ResponseResult.failure(e.getMessage().substring(e.getMessage().indexOf("SheetException:") + 15));
+			if (e.getMessage() != null && e.getMessage().contains("BusinessException:"))
+				return ResponseResult.failure(e.getMessage().substring(e.getMessage().indexOf("BusinessException:") + 15));
 			return ResponseResult.failure("构建表格数据失败");
 		}
 
@@ -710,7 +712,7 @@ public class SheetComController extends BaseController {
 			}else{
 				key = sheetId;
 			}
-			UUID userId = getCurrentLoggedInUser().getId();
+			UUID userId = UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId());
 			SheetStatisticsStatus status = sheetComService.pollingGetStatus(userId,UUID.fromString(key));
 			if(status.getStatus() == -1){
 				sheetComService.cancelStatistics(userId,UUID.fromString(key));
@@ -810,7 +812,7 @@ public class SheetComController extends BaseController {
 			Map<String, Object> sqlDescription = sheetComService.getSqlDescription(designDataSources, designFields,
 					designConditions, rowNo, columnNo, jsonArray);
 			return ResponseResult.success(sqlDescription, 1, "查看sql描述成功");
-		} catch (SheetException e) {
+		} catch (BusinessException e) {
 			// e.printStackTrace();
 			return ResponseResult.failure(e.getMessage());
 		} catch (IllegalArgumentException e) {
@@ -842,7 +844,7 @@ public class SheetComController extends BaseController {
 			Map<String, Object> sqlDescription = sheetComService.getSqlDescription(designDataSources, designConditions,
 					UUID.fromString(designId), sectionNo, jsonArray);
 			return ResponseResult.success(sqlDescription, 1, "查看sql描述成功");
-		} catch (SheetException e) {
+		} catch (BusinessException e) {
 			// e.printStackTrace();
 			return ResponseResult.failure(e.getMessage());
 		} catch (IllegalArgumentException e) {
@@ -1159,9 +1161,9 @@ public class SheetComController extends BaseController {
 				sheetData.setBeingEdited(false);
 				sheetData.setSectionNo((String) map.get("sectionNo"));
 				sheetData.setStringValue((String) map.get("bindValue"));
-				sheetData.setCreatedBy(this.getCurrentLoggedInUser().getId());
+				sheetData.setCreatedBy(this.UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId()));
 				sheetData.setCreatedTime(new Timestamp(System.currentTimeMillis()));
-				sheetData.setLastModifiedBy(this.getCurrentLoggedInUser().getId());
+				sheetData.setLastModifiedBy(this.UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId()));
 				sheetData.setLastModifiedTime(new Timestamp(System.currentTimeMillis()));
 				sheetData.setStatus(DataStatus.NORMAL.getValue());
 				sheetData.setRowNo(-1);
@@ -1345,7 +1347,7 @@ public class SheetComController extends BaseController {
 			sheet.setOuterCheckStatus(outerCheckStatus);
 			sheetService.update(sheet);
 			return ResponseResult.success(result, result.size(), "数据校核成功");
-		} catch (SheetException e) {
+		} catch (BusinessException e) {
 			logger.error(e.getMessage(), e);
 			return ResponseResult.failure(e.getMessage());
 		} catch (Exception e) {
@@ -1419,7 +1421,7 @@ public class SheetComController extends BaseController {
 //								range.get("endColumnNo"), expression.getType());
 //					} catch (Exception e) {
 //						logger.error("公式：" + expression.getName() + " 有误，请检查！", e);
-//						throw new SheetException("公式：" + expression.getName() + " 有误，请检查！", e);
+//						throw new BusinessException("公式：" + expression.getName() + " 有误，请检查！", e);
 //					}
 //					for (Map<String, Object> map : listener.getLogicResult()) {
 //						map.put("expressionId", expression.getId());
@@ -1453,7 +1455,7 @@ public class SheetComController extends BaseController {
 //			sheet.setOuterCheckStatus(outerCheckStatus);
 //			sheetService.update(sheet);
 //			return ResponseResult.success(result, result.size(), "数据校核成功");
-//		} catch (SheetException e) {
+//		} catch (BusinessException e) {
 //			logger.error(e.getMessage(), e);
 //			return ResponseResult.failure(e.getMessage());
 //		} catch (Exception e) {
@@ -1580,7 +1582,7 @@ public class SheetComController extends BaseController {
 			}else{
 				key = UUID.fromString(sheetId);
 			}
-			UUID userId = getCurrentLoggedInUser().getId();
+			UUID userId = UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId());
 			sheetComService.cancelStatistics(userId,key);
 			return ResponseResult.success("取消统计成功");
 		} catch (Exception e) {
@@ -1712,9 +1714,9 @@ public class SheetComController extends BaseController {
 	 * 
 	 * @param designId
 	 * @return
-	 * @throws SheetException
+	 * @throws BusinessException
 	 */
-	private List<Map<String, Object>> getBuildWordData(String designId, JSONArray jsonArray) throws SheetException {
+	private List<Map<String, Object>> getBuildWordData(String designId, JSONArray jsonArray) throws BusinessException {
 		// 查出同一designId的数据块、数据源、数据项、条件项
 		Collection<SheetDesignSection> sections = sheetDesignSectionService.getByDesignId(UUID.fromString(designId));
 		Collection<SheetDesignDataSource> designDataSources = sheetDesignDataSourceService

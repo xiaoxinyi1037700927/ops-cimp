@@ -1,11 +1,12 @@
 package com.sinosoft.ops.cimp.controller.sheet;
 
 import com.google.common.base.Throwables;
-import com.newskysoft.iimp.common.DataStatus;
-import com.newskysoft.iimp.common.ResponseResult;
-import com.newskysoft.iimp.common.controller.BaseEntityController;
-import com.newskysoft.iimp.sheet.model.SheetDesignVariable;
-import com.newskysoft.iimp.sheet.service.SheetDesignVariableService;
+import com.sinosoft.ops.cimp.common.model.DataStatus;
+import com.sinosoft.ops.cimp.common.model.ResponseResult;
+import com.sinosoft.ops.cimp.controller.BaseEntityController;
+import com.sinosoft.ops.cimp.entity.sheet.SheetDesignVariable;
+import com.sinosoft.ops.cimp.service.sheet.SheetDesignVariableService;
+import com.sinosoft.ops.cimp.util.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,7 @@ import java.util.UUID;
  */
 @Controller("SheetDesignVariableController")
 @RequestMapping("sheet/SheetDesignVariable")
-public class SheetDesignVariableController extends BaseEntityController<SheetDesignVariable>{
+public class SheetDesignVariableController extends BaseEntityController<SheetDesignVariable> {
 	private static final Logger logger = LoggerFactory.getLogger(SheetController.class);
 
     @Autowired
@@ -38,13 +39,13 @@ public class SheetDesignVariableController extends BaseEntityController<SheetDes
 
     @ResponseBody
     @RequestMapping(value = MAPPING_PATH_CREATE)//SpringMVC这个类的前段请求路径
-    @Override
+    
 	public ResponseResult create(SheetDesignVariable entity) {
     	 try{
 			 entity.setStatus(DataStatus.NORMAL.getValue());
 			 entity.setOrdinal(sheetDesignVariableService.getNextOrdinal());
 			 entity.setId(UUID.randomUUID());
-			 entity.setCreatedBy(getCurrentLoggedInUser().getId());
+			 entity.setCreatedBy(UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId()));
 			 entity.setCreatedTime(new Timestamp(System.currentTimeMillis()));
 			 entity.setLastModifiedTime(new Timestamp(System.currentTimeMillis()));
          	sheetDesignVariableService.saveVariable(entity);
@@ -83,7 +84,7 @@ public class SheetDesignVariableController extends BaseEntityController<SheetDes
 	        }
 	}
 
-	@Override
+	
 	@RequestMapping(value = MAPPING_PATH_DELETE_BY_ID)
 	public ResponseResult deleteById(HttpServletRequest request) {
 		try{
@@ -108,22 +109,22 @@ public class SheetDesignVariableController extends BaseEntityController<SheetDes
 		}
 	}
 
-	@Override
+	
 	public ResponseResult findByPage(HttpServletRequest request) {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	@Override
+	
 	public ResponseResult getById(HttpServletRequest request) {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	@Override
+	
 	public ResponseResult delete(SheetDesignVariable entity) {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	@Override
+	
 	public ResponseResult update(SheetDesignVariable entity) {
 		// TODO Auto-generated method stub
 		return null;

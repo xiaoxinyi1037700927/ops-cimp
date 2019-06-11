@@ -1,13 +1,14 @@
 package com.sinosoft.ops.cimp.controller.sheet;
 
 import com.google.common.base.Throwables;
-import com.newskysoft.iimp.common.DataStatus;
-import com.newskysoft.iimp.common.ResponseResult;
-import com.newskysoft.iimp.common.controller.BaseEntityController;
-import com.newskysoft.iimp.sheet.model.SheetDataSource;
-import com.newskysoft.iimp.sheet.model.SheetDesignDataSource;
-import com.newskysoft.iimp.sheet.service.SheetDataSourceService;
-import com.newskysoft.iimp.sheet.service.SheetDesignDataSourceService;
+import com.sinosoft.ops.cimp.common.model.DataStatus;
+import com.sinosoft.ops.cimp.common.model.ResponseResult;
+import com.sinosoft.ops.cimp.controller.BaseEntityController;
+import com.sinosoft.ops.cimp.entity.sheet.SheetDataSource;
+import com.sinosoft.ops.cimp.entity.sheet.SheetDesignDataSource;
+import com.sinosoft.ops.cimp.service.sheet.SheetDataSourceService;
+import com.sinosoft.ops.cimp.service.sheet.SheetDesignDataSourceService;
+import com.sinosoft.ops.cimp.util.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,7 @@ import java.util.*;
  */
 @Controller("sheetDesignDataSourceController")
 @RequestMapping("sheet/sheetDesignDataSource")
-public class SheetDesignDataSourceController extends BaseEntityController<SheetDesignDataSource>{
+public class SheetDesignDataSourceController extends BaseEntityController<SheetDesignDataSource> {
 	private static final Logger logger = LoggerFactory.getLogger(SheetDesignDataSourceController.class);
 
     @Autowired
@@ -43,7 +44,7 @@ public class SheetDesignDataSourceController extends BaseEntityController<SheetD
 
     @ResponseBody
     @RequestMapping(value = MAPPING_PATH_CREATE)//SpringMVC这个类的前段请求路径
-    @Override
+    
 	public ResponseResult create(SheetDesignDataSource entity) {
     	 try{
          	entity.setId(UUID.randomUUID());
@@ -82,7 +83,7 @@ public class SheetDesignDataSourceController extends BaseEntityController<SheetD
     } 
     
 
-	@Override
+	
 	@RequestMapping(value = MAPPING_PATH_DELETE_BY_ID)
 	@ResponseBody
 	public ResponseResult deleteById(HttpServletRequest request) {
@@ -96,12 +97,12 @@ public class SheetDesignDataSourceController extends BaseEntityController<SheetD
 	}
 
 
-	@Override
+	
 	public ResponseResult findByPage(HttpServletRequest request) {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	@Override
+	
 	@RequestMapping(value=MAPPING_PATH_GET_BY_ID)
 	@ResponseBody
 	public ResponseResult getById(HttpServletRequest request) {
@@ -114,7 +115,7 @@ public class SheetDesignDataSourceController extends BaseEntityController<SheetD
             return ResponseResult.failure("查询失败.");
         }
 	}
-	@Override
+	
 	@RequestMapping(value=MAPPING_PATH_DELETE)
 	@ResponseBody
 	public ResponseResult delete(SheetDesignDataSource entity) {
@@ -127,7 +128,7 @@ public class SheetDesignDataSourceController extends BaseEntityController<SheetD
 		}
 	}
 	
-	@Override
+	
 	@RequestMapping(value=MAPPING_PATH_UPDATE)
 	@ResponseBody
 	public ResponseResult update(SheetDesignDataSource entity) {
@@ -228,14 +229,14 @@ public class SheetDesignDataSourceController extends BaseEntityController<SheetD
 	private void addTrackData(SheetDesignDataSource entity) {
 		// 创建人
         if (entity.getCreatedBy() == null) {
-            entity.setCreatedBy(getCurrentLoggedInUser().getId());
+            entity.setCreatedBy(UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId()));
         }
         // 创建时间
         if (entity.getCreatedTime() == null) {
             entity.setCreatedTime(new Timestamp(System.currentTimeMillis()));
         }
         // 最后修改人
-        entity.setLastModifiedBy(getCurrentLoggedInUser().getId());
+        entity.setLastModifiedBy(UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId()));
         // 最后修改时间
         entity.setLastModifiedTime(new Timestamp(System.currentTimeMillis()));
 

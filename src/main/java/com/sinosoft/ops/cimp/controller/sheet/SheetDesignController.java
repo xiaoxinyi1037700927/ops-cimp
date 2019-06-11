@@ -6,15 +6,20 @@
 package com.sinosoft.ops.cimp.controller.sheet;
 
 import com.google.common.base.Throwables;
-import com.newskysoft.iimp.common.Constants;
-import com.newskysoft.iimp.common.PageableQueryParameter;
-import com.newskysoft.iimp.common.PageableQueryResult;
-import com.newskysoft.iimp.common.ResponseResult;
-import com.newskysoft.iimp.common.controller.BaseEntityController;
-import com.newskysoft.iimp.sheet.model.*;
-import com.newskysoft.iimp.sheet.service.*;
-import com.newskysoft.iimp.system.service.SystemUserService;
-import com.newskysoft.iimp.word.util.FileUtils;
+import com.sinosoft.ops.cimp.common.model.Constants;
+import com.sinosoft.ops.cimp.common.model.PageableQueryParameter;
+import com.sinosoft.ops.cimp.common.model.PageableQueryResult;
+import com.sinosoft.ops.cimp.common.model.ResponseResult;
+import com.sinosoft.ops.cimp.controller.BaseEntityController;
+import com.sinosoft.ops.cimp.entity.sheet.SheetDesign;
+import com.sinosoft.ops.cimp.entity.sheet.SheetDesignCarrier;
+import com.sinosoft.ops.cimp.entity.sheet.SheetDesignDesignCategory;
+import com.sinosoft.ops.cimp.service.sheet.SheetDesignCarrierService;
+import com.sinosoft.ops.cimp.service.sheet.SheetDesignDesignCategoryService;
+import com.sinosoft.ops.cimp.service.sheet.SheetDesignSectionService;
+import com.sinosoft.ops.cimp.service.sheet.SheetDesignService;
+import com.sinosoft.ops.cimp.util.SecurityUtils;
+import com.sinosoft.ops.cimp.util.word.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,10 +62,10 @@ public class SheetDesignController extends BaseEntityController<SheetDesign> {
 
     @ResponseBody
     @RequestMapping(value = MAPPING_PATH_CREATE)
-    public ResponseResult create(SheetDesign entity,HttpServletRequest request) {
+    public ResponseResult create(SheetDesign entity, HttpServletRequest request) {
         try {
             UUID categoryId = UUID.fromString(request.getParameter("categoryId"));
-            entity.setCreatedBy(getCurrentLoggedInUser().getId());
+            entity.setCreatedBy(UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId()));
             if(!sheetDesignService.checkSheetNo(entity.getSheetNo()))
             {
                 return ResponseResult.failure("模板号不能重复！");
@@ -218,7 +223,7 @@ public class SheetDesignController extends BaseEntityController<SheetDesign> {
     public ResponseResult saveAs(HttpServletRequest request, HttpServletResponse response, SheetDesign entity) {
         try {
             UUID categoryId = UUID.fromString(request.getParameter("categoryId"));
-            entity.setCreatedBy(getCurrentLoggedInUser().getId());
+            entity.setCreatedBy(UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId()));
             if(!sheetDesignService.checkSheetNo(entity.getSheetNo()))
             {
                 return ResponseResult.failure("模板号不能重复！");
@@ -252,7 +257,7 @@ public class SheetDesignController extends BaseEntityController<SheetDesign> {
     }
 
     @ResponseBody
-    @Override
+    
     @RequestMapping(value = MAPPING_PATH_UPDATE)
     public ResponseResult update(SheetDesign entity) {
         try {
@@ -270,7 +275,7 @@ public class SheetDesignController extends BaseEntityController<SheetDesign> {
             entity.setOrdinal(sd.getOrdinal());
             entity.setCreatedBy(sd.getCreatedBy());
             entity.setCreatedTime(sd.getCreatedTime());
-            entity.setLastModifiedBy(getCurrentLoggedInUser().getId());
+            entity.setLastModifiedBy(UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId()));
             entity.setLastModifiedTime(new Timestamp(System.currentTimeMillis()));
             sheetDesignService.update(entity);
             return ResponseResult.success(entity, 1, "保存成功！");
@@ -292,7 +297,7 @@ public class SheetDesignController extends BaseEntityController<SheetDesign> {
                 return ResponseResult.failure("模板号不能重复！");
             }
             entity.setOrdinal(sd.getOrdinal());
-            sd.setLastModifiedBy(getCurrentLoggedInUser().getId());
+            sd.setLastModifiedBy(UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId()));
             sd.setLastModifiedTime(new Timestamp(System.currentTimeMillis()));
             sheetDesignService.output(entity);
             return ResponseResult.success(entity, 1, "发布成功！");
@@ -313,7 +318,7 @@ public class SheetDesignController extends BaseEntityController<SheetDesign> {
                 return ResponseResult.failure("模板号不能重复！");
             }
             entity.setOrdinal(sd.getOrdinal());
-            entity.setLastModifiedBy(getCurrentLoggedInUser().getId());
+            entity.setLastModifiedBy(UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId()));
             entity.setLastModifiedTime(new Timestamp(System.currentTimeMillis()));
             sheetDesignService.update(entity);
             return ResponseResult.success(entity, 1, "取消发布成功！");
@@ -328,7 +333,7 @@ public class SheetDesignController extends BaseEntityController<SheetDesign> {
     public ResponseResult delete(SheetDesign entity,HttpServletRequest request) {
         try {
             UUID categoryId = UUID.fromString(request.getParameter("categoryId"));
-            entity.setLastModifiedBy(getCurrentLoggedInUser().getId());
+            entity.setLastModifiedBy(UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId()));
             sheetDesignService.delete(entity, categoryId);
             return ResponseResult.success(entity, 1, "删除成功！");
         } catch (Exception e) {
@@ -338,7 +343,7 @@ public class SheetDesignController extends BaseEntityController<SheetDesign> {
     }
 
     @ResponseBody
-    @Override
+    
     @RequestMapping(value = MAPPING_PATH_DELETE_BY_ID)
     public ResponseResult deleteById(HttpServletRequest request) {
         try {
@@ -353,7 +358,7 @@ public class SheetDesignController extends BaseEntityController<SheetDesign> {
     }
 
     @ResponseBody
-    @Override
+    
     @RequestMapping(value = MAPPING_PATH_GET_BY_ID)
     public ResponseResult getById(HttpServletRequest request) {
         try {
@@ -370,7 +375,7 @@ public class SheetDesignController extends BaseEntityController<SheetDesign> {
     }
 
 //    @ResponseBody
-//    @Override
+//    
 //    @RequestMapping(value = MAPPING_PATH_FIND_BY_PAGE)
 //    public ResponseResult findByPage(HttpServletRequest request, HttpServletResponse response) {
 //        try {
@@ -396,7 +401,7 @@ public class SheetDesignController extends BaseEntityController<SheetDesign> {
 //    }
 
     @ResponseBody
-    @Override
+    
     @RequestMapping(value = MAPPING_PATH_FIND_BY_PAGE)
     public ResponseResult findByPage(HttpServletRequest request) {
         try {
@@ -449,8 +454,8 @@ public class SheetDesignController extends BaseEntityController<SheetDesign> {
                     }
                 }
             }
-            if(!"sa".equals(this.getCurrentLoggedInUser().getLoginName())){
-            	Collection<String> organizationIds = systemUserService.getTreeOrganizationIds(this.getCurrentLoggedInUser().getId(), "DepTree");
+            if(!"sa".equals(SecurityUtils.getSubject().getCurrentUser().getLoginName())){
+            	Collection<String> organizationIds = systemUserService.getTreeOrganizationIds(UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId()), "DepTree");
             	//Collection<String> depIds = sheetDesignService.getAllOrganizationByParent(organizationIds);
             	queryParameter.getParameters().put("depIds", organizationIds);
             }
@@ -473,7 +478,7 @@ public class SheetDesignController extends BaseEntityController<SheetDesign> {
     public ResponseResult copy(HttpServletRequest request, HttpServletResponse response, SheetDesign entity) {
         try {
             UUID categoryId = UUID.fromString(request.getParameter("categoryId"));
-            entity.setCreatedBy(getCurrentLoggedInUser().getId());
+            entity.setCreatedBy(UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId()));
             sheetDesignService.copy(entity, categoryId);
             return ResponseResult.success(entity, 1, "复制成功！");
         } catch (Exception e) {
@@ -492,7 +497,7 @@ public class SheetDesignController extends BaseEntityController<SheetDesign> {
     public ResponseResult moveUp(HttpServletRequest request, HttpServletResponse response, SheetDesign entity) {
         try {
             UUID categoryId = UUID.fromString(request.getParameter("categoryId"));
-            entity.setLastModifiedBy(getCurrentLoggedInUser().getId());
+            entity.setLastModifiedBy(UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId()));
             boolean success = sheetDesignService.moveUp(entity, categoryId);
             if (success) {
                 return ResponseResult.success(entity, 1, "上移成功！");
@@ -515,7 +520,7 @@ public class SheetDesignController extends BaseEntityController<SheetDesign> {
     public ResponseResult moveDown(HttpServletRequest request, HttpServletResponse response, SheetDesign entity) {
         try {
             UUID categoryId = UUID.fromString(request.getParameter("categoryId"));
-            entity.setLastModifiedBy(getCurrentLoggedInUser().getId());
+            entity.setLastModifiedBy(UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId()));
             boolean success = sheetDesignService.moveDown(entity, categoryId);
             if (success) {
                 return ResponseResult.success(entity, 1, "下移成功！");
@@ -555,8 +560,8 @@ public class SheetDesignController extends BaseEntityController<SheetDesign> {
                 // 生成新记录
                 SheetDesignCarrier newItem = new SheetDesignCarrier();
                 newItem.setId(UUID.randomUUID());
-                newItem.setCreatedBy(getCurrentLoggedInUser().getId());
-                newItem.setLastModifiedBy(getCurrentLoggedInUser().getId());
+                newItem.setCreatedBy(UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId()));
+                newItem.setLastModifiedBy(UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId()));
                 newItem.setCreatedTime(now);
                 newItem.setLastModifiedTime(now);
                 newItem.setType((byte) 3);
@@ -569,7 +574,7 @@ public class SheetDesignController extends BaseEntityController<SheetDesign> {
                 sheetDesignCarrierService.create(newItem);
             } else {
                 // 修改原记录
-                oldItem.setLastModifiedBy(getCurrentLoggedInUser().getId());
+                oldItem.setLastModifiedBy(UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId()));
                 oldItem.setLastModifiedTime(now);
                 oldItem.setType((byte) 3);
                 oldItem.setStatus((byte) 0);

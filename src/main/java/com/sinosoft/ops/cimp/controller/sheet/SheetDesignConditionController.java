@@ -2,13 +2,14 @@ package com.sinosoft.ops.cimp.controller.sheet;
 
 
 import com.google.common.base.Throwables;
-import com.newskysoft.iimp.common.DataStatus;
-import com.newskysoft.iimp.common.ResponseResult;
-import com.newskysoft.iimp.common.controller.BaseEntityController;
-import com.newskysoft.iimp.sheet.model.SheetCondition;
-import com.newskysoft.iimp.sheet.model.SheetDesignCondition;
-import com.newskysoft.iimp.sheet.service.SheetConditionService;
-import com.newskysoft.iimp.sheet.service.SheetDesignConditionService;
+import com.sinosoft.ops.cimp.common.model.DataStatus;
+import com.sinosoft.ops.cimp.common.model.ResponseResult;
+import com.sinosoft.ops.cimp.controller.BaseEntityController;
+import com.sinosoft.ops.cimp.entity.sheet.SheetCondition;
+import com.sinosoft.ops.cimp.entity.sheet.SheetDesignCondition;
+import com.sinosoft.ops.cimp.service.sheet.SheetConditionService;
+import com.sinosoft.ops.cimp.service.sheet.SheetDesignConditionService;
+import com.sinosoft.ops.cimp.util.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -52,7 +53,7 @@ public class SheetDesignConditionController extends BaseEntityController<SheetDe
 				entity.setStatus(DataStatus.NORMAL.getValue());
 				entity.setOrdinal(sheetDesignConditionService.getNextOrdinal());
 				entity.setId(UUID.randomUUID());
-				entity.setCreatedBy(getCurrentLoggedInUser().getId());
+				entity.setCreatedBy(UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId()));
 				entity.setCreatedTime(new Timestamp(System.currentTimeMillis()));
 				entity.setLastModifiedTime(new Timestamp(System.currentTimeMillis()));
 
@@ -65,7 +66,7 @@ public class SheetDesignConditionController extends BaseEntityController<SheetDe
 		}
 	}
 
-	@Override
+	
 	@ResponseBody
 	@RequestMapping(value = MAPPING_PATH_CREATE)
 	public ResponseResult create(SheetDesignCondition entity) {
@@ -81,7 +82,7 @@ public class SheetDesignConditionController extends BaseEntityController<SheetDe
 		}
 	}
 
-	@Override
+	
 	@ResponseBody
 	@RequestMapping(value = MAPPING_PATH_UPDATE)
 	public ResponseResult update(SheetDesignCondition entity) {
@@ -94,7 +95,7 @@ public class SheetDesignConditionController extends BaseEntityController<SheetDe
 		}
 	}
 
-	@Override
+	
 	@ResponseBody
 	@RequestMapping(value = MAPPING_PATH_DELETE)
 	public ResponseResult delete(SheetDesignCondition entity) {
@@ -129,7 +130,7 @@ public class SheetDesignConditionController extends BaseEntityController<SheetDe
 		}
 	}
 
-	@Override
+	
 	@ResponseBody
 	@RequestMapping(value = MAPPING_PATH_DELETE_BY_ID)
 	public ResponseResult deleteById(HttpServletRequest request) {
@@ -142,7 +143,7 @@ public class SheetDesignConditionController extends BaseEntityController<SheetDe
 		}		
 	}
 
-	@Override
+	
 	@ResponseBody
 	@RequestMapping(value = MAPPING_PATH_GET_BY_ID)
 	public ResponseResult getById(HttpServletRequest request) {
@@ -259,7 +260,7 @@ public class SheetDesignConditionController extends BaseEntityController<SheetDe
 		}
 	}
  
-	@Override
+	
 	@RequestMapping(value = MAPPING_PATH_FIND_BY_PAGE)
 	public ResponseResult findByPage(HttpServletRequest request) {
 		return null;
@@ -285,7 +286,7 @@ public class SheetDesignConditionController extends BaseEntityController<SheetDe
     public ResponseResult moveUp(HttpServletRequest request, HttpServletResponse response, SheetDesignCondition entity) {
         try{
         	UUID designId = UUID.fromString(request.getParameter("designId"));
-        	entity.setLastModifiedBy(getCurrentLoggedInUser().getId());
+        	entity.setLastModifiedBy(UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId()));
             boolean success = sheetDesignConditionService.moveUp(entity, designId);
             if (success) {
             	return ResponseResult.success(entity,1,"上移成功！");
@@ -308,7 +309,7 @@ public class SheetDesignConditionController extends BaseEntityController<SheetDe
     public ResponseResult moveDown(HttpServletRequest request, HttpServletResponse response, SheetDesignCondition entity) {
         try{
         	UUID designId = UUID.fromString(request.getParameter("designId"));
-        	entity.setLastModifiedBy(getCurrentLoggedInUser().getId());
+        	entity.setLastModifiedBy(UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId()));
             boolean success = sheetDesignConditionService.moveDown(entity, designId);
             if (success) {
             	return ResponseResult.success(entity,1,"下移成功！");

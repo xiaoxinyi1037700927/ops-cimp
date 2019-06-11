@@ -1,11 +1,13 @@
 package com.sinosoft.ops.cimp.controller.sheet;
 
-import com.newskysoft.iimp.common.*;
-import com.newskysoft.iimp.common.controller.BaseEntityController;
-import com.newskysoft.iimp.sheet.model.SheetDesignCarrier;
-import com.newskysoft.iimp.sheet.model.SheetDesignSection;
-import com.newskysoft.iimp.sheet.service.SheetDesignCarrierService;
-import com.newskysoft.iimp.sheet.service.SheetDesignSectionService;
+
+import com.sinosoft.ops.cimp.common.model.*;
+import com.sinosoft.ops.cimp.controller.BaseEntityController;
+import com.sinosoft.ops.cimp.entity.sheet.SheetDesignCarrier;
+import com.sinosoft.ops.cimp.entity.sheet.SheetDesignSection;
+import com.sinosoft.ops.cimp.service.sheet.SheetDesignCarrierService;
+import com.sinosoft.ops.cimp.service.sheet.SheetDesignSectionService;
+import com.sinosoft.ops.cimp.util.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +24,7 @@ import java.util.UUID;
 
 @Controller("sheetDesignSectionController")
 @RequestMapping("sheet/designSection")
-public class SheetDesignSectionController extends BaseEntityController<SheetDesignSection>{
+public class SheetDesignSectionController extends BaseEntityController<SheetDesignSection> {
 
 	private static final Logger logger = LoggerFactory.getLogger(SheetDesignSectionController.class);
 
@@ -33,7 +35,7 @@ public class SheetDesignSectionController extends BaseEntityController<SheetDesi
 	private SheetDesignCarrierService sheetDesignCarrierService;
 
 	@ResponseBody
-	@Override
+	
 	@RequestMapping(value = MAPPING_PATH_CREATE)
 	public ResponseResult create(SheetDesignSection entity) {
 		try {
@@ -54,7 +56,7 @@ public class SheetDesignSectionController extends BaseEntityController<SheetDesi
 	}
 
 	@ResponseBody
-	@Override
+	
 	@RequestMapping(value = MAPPING_PATH_UPDATE)
 	public ResponseResult update(SheetDesignSection entity) {
 		try {
@@ -66,7 +68,7 @@ public class SheetDesignSectionController extends BaseEntityController<SheetDesi
 		}
 	}
 
-	@Override
+	
 	@RequestMapping(value = MAPPING_PATH_DELETE)
 	@ResponseBody
 	public ResponseResult delete(SheetDesignSection entity) {
@@ -80,7 +82,7 @@ public class SheetDesignSectionController extends BaseEntityController<SheetDesi
 	}
 
 	@ResponseBody
-	@Override
+	
 	@RequestMapping(value = MAPPING_PATH_DELETE_BY_ID)
 	public ResponseResult deleteById(HttpServletRequest request) {
 		try {
@@ -94,7 +96,7 @@ public class SheetDesignSectionController extends BaseEntityController<SheetDesi
 	}
 
 	@ResponseBody
-	@Override
+	
 	@RequestMapping(value = MAPPING_PATH_GET_BY_ID)
 	public ResponseResult getById(HttpServletRequest request) {
 		try {
@@ -111,7 +113,7 @@ public class SheetDesignSectionController extends BaseEntityController<SheetDesi
 	}
 
 	@ResponseBody
-	@Override
+	
 	@RequestMapping(value = MAPPING_PATH_FIND_BY_PAGE)
 	public ResponseResult findByPage(HttpServletRequest request) {
 		try {
@@ -208,7 +210,7 @@ public class SheetDesignSectionController extends BaseEntityController<SheetDesi
     public ResponseResult moveUp(HttpServletRequest request, HttpServletResponse response, SheetDesignSection entity) {
         try{
         	UUID designId = UUID.fromString(request.getParameter("designId"));
-        	entity.setLastModifiedBy(getCurrentLoggedInUser().getId());
+        	entity.setLastModifiedBy(UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId()));
             boolean success = SheetDesignSectionService.moveUp(entity, designId);
             if (success) {
             	return ResponseResult.success(entity,1,"上移成功！");
@@ -231,7 +233,7 @@ public class SheetDesignSectionController extends BaseEntityController<SheetDesi
     public ResponseResult moveDown(HttpServletRequest request, HttpServletResponse response, SheetDesignSection entity) {
         try{
         	UUID designId = UUID.fromString(request.getParameter("designId"));
-        	entity.setLastModifiedBy(getCurrentLoggedInUser().getId());
+        	entity.setLastModifiedBy(UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId()));
             boolean success = SheetDesignSectionService.moveDown(entity, designId);
             if (success) {
             	return ResponseResult.success(entity,1,"下移成功！");
@@ -248,14 +250,14 @@ public class SheetDesignSectionController extends BaseEntityController<SheetDesi
 	private void addTrackData(SheetDesignSection entity) {
 		// 创建人
         if (entity.getCreatedBy() == null) {
-            entity.setCreatedBy(getCurrentLoggedInUser().getId());
+            entity.setCreatedBy(UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId()));
         }
         // 创建时间
         if (entity.getCreatedTime() == null) {
             entity.setCreatedTime(new Timestamp(System.currentTimeMillis()));
         }
         // 最后修改人
-        entity.setLastModifiedBy(getCurrentLoggedInUser().getId());
+        entity.setLastModifiedBy(UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId()));
         // 最后修改时间
         entity.setLastModifiedTime(new Timestamp(System.currentTimeMillis()));
 

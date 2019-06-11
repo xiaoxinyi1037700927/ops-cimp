@@ -1,10 +1,11 @@
 package com.sinosoft.ops.cimp.controller.sheet;
 
-import java.sql.Timestamp;
-import java.util.UUID;
-
-import javax.servlet.http.HttpServletRequest;
-
+import com.sinosoft.ops.cimp.common.model.DataStatus;
+import com.sinosoft.ops.cimp.common.model.ResponseResult;
+import com.sinosoft.ops.cimp.controller.BaseEntityController;
+import com.sinosoft.ops.cimp.entity.sheet.SheetDesignSql;
+import com.sinosoft.ops.cimp.service.sheet.SheetDesignSqlService;
+import com.sinosoft.ops.cimp.util.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,12 +13,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.newskysoft.iimp.common.DataStatus;
-import com.newskysoft.iimp.common.ResponseResult;
-import com.newskysoft.iimp.common.controller.BaseEntityController;
-import com.newskysoft.iimp.sheet.model.SheetDesignField;
-import com.newskysoft.iimp.sheet.model.SheetDesignSql;
-import com.newskysoft.iimp.sheet.service.SheetDesignSqlService;
+import javax.servlet.http.HttpServletRequest;
+import java.sql.Timestamp;
+import java.util.UUID;
+
 
 /**
  * 
@@ -30,14 +29,14 @@ import com.newskysoft.iimp.sheet.service.SheetDesignSqlService;
  */
 @Controller
 @RequestMapping("sheetDesignSqlController")
-public class SheetDesignSqlController extends BaseEntityController<SheetDesignSql>{
+public class SheetDesignSqlController extends BaseEntityController<SheetDesignSql> {
 	
 	private static final Logger logger = LoggerFactory.getLogger(SheetDesignSqlController.class);
 	
 	@Autowired
 	private SheetDesignSqlService sheetDesignSqlService;
 
-	@Override
+	
 	@RequestMapping(value=MAPPING_PATH_CREATE)
 	@ResponseBody
 	public ResponseResult create(SheetDesignSql entity) {
@@ -52,7 +51,7 @@ public class SheetDesignSqlController extends BaseEntityController<SheetDesignSq
 		}
 	}
 
-	@Override
+	
 	@RequestMapping(value=MAPPING_PATH_UPDATE)
 	@ResponseBody
 	public ResponseResult update(SheetDesignSql entity) {
@@ -67,7 +66,7 @@ public class SheetDesignSqlController extends BaseEntityController<SheetDesignSq
 		}
 	}
 
-	@Override
+	
 	@RequestMapping(value=MAPPING_PATH_DELETE)
 	@ResponseBody
 	public ResponseResult delete(SheetDesignSql entity) {
@@ -81,7 +80,7 @@ public class SheetDesignSqlController extends BaseEntityController<SheetDesignSq
 		}
 	}
 
-	@Override
+	
 	@RequestMapping(value=MAPPING_PATH_DELETE_BY_ID)
 	@ResponseBody
 	public ResponseResult deleteById(HttpServletRequest request) {
@@ -95,7 +94,7 @@ public class SheetDesignSqlController extends BaseEntityController<SheetDesignSq
 		}
 	}
 
-	@Override
+	
 	@RequestMapping(value=MAPPING_PATH_GET_BY_ID)
 	@ResponseBody
 	public ResponseResult getById(HttpServletRequest request) {
@@ -109,7 +108,7 @@ public class SheetDesignSqlController extends BaseEntityController<SheetDesignSq
 		}
 	}
 
-	@Override
+	
 	public ResponseResult findByPage(HttpServletRequest request) {
 		// TODO 根据业务后续完善
 		return null;
@@ -118,14 +117,14 @@ public class SheetDesignSqlController extends BaseEntityController<SheetDesignSq
 	private void addTrackData(SheetDesignSql entity) {
 		// 创建人
         if (entity.getCreatedBy() == null) {
-            entity.setCreatedBy(getCurrentLoggedInUser().getId());
+            entity.setCreatedBy(UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId()));
         }
         // 创建时间
         if (entity.getCreatedTime() == null) {
             entity.setCreatedTime(new Timestamp(System.currentTimeMillis()));
         }
         // 最后修改人
-        entity.setLastModifiedBy(getCurrentLoggedInUser().getId());
+        entity.setLastModifiedBy(UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId()));
         // 最后修改时间
         entity.setLastModifiedTime(new Timestamp(System.currentTimeMillis()));
 

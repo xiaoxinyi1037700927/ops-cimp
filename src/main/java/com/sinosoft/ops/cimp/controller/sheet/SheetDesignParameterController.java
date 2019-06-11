@@ -5,15 +5,17 @@
  */
 package com.sinosoft.ops.cimp.controller.sheet;
 
-import com.newskysoft.iimp.common.DataStatus;
-import com.newskysoft.iimp.common.ResponseResult;
-import com.newskysoft.iimp.common.controller.BaseEntityController;
-import com.newskysoft.iimp.sheet.model.SheetDesign;
-import com.newskysoft.iimp.sheet.model.SheetDesignParameter;
-import com.newskysoft.iimp.sheet.service.SheetDesignParameterService;
-import com.newskysoft.iimp.sheet.service.SheetDesignService;
-import com.newskysoft.iimp.system.model.SysParameter;
-import com.newskysoft.iimp.system.service.SysParameterService;
+
+import com.sinosoft.ops.cimp.common.model.DataStatus;
+import com.sinosoft.ops.cimp.common.model.ResponseResult;
+import com.sinosoft.ops.cimp.controller.BaseEntityController;
+import com.sinosoft.ops.cimp.entity.sheet.SheetDesign;
+import com.sinosoft.ops.cimp.entity.sheet.SheetDesignParameter;
+import com.sinosoft.ops.cimp.entity.system.SysParameter;
+import com.sinosoft.ops.cimp.service.sheet.SheetDesignParameterService;
+import com.sinosoft.ops.cimp.service.sheet.SheetDesignService;
+import com.sinosoft.ops.cimp.service.system.SysParameterService;
+import com.sinosoft.ops.cimp.util.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,14 +51,14 @@ public class SheetDesignParameterController extends BaseEntityController<SheetDe
     private SheetDesignService sheetDesignService;
 
     @ResponseBody
-    @Override
+    
     @RequestMapping(value = MAPPING_PATH_CREATE)
     public ResponseResult create(SheetDesignParameter entity) {
         try {
-            entity.setCreatedBy(this.getCurrentLoggedInUser().getId());
+            entity.setCreatedBy(UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId()));
             entity.setCreatedTime(new Timestamp(System.currentTimeMillis()));
             entity.setLastModifiedTime(new Timestamp(System.currentTimeMillis()));
-            entity.setId(UUID.randomUUID());
+            entity.setId(UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId()));
             entity.setStatus(DataStatus.NORMAL.getValue());
             entity.setOrdinal(sheetDesignParameterService.getNextOrdinal());
             sheetDesignParameterService.create(entity);
@@ -68,7 +70,7 @@ public class SheetDesignParameterController extends BaseEntityController<SheetDe
     }
 
     @ResponseBody
-    @Override
+    
     @RequestMapping(value = MAPPING_PATH_UPDATE)
     public ResponseResult update(SheetDesignParameter entity) {
         try {
@@ -82,7 +84,7 @@ public class SheetDesignParameterController extends BaseEntityController<SheetDe
 
 
     @ResponseBody
-    @Override
+    
     @RequestMapping(value = MAPPING_PATH_DELETE_BY_ID)
     public ResponseResult deleteById(HttpServletRequest request) {
         try {
@@ -95,7 +97,7 @@ public class SheetDesignParameterController extends BaseEntityController<SheetDe
     }
 
     @ResponseBody
-    @Override
+    
     @RequestMapping(value = MAPPING_PATH_GET_BY_ID)
     public ResponseResult getById(HttpServletRequest request) {
         try {
@@ -220,7 +222,7 @@ public class SheetDesignParameterController extends BaseEntityController<SheetDe
     public ResponseResult moveUp(HttpServletRequest request, HttpServletResponse response, SheetDesignParameter entity) {
         try{
         	UUID designId = UUID.fromString(request.getParameter("designId"));
-        	entity.setLastModifiedBy(getCurrentLoggedInUser().getId());
+        	entity.setLastModifiedBy(UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId()));
             boolean success = sheetDesignParameterService.moveUp(entity, designId);
             if (success) {
             	return ResponseResult.success(entity,1,"上移成功！");
@@ -243,7 +245,7 @@ public class SheetDesignParameterController extends BaseEntityController<SheetDe
     public ResponseResult moveDown(HttpServletRequest request, HttpServletResponse response, SheetDesignParameter entity) {
         try{
         	UUID designId = UUID.fromString(request.getParameter("designId"));
-        	entity.setLastModifiedBy(getCurrentLoggedInUser().getId());
+        	entity.setLastModifiedBy(UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId()));
             boolean success = sheetDesignParameterService.moveDown(entity, designId);
             if (success) {
             	return ResponseResult.success(entity,1,"下移成功！");
@@ -256,13 +258,13 @@ public class SheetDesignParameterController extends BaseEntityController<SheetDe
         }
     }
 
-	@Override
+	
 	public ResponseResult delete(SheetDesignParameter entity) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
+	
 	public ResponseResult findByPage(HttpServletRequest request) {
 		// TODO Auto-generated method stub
 		return null;

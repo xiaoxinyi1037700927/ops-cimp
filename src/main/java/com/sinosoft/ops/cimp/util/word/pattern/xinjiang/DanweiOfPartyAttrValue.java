@@ -1,13 +1,12 @@
 package com.sinosoft.ops.cimp.util.word.pattern.xinjiang;
 
-import java.util.ArrayList;
+import com.sinosoft.ops.cimp.service.word.ExportService;
+import com.sinosoft.ops.cimp.util.StringUtil;
+
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 
-import com.newskysoft.iimp.word.service.ExportService;
-import com.newskysoft.iimp.word.util.StringUtil;
 
 /**
  * @classname:  DanweiOfPartyAttrValue

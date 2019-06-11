@@ -1,14 +1,14 @@
 package com.sinosoft.ops.cimp.controller.sheet;
 
 import com.google.common.base.Throwables;
-import com.newskysoft.iimp.common.DataStatus;
-import com.newskysoft.iimp.common.ResponseResult;
-import com.newskysoft.iimp.common.TreeNode;
-import com.newskysoft.iimp.common.controller.BaseEntityController;
-import com.newskysoft.iimp.common.model.DefaultTreeNode;
-import com.newskysoft.iimp.sheet.model.SheetDesignExpression;
-import com.newskysoft.iimp.sheet.model.SheetDesignParameter;
-import com.newskysoft.iimp.sheet.service.SheetDesignExpressionService;
+import com.sinosoft.ops.cimp.common.model.TreeNode;
+import com.sinosoft.ops.cimp.common.model.DataStatus;
+import com.sinosoft.ops.cimp.common.model.DefaultTreeNode;
+import com.sinosoft.ops.cimp.common.model.ResponseResult;
+import com.sinosoft.ops.cimp.controller.BaseEntityController;
+import com.sinosoft.ops.cimp.entity.sheet.SheetDesignExpression;
+import com.sinosoft.ops.cimp.service.sheet.SheetDesignExpressionService;
+import com.sinosoft.ops.cimp.util.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +33,7 @@ import java.util.UUID;
  */
 @Controller("SheetDesignExpressionController")
 @RequestMapping("sheet/sheetDesignExpression")
-public class SheetDesignExpressionController extends BaseEntityController<SheetDesignExpression>{
+public class SheetDesignExpressionController extends BaseEntityController<SheetDesignExpression> {
 	private static final Logger logger = LoggerFactory.getLogger(SheetDesignExpressionController.class);
 	@Autowired
 	private SheetDesignExpressionService sheetDesignExpressionService;
@@ -109,7 +109,7 @@ public class SheetDesignExpressionController extends BaseEntityController<SheetD
 	}
 	@ResponseBody
 	@RequestMapping(value = MAPPING_PATH_GET_BY_ID)
-	@Override
+	
 	public ResponseResult getById(HttpServletRequest request) {
 		try{
 			SheetDesignExpression entity = sheetDesignExpressionService.getById(toUUID(request.getParameter("id")));
@@ -122,7 +122,7 @@ public class SheetDesignExpressionController extends BaseEntityController<SheetD
 
 	@ResponseBody
 	@RequestMapping(value = MAPPING_PATH_UPDATE)
-	@Override
+	
 	public ResponseResult update(SheetDesignExpression entity) {
 		try {
 			SheetDesignExpression expression = sheetDesignExpressionService.getById(entity.getId());
@@ -140,7 +140,7 @@ public class SheetDesignExpressionController extends BaseEntityController<SheetD
 
 	@ResponseBody
 	@RequestMapping(value = MAPPING_PATH_DELETE_BY_ID)
-	@Override
+	
 	public ResponseResult deleteById(HttpServletRequest request) {
 		try{
 			sheetDesignExpressionService.deleteById(toUUID(request.getParameter("id")));
@@ -162,7 +162,7 @@ public class SheetDesignExpressionController extends BaseEntityController<SheetD
     public ResponseResult moveUp(HttpServletRequest request, HttpServletResponse response, SheetDesignExpression entity) {
         try{
         	UUID designId = UUID.fromString(request.getParameter("designId"));
-        	entity.setLastModifiedBy(getCurrentLoggedInUser().getId());
+        	entity.setLastModifiedBy(UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId()));
             boolean success = sheetDesignExpressionService.moveUp(entity, designId);
             if (success) {
             	return ResponseResult.success(entity,1,"上移成功！");
@@ -185,7 +185,7 @@ public class SheetDesignExpressionController extends BaseEntityController<SheetD
     public ResponseResult moveDown(HttpServletRequest request, HttpServletResponse response, SheetDesignExpression entity) {
         try{
         	UUID designId = UUID.fromString(request.getParameter("designId"));
-        	entity.setLastModifiedBy(getCurrentLoggedInUser().getId());
+        	entity.setLastModifiedBy(UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId()));
             boolean success = sheetDesignExpressionService.moveDown(entity, designId);
             if (success) {
             	return ResponseResult.success(entity,1,"下移成功！");
@@ -216,25 +216,25 @@ public class SheetDesignExpressionController extends BaseEntityController<SheetD
 			entity.setCreatedTime(new Timestamp(System.currentTimeMillis()));;
 		}
 		if(entity.getCreatedBy() == null){
-			entity.setCreatedBy(getCurrentLoggedInUser().getId());
+			entity.setCreatedBy(UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId()));
 		}
 		if(entity.getLastModifiedTime() == null){
 			entity.setLastModifiedTime(new Timestamp(System.currentTimeMillis()));
 		}
 		if(entity.getLastModifiedBy() == null){
-			entity.setLastModifiedBy(UUID.randomUUID());
+			entity.setLastModifiedBy(UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId()));
 		}
 		
 
 	}
 
 
-	@Override
+	
 	public ResponseResult findByPage(HttpServletRequest request) {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	@Override
+	
 	public ResponseResult delete(SheetDesignExpression entity) {
 		// TODO Auto-generated method stub
 		return null;

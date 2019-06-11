@@ -1,16 +1,17 @@
 package com.sinosoft.ops.cimp.controller.sheet;
 
 import com.google.common.base.Throwables;
-import com.newskysoft.iimp.common.ResponseResult;
-import com.newskysoft.iimp.common.controller.BaseEntityController;
-import com.newskysoft.iimp.sheet.SheetDesignBind;
-import com.newskysoft.iimp.sheet.model.SheetDesignCondition;
-import com.newskysoft.iimp.sheet.model.SheetDesignDataSource;
-import com.newskysoft.iimp.sheet.model.SheetDesignField;
-import com.newskysoft.iimp.sheet.service.SheetDesignBindService;
-import com.newskysoft.iimp.sheet.service.SheetDesignConditionService;
-import com.newskysoft.iimp.sheet.service.SheetDesignDataSourceService;
-import com.newskysoft.iimp.sheet.service.SheetDesignFieldService;
+import com.sinosoft.ops.cimp.common.model.ResponseResult;
+import com.sinosoft.ops.cimp.controller.BaseEntityController;
+import com.sinosoft.ops.cimp.entity.sheet.SheetDesignCondition;
+import com.sinosoft.ops.cimp.entity.sheet.SheetDesignDataSource;
+import com.sinosoft.ops.cimp.entity.sheet.SheetDesignField;
+import com.sinosoft.ops.cimp.repository.sheet.impl.SheetDesignBind;
+import com.sinosoft.ops.cimp.service.sheet.SheetDesignBindService;
+import com.sinosoft.ops.cimp.service.sheet.SheetDesignConditionService;
+import com.sinosoft.ops.cimp.service.sheet.SheetDesignDataSourceService;
+import com.sinosoft.ops.cimp.service.sheet.SheetDesignFieldService;
+import com.sinosoft.ops.cimp.util.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +52,7 @@ public class SheetDesignBindController extends BaseEntityController<SheetDesignB
     @RequestMapping("/update")
 	public ResponseResult upate(HttpServletRequest request, HttpServletResponse response, @RequestBody List<SheetDesignBind> sheetDesignBinds) {
     	try{
-    		String userId = getCurrentLoggedInUser().getId().toString().replace("-", "").toUpperCase();
+    		String userId = UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId()).toString().replace("-", "").toUpperCase();
     		int cnt = 0;
     		for(SheetDesignBind sheetDesignBind :sheetDesignBinds) {
 				cnt+=sheetDesignBindService.updateRowCol(sheetDesignBind, userId);
@@ -72,7 +73,7 @@ public class SheetDesignBindController extends BaseEntityController<SheetDesignB
     @RequestMapping("/delete")
 	public ResponseResult delete(HttpServletRequest request, HttpServletResponse response, @RequestBody List<SheetDesignBind> sheetDesignBinds) {
     	try{
-    		String userId = getCurrentLoggedInUser().getId().toString().replace("-", "").toUpperCase();
+    		String userId = UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId()).toString().replace("-", "").toUpperCase();
     		int cnt = 0;
     		for(SheetDesignBind sheetDesignBind :sheetDesignBinds) {
 				cnt+=sheetDesignBindService.deleteRowCol(sheetDesignBind, userId);
@@ -144,37 +145,37 @@ public class SheetDesignBindController extends BaseEntityController<SheetDesignB
 		}
 	}
 
-	@Override
+	
 	public ResponseResult create(SheetDesignBind entity) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
+	
 	public ResponseResult update(SheetDesignBind entity) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
+	
 	public ResponseResult delete(SheetDesignBind entity) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
+	
 	public ResponseResult deleteById(HttpServletRequest request) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
+	
 	public ResponseResult getById(HttpServletRequest request) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
+	
 	public ResponseResult findByPage(HttpServletRequest request) {
 		// TODO Auto-generated method stub
 		return null;

@@ -1,10 +1,10 @@
 package com.sinosoft.ops.cimp.controller.sheet;
 
 import com.google.common.base.Throwables;
-import com.newskysoft.iimp.common.ResponseResult;
-import com.newskysoft.iimp.common.controller.BaseEntityController;
-import com.newskysoft.iimp.sheet.model.SheetDesignPageSetup;
-import com.newskysoft.iimp.sheet.service.SheetDesignPageSetupService;
+import com.sinosoft.ops.cimp.common.model.ResponseResult;
+import com.sinosoft.ops.cimp.controller.BaseEntityController;
+import com.sinosoft.ops.cimp.entity.sheet.SheetDesignPageSetup;
+import com.sinosoft.ops.cimp.service.sheet.SheetDesignPageSetupService;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
-
 import java.util.UUID;
 
 /**
@@ -36,7 +35,7 @@ public class SheetDesignPageSetupController extends BaseEntityController<SheetDe
 
     @ResponseBody
     @RequestMapping(value = MAPPING_PATH_CREATE)//SpringMVC这个类的前段请求路径
-    public ResponseResult create(SheetDesignPageSetup entity,HttpServletRequest request) {
+    public ResponseResult create(SheetDesignPageSetup entity, HttpServletRequest request) {
         try{
         	if(ArrayUtils.isNotEmpty(request.getParameterValues("outputArr"))){
         	    entity.setOutput(String.join(",", request.getParameterValues("outputArr")));
@@ -73,7 +72,7 @@ public class SheetDesignPageSetupController extends BaseEntityController<SheetDe
 
     }
 
-    @Override
+    
     @ResponseBody
     @RequestMapping(value=MAPPING_PATH_GET_BY_ID)
     public ResponseResult getById(HttpServletRequest request) {
@@ -88,7 +87,7 @@ public class SheetDesignPageSetupController extends BaseEntityController<SheetDe
     }
 
 
-    @Override
+    
     @ResponseBody
     @RequestMapping(value=MAPPING_PATH_DELETE_BY_ID)
     public ResponseResult deleteById(HttpServletRequest request) {
@@ -102,12 +101,12 @@ public class SheetDesignPageSetupController extends BaseEntityController<SheetDe
         }
     }
 
-    @Override
+    
     public Class<SheetDesignPageSetup> getClazz() {
         return super.getClazz();
     }
 
-    @Override
+    
     public void setClazz(Class<SheetDesignPageSetup> clazz) {
         super.setClazz(clazz);
     }

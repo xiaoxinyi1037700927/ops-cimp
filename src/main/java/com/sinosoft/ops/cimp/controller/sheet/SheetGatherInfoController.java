@@ -1,12 +1,11 @@
 package com.sinosoft.ops.cimp.controller.sheet;
 
-import java.sql.Timestamp;
-import java.util.List;
-import java.util.UUID;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.sinosoft.ops.cimp.common.model.DataStatus;
+import com.sinosoft.ops.cimp.common.model.ResponseResult;
+import com.sinosoft.ops.cimp.controller.BaseEntityController;
+import com.sinosoft.ops.cimp.entity.sheet.SheetGatherInfo;
+import com.sinosoft.ops.cimp.service.sheet.SheetGatherInfoService;
+import com.sinosoft.ops.cimp.util.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,53 +14,54 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.newskysoft.iimp.common.DataStatus;
-import com.newskysoft.iimp.common.ResponseResult;
-import com.newskysoft.iimp.common.controller.BaseEntityController;
-import com.newskysoft.iimp.sheet.model.SheetData;
-import com.newskysoft.iimp.sheet.model.SheetGatherInfo;
-import com.newskysoft.iimp.sheet.service.SheetGatherInfoService;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.sql.Timestamp;
+import java.util.List;
+import java.util.UUID;
+
+
 
 @Controller
 @RequestMapping("sheetGatherInfo")
-public class SheetGatherInfoController extends BaseEntityController<SheetGatherInfo>{
+public class SheetGatherInfoController extends BaseEntityController<SheetGatherInfo> {
 
 	private static final Logger logger = LoggerFactory.getLogger(SheetGatherInfoController.class);
 	
 	@Autowired
 	private SheetGatherInfoService sheetGatherInfoService;
 	
-	@Override
+	
 	public ResponseResult create(SheetGatherInfo entity) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
+	
 	public ResponseResult update(SheetGatherInfo entity) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
+	
 	public ResponseResult delete(SheetGatherInfo entity) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
+	
 	public ResponseResult deleteById(HttpServletRequest request) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
+	
 	public ResponseResult getById(HttpServletRequest request) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
+	
 	public ResponseResult findByPage(HttpServletRequest request) {
 		// TODO Auto-generated method stub
 		return null;
@@ -103,14 +103,14 @@ public class SheetGatherInfoController extends BaseEntityController<SheetGatherI
 	private void addTrackData(SheetGatherInfo entity) {
 		// 创建人
         if (entity.getCreatedBy() == null) {
-            entity.setCreatedBy(getCurrentLoggedInUser().getId());
+            entity.setCreatedBy(UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId()));
         }
         // 创建时间
         if (entity.getCreatedTime() == null) {
             entity.setCreatedTime(new Timestamp(System.currentTimeMillis()));
         }
         // 最后修改人
-        entity.setLastModifiedBy(getCurrentLoggedInUser().getId());
+        entity.setLastModifiedBy(UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId()));
         // 最后修改时间
         entity.setLastModifiedTime(new Timestamp(System.currentTimeMillis()));
 

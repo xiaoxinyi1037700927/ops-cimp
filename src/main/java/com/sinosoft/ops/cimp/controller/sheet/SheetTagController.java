@@ -27,14 +27,14 @@ import java.util.UUID;
 public class SheetTagController extends BaseEntityController<SheetTag> {
 
 	private static final Logger logger = LoggerFactory.getLogger(SheetTagController.class);
-	
+
 	@Autowired
 	private SheetTagService sheetTagService;
 	@Autowired
 	private SheetComService sheetComService;
 	@Autowired
 	private SheetService sheetService;
-	
+
 	@RequestMapping("/getBySheetId")
 	@ResponseBody
 	public ResponseResult getBySheetId(HttpServletRequest request, HttpServletResponse response, String sheetId){
@@ -52,38 +52,32 @@ public class SheetTagController extends BaseEntityController<SheetTag> {
 			return ResponseResult.failure("获取批注失败");
 		}
 	}
-	
-	@Override
+
 	public ResponseResult create(SheetTag entity) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
 	public ResponseResult update(SheetTag entity) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
 	public ResponseResult delete(SheetTag entity) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
 	public ResponseResult deleteById(HttpServletRequest request) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
 	public ResponseResult getById(HttpServletRequest request) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
 	public ResponseResult findByPage(HttpServletRequest request) {
 		// TODO Auto-generated method stub
 		return null;

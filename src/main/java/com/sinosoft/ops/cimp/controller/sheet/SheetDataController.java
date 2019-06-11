@@ -1,15 +1,17 @@
 package com.sinosoft.ops.cimp.controller.sheet;
 
-import com.newskysoft.iimp.common.DataStatus;
-import com.newskysoft.iimp.common.ResponseResult;
-import com.newskysoft.iimp.common.controller.BaseEntityController;
-import com.newskysoft.iimp.sheet.model.Sheet;
-import com.newskysoft.iimp.sheet.model.SheetData;
-import com.newskysoft.iimp.sheet.model.SheetDesignSection;
-import com.newskysoft.iimp.sheet.service.SheetComService;
-import com.newskysoft.iimp.sheet.service.SheetDataService;
-import com.newskysoft.iimp.sheet.service.SheetDesignSectionService;
-import com.newskysoft.iimp.sheet.service.SheetService;
+
+import com.sinosoft.ops.cimp.common.model.DataStatus;
+import com.sinosoft.ops.cimp.common.model.ResponseResult;
+import com.sinosoft.ops.cimp.controller.BaseEntityController;
+import com.sinosoft.ops.cimp.entity.sheet.Sheet;
+import com.sinosoft.ops.cimp.entity.sheet.SheetData;
+import com.sinosoft.ops.cimp.entity.sheet.SheetDesignSection;
+import com.sinosoft.ops.cimp.service.sheet.SheetComService;
+import com.sinosoft.ops.cimp.service.sheet.SheetDataService;
+import com.sinosoft.ops.cimp.service.sheet.SheetDesignSectionService;
+import com.sinosoft.ops.cimp.service.sheet.SheetService;
+import com.sinosoft.ops.cimp.util.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +38,7 @@ import java.util.UUID;
  */
 @Controller
 @RequestMapping("/sheet/sheetData")
-public class SheetDataController extends BaseEntityController<SheetData>{
+public class SheetDataController extends BaseEntityController<SheetData> {
 	
 	private static final Logger logger = LoggerFactory.getLogger(SheetDataController.class);
 	
@@ -49,37 +51,37 @@ public class SheetDataController extends BaseEntityController<SheetData>{
 	@Autowired
 	private SheetDesignSectionService sheetDesignSectionService;
 
-	@Override
+	
 	public ResponseResult create(SheetData entity) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
+	
 	public ResponseResult update(SheetData entity) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
+	
 	public ResponseResult delete(SheetData entity) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
+	
 	public ResponseResult deleteById(HttpServletRequest request) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
+	
 	public ResponseResult getById(HttpServletRequest request) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
+	
 	public ResponseResult findByPage(HttpServletRequest request) {
 		// TODO Auto-generated method stub
 		return null;
@@ -137,14 +139,14 @@ public class SheetDataController extends BaseEntityController<SheetData>{
 	private void addTrackData(SheetData entity) {
 		// 创建人
         if (entity.getCreatedBy() == null) {
-            entity.setCreatedBy(getCurrentLoggedInUser().getId());
+            entity.setCreatedBy(UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId()));
         }
         // 创建时间
         if (entity.getCreatedTime() == null) {
             entity.setCreatedTime(new Timestamp(System.currentTimeMillis()));
         }
         // 最后修改人
-        entity.setLastModifiedBy(getCurrentLoggedInUser().getId());
+        entity.setLastModifiedBy(UUID.fromString(SecurityUtils.getSubject().getCurrentUser().getId()));
         // 最后修改时间
         entity.setLastModifiedTime(new Timestamp(System.currentTimeMillis()));
 

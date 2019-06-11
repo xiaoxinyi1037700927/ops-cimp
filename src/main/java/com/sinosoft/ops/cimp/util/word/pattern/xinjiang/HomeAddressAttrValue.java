@@ -1,9 +1,11 @@
 package com.sinosoft.ops.cimp.util.word.pattern.xinjiang;
 
+import com.sinosoft.ops.cimp.service.word.ExportService;
+
 import java.util.List;
 import java.util.Map;
 
-import com.newskysoft.iimp.word.service.ExportService;
+
 
 /**
  * @classname:  HomeAddressAttrValue
