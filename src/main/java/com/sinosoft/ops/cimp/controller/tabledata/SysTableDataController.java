@@ -638,7 +638,8 @@ public class SysTableDataController extends BaseController {
             String selectCountFieldEn = viewModel.getSelectCountFieldEn();
             String execCadreCountSql = execCountSql.replaceAll("\\$\\{deptId}", dataOrganizationId)
                     .replaceAll("\\$\\{includeSubNode}", "1")
-                    .replaceAll("\\$\\{custom}", "");
+                    .replaceAll("\\$\\{custom}", "")
+                    .replaceAll("\\$\\{cadreStatus}", "1");
 
             Map<String, Object> countMap = jdbcTemplate.queryForMap(execCadreCountSql);
             Object cadreCount = countMap.get(selectCountFieldEn);
