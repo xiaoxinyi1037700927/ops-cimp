@@ -20,8 +20,12 @@ public class ProposedPostAttrValue implements AttrValue {
 
     @Override
     public Object getAttrValue(Map<String, Object> attrValueContext, String empId) throws Exception {
-        Object var = ExecuteContext.getVariable(KEY);
-        return var != null ? var : "";
+        try {
+            Object var = ExecuteContext.getVariable(KEY);
+            return var != null ? var : "";
+        } catch (Exception e) {
+            return "";
+        }
     }
 
     @Override

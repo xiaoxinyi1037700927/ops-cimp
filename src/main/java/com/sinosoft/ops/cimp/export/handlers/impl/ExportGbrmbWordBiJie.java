@@ -39,12 +39,15 @@ public class ExportGbrmbWordBiJie extends AbstractExportGbrmbBiJie {
             String name = map.get("name").toString();
             String cardNo = map.get("cardNo").toString();
 
-            String baseDir = "";
-            Object isTmp = ExecuteContext.getVariable(ExportConstant.IS_TMP);
-            if (isTmp == null) {
-                baseDir = ExportConstant.EXPORT_BASE_PATH + ExportConstant.EXPORT_GBRMB_WORD;
-            } else {
-                baseDir = ExportConstant.EXPORT_BASE_PATH + ExportConstant.EXPORT_GBRMB_TMP;
+            String baseDir = ExportConstant.EXPORT_BASE_PATH + ExportConstant.EXPORT_GBRMB_WORD;
+
+            try {
+                Object isTmp = ExecuteContext.getVariable(ExportConstant.IS_TMP);
+                if (isTmp != null) {
+                    baseDir = ExportConstant.EXPORT_BASE_PATH + ExportConstant.EXPORT_GBRMB_TMP;
+                }
+            } catch (Exception e) {
+//                e.printStackTrace();
             }
 
             filePath = baseDir + name + cardNo + ExportConstant.RMB_SUFFIX_WORD;

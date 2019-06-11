@@ -22,11 +22,15 @@ public class ExportGbrmbHtmlBiJie extends AbstractExportGbrmbBiJie {
         htmlFileName = empId + ExportConstant.RMB_SUFFIX_HTML;
         pdfFileName = empId + ExportConstant.RMB_SUFFIX_PDF;
 
-        Object isTmp = ExecuteContext.getVariable(ExportConstant.IS_TMP);
-        if (isTmp == null) {
-            fileDir = ExportConstant.EXPORT_BASE_PATH + ExportConstant.EXPORT_GBRMB_HTML;
-        } else {
-            fileDir = ExportConstant.EXPORT_BASE_PATH + ExportConstant.EXPORT_GBRMB_TMP;
+        fileDir = ExportConstant.EXPORT_BASE_PATH + ExportConstant.EXPORT_GBRMB_HTML;
+
+        try {
+            Object isTmp = ExecuteContext.getVariable(ExportConstant.IS_TMP);
+            if (isTmp != null) {
+                fileDir = ExportConstant.EXPORT_BASE_PATH + ExportConstant.EXPORT_GBRMB_TMP;
+            }
+        } catch (Exception e) {
+//            e.printStackTrace();
         }
 
     }
