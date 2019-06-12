@@ -20,10 +20,6 @@ public interface SysAppFieldAccessService {
      */
     void addFieldAccess(SysAppFieldAccessAddModel addModel);
 
-    /**
-     * 删除对表字段的访问权限
-     */
-    void deleteFieldAccess(List<String> ids);
 
     /**
      * 修改对表字段的访问权限
@@ -34,5 +30,20 @@ public interface SysAppFieldAccessService {
      * 获取用户对app下表字段的访问权限
      */
     Map<String, SysAppFieldAccessModel> getFieldAccess(String appCode, String sysTableId);
+
+    /**
+     * 系统应用添加字段同步至角色访问权限
+     *
+     * @param tableSetId
+     * @param fieldSetId
+     */
+    void addField(String tableSetId, String fieldSetId);
+
+    /**
+     * 系统应用删除字段同步至角色访问权限
+     *
+     * @param fieldSetIds
+     */
+    void deleteField(List<String> fieldSetIds);
 
 }

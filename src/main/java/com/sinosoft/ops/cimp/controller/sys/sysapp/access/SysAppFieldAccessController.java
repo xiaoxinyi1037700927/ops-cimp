@@ -4,6 +4,7 @@ import com.sinosoft.ops.cimp.annotation.SystemApiGroup;
 import com.sinosoft.ops.cimp.controller.BaseController;
 import com.sinosoft.ops.cimp.exception.BusinessException;
 import com.sinosoft.ops.cimp.service.sys.sysapp.acess.SysAppFieldAccessService;
+import com.sinosoft.ops.cimp.util.CachePackage.SysTableModelInfoManager;
 import com.sinosoft.ops.cimp.vo.from.sys.sysapp.access.SysAppFieldAccessAddModel;
 import com.sinosoft.ops.cimp.vo.from.sys.sysapp.access.SysAppFieldAccessDeleteModel;
 import com.sinosoft.ops.cimp.vo.from.sys.sysapp.access.SysAppFieldAccessModifyModel;
@@ -39,25 +40,6 @@ public class SysAppFieldAccessController extends BaseController {
         return ok(fieldAccessService.listFieldAccess(searchModel));
     }
 
-//    /**
-//     * 新增对表字段的访问权限
-//     */
-//    @ApiOperation(value = "新增对表字段的访问权限")
-//    @PostMapping("/add")
-//    public ResponseEntity addFieldAccess(@RequestBody SysAppFieldAccessAddModel addModel) throws BusinessException {
-//        fieldAccessService.addFieldAccess(addModel);
-//        return ok("新增成功！");
-//    }
-
-//    /**
-//     * 删除对表字段的访问权限
-//     */
-//    @ApiOperation(value = "删除对表字段的访问权限")
-//    @PostMapping("/delete")
-//    public ResponseEntity deleteFieldAccess(@RequestBody SysAppFieldAccessDeleteModel deleteModel) throws BusinessException {
-//        fieldAccessService.deleteFieldAccess(deleteModel.getIds());
-//        return ok("删除成功！");
-//    }
 
     /**
      * 修改对表字段的访问权限
@@ -65,6 +47,7 @@ public class SysAppFieldAccessController extends BaseController {
     @ApiOperation(value = "修改对表字段的访问权限")
     @PostMapping("/modify")
     public ResponseEntity modifyFieldAccess(@RequestBody SysAppFieldAccessModifyModel modifyModel) throws BusinessException {
+        SysTableModelInfoManager.removeAllCache();
         return fieldAccessService.modifyFieldAccess(modifyModel) ? ok("修改成功！") : fail("修改失败！");
     }
 

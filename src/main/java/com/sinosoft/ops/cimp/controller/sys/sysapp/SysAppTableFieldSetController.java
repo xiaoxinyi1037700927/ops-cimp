@@ -80,7 +80,7 @@ public class SysAppTableFieldSetController extends BaseController {
     /**
      * 修改排序
      */
-    @ApiOperation(value = "交换排序")
+    @ApiOperation(value = "修改排序")
     @PostMapping("/sort/modify")
     public ResponseEntity modifySort(@RequestBody SysAppTableFieldSetSortModel sortModel) throws BusinessException {
         SysTableModelInfoManager.removeAllCache();

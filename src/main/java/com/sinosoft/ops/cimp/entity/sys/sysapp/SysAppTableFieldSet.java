@@ -17,8 +17,6 @@ public class SysAppTableFieldSet implements Serializable {
      * 主键id
      */
     @Id
-    @GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid", strategy = "uuid")
     @Column(name = "ID", length = 36)
     private String id;
     /**

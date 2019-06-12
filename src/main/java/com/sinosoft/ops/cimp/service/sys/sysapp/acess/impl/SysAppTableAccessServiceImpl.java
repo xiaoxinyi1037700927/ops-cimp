@@ -21,11 +21,9 @@ import com.sinosoft.ops.cimp.repository.sys.sysapp.access.SysAppFieldAccessRepos
 import com.sinosoft.ops.cimp.repository.sys.sysapp.access.SysAppTableAccessRepository;
 import com.sinosoft.ops.cimp.service.sys.sysapp.acess.SysAppFieldAccessService;
 import com.sinosoft.ops.cimp.service.sys.sysapp.acess.SysAppTableAccessService;
-import com.sinosoft.ops.cimp.util.IdUtil;
 import com.sinosoft.ops.cimp.util.SecurityUtils;
 import com.sinosoft.ops.cimp.vo.from.sys.sysapp.access.SysAppFieldAccessAddModel;
 import com.sinosoft.ops.cimp.vo.from.sys.sysapp.access.SysAppTableAccessAddModel;
-import com.sinosoft.ops.cimp.vo.from.sys.sysapp.access.SysAppTableAccessModifyModel;
 import com.sinosoft.ops.cimp.vo.from.sys.sysapp.access.SysAppTableAccessSearchModel;
 import com.sinosoft.ops.cimp.vo.to.sys.sysapp.access.SysAppTableAccessModel;
 import com.sinosoft.ops.cimp.vo.to.sys.sysapp.sysApp.SysAppTreeModel;
@@ -35,7 +33,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -155,24 +155,6 @@ public class SysAppTableAccessServiceImpl implements SysAppTableAccessService {
         fieldAccessRepository.deleteBySysAppRoleTableAccessIdIn(ids);
     }
 
-    /**
-     * 修改对表的访问权限
-     */
-    @Transactional
-    @Override
-    public boolean modifyTableAccess(SysAppTableAccessModifyModel modifyModel) {
-        List<SysAppRoleTableAccess> tableAccesses = new ArrayList<>();
-        for (String id : modifyModel.getIds()) {
-            Optional<SysAppRoleTableAccess> tableAccessOptional = tableAccessRepository.findById(id);
-            tableAccessOptional.ifPresent(tableAccess -> {
-                SysAppTableAccessMapper.INSTANCE.modifyModelToTableAccess(modifyModel, tableAccess);
-                tableAccesses.add(tableAccess);
-            });
-        }
-        tableAccessRepository.saveAll(tableAccesses);
-
-        return true;
-    }
 
     /**
      * 获取当前用户对app的表访问权限

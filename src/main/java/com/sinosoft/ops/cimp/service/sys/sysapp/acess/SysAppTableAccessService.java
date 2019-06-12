@@ -2,7 +2,6 @@ package com.sinosoft.ops.cimp.service.sys.sysapp.acess;
 
 import com.sinosoft.ops.cimp.dto.PaginationViewModel;
 import com.sinosoft.ops.cimp.vo.from.sys.sysapp.access.SysAppTableAccessAddModel;
-import com.sinosoft.ops.cimp.vo.from.sys.sysapp.access.SysAppTableAccessModifyModel;
 import com.sinosoft.ops.cimp.vo.from.sys.sysapp.access.SysAppTableAccessSearchModel;
 import com.sinosoft.ops.cimp.vo.to.sys.sysapp.access.SysAppTableAccessModel;
 import com.sinosoft.ops.cimp.vo.to.sys.sysapp.sysApp.SysAppTreeModel;
@@ -26,11 +25,6 @@ public interface SysAppTableAccessService {
      * 删除对表的访问权限
      */
     void deleteTableAccess(List<String> ids);
-
-    /**
-     * 修改对表的访问权限
-     */
-    boolean modifyTableAccess(SysAppTableAccessModifyModel modifyModel);
 
     /**
      * 获取当前用户对app的表访问权限

@@ -19,6 +19,7 @@ import com.sinosoft.ops.cimp.repository.sys.sysapp.SysAppTableSetRepository;
 import com.sinosoft.ops.cimp.repository.sys.sysapp.access.SysAppFieldAccessRepository;
 import com.sinosoft.ops.cimp.repository.sys.systable.SysTableFieldRepository;
 import com.sinosoft.ops.cimp.service.sys.sysapp.SysAppTableFieldSetService;
+import com.sinosoft.ops.cimp.service.sys.sysapp.acess.SysAppFieldAccessService;
 import com.sinosoft.ops.cimp.vo.from.sys.sysapp.sysAppTableFieldSet.*;
 import com.sinosoft.ops.cimp.vo.to.sys.sysapp.sysAppTableFieldSet.SysAppTableFieldModel;
 import com.sinosoft.ops.cimp.vo.to.sys.sysapp.sysAppTableFieldSet.SysAppTableFieldSetModel;
@@ -53,6 +54,9 @@ public class SysAppTableFieldSetServiceImpl implements SysAppTableFieldSetServic
 
     @Autowired
     private SysAppFieldAccessRepository fieldAccessRepository;
+
+    @Autowired
+    private SysAppFieldAccessService fieldAccessService;
 
     /**
      * 获取系统应用字段集合列表
@@ -147,7 +151,12 @@ public class SysAppTableFieldSetServiceImpl implements SysAppTableFieldSetServic
             Integer sort = jpaQueryFactory.select(qFieldSet.sort.max()).from(qFieldSet).where(qFieldSet.sysAppTableFieldGroupId.eq(fieldSet.getSysAppTableFieldGroupId())).fetchOne();
             fieldSet.setSort(sort != null ? ++sort : 0);
 
-            fieldSetRepository.save(fieldSet);
+            fieldSetRepository.saveAndFlush(fieldSet);
+
+            //同步角色访问权限
+            Optional<SysAppTableFieldGroup> fieldGroupOptional = fieldGroupRepository.findById(fieldSet.getSysAppTableFieldGroupId());
+            fieldAccessService.addField(fieldGroupOptional.get().getSysAppTableSetId(), fieldSet.getId());
+
         }
     }
 
