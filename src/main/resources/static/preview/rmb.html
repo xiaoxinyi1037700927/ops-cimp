@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>预览干部任免表</title>
+    <link rel="shortcut icon" href=/static/img/favicon.png>
     <script src="/js/jquery-3.4.1.min.js"></script>
     <script>
 
@@ -28,6 +30,10 @@
             var empId=getPar("empid");
 
            var generate=function(){
+               $("#loading").show();
+               $("#rmb").hide();
+               $("#error").hide();
+
                $.ajax({
                    type: "POST",
                    url: "/export/gbrmb/bj/html/generate",
@@ -64,16 +70,158 @@
                });
            };
             generate();
+
+            $("#reload").click(function () {
+                generate();
+            })
+
+            $("#down").attr("href","/export/gbrmb/bj/word/generateAndExport?empIds="+empId);
+            
+            $("#close").click(function () {
+                var userAgent = navigator.userAgent;
+                if (userAgent.indexOf("Firefox") != -1 || userAgent.indexOf("Chrome") !=-1) {
+                    window.location.href="about:blank";
+                    window.close();
+                } else {
+                    window.opener = null;
+                    window.open("", "_self");
+                    window.close();
+                }
+            })
         });
     </script>
+    <style>
+        *{
+            margin:0;
+            padding:0;
+        }
+        div.container{
+            width:500px;
+            height:500px;
+            margin:50px auto;
+            display:table;
+        }
+        div.wrapper{
+            text-align:center;
+            display:table-cell;
+            vertical-align:middle;
+        }
+        .loading{
+            width: 80px;
+            height: 40px;
+            margin: 0 auto;
+            margin-top:100px;
+        }
+        .loading span{
+            display: inline-block;
+            width: 8px;
+            height: 100%;
+            border-radius: 4px;
+            background: lightgreen;
+            -webkit-animation: load 1s ease infinite;
+        }
+        @-webkit-keyframes load{
+            0%,100%{
+                height: 40px;
+                background: lightgreen;
+            }
+            50%{
+                height: 70px;
+                margin: -15px 0;
+                background: lightblue;
+            }
+        }
+        .loading span:nth-child(2){
+            -webkit-animation-delay:0.2s;
+        }
+        .loading span:nth-child(3){
+            -webkit-animation-delay:0.4s;
+        }
+        .loading span:nth-child(4){
+            -webkit-animation-delay:0.6s;
+        }
+        .loading span:nth-child(5){
+            -webkit-animation-delay:0.8s;
+        }
+        .message{
+            margin-top: 30px;
+            padding-left: 15px;
+            font-size: 14px;
+        }
+        .operate{
+            text-align: right;
+            width: 100%;
+            background-color: rgba(0,0,0,.3);
+            padding: 10px;
+            position: absolute;
+            bottom: 0;
+            right: 0;
+        }
+        .el-button{
+            display: inline-block;
+            line-height: 1;
+            white-space: nowrap;
+            cursor: pointer;
+            background: #fff;
+            border: 1px solid #dcdfe6;
+            color: #606266;
+            -webkit-appearance: none;
+            text-align: center;
+            box-sizing: border-box;
+            outline: 0;
+            margin: 0;
+            transition: .1s;
+            font-weight: 500;
+            -moz-user-select: none;
+            padding: 12px 20px;
+            font-size: 14px;
+            border-radius: 4px;
+        }
+        .el-button--primary {
+            color: #fff;
+            background-color: #409eff;
+            border-color: #409eff;
+        }
+        .el-button--primary:hover {
+            background: #66b1ff;
+            border-color: #66b1ff;
+            color: #fff;
+        }
+        .el-button--primary.is-active, .el-button--primary:active {
+            background: #3a8ee6;
+            border-color: #3a8ee6;
+            color: #fff;
+        }
+
+    </style>
 </head>
 <body>
-<div id="loading">
-任免表生成中...
+<div class="container">
+    <div class="wrapper">
+        <div id="loading" class="loading">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <div class="message">
+            任免表生成中...
+        </div>
+    </div>
 </div>
+
 <div id="error">
 </div>
 <div style="width: 100%;height: 100%;display: none" id="rmb">
 </div>
+
+
+<div  class="operate">
+    <button type="button" class="el-button el-button--primary" id="reload"><span>重新加载任免表</span></button>
+    <a type="button" class="el-button el-button--primary" id="down" href="#" target="_blank"><span>下载</span></a>
+
+    <button  type="button" class="el-button el-button--default" id="close" ><span>关闭</span></button></div>
+
 </body>
 </html>
