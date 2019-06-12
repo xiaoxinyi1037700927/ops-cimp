@@ -13,4 +13,6 @@ public interface SysAppTableAccessRepository extends JpaRepository<SysAppRoleTab
     List<SysAppRoleTableAccess> findByRoleId(String roleId);
 
     void deleteBySysAppTableSetIdIn(List<String> tableSetIds);
+
+    List<SysAppRoleTableAccess> findBySysAppTableSetId(String tableSetId);
 }

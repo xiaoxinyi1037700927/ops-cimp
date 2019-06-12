@@ -13,4 +13,5 @@ public interface SysAppFieldAccessRepository extends JpaRepository<SysAppRoleFie
     void deleteBySysAppTableFieldSetIdIn(List<String> ids);
 
     void deleteBySysAppRoleTableAccessIdIn(List<String> ids);
+
 }

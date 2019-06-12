@@ -7,15 +7,18 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sinosoft.ops.cimp.dto.PaginationViewModel;
 import com.sinosoft.ops.cimp.entity.sys.sysapp.QSysApp;
+import com.sinosoft.ops.cimp.entity.sys.sysapp.QSysAppTableFieldGroup;
 import com.sinosoft.ops.cimp.entity.sys.sysapp.QSysAppTableFieldSet;
 import com.sinosoft.ops.cimp.entity.sys.sysapp.QSysAppTableSet;
 import com.sinosoft.ops.cimp.entity.sys.sysapp.fieldAccess.QSysAppRoleFieldAccess;
 import com.sinosoft.ops.cimp.entity.sys.sysapp.fieldAccess.QSysAppRoleTableAccess;
 import com.sinosoft.ops.cimp.entity.sys.sysapp.fieldAccess.SysAppRoleFieldAccess;
+import com.sinosoft.ops.cimp.entity.sys.sysapp.fieldAccess.SysAppRoleTableAccess;
 import com.sinosoft.ops.cimp.entity.sys.systable.QSysTableField;
 import com.sinosoft.ops.cimp.entity.user.UserRole;
 import com.sinosoft.ops.cimp.mapper.sys.sysapp.access.SysAppFieldAccessMapper;
 import com.sinosoft.ops.cimp.repository.sys.sysapp.access.SysAppFieldAccessRepository;
+import com.sinosoft.ops.cimp.repository.sys.sysapp.access.SysAppTableAccessRepository;
 import com.sinosoft.ops.cimp.service.sys.sysapp.acess.SysAppFieldAccessService;
 import com.sinosoft.ops.cimp.util.IdUtil;
 import com.sinosoft.ops.cimp.util.SecurityUtils;
@@ -34,13 +37,14 @@ import java.util.stream.Collectors;
 public class SysAppFieldAccessServiceImpl implements SysAppFieldAccessService {
 
     private final SysAppFieldAccessRepository fieldAccessRepository;
-
+    private final SysAppTableAccessRepository tableAccessRepository;
     private final JPAQueryFactory jpaQueryFactory;
 
     @Autowired
-    public SysAppFieldAccessServiceImpl(JPAQueryFactory jpaQueryFactory, SysAppFieldAccessRepository fieldAccessRepository) {
+    public SysAppFieldAccessServiceImpl(JPAQueryFactory jpaQueryFactory, SysAppFieldAccessRepository fieldAccessRepository, SysAppTableAccessRepository tableAccessRepository) {
         this.jpaQueryFactory = jpaQueryFactory;
         this.fieldAccessRepository = fieldAccessRepository;
+        this.tableAccessRepository = tableAccessRepository;
     }
 
     /**
@@ -51,6 +55,7 @@ public class SysAppFieldAccessServiceImpl implements SysAppFieldAccessService {
         QSysAppRoleFieldAccess qFieldAccess = QSysAppRoleFieldAccess.sysAppRoleFieldAccess;
         QSysAppTableFieldSet qFieldSet = QSysAppTableFieldSet.sysAppTableFieldSet;
         QSysTableField qSysTableField = QSysTableField.sysTableField;
+        QSysAppTableFieldGroup qFieldGroup = QSysAppTableFieldGroup.sysAppTableFieldGroup;
         int pageSize = searchModel.getPageSize();
         int pageIndex = searchModel.getPageIndex();
 
@@ -64,7 +69,8 @@ public class SysAppFieldAccessServiceImpl implements SysAppFieldAccessService {
                 qFieldSet.id.as("sysAppTableFieldSetId"),
                 qFieldSet.sysTableFieldId
         )).from(qFieldAccess).innerJoin(qFieldSet).on(qFieldSet.id.eq(qFieldAccess.sysAppTableFieldSetId))
-                .innerJoin(qSysTableField).on(qFieldSet.sysTableFieldId.eq(qSysTableField.id));
+                .innerJoin(qSysTableField).on(qFieldSet.sysTableFieldId.eq(qSysTableField.id))
+                .innerJoin(qFieldGroup).on(qFieldGroup.id.eq(qFieldSet.sysAppTableFieldGroupId));
 
         BooleanBuilder builder = new BooleanBuilder();
         builder.and(qFieldAccess.sysAppRoleTableAccessId.eq(searchModel.getSysAppRoleTableAccessId()));
@@ -77,7 +83,7 @@ public class SysAppFieldAccessServiceImpl implements SysAppFieldAccessService {
             builder.and(subBuilder);
         }
 
-        query = query.where(builder).orderBy(qFieldSet.sort.asc());
+        query = query.where(builder).orderBy(qFieldGroup.sort.asc(), qFieldSet.sort.asc());
         if (pageSize > 0 && pageIndex > 0) {
             query = query.offset((pageIndex - 1) * pageSize).limit(pageSize);
         }
@@ -108,19 +114,6 @@ public class SysAppFieldAccessServiceImpl implements SysAppFieldAccessService {
 
         fieldAccessRepository.saveAll(fieldAccesses);
 
-    }
-
-    /**
-     * 删除对表字段的访问权限
-     */
-    @Override
-    public void deleteFieldAccess(List<String> ids) {
-        if (ids == null || ids.size() == 0) {
-            return;
-        }
-        for (String id : ids) {
-            fieldAccessRepository.deleteById(id);
-        }
     }
 
     /**
@@ -185,5 +178,44 @@ public class SysAppFieldAccessServiceImpl implements SysAppFieldAccessService {
         });
 
         return result;
+    }
+
+    /**
+     * 系统应用添加字段同步至角色访问权限
+     *
+     * @param tableSetId
+     * @param fieldSetId
+     */
+    @Override
+    public void addField(String tableSetId, String fieldSetId) {
+        String userId = SecurityUtils.getSubject().getCurrentUser().getId();
+        List<SysAppRoleTableAccess> tableAccesses = tableAccessRepository.findBySysAppTableSetId(tableSetId);
+
+        List<SysAppRoleFieldAccess> fieldAccesses = new ArrayList<>();
+        for (SysAppRoleTableAccess tableAccess : tableAccesses) {
+            SysAppRoleFieldAccess fieldAccess = new SysAppRoleFieldAccess();
+            fieldAccess.setSysAppTableFieldSetId(fieldSetId);
+            fieldAccess.setSysAppRoleTableAccessId(tableAccess.getId());
+            fieldAccess.setCanRead(true);
+            fieldAccess.setCanWrite(true);
+            fieldAccess.setCreateId(userId);
+            fieldAccess.setCreateTime(new Date());
+
+            fieldAccesses.add(fieldAccess);
+        }
+
+        if (fieldAccesses.size() > 0) {
+            fieldAccessRepository.saveAll(fieldAccesses);
+        }
+    }
+
+    /**
+     * 系统应用删除字段同步至角色访问权限
+     *
+     * @param fieldSetIds
+     */
+    @Override
+    public void deleteField(List<String> fieldSetIds) {
+        fieldAccessRepository.deleteBySysAppTableFieldSetIdIn(fieldSetIds);
     }
 }
