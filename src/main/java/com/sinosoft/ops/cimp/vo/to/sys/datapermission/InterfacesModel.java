@@ -26,6 +26,11 @@ public class InterfacesModel {
     @ApiModelProperty(value = "配置类型")
     private String configType;
     /**
+     * 配置类型名称
+     */
+    @ApiModelProperty(value = "配置类型")
+    private String configTypeName;
+    /**
      * sql表达式
      */
     @ApiModelProperty(value = "sql表达式")
@@ -69,5 +74,13 @@ public class InterfacesModel {
 
     public void setSql(String sql) {
         this.sql = sql;
+    }
+
+    public String getConfigTypeName() {
+        return configTypeName;
+    }
+
+    public void setConfigTypeName(String configTypeName) {
+        this.configTypeName = configTypeName;
     }
 }

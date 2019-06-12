@@ -9,6 +9,7 @@ import com.sinosoft.ops.cimp.vo.from.sys.dataPermission.InterfacesSearchModel;
 import com.sinosoft.ops.cimp.vo.to.sys.datapermission.InterfacesModel;
 
 import java.util.List;
+import java.util.Map;
 
 public interface InterfacesService {
     /**
@@ -45,5 +46,5 @@ public interface InterfacesService {
      *
      * @return
      */
-    List<String> getConfigType();
+    List<Map<String,Object>> getConfigType();
 }

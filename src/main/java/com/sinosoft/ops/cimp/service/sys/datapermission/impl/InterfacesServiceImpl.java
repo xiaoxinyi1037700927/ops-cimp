@@ -22,6 +22,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -79,6 +80,7 @@ public class InterfacesServiceImpl implements InterfacesService {
                 .totalCount(total)
                 .data(ifaceList.stream().map(iface -> {
                     InterfacesModel model = InterfacesMapper.INSTANCE.interfacesToModel(iface);
+                    model.setConfigTypeName(ConfigType.getName(iface.getConfigType()));
 
                     if (StringUtils.isNotEmpty(roleId)) {
                         List<RoleDataPermission> pers = roleDataPermissionRepository.findByRoleIdAndInterfaceId(roleId, iface.getId());
@@ -144,7 +146,7 @@ public class InterfacesServiceImpl implements InterfacesService {
      * @return
      */
     @Override
-    public List<String> getConfigType() {
+    public List<Map<String, Object>> getConfigType() {
         return ConfigType.getConfigTypes();
     }
 }
